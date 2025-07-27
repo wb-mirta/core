@@ -36,7 +36,7 @@ function renderTemplate(sourcePath: string, targetPath: string) {
 
   }
 
-  if (['extensions.json', 'settings.json', 'tasks.json'].includes(filename) && fs.existsSync(targetPath)) {
+  if (['extensions.json', 'settings.json', 'tasks.json', 'tsconfig.json'].includes(filename) && fs.existsSync(targetPath)) {
 
     renderJson(sourcePath, targetPath)
     return
