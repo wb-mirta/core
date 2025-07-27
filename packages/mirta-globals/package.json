@@ -1,7 +1,7 @@
 {
   "name": "@mirta/globals",
   "description": "Complete set of types for wb-rule development in TypeScript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Unlicense",
   "keywords": [
     "mirta",
