@@ -1,0 +1,34 @@
+{
+  "name": "@mirta/polyfills",
+  "description": "Modern JavaScript feature polyfills for enhanced wb-rules",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "keywords": [
+    "mirta",
+    "wb-rules"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": "./dist/index.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-polyfills#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-polyfills"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist build",
+    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "prepublishOnly": "pnpm run build"
+  }
+}

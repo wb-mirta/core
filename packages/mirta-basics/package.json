@@ -1,0 +1,41 @@
+{
+  "name": "@mirta/basics",
+  "description": "Utility functions providing core functionality for the Mirta Framework.",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "keywords": [
+    "mirta",
+    "wb-rules"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-basics#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-basics"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist build",
+    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "prepublishOnly": "pnpm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

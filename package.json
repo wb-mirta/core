@@ -1,0 +1,67 @@
+{
+  "private": true,
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "engines": {
+    "node": ">=22.17.1"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "build": "cross-env NODE_ENV=production pnpm --filter './packages/*' run build",
+    "build:dev": "cross-env NODE_ENV=development pnpm --filter './packages/*' run build",
+    "release": "node ./scripts/release.js",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "node scripts/verify-commit.js"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@eslint/json": "^0.13.0",
+    "@mirta/globals": "workspace:*",
+    "@mirta/tsconfig": "workspace:*",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@stylistic/eslint-plugin": "^5.2.0",
+    "@types/node": "^24.0.14",
+    "@types/prompts": "^2.4.9",
+    "chalk": "^5.4.1",
+    "conventional-changelog-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.31.0",
+    "eslint-plugin-vitest": "^0.5.4",
+    "eslint-plugin-workspaces": "^0.11.0",
+    "globals": "^16.3.0",
+    "lint-staged": "^16.1.2",
+    "prompts": "^2.4.2",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.45.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-delete": "^3.0.1",
+    "rollup-plugin-dts": "^6.2.1",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "semver": "^7.7.2",
+    "simple-git-hooks": "^2.13.0",
+    "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.37.0",
+    "vitest": "^3.2.4"
+  }
+}

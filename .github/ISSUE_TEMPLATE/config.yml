@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/wb-mirta/core/discussions
+    about: Пожалуйста, задавайте вопросы и отвечайте на них здесь
+  - name: Уютный чат Wiren Board в Телеграме
+    url: https://t.me/wirenboard
+    about: Официальная группа для обсуждения устройств и обменяться опытом.
+  - name: Канал на Дзене
+    url: https://dzen.ru/wihome
+    about: Об автоматизациях с применением оборудования Wiren Board

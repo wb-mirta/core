@@ -1,0 +1,22 @@
+{
+  "extends": "@mirta/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": [
+      "@mirta/globals",
+      "node",
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "*.ts",
+    "*.mts",
+    "packages/*/src/**/*.ts",
+    "packages/*/tests/**/*.ts",
+    "packages/*/types/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/create-mirta/public/**/*"
+  ]
+}

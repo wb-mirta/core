@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - latest
+  pull_request:
+    branches:
+      - latest
+
+jobs:
+  test:
+    if: ${{ !startsWith(github.event.head_commit.message, 'release:') && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
+    uses: ./.github/workflows/test.yml
+  build:
+    # Prevents this action from running on forks
+    if: github.repository == 'wb-mirta/core'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build

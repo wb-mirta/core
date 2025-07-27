@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "target": "esnext",
+    "module": "esnext",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    // Best practices
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "noImplicitThis": true,
+
+    "skipLibCheck": false,
+    "resolveJsonModule": true,
+
+    "sourceMap": false,
+
+    // Unit-testing requirement
+    "strictNullChecks": true
+  }
+}

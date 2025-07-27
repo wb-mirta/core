@@ -1,0 +1,45 @@
+{
+  "name": "@mirta/testing",
+  "description": "A unit-test runner equipped with built-in Wiren Board runtime emulation",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "keywords": [
+    "mirta",
+    "wb-rules"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-testing#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-testing"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist build",
+    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "mirta": "workspace:*",
+    "vitest-mock-extended": "^3.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

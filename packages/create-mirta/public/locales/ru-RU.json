@@ -1,0 +1,76 @@
+{
+  "title": "Фреймворк для создания правил wb-rules на TypeScript",
+  "intro": "Параметры проекта",
+  "projectName": {
+    "message": "Название (целевая директория):",
+    "errorMessage": "Требуется указать значение"
+  },
+  "packageName": {
+    "message": "Название пакета:",
+    "errorMessage": "Недопустимый формат ввода"
+  },
+  "shouldOverwrite": {
+    "directory": {
+      "current": "Текущая директория",
+      "target": "Указанная директория"
+    },
+    "message": "содержит файлы.",
+    "confirmDelete": "Удалить их?"
+  },
+  "featureSelection": {
+    "message": "Выберите добавляемый функционал:",
+    "hint": "↑/↓ для навигации, пробел для выбора, A - выбрать всё, Enter - подтвердить"
+  },
+  "addEslint": {
+    "message": "ESLint",
+    "hint": "предотвращение потенциальных проблем в коде"
+  },
+  "addVitest": {
+    "message": "Mirta Testing",
+    "hint": "Юнит-тесты и имитатор запуска на контроллере"
+  },
+  "addStore": {
+    "message": "Mirta Store",
+    "hint": "хранилище состояний"
+  },
+  "validation": {
+    "required": "Требуется указать значение"
+  },
+  "status": {
+    "success": "Успешно",
+    "error": "Ошибка",
+    "canceled": "Отменено",
+    "scaffolding": "Генерация файлов проекта в",
+    "scaffolded": "Проект создан",
+    "installingDependencies": "Вызов менеджера пакетов"
+  },
+  "accent": {
+    "recommended": "(рекомендуется)"
+  },
+  "dependencies": {
+    "question": "Установить требуемые зависимости?",
+    "current": {
+      "message": "Да, используя"
+    },
+    "pnpm": {
+      "message": "Да, используя pnpm",
+      "hint": "рекомендуется"
+    },
+    "yarn": {
+      "message": "Да, используя yarn"
+    },
+    "npm": {
+      "message": "Да, используя npm"
+    },
+    "bun": {
+      "message": "Да, используя bun"
+    },
+    "no": {
+      "message": "Нет, разберусь с этим самостоятельно"
+    }
+  },
+  "errors": {
+    "operationCanceled": "Операция прервана",
+    "rootIsNotRelative": "Расположение находится вне рабочей директории"
+  }
+}

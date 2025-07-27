@@ -1,0 +1,41 @@
+{
+  "files.eol": "\n",
+  "task.autoDetect": "off",
+  "todohighlight.keywords": [
+    {
+      "text": "DEBUG:",
+      "color": "#F0F4C3",
+      "backgroundColor": "#827717"
+    },
+    {
+      "text": "REVIEW:",
+      "color": "#DCEDC8",
+      "backgroundColor": "#33691E"
+    },
+    {
+      "text": "NOTE:",
+      "color": "#B3E5FC",
+      "backgroundColor": "#01579B"
+    },
+    {
+      "text": "HACK:",
+      "color": "#FFCDD2",
+      "backgroundColor": "#B71C1C"
+    },
+    {
+      "text": "FIXME:",
+      "color": "#F8BBD0",
+      "backgroundColor": "#880E4F"
+    },
+    {
+      "text": "TODO:",
+      "color": "#FFE0B2",
+      "backgroundColor": "#E65100"
+    }
+  ],
+  "todohighlight.defaultStyle": {
+    "cursor": "pointer",
+    "fontWeight": "bold",
+    "borderRadius": "2px"
+  }
+}

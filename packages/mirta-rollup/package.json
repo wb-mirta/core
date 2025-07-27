@@ -1,0 +1,57 @@
+{
+  "name": "@mirta/rollup",
+  "description": "Predefined Rollup configuration for wb-rules project builds.",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "keywords": [
+    "mirta",
+    "wb-rules"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-rollup"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist build",
+    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@dotenv-run/rollup": "^1.3.7",
+    "@mirta/polyfills": "workspace:*",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "del": "^8.0.0",
+    "magic-string": "^0.30.17",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "rollup": "^4.45.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

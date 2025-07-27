@@ -1,0 +1,75 @@
+{
+  "title": "The Framework to write wb-rules in TypeScript",
+  "intro": "Project Settings",
+  "projectName": {
+    "message": "Project Name (target directory):"
+  },
+  "packageName": {
+    "message": "Package name:",
+    "errorMessage": "Format is not valid"
+  },
+  "shouldOverwrite": {
+    "directory": {
+      "current": "Current directory",
+      "target": "Target directory"
+    },
+    "message": "is not empty.",
+    "confirmDelete": "Remove existing files before continue?"
+  },
+  "featureSelection": {
+    "message": "Select features to include in your project:",
+    "hint": "↑/↓ to navigate, space to select, A to toggle all, Enter to confirm"
+  },
+  "addEslint": {
+    "message": "ESLint",
+    "hint": "error prevention"
+  },
+  "addVitest": {
+    "message": "Mirta Testing",
+    "hint": "Vitest, unit-testing and simulations"
+  },
+  "addStore": {
+    "message": "Mirta Store",
+    "hint": "state management"
+  },
+  "validation": {
+    "required": "Must be provided"
+  },
+  "status": {
+    "success": "Success",
+    "error": "Error",
+    "canceled": "Canceled",
+    "scaffolding": "Scaffolding project in",
+    "scaffolded": "The project has been scaffolded",
+    "installingDependencies": "Calling the package manager"
+  },
+  "accent": {
+    "recommended": "(recommended)"
+  },
+  "dependencies": {
+    "question": "Install project dependencies?",
+    "current": {
+      "message": "Yes, use"
+    },
+    "pnpm": {
+      "message": "Yes, use PNPM",
+      "hint": "recommended"
+    },
+    "yarn": {
+      "message": "Yes, use Yarn"
+    },
+    "npm": {
+      "message": "Yes, use NPM"
+    },
+    "bun": {
+      "message": "Yes, use Bun"
+    },
+    "no": {
+      "message": "No, I will handle that myself"
+    }
+  },
+  "errors": {
+    "operationCanceled": "Operation canceled",
+    "rootIsNotRelative": "Location is out of working directory"
+  }
+}

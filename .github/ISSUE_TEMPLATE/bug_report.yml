@@ -1,0 +1,77 @@
+name: Bug Report
+description: Отправьте отчёт об ошибке
+labels: [triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо, что уделяете время заполнению данного отчёта. Обратите внимание, шаблон предназначен только для отчётов о багах. Используйте раздел [GitHub Discussions](https://github.com/wb-mirta/core/discussions) при возникновении каких-либо вопросов.
+  - type: checkboxes
+    id: preconditions
+    attributes:
+      label: Что нужно проверить
+      options:
+        - label: Я выполнил поиск этого бага в **существующих Issues**
+          required: true
+    validations:
+      required: true
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Тип бага
+      multiple: true
+      options:
+        - Правила wb-rules
+        - Модули правил wb-rules
+        - Настройки проекта
+        - Документация
+        - Другое
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Что случилось?
+      description: Пожалуйста, кратко опишите проблему. Вы можете использовать фрагменты кода, скриншоты или видео для более лучшего объяснения сути. Пожалуйста, публикуйте фрагменты кода, заключая их в обратные кавычки, а не в виде скриншотов.
+      placeholder: Опишите проблему!
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Ожидаемое поведение
+      description: Пожалуйста, предоставьте чёткое и лаконичное описание ожидаемого поведения.
+      placeholder: Опишите ожидаемое поведение!
+    validations:
+      required: true
+  - type: input
+    id: repro-link
+    attributes:
+      label: Ссылка на воспроизведение
+      description: По возможности, предоставьте ссылку на минимальный и достаточный для воспроизведения проблемы репозиторий GitHub (без полных приложений).
+      placeholder: https://github.com/*
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: Шаги для воспроизведения
+      description: Как вы поймали этот баг? Пожалуйста, расскажите нам об этом шаг за шагом.
+      value: |
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Релевантные логи
+      description: Пожалуйста, скопируйте и вставьте соответствующие данные логов. Текст будет автоматически отформатирован как код, поэтому нет необходимости в использовании обратных кавычек.
+      render: shell
+  - type: checkboxes
+    id: pr
+    attributes:
+      label: Pull Request
+      description: Если вам нужно исправить это в ближайшее время, рассмотрите возможность отправки запроса на внесение изменений. Вклад сообщества в развитие проекта очень ценен!
+      options:
+        - label: Я планирую подготовить Pull Request

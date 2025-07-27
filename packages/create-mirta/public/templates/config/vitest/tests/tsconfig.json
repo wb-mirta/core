@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "paths": {
+      "@wb/*": ["../src/wb-rules/*"],
+      "@wbm/*": ["../src/wb-rules-modules/*"]
+    }
+  }
+}

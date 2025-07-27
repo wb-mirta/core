@@ -1,0 +1,33 @@
+{
+  "name": "@mirta/tsconfig",
+  "description": "Base TSConfig for working with Mirta",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "keywords": [
+    "mirta",
+    "wb-rules",
+    "tsconfig"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "tsconfig.json"
+  ],
+  "exports": {
+    ".": {
+      "default": "./tsconfig.json"
+    }
+  },
+  "homepage": "https://github.com/wb-mirta/core/packages/mirta-tsconfig#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-tsconfig"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
