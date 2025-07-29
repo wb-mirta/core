@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "Unlicense",
   "engines": {
     "node": ">=22.17.1"
