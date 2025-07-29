@@ -15,6 +15,12 @@ export const featureFlags = ({
 
 export const allOptions = ({
   ...featureFlags,
+  ssh: {
+    type: 'string',
+  },
+  rutoken: {
+    type: 'boolean',
+  },
   version: {
     type: 'boolean',
     short: 'v',
@@ -23,12 +29,12 @@ export const allOptions = ({
     type: 'boolean',
     short: 'f',
   },
-  help: {
-    type: 'boolean',
-    short: 'h',
-  },
   bare: {
     type: 'boolean',
     short: 'b',
+  },
+  help: {
+    type: 'boolean',
+    short: 'h',
   },
 }) as const

@@ -43,7 +43,7 @@ export function usePrompts(messages: Localized) {
     cancel,
     prompt,
     step: p.log.step,
-    note: p.note,
+    message: p.log.message,
     inlineSub,
   }
 

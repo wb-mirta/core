@@ -23,7 +23,10 @@ export interface LocalizedItemRequired {
 
 export interface Localized {
   title: string
-  intro: string
+  captions: {
+    intro: string
+    deploy: string
+  }
   projectName: LocalizedItem
   packageName: LocalizedItem
   shouldOverwrite: {
@@ -33,6 +36,12 @@ export interface Localized {
     }
     message: string
     confirmDelete: string
+  }
+  ssh: {
+    username: string
+    host: string
+    port: string
+    useRutoken: string
   }
   featureSelection: LocalizedItem
   addEslint: LocalizedItem
@@ -51,6 +60,7 @@ export interface Localized {
   }
   accent: {
     recommended: string
+    ifConfigured: string
   }
   dependencies: {
     question: string

@@ -25,6 +25,10 @@ ${yellow('Feature flags:')}
     ${dim('Add store for state management')}
 
 ${yellow('Options:')}
+  --ssh
+    ${dim('Set SSH destination of deployment process as [username@][hostname][:port]')}
+  --rutoken
+    ${dim('Use Rutoken ECP as encrypted store of SSH private key')}
   -v, --version
     ${dim('Display the version number of this CLI')}
   -f, --force
@@ -55,6 +59,10 @@ ${yellow('Флаги функционала:')}
     ${dim('Добавить хранилище состояний')}
 
 ${yellow('Опции:')}
+  --ssh
+    ${dim('Настроить подключение SSH для деплоя в формате [username@][hostname][:port]')}
+  --rutoken
+    ${dim('Использовать Рутокен ЭЦП в качестве хранилища для закрытого ключа SSH')}
   -v, --version
     ${dim('Отобразить номер версии данного CLI')}
   -f, --force

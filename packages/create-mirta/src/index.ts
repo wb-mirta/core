@@ -13,6 +13,7 @@ import chalk from 'chalk'
 import { type CliScope } from './types'
 import { featureFlags, allOptions } from './cli-options'
 import { getLocalized } from './utils/localization'
+import { parseUrl } from './utils/parsers'
 
 import renderTemplate from './utils/render-template'
 import renderEslintConfig from './utils/render-eslint-config'
@@ -52,7 +53,7 @@ const featureOptions: FeatureOption[] = [
   },
 ]
 
-const { prompt, cancel, step, inlineSub } = usePrompts(messages)
+const { prompt, cancel, step, message, inlineSub } = usePrompts(messages)
 
 function isValidPackageName(packageName: string) {
 
@@ -108,19 +109,32 @@ async function run() {
 
   const shouldOverwrite = argv.force
 
+  const sshAddress = parseUrl(argv.ssh)
+  const sshDefaultUser = 'root'
+  const sshDefaultHost = '10.200.200.1'
+  const sshDefaultPort = '22'
+
+  const sshFullyDefined = !!(sshAddress.username && sshAddress.hostname)
+
   const scope: CliScope = {
     projectName: defaultProjectName,
     projectRoot: '',
     packageName: defaultProjectName,
     shouldOverwrite,
+
     features: [],
+
+    sshUsername: sshAddress.username,
+    sshHostname: sshAddress.hostname,
+    sshPort: sshAddress.port,
+    rutoken: argv.rutoken,
   }
 
   console.log(banner)
   console.log(messages.title)
   console.log()
 
-  intro(chalk.bgYellow.black(` ${messages.intro} `))
+  intro(chalk.bgBlackBright.black(` ${messages.captions.intro} `))
 
   if (!targetDir) {
 
@@ -196,6 +210,95 @@ async function run() {
 
   }
 
+  message(chalk.bgBlackBright.black(
+    ` ${messages.captions.deploy} `
+  ))
+
+  if (!scope.sshUsername) {
+
+    scope.sshUsername = await prompt(
+      text({
+        message: messages.ssh.username,
+        placeholder: sshDefaultUser,
+        defaultValue: sshDefaultUser,
+        validate: (value) => {
+
+          if (value.length !== 0 && value.trim().length === 0)
+            return messages.validation.required
+
+        },
+      })
+    )
+
+  }
+  else {
+
+    step(`${messages.ssh.username}\n${dim(scope.sshUsername)}`)
+
+  }
+
+  if (!scope.sshHostname) {
+
+    scope.sshHostname = await prompt(
+      text({
+        message: messages.ssh.host,
+        placeholder: sshDefaultHost,
+        defaultValue: sshDefaultHost,
+        validate: (value) => {
+
+          if (value.length !== 0 && value.trim().length === 0)
+            return messages.validation.required
+
+        },
+      })
+    )
+
+  }
+  else {
+
+    step(`${messages.ssh.host}\n${dim(scope.sshHostname)}`)
+
+  }
+
+  if (!sshFullyDefined && !scope.sshPort) {
+
+    scope.sshPort = await prompt(
+      text({
+        message: messages.ssh.port,
+        placeholder: sshDefaultPort,
+        defaultValue: sshDefaultPort,
+        validate: (value) => {
+
+          if (value.length !== 0 && value.trim().length === 0)
+            return messages.validation.required
+
+        },
+      })
+    )
+
+  }
+  else if (scope.sshPort) {
+
+    step(`${messages.ssh.port}\n${dim(scope.sshPort)}`)
+
+  }
+
+  if (!sshFullyDefined && !scope.rutoken) {
+
+    scope.rutoken = await prompt(
+      confirm({
+        message: `${messages.ssh.useRutoken} ${dim(messages.accent.ifConfigured)}`,
+        initialValue: false,
+      })
+    )
+
+  }
+  else if (scope.rutoken) {
+
+    step(`${messages.ssh.useRutoken} ${dim(messages.accent.ifConfigured)}\n${dim('Yes')}`)
+
+  }
+
   if (!isFeatureFlagsUsed) {
 
     scope.features = await prompt(
@@ -229,7 +332,42 @@ async function run() {
 
   step(`${messages.status.scaffolding} ${yellow(root)}`)
 
-  const pkg = { name: scope.packageName, version: '0.0.0' }
+  const pkg = {
+    name: scope.packageName,
+    version: '0.0.0',
+    scripts: {
+      'wb:deploy': '',
+    },
+  }
+
+  const deployScript: string[] = ['rsync']
+
+  if (process.platform === 'win32') {
+
+    // Run rsync trough WSL on Windows systems.
+    deployScript.unshift('wsl ')
+
+  }
+
+  if (scope.rutoken || scope.sshPort) {
+
+    deployScript.push(' -e \'ssh')
+
+    if (scope.rutoken)
+      deployScript.push(' -I /usr/lib/librtpkcs11ecp.so')
+
+    if (scope.sshPort)
+      deployScript.push(` -p ${scope.sshPort}`)
+
+    deployScript.push('\'')
+
+  }
+
+  deployScript.push(' -rltzvgO --progress --delete --exclude=\'alarms.conf\'')
+  deployScript.push(' --groupmap=\'*:developers\' dist/es5/*')
+  deployScript.push(` '${scope.sshUsername}@${scope.sshHostname}:/mnt/data/etc/'`)
+
+  pkg.scripts['wb:deploy'] = deployScript.join('')
 
   fs.writeFileSync(
     resolve(root, 'package.json'),

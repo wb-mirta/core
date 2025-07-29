@@ -1,6 +1,9 @@
 {
   "title": "The Framework to write wb-rules in TypeScript",
-  "intro": "Project Settings",
+  "captions": {
+    "intro": "Project Settings",
+    "deploy": "Deploy Settings"
+  },
   "projectName": {
     "message": "Project Name (target directory):"
   },
@@ -15,6 +18,12 @@
     },
     "message": "is not empty.",
     "confirmDelete": "Remove existing files before continue?"
+  },
+  "ssh": {
+    "username": "🔑 SSH Username:",
+    "host": "🌐 SSH Host:",
+    "port": "🚩 SSH Port:",
+    "useRutoken": "Use Rutoken ECP"
   },
   "featureSelection": {
     "message": "Select features to include in your project:",
@@ -44,7 +53,8 @@
     "installingDependencies": "Calling the package manager"
   },
   "accent": {
-    "recommended": "(recommended)"
+    "recommended": "(recommended)",
+    "ifConfigured": "(if configured)"
   },
   "dependencies": {
     "question": "Install project dependencies?",
