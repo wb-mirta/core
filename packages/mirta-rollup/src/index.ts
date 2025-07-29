@@ -12,27 +12,9 @@ import wbRulesImports from './plugins/wb-rules-imports'
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
-const scriptsPattern = /src\/wb-rules\/(.*)/
-const modulesPattern = /src\/wb-rules-modules\/(.*)/
 const packagesPattern = /node_modules\/@?(.*)\/dist\/(.*)/
-
-function scriptEntry(entry: string) {
-
-  // if (__DEV__)
-  //   console.debug(`Script Entry: ${entry}`)
-
-  return `wb-rules/${entry}.js`
-
-}
-
-function moduleEntry(entry: string) {
-
-  // if (__DEV__)
-  //   console.debug(`Module Entry: ${entry}`)
-
-  return `wb-rules-modules/${entry}.js`
-
-}
+const modulesPattern = /(?:src\/)?wb-rules-modules\/(.*)/
+const scriptsPattern = /(?:src\/)?(?:wb-rules\/)?(.*)/
 
 function packageEntry(pkg: string, entry: string) {
 
@@ -45,18 +27,39 @@ function packageEntry(pkg: string, entry: string) {
 
 }
 
+function moduleEntry(entry: string) {
+
+  // if (__DEV__)
+  //   console.debug(`Module Entry: ${entry}`)
+
+  return `wb-rules-modules/${entry}.js`
+
+}
+
+function scriptEntry(entry: string) {
+
+  // if (__DEV__)
+  //   console.debug(`Script Entry: ${entry}`)
+
+  return `wb-rules/${entry}.js`
+
+}
+
 function getEntry(path: string) {
+
+  if (path.startsWith('_virtual'))
+    return path
 
   let match: RegExpExecArray | NullValue
 
-  match = scriptsPattern.exec(path)
+  match = packagesPattern.exec(path)
 
   if (match) {
 
     // if (__DEV__)
     //   console.debug(match)
 
-    return scriptEntry(match[1])
+    return packageEntry(match[1], match[2])
 
   }
 
@@ -71,16 +74,18 @@ function getEntry(path: string) {
 
   }
 
-  match = packagesPattern.exec(path)
+  match = scriptsPattern.exec(path)
 
   if (match) {
 
     // if (__DEV__)
     //   console.debug(match)
 
-    return packageEntry(match[1], match[2])
+    return scriptEntry(match[1])
 
   }
+
+  // console.log(`No one! ${path}`)
 
   return path
 
