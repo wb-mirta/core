@@ -196,7 +196,7 @@ declare namespace WbRules {
     /**
      * значение параметра по умолчанию
      */
-    value: string | number | boolean
+    value?: string | number | boolean
     /**
      * когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
      * Иначе он будет установлен в последнее сохранённое значение.
@@ -295,11 +295,6 @@ declare namespace WbRules {
   interface StorageOptions {
     global: boolean
   }
-
-  type PersistentStorage = new (
-    name: string,
-    options: StorageOptions
-  ) => PersistentStorage
 }
 
 declare namespace NodeJS {
@@ -468,6 +463,10 @@ declare function publish(
   QoS?: number,
   retain?: boolean
 ): void
+
+declare class PersistentStorage {
+  constructor(name: string, options: WbRules.StorageOptions)
+}
 
 /**
  * Класс оповещения
