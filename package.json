@@ -27,7 +27,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix"
+      "eslint --fix --no-warn-ignored"
     ]
   },
   "devDependencies": {

@@ -1,3 +1,23 @@
+/**
+ * Используется для нормализации составных типов.
+ *
+ * @example
+ * ```ts
+ * interface A { value: number }
+ * interface B { readonly: boolean }
+ *
+ * type C = A & B
+ * // A & B
+ *
+ * type D = Expand<A & B>
+ * // {
+ * //   value: number;
+ * //   readonly: boolean;
+ * // }
+ * ```
+ **/
+declare type Expand<T> = { [K in keyof T]: T[K] } & {}
+
 /** Типы и интерфейсы правил wb-rules */
 declare namespace WbRules {
 
@@ -45,8 +65,6 @@ declare namespace WbRules {
     error(message: string | undefined, ...args: (string | number | boolean)[]): void
   }
 
-  type Dev = object
-
   interface Timer {
     firing: boolean
 
@@ -57,6 +75,13 @@ declare namespace WbRules {
 
   /** Тип значения топика MQTT. */
   type MqttValue = string | number | boolean
+
+  type DevControl = Record<string, MqttValue>
+
+  type Dev = Expand<
+    Record<`${string}/${string}`, MqttValue>
+    & Record<string, DevControl>
+  >
 
   interface MqttMessage {
     topic: string
@@ -89,21 +114,41 @@ declare namespace WbRules {
      * @param controlId Поле, по которому произошло событие
      */
     then(
-      newValue?: MqttValue,
+      newValue: MqttValue,
       deviceId?: string,
       controlId?: string
     ): void
   }
 
-  enum ControlType {
-    SWITCH = 'switch',
-    ALARM = 'alarm',
-    PUSHBUTTON = 'pushbutton',
-    RANGE = 'range',
-    RGB = 'rgb',
-    TEXT = 'text',
-    VALUE = 'value'
+  // Соответствие типа контрола и его данных
+  interface TypeMappings {
+    /** A control that displays a value as text. */
+    'text': string
+    /** A control for a arbitrary value. */
+    'value': number
+    /** A control that toggles it's value when pressed by the user. */
+    'switch': boolean
+    /** A stateless push button. */
+    'pushbutton': boolean
+    /** A control for color in `'R;G;B'` format */
+    'rgb': string
+    /** A range slider that takes integer values between 0 and any other integer that is greater 1. */
+    'range': number
+    /** A control that indicates whether an alarm is active. */
+    'alarm': boolean
   }
+
+  type ControlType = Expand<keyof TypeMappings>
+
+  // enum ControlType {
+  //   SWITCH = 'switch',
+  //   ALARM = 'alarm',
+  //   PUSHBUTTON = 'pushbutton',
+  //   RANGE = 'range',
+  //   RGB = 'rgb',
+  //   TEXT = 'text',
+  //   VALUE = 'value'
+  // }
 
   /**
    * Объект настроек передаваемого в контрол значения.
@@ -121,6 +166,9 @@ declare namespace WbRules {
     notify?: boolean
   }
 
+  type Title = string | TitleLocalized
+  type TitleLocalized = Record<string, string>
+
   /**
    * Контрол устройства
    */
@@ -129,7 +177,7 @@ declare namespace WbRules {
      * Устанавливает заголовок.
      * @param title
      */
-    setTitle(title: string): void
+    setTitle(title: Title): void
 
     /**
      * Устанавливает описание.
@@ -142,7 +190,7 @@ declare namespace WbRules {
      * @param type Тип значения.
      * @see ControlType
      */
-    setType(controlType: ControlType): void
+    setType(type: ControlType): void
 
     setUnits(units: string): void
 
@@ -158,7 +206,11 @@ declare namespace WbRules {
 
     getId(): string
 
-    getTitle(): string
+    /**
+     * Возвращает заголовок контрола.
+     * @param lang Язык заголовка, "en" по умолчанию.
+     */
+    getTitle(lang?: string): string
 
     getDescription(): string
 
@@ -179,23 +231,35 @@ declare namespace WbRules {
     getValue(): string | number | boolean
   }
 
-  /**
-   * Конфигурация контрола.
-   */
-  interface ControlOptions {
+  type MaybeValueEnum<TControl>
+    = TControl extends 'value'
+      ? { enum?: Record<number, TitleLocalized> }
+      : never
+
+  type MaybeTextEnum<TControl>
+    = TControl extends 'text'
+      ? { enum?: Record<string, TitleLocalized> }
+      : never
+
+  type TypeDef<TControl, TValue> = {
+    /** Тип контрола, публикуемый в MQTT-топике. */
+    type: TControl
+    /** Значение по умолчанию. */
+    value?: TValue
+  } & (MaybeValueEnum<TControl> | MaybeTextEnum<TControl> | {})
+
+  type TypeMapper<K extends keyof TypeMappings>
+  = K extends infer TControl
+    ? TypeDef<TControl, TypeMappings[K]>
+    : never
+
+  type MappedTypes = TypeMapper<keyof TypeMappings>
+
+  type ControlOptions = Expand<MappedTypes & {
     /**
      * имя, публикуемое в MQTT-топике
      */
-    title?: string
-    /**
-     * тип, публикуемый в MQTT-топике
-     * @see ControlType
-     */
-    type: string
-    /**
-     * значение параметра по умолчанию
-     */
-    value?: string | number | boolean
+    title?: Title
     /**
      * когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
      * Иначе он будет установлен в последнее сохранённое значение.
@@ -224,7 +288,54 @@ declare namespace WbRules {
      * для параметра типа range может задавать его минимально допустимое значение
      */
     min?: number
-  }
+  }>
+
+  // /**
+  //  * Конфигурация контрола.
+  //  */
+  // interface ControlOptions<TControlType, TValueType> {
+  //   /**
+  //    * имя, публикуемое в MQTT-топике
+  //    */
+  //   title?: Title
+  //   /**
+  //    * тип, публикуемый в MQTT-топике
+  //    * @see ControlType
+  //    */
+  //   type: TControlType
+  //   /**
+  //    * значение параметра по умолчанию
+  //    */
+  //   value?: TValueType
+  //   /**
+  //    * когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
+  //    * Иначе он будет установлен в последнее сохранённое значение.
+  //    */
+  //   forceDefault?: boolean
+  //   /**
+  //    * когда задано истинное значение, параметр объявляется read-only
+  //    */
+  //   readonly?: boolean
+  //   precision?: number
+  //   /**
+  //    * когда задано истинное значение, при описании контрола в коде фактическое создание его в mqtt происходить
+  //    * не будет до тех пор, пока этому контролу не будет присвоено какое-то значение
+  //    * (например dev[deviceID][controlID] = "string")
+  //    */
+  //   lazyInit?: boolean
+  //   /**
+  //    * Порядок следования полей
+  //    */
+  //   order?: number
+  //   /**
+  //    * для параметра типа range может задавать его максимально допустимое значение
+  //    */
+  //   max?: number
+  //   /**
+  //    * для параметра типа range может задавать его минимально допустимое значение
+  //    */
+  //   min?: number
+  // }
 
   /**
    * Интерфейс устройства
@@ -250,7 +361,7 @@ declare namespace WbRules {
   type ControlOptionsTree = Record<string, ControlOptions>
 
   interface DeviceOptions {
-    title: string
+    title: Title
     cells: ControlOptionsTree
   }
 
@@ -409,7 +520,7 @@ declare function spawn(
 
 declare function runShellCommand(
   command: string,
-  options: WbRules.SpawnOptions | WbRules.ExitCallback
+  options?: WbRules.SpawnOptions | WbRules.ExitCallback
 ): void
 
 declare function readConfig(

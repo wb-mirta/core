@@ -57,6 +57,9 @@ export default defineConfig([
         path: 'always',
         types: 'prefer-import',
       }],
+      '@typescript-eslint/no-empty-object-type': ['error', {
+        allowObjectTypes: 'always',
+      }],
     },
   },
   // Stylistic Defaults
