@@ -45,8 +45,7 @@ declare namespace WbRules {
     error(message: string | undefined, ...args: (string | number | boolean)[]): void
   }
 
-  type DevControl = Record<string, unknown>
-  type Dev = Record<string, DevControl | undefined>
+  type Dev = object
 
   interface Timer {
     firing: boolean
