@@ -1,3 +1,12 @@
+## [0.0.6](https://github.com/wb-mirta/core/compare/v0.0.5...v0.0.6) (2025-08-06)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** external packages, no strict ([9638769](https://github.com/wb-mirta/core/commit/9638769fa5c0da504806a92f88b36fa0babc34bb))
+
+
+
 ## [0.0.5](https://github.com/wb-mirta/core/compare/v0.0.4...v0.0.5) (2025-08-06)
 
 
