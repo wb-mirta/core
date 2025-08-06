@@ -233,7 +233,7 @@ declare namespace WbRules {
 
   type MaybeValueEnum<TControl>
     = TControl extends 'value'
-      ? { enum?: Record<number, TitleLocalized> }
+      ? { units?: string, enum?: Record<number, TitleLocalized> }
       : never
 
   type MaybeTextEnum<TControl>
