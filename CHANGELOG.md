@@ -1,3 +1,12 @@
+## [0.0.5](https://github.com/wb-mirta/core/compare/v0.0.4...v0.0.5) (2025-08-06)
+
+
+### Features
+
+* **mirta-globals:** add units to control def ([d5615d2](https://github.com/wb-mirta/core/commit/d5615d232f2b9e14f910a84872fb604e7a9ddb8c))
+
+
+
 ## [0.0.4](https://github.com/wb-mirta/core/compare/v0.0.3...v0.0.4) (2025-08-05)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "@mirta/store",
   "description": "Type-safe store for wb-rules",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "Unlicense",
   "keywords": [
     "mirta",

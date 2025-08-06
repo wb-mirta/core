@@ -1,7 +1,7 @@
 {
   "name": "@mirta/testing",
   "description": "A unit-test runner equipped with built-in Wiren Board runtime emulation",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "Unlicense",
   "keywords": [
     "mirta",

@@ -1,7 +1,7 @@
 {
   "name": "create-mirta",
   "description": "🛠️ The recommended way to start a Mirta project.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "Unlicense",
   "keywords": [
     "mirta",
