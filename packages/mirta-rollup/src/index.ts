@@ -12,7 +12,7 @@ import wbRulesImports from './plugins/wb-rules-imports'
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
-const packagesPattern = /node_modules\/@?(.*)\/dist\/(.*)/
+const packagesPattern = /node_modules\/@?(.+)\/(.+)/
 const modulesPattern = /(?:src\/)?wb-rules-modules\/(.*)/
 const scriptsPattern = /(?:src\/)?(?:wb-rules\/)?(.*)/
 
@@ -59,7 +59,7 @@ function getEntry(path: string) {
     // if (__DEV__)
     //   console.debug(match)
 
-    return packageEntry(match[1], match[2])
+    return packageEntry(match[1].replace(/\/dist$/, ''), match[2])
 
   }
 
@@ -164,6 +164,7 @@ export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
     output: {
 
       format: 'cjs',
+      strict: false,
 
       dir: 'dist/es5',
 
