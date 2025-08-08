@@ -27,14 +27,32 @@ export default defineConfig([
     rules: {
       // Правило несовместимо с wb-rules 2.0
       '@typescript-eslint/prefer-includes': 'off',
+      // Позволяет работать с dev['deviceId']['controlId']
+      '@typescript-eslint/dot-notation': 'off',
       // Разрешает интерполяцию базовых типов
-      '@typescript-eslint/restrict-template-expressions': ['error', {
-        allowAny: false,
-        allowBoolean: true,
-        allowNullish: true,
-        allowNumber: true,
-        allowRegExp: true,
-      }],
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        {
+          allowAny: false,
+          allowBoolean: true,
+          allowNullish: true,
+          allowNumber: true,
+          allowRegExp: true,
+        },
+      ],
+      // Разрешает неиспользуемые переменные с символом подчёркивания
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'args': 'all',
+          'argsIgnorePattern': '^_',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'ignoreRestSiblings': true,
+        },
+      ],
     },
     languageOptions: {
       parserOptions: {

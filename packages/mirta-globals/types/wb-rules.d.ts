@@ -76,12 +76,7 @@ declare namespace WbRules {
   /** Тип значения топика MQTT. */
   type MqttValue = string | number | boolean
 
-  type DevControl = Record<string, MqttValue>
-
-  type Dev = Expand<
-    Record<`${string}/${string}`, MqttValue>
-    & Record<string, DevControl>
-  >
+  type Dev = Record<string, MqttValue | Record<string, MqttValue>>
 
   interface MqttMessage {
     topic: string

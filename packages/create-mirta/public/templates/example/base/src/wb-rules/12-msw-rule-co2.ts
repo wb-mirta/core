@@ -21,25 +21,25 @@ defineRule('msw3_co2', {
 
     if (co2_good) {
 
-      dev[devName]['/Green LED'] = true
-      dev[devName]['/Red LED'] = false
-      dev[devName]['/LED Period (s)'] = 10
+      dev[devName]['Green LED'] = true
+      dev[devName]['Red LED'] = false
+      dev[devName]['LED Period (s)'] = 10
 
     }
 
     if (co2_middle) {
 
-      dev[devName]['/Green LED'] = true
-      dev[devName]['/Red LED'] = true
-      dev[devName]['/LED Period (s)'] = 5
+      dev[devName]['Green LED'] = true
+      dev[devName]['Red LED'] = true
+      dev[devName]['LED Period (s)'] = 5
 
     }
 
     if (co2_bad) {
 
-      dev[devName]['/Green LED'] = false
-      dev[devName]['/Red LED'] = true
-      dev[devName]['/LED Period (s)'] = 1
+      dev[devName]['Green LED'] = false
+      dev[devName]['Red LED'] = true
+      dev[devName]['LED Period (s)'] = 1
 
     }
 

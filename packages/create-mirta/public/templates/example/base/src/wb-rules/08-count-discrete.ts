@@ -36,7 +36,7 @@ defineRule('count_impulses', {
     if (lastInputState == 0 && newValue == 1) { // Проверка фронта импульса с 0 на 1
 
       impulseCount += 1 // Счетчик импульсов
-      dev.pulse_counter.impulses = impulseCount // Отображение импульсов в виртуальном устройстве
+      dev['pulse_counter']['impulses'] = impulseCount // Отображение импульсов в виртуальном устройстве
 
     }
 
@@ -51,7 +51,7 @@ defineRule('reset_counter', {
   then: function () {
 
     impulseCount = 0 // Сброс счетчика
-    dev.pulse_counter.impulses = impulseCount
+    dev['pulse_counter']['impulses'] = impulseCount
 
   },
 })
