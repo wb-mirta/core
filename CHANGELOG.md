@@ -1,3 +1,12 @@
+## [0.0.7](https://github.com/wb-mirta/core/compare/v0.0.6...v0.0.7) (2025-08-08)
+
+
+### Bug Fixes
+
+* **create-mirta:** change dev type ([797e2f6](https://github.com/wb-mirta/core/commit/797e2f625ef11f82f7f0e95b775b32d7e09c11cf))
+
+
+
 ## [0.0.6](https://github.com/wb-mirta/core/compare/v0.0.5...v0.0.6) (2025-08-06)
 
 

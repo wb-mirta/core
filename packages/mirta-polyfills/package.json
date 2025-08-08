@@ -1,7 +1,7 @@
 {
   "name": "@mirta/polyfills",
   "description": "Modern JavaScript feature polyfills for enhanced wb-rules",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "Unlicense",
   "keywords": [
     "mirta",
