@@ -1,5 +1,5 @@
-import { useEvent, type Event } from 'mirta'
-import { type SimulatorInstance } from './types'
+import { useEvent, type EventRaiser } from 'mirta'
+import { type MqttMessageEventHandler, type SimulatorInstance } from './types'
 
 class SameTopicValueError extends Error {
   constructor(message: WbRules.MqttMessage) {
@@ -31,12 +31,12 @@ export interface DefineRuleSimulator extends SimulatorInstance {
 
 function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
 
-  let mqttEvent: Event<WbRules.MqttMessage>
+  let mqttEvent: EventRaiser<MqttMessageEventHandler>
   let values: Record<string, WbRules.MqttValue> = {}
 
   function reset() {
 
-    mqttEvent = useEvent<WbRules.MqttMessage>()
+    mqttEvent = useEvent<MqttMessageEventHandler>()
     values = {}
 
     global.defineRule = (variantA: WbRules.RuleOptions | string, variantB?: WbRules.RuleOptions) => {
