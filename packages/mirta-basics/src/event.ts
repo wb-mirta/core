@@ -1,6 +1,6 @@
-export type EventHandler<TArgs> = (args: TArgs) => void
+export type EventHandler = (...args: unknown[]) => void
 
-export interface Event<TArgs> {
+export interface Event<THandler extends EventHandler> {
   /**
    * Подписывает на событие, есть возможность отписки.
    * @example
@@ -13,7 +13,7 @@ export interface Event<TArgs> {
    * subscription.off()
    * ```
    **/
-  on: (handler: EventHandler<TArgs>) => { off: () => void }
+  on: (handler: THandler) => { off: () => void }
   /**
    * Подписывает на событие, однократное выполнение.
    * @example
@@ -24,7 +24,7 @@ export interface Event<TArgs> {
    * stateChanged.once(() => { ... })
    * ```
    **/
-  once: (handler: EventHandler<TArgs>) => void
+  once: (handler: THandler) => void
   /**
    * Отписывает указанный обработчик от прослушивания события.
    * @example
@@ -39,7 +39,11 @@ export interface Event<TArgs> {
    * stateChanged.off(handler)
    * ```
    **/
-  off: (handler: EventHandler<TArgs>) => void
+  off: (handler: THandler) => void
+}
+
+export interface EventRaiser<THandler extends EventHandler> extends Event<THandler> {
+
   /**
    * Объявляет всем подписчикам о наступлении события.
    * @example
@@ -50,7 +54,9 @@ export interface Event<TArgs> {
    * stateChanged.raise()
    * ```
    **/
-  raise: (args: TArgs) => void
+  raise: (...args: Parameters<THandler>) => void
+
+  withoutRaise: () => Event<THandler>
 }
 
 /**
@@ -74,11 +80,11 @@ export interface Event<TArgs> {
  * countChanged.raise(100)
  * ```
  */
-export function useEvent<TArgs = void>(): Event<TArgs> {
+export function useEvent<THandler extends EventHandler>(): EventRaiser<THandler> {
 
-  const handlers: EventHandler<TArgs>[] = []
+  const handlers: THandler[] = []
 
-  function off(handler: EventHandler<TArgs>) {
+  function off(handler: THandler) {
 
     const index = handlers.indexOf(handler)
 
@@ -87,7 +93,7 @@ export function useEvent<TArgs = void>(): Event<TArgs> {
 
   }
 
-  function on(handler: EventHandler<TArgs>) {
+  function on(handler: THandler) {
 
     handlers.push(handler)
 
@@ -102,26 +108,26 @@ export function useEvent<TArgs = void>(): Event<TArgs> {
 
   }
 
-  function once(handler: EventHandler<TArgs>) {
+  function once(handler: THandler) {
 
-    const wrapper = (args: TArgs) => {
+    const wrapper = ((...args: Parameters<THandler>) => {
 
-      handler(args)
+      handler(...args)
       off(wrapper)
 
-    }
+    }) as THandler
 
     handlers.push(wrapper)
 
   }
 
-  function raise(args: TArgs) {
+  const raise = (...args: Parameters<THandler>) => {
 
     // Защита от сдвига в массиве при выполнении once.
     const handlersCopy = handlers.concat()
 
     for (let i = 0, len = handlersCopy.length; i < len; i++)
-      (handlersCopy[i])(args)
+      (handlersCopy[i])(...args)
 
   }
 
@@ -130,6 +136,11 @@ export function useEvent<TArgs = void>(): Event<TArgs> {
     once,
     off,
     raise,
+    withoutRaise: () => ({
+      on,
+      once,
+      off,
+    }),
   }
 
 }

@@ -1,5 +1,5 @@
-import { useEvent, type Event } from 'mirta'
-import { type SimulatorInstance } from './types'
+import { useEvent, type EventRaiser } from 'mirta'
+import { type MqttMessageEventHandler, type SimulatorInstance } from './types'
 
 interface WithDevice {
   publish(controlId: string, value: WbRules.MqttValue): WithDevice
@@ -13,11 +13,11 @@ export interface TrackMqttSimulator extends SimulatorInstance {
 
 function createInstance(): TrackMqttSimulator {
 
-  let mqttEvent: Event<WbRules.MqttMessage>
+  let mqttEvent: EventRaiser<MqttMessageEventHandler>
 
   function reset() {
 
-    mqttEvent = useEvent<WbRules.MqttMessage>()
+    mqttEvent = useEvent<MqttMessageEventHandler>()
 
     global.trackMqtt = (topic: string, callback: (message: WbRules.MqttMessage) => void) => {
 
