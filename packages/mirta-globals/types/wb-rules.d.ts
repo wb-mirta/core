@@ -4,7 +4,7 @@
  * @example
  * ```ts
  * interface A { value: number }
- * interface B { readonly: boolean }
+ * interface B { isReadonly: boolean }
  *
  * type C = A & B
  * // A & B
@@ -12,9 +12,10 @@
  * type D = Expand<A & B>
  * // {
  * //   value: number;
- * //   readonly: boolean;
+ * //   isReadonly: boolean;
  * // }
  * ```
+ * @since 0.0.4
  **/
 declare type Expand<T> = { [K in keyof T]: T[K] } & {}
 
@@ -115,7 +116,11 @@ declare namespace WbRules {
     ): void
   }
 
-  // Соответствие типа контрола и его данных
+  /**
+   * Соответствие типа контрола его типу значения.
+   * @since 0.0.4
+   *
+   **/
   interface TypeMappings {
     /** A control that displays a value as text. */
     'text': string
@@ -134,16 +139,6 @@ declare namespace WbRules {
   }
 
   type ControlType = Expand<keyof TypeMappings>
-
-  // enum ControlType {
-  //   SWITCH = 'switch',
-  //   ALARM = 'alarm',
-  //   PUSHBUTTON = 'pushbutton',
-  //   RANGE = 'range',
-  //   RGB = 'rgb',
-  //   TEXT = 'text',
-  //   VALUE = 'value'
-  // }
 
   /**
    * Объект настроек передаваемого в контрол значения.
@@ -226,111 +221,143 @@ declare namespace WbRules {
     getValue(): string | number | boolean
   }
 
-  type MaybeValueEnum<TControl>
-    = TControl extends 'value'
-      ? { units?: string, enum?: Record<number, TitleLocalized> }
-      : never
-
-  type MaybeTextEnum<TControl>
-    = TControl extends 'text'
-      ? { enum?: Record<string, TitleLocalized> }
-      : never
-
-  type TypeDef<TControl, TValue> = {
+  /**
+   * Базовые определения контрола.
+   * @since 0.1.0
+   *
+   **/
+  interface BaseControlType<TControl, TValue> {
     /** Тип контрола, публикуемый в MQTT-топике. */
     type: TControl
     /** Значение по умолчанию. */
     value?: TValue
-  } & (MaybeValueEnum<TControl> | MaybeTextEnum<TControl> | {})
+  }
 
-  type TypeMapper<K extends keyof TypeMappings>
-  = K extends infer TControl
-    ? TypeDef<TControl, TypeMappings[K]>
-    : never
+  /**
+   * Расширяет тип Text дополнительными свойствами.
+   * @since 0.1.0
+   *
+   **/
+  interface __TextControlTypeExtension {
 
-  type MappedTypes = TypeMapper<keyof TypeMappings>
+    /**
+     * Задаёт подписи к значениям.
+     *
+     * Используется, когда количество значений
+     * ограничено - например, при перечислении дней недели.
+     *
+     **/
+    enum?: Record<string, Title>
+  }
 
-  type ControlOptions = Expand<MappedTypes & {
+  /**
+   * Расширяет тип Value дополнительными свойствами.
+   * @since 0.1.0
+   *
+   **/
+  interface __ValueControlTypeExtension {
+
     /**
-     * имя, публикуемое в MQTT-топике
-     */
-    title?: Title
-    /**
-     * когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
-     * Иначе он будет установлен в последнее сохранённое значение.
-     */
-    forceDefault?: boolean
-    /**
-     * когда задано истинное значение, параметр объявляется read-only
-     */
-    readonly?: boolean
-    precision?: number
-    /**
-     * когда задано истинное значение, при описании контрола в коде фактическое создание его в mqtt происходить
-     * не будет до тех пор, пока этому контролу не будет присвоено какое-то значение
-     * (например dev[deviceID][controlID] = "string")
-     */
-    lazyInit?: boolean
-    /**
-     * Порядок следования полей
-     */
-    order?: number
-    /**
-     * для параметра типа range может задавать его максимально допустимое значение
-     */
-    max?: number
-    /**
-     * для параметра типа range может задавать его минимально допустимое значение
-     */
+     * Задаёт подписи к значениям.
+     *
+     * Используется, когда количество значений
+     * ограничено - например, при перечислении дней недели.
+     *
+     **/
+    enum?: Record<number, WbRules.Title>
+
+    /** Задаёт минимально допустимое значение. */
     min?: number
-  }>
 
-  // /**
-  //  * Конфигурация контрола.
-  //  */
-  // interface ControlOptions<TControlType, TValueType> {
-  //   /**
-  //    * имя, публикуемое в MQTT-топике
-  //    */
-  //   title?: Title
-  //   /**
-  //    * тип, публикуемый в MQTT-топике
-  //    * @see ControlType
-  //    */
-  //   type: TControlType
-  //   /**
-  //    * значение параметра по умолчанию
-  //    */
-  //   value?: TValueType
-  //   /**
-  //    * когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
-  //    * Иначе он будет установлен в последнее сохранённое значение.
-  //    */
-  //   forceDefault?: boolean
-  //   /**
-  //    * когда задано истинное значение, параметр объявляется read-only
-  //    */
-  //   readonly?: boolean
-  //   precision?: number
-  //   /**
-  //    * когда задано истинное значение, при описании контрола в коде фактическое создание его в mqtt происходить
-  //    * не будет до тех пор, пока этому контролу не будет присвоено какое-то значение
-  //    * (например dev[deviceID][controlID] = "string")
-  //    */
-  //   lazyInit?: boolean
-  //   /**
-  //    * Порядок следования полей
-  //    */
-  //   order?: number
-  //   /**
-  //    * для параметра типа range может задавать его максимально допустимое значение
-  //    */
-  //   max?: number
-  //   /**
-  //    * для параметра типа range может задавать его минимально допустимое значение
-  //    */
-  //   min?: number
-  // }
+    /** Задаёт максимально допустимое значение. */
+    max?: number
+
+    /** Определяет количество знаков после запятой. */
+    precision?: number
+
+    units?: string
+  }
+
+  /**
+   * Расширяет тип Range дополнительными свойствами.
+   * @since 0.1.0
+   *
+   **/
+  interface __RangeControlTypeExtension {
+
+    /** Задаёт минимально допустимое значение. */
+    min?: number
+
+    /** Задаёт максимально допустимое значение. */
+    max?: number
+
+    /** Определяет количество знаков после запятой. */
+    precision?: number
+  }
+
+  /**
+   * Добавляет расширенные свойства, соответственно типу контрола.
+   * @since 0.1.0
+   *
+   **/
+  type ControlTypeExtension<TControl>
+    = TControl extends 'text'
+      ? __TextControlTypeExtension
+      : TControl extends 'value'
+        ? __ValueControlTypeExtension
+        : TControl extends 'range'
+          ? __RangeControlTypeExtension
+          : {}
+
+  type __MappedControlTypes<
+    K extends keyof TypeMappings = keyof TypeMappings
+  >
+    = K extends infer TControl
+      ? BaseControlType<TControl, TypeMappings[K]> & ControlTypeExtension<TControl>
+      : never
+
+  /**
+   * Параметры контрола.
+   *
+   **/
+  type ControlOptions = Expand<__MappedControlTypes & {
+
+    /**
+     * Заголовок, публикуемый в MQTT-топике (meta/title)
+     *
+     **/
+    title?: Title
+
+    /**
+     * Когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
+     * Иначе он будет установлен в последнее сохранённое значение.
+     *
+     **/
+    forceDefault?: boolean
+
+    /**
+     * Когда задано истинное значение, параметр становится доступным только для чтения.
+     *
+     **/
+    readonly?: boolean
+
+    /**
+     * Когда задано истинное значение, при описании контрола в коде фактическое создание его в MQTT происходить
+     * не будет до тех пор, пока этому контролу не будет присвоено какое-либо значение.
+     *
+     * @example
+     * ```ts
+     * dev[deviceID][controlID] = "string"
+     * ```
+     **/
+    lazyInit?: boolean
+
+    /**
+     * Порядок следования полей.
+     *
+     **/
+    order?: number
+  }>
 
   /**
    * Интерфейс устройства
@@ -361,11 +388,12 @@ declare namespace WbRules {
   }
 
   /**
-   * Функция, вызываемая при завершении процесса
+   * Функция, вызываемая при завершении процесса.
    * @param exitCode код возврата процесса
-   * @param capturedOutput захваченный stdout процесса в виде строки в случае, когда задана опция captureOutput
-   * @param capturedErrorOutput захваченный stderr процесса в виде строки в случае, когда задана опция captureErrorOutput
-   */
+   * @param capturedOutput захваченный stdout процесса в виде строки в случае, когда задана опция {@link SpawnOptions.captureOutput}
+   * @param capturedErrorOutput захваченный stderr процесса в виде строки в случае, когда задана опция {@link SpawnOptions.captureErrorOutput}
+   *
+   **/
   type ExitCallback = (
     exitCode: number,
     capturedOutput?: string,
@@ -373,23 +401,30 @@ declare namespace WbRules {
   ) => void
 
   interface SpawnOptions {
+
     /**
-     * Если true, захватить stdout процесса и передать его в виде строки в exitCallback
-     */
+     * Если true, захватить stdout процесса и передать его в виде строки в {@link exitCallback}
+     *
+     **/
     captureOutput?: boolean
+
     /**
-     * Если true, захватить stderr процесса и передать его в виде строки в exitCallback.
+     * Если true, захватить stderr процесса и передать его в виде строки в {@link exitCallback}.
      * Если данный параметр не задан, то stderr дочернего процесса направляется в stderr процесса wb-rules
-     */
+     *
+     **/
     captureErrorOutput?: boolean
+
     /**
-     * Строка, которую следует использовать в качестве содержимого stdin процесса
-     */
+     * Строка, которую следует использовать в качестве содержимого stdin процесса.
+     *
+     **/
     input?: string
 
     /**
-     * Функция, вызываемая при завершении процесса
-     */
+     * Функция, вызываемая при завершении процесса.
+     *
+     **/
     exitCallback?: ExitCallback
   }
 
@@ -404,42 +439,48 @@ declare namespace WbRules {
 
 declare namespace NodeJS {
   interface Module {
-    /**
-       * Хранит данные, общие для всех экземпляров данного модуля.
-      */
+    /** Хранит данные, общие для всех экземпляров данного модуля. */
     static: WbRules.ModuleStatic
   }
 }
 
+/**
+ * Путь к текущему сценарию wb-rules (точке входа), даже в модулях.
+ * Пример строки: `/etc/wb-rules/my-script.js`
+ *
+ **/
+declare var __filename: string
+
+/** Используется для вывода сообщений в журнал контроллера и отладочную консоль. */
 declare var log: WbRules.Log
 
-/**
- * Объект доступа к MQTT-топикам устройства
- */
+/** Объект доступа к MQTT-топикам устройства. */
 declare var dev: WbRules.Dev
 
-/**
- * Объект доступа к именованным таймерам
- */
+/** Объект доступа к именованным таймера. */
 declare var timers: WbRules.TimerCollection
 
 /**
  * Создаёт правило обработки.
  * @param ruleName Название правила.
  * @param options Конфигурация правила.
- */
+ *
+ **/
 declare function defineRule(name: string, options: WbRules.RuleOptions): void
+
 /**
  * Создаёт анонимное правило обработки.
  * @param options Конфигурация правила.
- */
+ *
+ **/
 declare function defineRule(options: WbRules.RuleOptions): void
 
 /**
  * Создаёт виртуальное устройство.
  * @param deviceId Идентификатор устройства.
  * @param options Конфигурация устройства.
- */
+ *
+ **/
 declare function defineVirtualDevice(
   deviceId: string,
   options: WbRules.DeviceOptions
@@ -448,23 +489,25 @@ declare function defineVirtualDevice(
 /**
  * Позволяет получить объект для работы с указанным устройством.
  * @param deviceId Идентификатор устройства.
- */
+ *
+ **/
 declare function getDevice(deviceId: string): WbRules.Device | undefined
 
 /**
  * Позволяет получить объект для работы с указанным контролом устройства.
  * @param controlPath Строка в формате "deviceId/controlId"
- */
+ *
+ **/
 declare function getControl(controlPath: string): WbRules.Control | undefined
 
 /**
  * Запускает периодический таймер с указанным интервалом.
+ * К таймеру можно обратиться через `timers.<name>` внутри when при работе с {@link defineRule}.
  *
- * К таймеру можно обратиться через `timers.<name>` внутри when при работе с `defineRule`.
- *
- * @param name Идентификатор таймера в глобальном наборе `timers`.
+ * @param name Идентификатор таймера в глобальном наборе {@link timers}.
  * @param delay Интервал срабатывания, в миллисекундах
- */
+ *
+ **/
 declare function startTicker(name: string, interval: number): void
 
 /**
@@ -473,7 +516,7 @@ declare function startTicker(name: string, interval: number): void
  *
  * см. [руководство по однократным таймерам](https://github.com/wirenboard/wb-rules?tab=readme-ov-file#однократные)
  *
- * @param name Идентификатор таймера в глобальном наборе `timers`.
+ * @param name Идентификатор таймера в глобальном наборе {@link timers}.
  * @param delay
  *
  * Используется при работе с определениями правил:
@@ -497,16 +540,16 @@ declare function startTicker(name: string, interval: number): void
  * })
  *
  * ```
- *
  */
 declare function startTimer(name: string, delay: number): void
 
 /**
- * Запуск внешних процессов
+ * Запуск внешних процессов.
  * @param cmd
  * @param args
  * @param options
- */
+ *
+ **/
 declare function spawn(
   cmd: string,
   args: string[],
@@ -535,17 +578,25 @@ declare function readConfig(
  */
 declare function defineAlias(alias: string, controlPath: string): void
 
-/**
- * Следует учесть, что функция format и xformat съедают одинарные квадратные скобки!
- * Поэтому, если необходимо их вывести, то нужно дублировать.
- */
 interface String {
+  /**
+   * Осуществляет последовательную замену подстрок `{}` в указанной строке
+   * на строковые представления своих аргументов и возвращает результирующую строку.
+   * @param args
+   */
   format(...args: (string | number | boolean)[]): string
+
+  /**
+   * Осуществляет последовательную замену подстрок `{}` в указанной строке
+   * на строковые представления своих аргументов и возвращает результирующую строку.
+   *
+   * @warning В отличие от {@link format}, выполняет код внутри строки! Не использовать для обработки значений, вводимых пользователем.
+   */
   xformat(...args: (string | number | boolean)[]): string
 }
 
 /**
- * Подписаться на топик (допустимы символы # и +)
+ * Подписывает на прослушивание топика MQTT (допустимы символы # и +).
  * @param topic
  * @param callback
  */
@@ -555,17 +606,18 @@ declare function trackMqtt(
 ): void
 
 /**
- * Публикация сообщений в MQTT
- * Важно: не используйте publish() для изменения значения параметров устройств.
+ * Публикация сообщений в MQTT.
+ *
+ * Внимание! Не используйте `publish()` для изменения значения параметров устройств.
  * @param topic
  * @param payload
- * @param QoS
+ * @param qos
  * @param retain
  */
 declare function publish(
   topic: string,
   value: WbRules.MqttValue,
-  QoS?: number,
+  qos?: number,
   retain?: boolean
 ): void
 
