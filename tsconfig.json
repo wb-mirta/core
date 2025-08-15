@@ -6,7 +6,15 @@
       "@mirta/globals",
       "node",
       "vitest/globals"
-    ]
+    ],
+    "paths": {
+      "@mirta/*": [
+        "packages/mirta-*/src"
+      ],
+      "mirta": [
+        "packages/mirta/src"
+      ]
+    }
   },
   "include": [
     "*.ts",
