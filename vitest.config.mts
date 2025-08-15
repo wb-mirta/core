@@ -7,6 +7,16 @@ const projects = readdirSync(packagesDir)
 
 const entries: Record<string, string> = {}
 
+function getPackageName(packageFolder: string) {
+
+  const packageName = packageFolder.startsWith('mirta-')
+    ? packageFolder.replace(/^mirta-/, '@mirta/')
+    : packageFolder
+
+  return packageName
+
+}
+
 // По умолчанию vite:import-analysis ищет точки входа
 // пакетов в секции exports соответствующего файла package.json,
 // однако тесты должны выполняться до сборки.
@@ -15,13 +25,8 @@ const entries: Record<string, string> = {}
 //
 projects.forEach((packageFolder) => {
 
-  const packageName = packageFolder.startsWith('mirta-')
-    ? packageFolder.replace(/^mirta-/, '@mirta/')
-    : packageFolder
-
   const packageEntryPoint = join(packagesDir, packageFolder, 'src/index.ts')
-
-  entries[packageName] = packageEntryPoint
+  entries[getPackageName(packageFolder)] = packageEntryPoint
 
 })
 
@@ -34,18 +39,23 @@ export default defineConfig({
     alias: entries,
   },
   test: {
+    environment: 'node',
     globals: true,
-    pool: 'threads',
+    isolate: false,
+    watch: false,
     exclude: [
       ...configDefaults.exclude,
       '**/public/templates/**',
     ],
     projects: [
-      ...projects.map<TestProjectConfiguration>(project => ({
+      ...projects.map<TestProjectConfiguration>(packageFolder => ({
         extends: true,
-        root: `packages/${project}`,
+        root: `packages/${packageFolder}`,
         test: {
-          name: project,
+          name: getPackageName(packageFolder),
+          typecheck: {
+            enabled: true,
+          },
         },
       })),
     ],
