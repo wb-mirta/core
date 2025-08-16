@@ -547,18 +547,6 @@ function createDevice<
 
   const controlDefs = options.controls
 
-  const context = configureContext(
-    deviceType,
-    deviceId,
-    controlDefs,
-    deviceType === 'virtual'
-      ? getValueOrDefault(
-        props['title'],
-        propDefs['title']['defaultValue']
-      ) as WbRules.Title
-      : ''
-  )
-
   const setupProps: Record<string, unknown> = {}
   const controls: Record<string, unknown> = {}
 
@@ -570,6 +558,15 @@ function createDevice<
     setupProps[key] = getValueOrDefault(props[key], propDefs[key]['defaultValue'])
 
   })
+
+  const context = configureContext(
+    deviceType,
+    deviceId,
+    controlDefs,
+    deviceType === 'virtual'
+      ? setupProps['title'] as WbRules.Title
+      : ''
+  )
 
   Object.keys(controlDefs).forEach((key) => {
 
