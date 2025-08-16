@@ -1,3 +1,18 @@
+# [0.1.0](https://github.com/wb-mirta/core/compare/v0.0.7...v0.1.0) (2025-08-16)
+
+
+### Bug Fixes
+
+* **mirta:** virtual device numbering ([8381a70](https://github.com/wb-mirta/core/commit/8381a70690f8c21a4edd220093baf304f2e92ab5))
+
+
+### Features
+
+* add composable support ([#6](https://github.com/wb-mirta/core/issues/6)) ([e1d294a](https://github.com/wb-mirta/core/commit/e1d294ad62c74ef15f13d1ed0da0ab3c0d5ffc7e))
+* **mirta-basics:** improve useEvent (closes [#1](https://github.com/wb-mirta/core/issues/1), closes [#2](https://github.com/wb-mirta/core/issues/2)) ([1e2962c](https://github.com/wb-mirta/core/commit/1e2962c26c83ae24f3e1105244524c7ce7455f30))
+
+
+
 ## [0.0.7](https://github.com/wb-mirta/core/compare/v0.0.6...v0.0.7) (2025-08-08)
 
 
