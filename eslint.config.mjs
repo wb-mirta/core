@@ -53,6 +53,9 @@ export default defineConfig([
           'ignoreRestSiblings': true,
         },
       ],
+      '@typescript-eslint/no-empty-object-type': ['error', {
+        allowObjectTypes: 'always',
+      }],
     },
     languageOptions: {
       parserOptions: {
@@ -74,9 +77,6 @@ export default defineConfig([
         lib: 'always',
         path: 'always',
         types: 'prefer-import',
-      }],
-      '@typescript-eslint/no-empty-object-type': ['error', {
-        allowObjectTypes: 'always',
       }],
     },
   },
