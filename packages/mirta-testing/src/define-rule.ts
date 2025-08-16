@@ -48,10 +48,10 @@ function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
       if (!rule)
         return
 
-      mqttEvent.on((message) => {
+      mqttEvent.on(({ topic, value }) => {
 
-        if (rule.whenChanged == message.topic)
-          rule.then(message.value)
+        if (rule.whenChanged === topic)
+          rule.then(value)
 
       })
 

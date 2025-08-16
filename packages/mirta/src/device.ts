@@ -1,7 +1,12 @@
+export type DeviceType = 'wired' | 'virtual' | 'zigbee'
+
 /** Контекст устройства. */
 export interface DeviceContext {
+
+  get deviceType(): DeviceType
+
   /** Идентификатор устройства. */
-  get id(): string
+  get deviceId(): string
 
   /**
      * Признак готовности к работе,
@@ -10,13 +15,3 @@ export interface DeviceContext {
 }
 
 export type TrackCallback = (controlId: string, callback: (value: WbRules.MqttValue) => void) => void
-
-/** Контекст плагина для привязки к устройству. */
-export interface PluginContext {
-  device: DeviceContext
-  track: TrackCallback
-}
-
-/** Плагин для расширения функциональности устройства. */
-export type DevicePlugin<TPlugin = unknown>
-  = (context: PluginContext) => TPlugin

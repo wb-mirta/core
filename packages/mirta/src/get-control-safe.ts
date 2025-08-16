@@ -50,7 +50,7 @@ export function getControlSafe(
       else {
 
         return context.isReady
-          ? control = getControl(`${context.id}/${controlId}`)
+          ? control = getControl(`${context.deviceId}/${controlId}`)
           : undefined
 
       }
