@@ -1,6 +1,4 @@
-import type { DevicePlugin } from 'mirta'
 import { useDefineRule, type DefineRuleSimulator, type DefineRuleOptions } from './define-rule'
-import { useDevicePlugin, type ExtractedPlugin } from './device-plugin'
 import { useTrackMqtt, type TrackMqttSimulator } from './track-mqtt'
 import { useGetDevice, type GetDeviceSimulator } from './get-device'
 import { useGetControl, type GetControlSimulator } from './get-control'
@@ -13,10 +11,6 @@ interface CoreSimulator extends SimulatorInstance {
   get defineRule(): DefineRuleSimulator
   get trackMqtt(): TrackMqttSimulator
   defineZigbeeDevice(deviceId: string): ZigbeeDevice
-  useDevicePlugin<TPlugin extends DevicePlugin>(
-    deviceId: string,
-    plugin: TPlugin
-  ): ExtractedPlugin<TPlugin>
 }
 
 interface CoreSimulatorOptions {
@@ -58,7 +52,6 @@ function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
     defineRule,
     trackMqtt,
     defineZigbeeDevice,
-    useDevicePlugin,
   }
 
 }

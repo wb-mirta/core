@@ -9,3 +9,6 @@ export const isNumber = (value: unknown): value is number =>
 /** Сужает диапазон множества типов до boolean */
 export const isBoolean = (value: unknown): value is boolean =>
   typeof value === 'boolean'
+
+export const isFunction = (value: unknown): value is ((...args: unknown[]) => unknown) =>
+  typeof value === 'function'
