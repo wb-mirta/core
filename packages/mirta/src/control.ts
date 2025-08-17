@@ -87,7 +87,7 @@ export function createControl<
   const valueReceived = useEvent<ValueEventHandler<TReturn>>()
   const valueChanged = useEvent<ValueEventHandler<TReturn>>()
 
-  let value: TReturn
+  let localValue: TReturn
 
   /**
    * Устанавливает новое значение, если оно отличается от существующего.
@@ -96,14 +96,14 @@ export function createControl<
    **/
   function setValue(newValue: TReturn, preventEmit = false) {
 
-    const oldValue = value
+    const oldValue = localValue
 
     valueReceived.raise(newValue, oldValue)
 
     if (oldValue === newValue)
       return
 
-    value = newValue
+    localValue = newValue
 
     if (!preventEmit)
       emitValue(newValue)
@@ -150,17 +150,17 @@ export function createControl<
 
     get value() {
 
-      if (value === undefined) {
+      if (localValue === undefined) {
 
         if (options.forceDefault)
-          return value = defaultValue as TReturn
+          return localValue = defaultValue as TReturn
 
         if (!options.lazyInit)
-          return value ??= control.safe?.getValue() as TReturn
+          return localValue ??= control.safe?.getValue() as TReturn
 
       }
 
-      return value
+      return localValue
 
     },
 
