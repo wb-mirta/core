@@ -1,12 +1,26 @@
 import { defineVirtualDevice, type PropType } from '../src'
+import { mock } from 'vitest-mock-extended'
 
 describe('Define Virtual Device Functionality Tests', () => {
+
+  let getControlRequestCount = 0
 
   beforeEach(() => {
 
     global.defineVirtualDevice = vi.fn()
     global.trackMqtt = vi.fn()
-    global.getControl = vi.fn()
+
+    const getControlMock = mock<WbRules.Control>()
+
+    getControlMock.getValue.mockImplementation(() => {
+
+      getControlRequestCount += 1
+
+      return 0
+
+    })
+
+    global.getControl = () => getControlMock
 
   })
 
@@ -108,6 +122,61 @@ describe('Define Virtual Device Functionality Tests', () => {
     device.increment()
 
     expect(device.value).toBe(11)
+
+  })
+
+  it('Should force default', () => {
+
+    const useDevice = defineVirtualDevice({
+      setup: ({ controls }) => {
+
+        return {
+          count: controls.count,
+        }
+
+      },
+      controls: {
+        count: {
+          type: 'value',
+          defaultValue: 0,
+          forceDefault: true,
+        },
+      },
+    })
+
+    const device = useDevice('my_device')
+
+    const value = device.count.value
+
+    expect(value).toBe(0)
+    expect(getControlRequestCount).toBe(0)
+
+  })
+
+  it('Should not call getControl when lazyInit', () => {
+
+    const useDevice = defineVirtualDevice({
+      setup: ({ controls }) => {
+
+        return {
+          count: controls.count,
+        }
+
+      },
+      controls: {
+        count: {
+          type: 'value',
+          lazyInit: true,
+        },
+      },
+    })
+
+    const device = useDevice('my_device')
+
+    const value = device.count.value
+
+    expect(value).toBeUndefined()
+    expect(getControlRequestCount).toBe(0)
 
   })
 
