@@ -570,13 +570,15 @@ function createDevice<
 
   Object.keys(controlDefs).forEach((key) => {
 
-    const controlDef = controlDefs[key]
+    const controlDef = controlDefs[key] as VirtualControlDef
     const controlId = controlDef.controlId ?? key
 
     const control = createControl({ deviceType, deviceId, isReady: true }, controlId, {
       type: controlDef.type,
       defaultValue: controlDef.defaultValue,
       isReadonly: controlDef.isReadonly,
+      forceDefault: controlDef.forceDefault,
+      lazyInit: controlDef.lazyInit,
     })
 
     controls[key] = control
