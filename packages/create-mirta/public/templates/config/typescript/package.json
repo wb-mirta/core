@@ -1,7 +1,7 @@
 {
   "devDependencies": {
-    "@mirta/globals": "0.1.0",
-    "@mirta/tsconfig": "0.1.0",
+    "@mirta/globals": "0.1.1",
+    "@mirta/tsconfig": "0.1.1",
     "@types/node": "^24.1.0",
     "typescript": "^5.8.3"
   }

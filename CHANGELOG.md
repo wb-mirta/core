@@ -1,3 +1,13 @@
+## [0.1.1](https://github.com/wb-mirta/core/compare/v0.1.0...v0.1.1) (2025-08-17)
+
+
+### Bug Fixes
+
+* **mirta:** control value getter returns itself ([#8](https://github.com/wb-mirta/core/issues/8)) ([61ef35a](https://github.com/wb-mirta/core/commit/61ef35a6a14691fbf4229d9a209c62b2c8532a75))
+* **mirta:** pass missing options to createControl ([#10](https://github.com/wb-mirta/core/issues/10)) ([2504998](https://github.com/wb-mirta/core/commit/25049981f2bf1af697d7da865d2f12dbec8c48ed))
+
+
+
 # [0.1.0](https://github.com/wb-mirta/core/compare/v0.0.7...v0.1.0) (2025-08-16)
 
 
