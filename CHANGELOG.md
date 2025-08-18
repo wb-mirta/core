@@ -1,3 +1,12 @@
+## [0.1.2](https://github.com/wb-mirta/core/compare/v0.1.1...v0.1.2) (2025-08-18)
+
+
+### Features
+
+* **mirta:** simplify event handlers registration ([#12](https://github.com/wb-mirta/core/issues/12)) ([d226d83](https://github.com/wb-mirta/core/commit/d226d832fe1460c3de10017337bddfda53aee875))
+
+
+
 ## [0.1.1](https://github.com/wb-mirta/core/compare/v0.1.0...v0.1.1) (2025-08-17)
 
 
