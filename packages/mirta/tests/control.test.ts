@@ -29,4 +29,40 @@ describe('Control tests', () => {
 
   })
 
+  it('Should handle value changes', () => {
+
+    const control = createControl(
+      {
+        deviceType: 'virtual',
+        deviceId: 'my_device',
+        isReady: true,
+      },
+      'my_control',
+      {
+        type: 'value',
+        defaultValue: 0,
+        forceDefault: true,
+      }
+    )
+
+    expect(control.value).toBe(0)
+
+    // Событие получения значения.
+    control.onValueReceived((newValue) => {
+
+      expect(newValue).toBe(10)
+
+    })
+
+    // Событие изменения значения.
+    control.onValueChanged((newValue) => {
+
+      expect(newValue).toBe(10)
+
+    })
+
+    control.value = 10
+
+  })
+
 })

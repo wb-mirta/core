@@ -1,5 +1,11 @@
 export type EventHandler = (...args: unknown[]) => void
 
+export type OnEvent<THandler extends EventHandler>
+  = (handler: THandler) => { off: () => void }
+
+export type OnceEvent<THandler extends EventHandler>
+  = (handler: THandler) => void
+
 export interface Event<THandler extends EventHandler> {
   /**
    * Подписывает на событие, есть возможность отписки.
@@ -13,7 +19,7 @@ export interface Event<THandler extends EventHandler> {
    * subscription.off()
    * ```
    **/
-  on: (handler: THandler) => { off: () => void }
+  on: OnEvent<THandler>
   /**
    * Подписывает на событие, однократное выполнение.
    * @example
@@ -24,7 +30,7 @@ export interface Event<THandler extends EventHandler> {
    * stateChanged.once(() => { ... })
    * ```
    **/
-  once: (handler: THandler) => void
+  once: OnceEvent<THandler>
   /**
    * Отписывает указанный обработчик от прослушивания события.
    * @example
@@ -72,8 +78,10 @@ export interface EventRaiser<THandler extends EventHandler> extends Event<THandl
  * ```
  * @example
  * ```ts
- * // Событие с аргументами заданного типа.
- * const countChanged = useEvent<number>()
+ * // Тип обработчика события.
+ * type CountEventHandler = (value: number) => void
+ * // Событие с передачей типа обработчика.
+ * const countChanged = useEvent<CountEventHandler>()
  * // Регистрация обработчика события.
  * countChanged.on((value) => { ... })
  * // Генерация события.
