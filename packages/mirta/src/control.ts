@@ -1,4 +1,4 @@
-import { useEvent, type Event } from '@mirta/basics'
+import { useEvent, type OnEvent } from '@mirta/basics'
 import type { DeviceContext } from './device'
 import { getControlSafe } from './get-control-safe'
 import type { ReadonlyPropWhen, StrictWhenSpecified } from './type-utils'
@@ -23,9 +23,9 @@ export interface Control<TValue> {
   /** Актуальное значение контрола. */
   value: TValue
   /** Событие, происходящее когда поступило новое значение. */
-  valueReceived: Event<ValueEventHandler<TValue>>
+  onValueReceived: OnEvent<ValueEventHandler<TValue>>
   /** Событие, происходящее когда значение изменилось. */
-  valueChanged: Event<ValueEventHandler<TValue>>
+  onValueChanged: OnEvent<ValueEventHandler<TValue>>
 }
 
 export type MaybeReadonlyControl<TValue, TReadonly extends boolean | undefined>
@@ -177,11 +177,9 @@ export function createControl<
 
     },
 
-    valueReceived: valueReceived
-      .withoutRaise(),
+    onValueReceived: valueReceived.on,
 
-    valueChanged: valueChanged
-      .withoutRaise(),
+    onValueChanged: valueChanged.on,
   }
 
 }
