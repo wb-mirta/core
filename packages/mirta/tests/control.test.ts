@@ -1,4 +1,5 @@
-import { createControl } from '../src/control'
+import { mock } from 'vitest-mock-extended'
+import { ChangePolicies, createControl } from '../src/control'
 
 describe('Control tests', () => {
 
@@ -6,6 +7,7 @@ describe('Control tests', () => {
 
     global.trackMqtt = vi.fn()
     global.getControl = vi.fn()
+    global.log = mock<WbRules.Log>()
 
   })
 
@@ -62,6 +64,30 @@ describe('Control tests', () => {
     })
 
     control.value = 10
+
+  })
+
+  it('Should respect readonly', () => {
+
+    const control = createControl(
+      {
+        deviceType: 'virtual',
+        deviceId: 'my_device',
+        isReady: true,
+      },
+      'my_control',
+      {
+        type: 'value',
+        changePolicy: ChangePolicies.ReadOnly,
+        defaultValue: 0,
+        forceDefault: true,
+      }
+    )
+
+    // @ts-expect-error Cannot assign to 'value' because it is a read-only property.
+    control.value = 10
+
+    expect(control.value).toBe(0)
 
   })
 

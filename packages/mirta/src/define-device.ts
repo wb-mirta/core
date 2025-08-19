@@ -1,5 +1,5 @@
 import type { DeviceType, DeviceContext } from './device'
-import { createControl, type MaybeReadonlyControl } from './control'
+import { createControl, ChangePolicies, type ChangePolicy, type VirtualChangePolicy, type MaybeReadonlyControl } from './control'
 import type { StrictWhenSpecified, HasPropertyOfType } from './type-utils'
 import { isFunction } from '@mirta/basics'
 import '@mirta/polyfills'
@@ -39,8 +39,11 @@ type VirtualTypeMapper<K extends keyof WbRules.TypeMappings = keyof WbRules.Type
 interface BaseControlDef {
   /** Идентификатор контрола. Если не указан, используется название свойства. */
   controlId?: string
-  /** Если `true`, то значение доступно только для чтения. */
-  isReadonly?: boolean
+
+  // TODO: Разделить changePolicy соответственно типу устройства - реальное или виртуальное.
+
+  /** Политика доступа на запись значения. */
+  changePolicy?: VirtualChangePolicy | ChangePolicy
 }
 
 /**
@@ -114,7 +117,7 @@ type CreatedControls<
         'defaultValue',
         WbRules.TypeMappings[TControls[K]['type']]
       >,
-      TControls[K]['isReadonly']
+      TControls[K]['changePolicy'] extends ChangePolicies.ReadOnly ? true : false
     >
   >
 }
@@ -416,6 +419,11 @@ function createContext(
 
 }
 
+const extendWithReadonly = (changePolicy: ChangePolicy | VirtualChangePolicy | undefined) =>
+  changePolicy && changePolicy !== ChangePolicies.Default
+    ? { readonly: changePolicy === ChangePolicies.Script || changePolicy === ChangePolicies.ReadOnly }
+    : {}
+
 function configureControls(
   deviceId: string,
   controls: VirtualControls
@@ -439,10 +447,14 @@ function configureControls(
 
     device.addControl(
       controlId,
-      assign({}, control, {
-        value: control.defaultValue,
-        readonly: control.isReadonly,
-      }) as WbRules.ControlOptions
+      assign(
+        {},
+        control,
+        {
+          value: control.defaultValue,
+        },
+        extendWithReadonly(control.changePolicy)
+      ) as WbRules.ControlOptions
     )
 
   })
@@ -494,13 +506,15 @@ function configureContext(
 
       Object.keys(controls).forEach((key) => {
 
+        const control = controls[key]
+
         const cell = assign(
           {},
-          controls[key],
+          control,
           {
-            value: controls[key]['defaultValue'],
+            value: control['defaultValue'],
           },
-          controls[key]['isReadonly'] ? { readonly: true } : {}
+          extendWithReadonly(control['changePolicy'])
         )
 
         cells[key] = cell as WbRules.ControlOptions
@@ -575,8 +589,8 @@ function createDevice<
 
     const control = createControl({ deviceType, deviceId, isReady: true }, controlId, {
       type: controlDef.type,
+      changePolicy: controlDef.changePolicy ?? ChangePolicies.Default,
       defaultValue: controlDef.defaultValue,
-      isReadonly: controlDef.isReadonly,
       forceDefault: controlDef.forceDefault,
       lazyInit: controlDef.lazyInit,
     })
