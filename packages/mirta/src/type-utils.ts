@@ -91,7 +91,7 @@ export type StrictWhenSpecified<
  **/
 export type ReadonlyPropWhen<TObject, K extends keyof TObject, TCondition extends boolean | undefined>
   = TCondition extends true
-    ? Omit<TObject, K> & { +readonly [P in K]-?: TObject[P]; }
+    ? Expand<Omit<TObject, K> & { +readonly [P in K]-?: TObject[P]; }>
     : TObject
 
 /**

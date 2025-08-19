@@ -3,7 +3,65 @@ import type { DeviceContext } from './device'
 import { getControlSafe } from './get-control-safe'
 import type { ReadonlyPropWhen, StrictWhenSpecified } from './type-utils'
 
+/**
+ * Набор политик, управляющих доступностью смены значения контрола.
+ *
+ * @since 0.2.0
+ *
+ **/
+export enum ChangePolicies {
+  /**
+   * Политика по умолчанию.
+   *
+   * - Применяет {@link Public} к контролам типа `switch`, `pushbutton`, `range` и `rgb`;
+   *
+   * - Применяет {@link Script} к остальным типам контролов.
+   *
+   **/
+  Default = 'default',
+
+  /**
+   * Установка значения возможна как скриптами wb-rules, так и сторонними службами.
+   *
+   * Применимо к контролам виртуальных устройств.
+   *
+   **/
+  Public = 'public',
+
+  /**
+   * Установка значения возможна только скриптами wb-rules.
+   *
+   * Применимо к контролам виртуальных устройств.
+   *
+   **/
+  Script = 'script',
+
+  /**
+   * Полный запрет записи, значение доступно только для чтения.
+   *
+   * Применимо к контролам реальных устройств.
+   *
+   **/
+  ReadOnly = 'read-only'
+}
+
 // Внимание! Внутренняя типизация, может измениться.
+
+/**
+ * Определяет политику установки значений реальных устройств.
+ *
+ * @since 0.2.0
+ *
+ **/
+export type ChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.Public | ChangePolicies.Script>}`
+
+/**
+ * Определяет политику установки значений контролов виртуальных устройств.
+ *
+ * @since 0.2.0
+ *
+ **/
+export type VirtualChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.ReadOnly>}`
 
 interface ControlOptions<
   TControl extends WbRules.ControlType,
@@ -13,7 +71,7 @@ interface ControlOptions<
   defaultValue?: TValue
   forceDefault?: boolean
   lazyInit?: boolean
-  isReadonly?: boolean
+  changePolicy?: VirtualChangePolicy | ChangePolicy
 }
 
 type ValueEventHandler<TValue>
@@ -44,6 +102,7 @@ const typeMappings = {
 /**
  * Создаёт контрол устройства.
  * @since 0.1.0
+ *
  **/
 export function createControl<
   TControl extends WbRules.ControlType,
@@ -54,10 +113,10 @@ export function createControl<
   context: DeviceContext,
   controlId: string,
   options: TOptions
-): MaybeReadonlyControl<TReturn, TOptions['isReadonly']> {
+): MaybeReadonlyControl<TReturn, TOptions['changePolicy'] extends ChangePolicies.ReadOnly ? true : false> {
 
   const { deviceType, deviceId } = context
-  const { type, isReadonly } = options
+  const { type, changePolicy = ChangePolicies.Default } = options
 
   const defaultValue = 'defaultValue' in options
     ? options['defaultValue']
@@ -93,6 +152,7 @@ export function createControl<
    * Устанавливает новое значение, если оно отличается от существующего.
    * @param newValue Устанавливаемое значение.
    * @param preventEmit Предотвращает отправку значения в устройство.
+   *
    **/
   function setValue(newValue: TReturn, preventEmit = false) {
 
@@ -166,9 +226,9 @@ export function createControl<
 
     set value(newValue: TReturn) {
 
-      if (isReadonly) {
+      if (changePolicy === ChangePolicies.ReadOnly) {
 
-        log.warning(`Value of '${deviceId}/${controlId}' is readonly`)
+        log.warning(`A new value of '${deviceId}/${controlId}' has been rejected: control is readonly.`)
         return
 
       }
