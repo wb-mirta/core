@@ -4,6 +4,7 @@
 [![GitHub Repo Stars](https://img.shields.io/github/stars/wb-mirta/core?color=594ae2&style=flat-square&logo=github)](https://github.com/wb-mirta/core/stargazers)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/wb-mirta/core?color=594ae2&style=flat-square&logo=github)](https://github.com/wb-mirta/core)
 [![NPM Downloads](https://img.shields.io/npm/dm/mirta?style=flat-square&logo=npm)](https://npmjs.com/package/mirta)
+[![pkg.pr.new](https://pkg.pr.new/badge/wb-mirta/core?style=flat-square&color=555)](https://pkg.pr.new/~/wb-mirta/core)
 
 Мирта - фреймворк для удобной разработки сценариев управления умными домами и другими автоматизациями с применением правил wb-rules контроллеров компании Wiren Board.
 
