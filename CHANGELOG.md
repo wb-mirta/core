@@ -1,3 +1,12 @@
+# [0.2.0](https://github.com/wb-mirta/core/compare/v0.1.2...v0.2.0) (2025-08-20)
+
+
+### Features
+
+* **mirta:** replace readonly with changePolicy ([#14](https://github.com/wb-mirta/core/issues/14)) ([55fa5cf](https://github.com/wb-mirta/core/commit/55fa5cf9dd68dae2df348ad77f76d77a7b6737b9))
+
+
+
 ## [0.1.2](https://github.com/wb-mirta/core/compare/v0.1.1...v0.1.2) (2025-08-18)
 
 
