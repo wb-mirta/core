@@ -10,10 +10,13 @@ on:
 
 jobs:
   test:
-    if: ${{ !startsWith(github.event.head_commit.message, 'release:') }}
+    if: |
+      (!startsWith(github.event.head_commit.message, 'release')) &&
+      (!startsWith(github.event.head_commit.message, 'docs')) &&
+      (!startsWith(github.event.head_commit.message, 'ci'))
     uses: ./.github/workflows/test.yml
   build:
-    # Prevents this action from running on forks
+    # Prevents this action from running on forks.
     if: github.repository == 'wb-mirta/core'
     needs: test
     runs-on: ubuntu-latest
@@ -38,4 +41,11 @@ jobs:
         run: pnpm build
 
       - name: Continuous Release
-        run: pnpx pkg-pr-new publish --compact --pnpm './packages/*'
+        # Prevents this step from running on pull requests.
+        # Runs only when commit message starts with 'fix' or 'feat'.
+        if: |
+          github.event_name == 'push' && (
+            startsWith(github.event.head_commit.message, 'fix') ||
+            startsWith(github.event.head_commit.message, 'feat')
+          )
+        run: pnpx pkg-pr-new publish --compact --pnpm './packages/*' --no-template
