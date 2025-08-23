@@ -91,4 +91,45 @@ describe('Control tests', () => {
 
   })
 
+  it('Should convert string to boolean', () => {
+
+    let _topic = ''
+
+    let _callback: (message: WbRules.MqttMessage) => void = function () {
+
+      throw new Error('Not implemented')
+
+    }
+
+    global.trackMqtt = function (topic: string, callback: (message: WbRules.MqttMessage) => void) {
+
+      _topic = topic
+      _callback = callback
+
+    }
+
+    const control = createControl(
+      {
+        deviceType: 'virtual',
+        deviceId: 'my_device',
+        isReady: true,
+      },
+      'my_control',
+      {
+        type: 'switch',
+        changePolicy: ChangePolicies.ReadOnly,
+        defaultValue: true,
+        forceDefault: true,
+      }
+    )
+
+    expect(_topic).toBe('/devices/my_device/controls/my_control')
+    expect(control.value).toBeTruthy()
+
+    _callback({ topic: _topic, value: '0' })
+
+    expect(control.value).toBeFalsy()
+
+  })
+
 })

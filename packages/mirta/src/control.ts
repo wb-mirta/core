@@ -1,4 +1,4 @@
-import { useEvent, type OnEvent } from '@mirta/basics'
+import { mqttToBoolean, useEvent, type OnEvent } from '@mirta/basics'
 import type { DeviceContext } from './device'
 import { getControlSafe } from './get-control-safe'
 import type { ReadonlyPropWhen, StrictWhenSpecified } from './type-utils'
@@ -177,32 +177,40 @@ export function createControl<
     const incomingType = typeof payload.value
     const expectingType = typeMappings[type]
 
+    let value: TReturn
+
     if (incomingType === 'string' && expectingType === 'number') {
 
-      const value = Number(payload.value)
+      const parsedValue = Number(payload.value)
 
-      if (isNaN(value)) {
+      if (isNaN(parsedValue)) {
 
         log.error(`Value ignored: control '${deviceId}/${controlId}' expects number, but Number(value) is NaN.`)
         return
 
       }
 
-      setValue(value as TReturn, true)
+      value = parsedValue as TReturn
+
+    }
+    else if (expectingType === 'boolean') {
+
+      value = mqttToBoolean(payload.value) as TReturn
+
+    }
+    else if (incomingType !== expectingType) {
+
+      log.error(`Value ignored: control '${deviceId}/${controlId}' expects type '${expectingType}', but received '${incomingType}'`)
+      return
 
     }
     else {
 
-      if (incomingType !== expectingType) {
-
-        log.error(`Value ignored: control '${deviceId}/${controlId}' expects type '${expectingType}', but received '${incomingType}'`)
-        return
-
-      }
-
-      setValue(payload.value as TReturn, true)
+      value = payload.value as TReturn
 
     }
+
+    setValue(value, true)
 
   })
 
