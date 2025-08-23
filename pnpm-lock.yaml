@@ -207,6 +207,9 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: ^16.0.1
         version: 16.0.1(rollup@4.46.0)
+      babel-plugin-array-includes:
+        specifier: ^2.0.3
+        version: 2.0.3
       del:
         specifier: ^8.0.0
         version: 8.0.0
@@ -1455,6 +1458,9 @@ packages:
 
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
+
+  babel-plugin-array-includes@2.0.3:
+    resolution: {integrity: sha512-sCOF2ST61Vlnss4IRn/X84crwJyzq0f/3z0voJd4XZ2izIUX2h9AO5L+F4CJ/7na3d9xRWDsaS0EfPTg8kJsqg==}
 
   babel-plugin-polyfill-corejs2@0.4.14:
     resolution: {integrity: sha512-Co2Y9wX854ts6U8gAAPXfn0GmAyctHuK8n0Yhfjd6t30g7yvKjspvvOo9yG+z52PZRgFErt7Ka2pYnXCjLKEpg==}
@@ -4107,6 +4113,8 @@ snapshots:
   assertion-error@2.0.1: {}
 
   async@3.2.6: {}
+
+  babel-plugin-array-includes@2.0.3: {}
 
   babel-plugin-polyfill-corejs2@0.4.14(@babel/core@7.28.0):
     dependencies:

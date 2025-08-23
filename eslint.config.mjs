@@ -25,8 +25,6 @@ export default defineConfig([
   {
     files: ['**/*.{ts,mts}'],
     rules: {
-      // Правило несовместимо с wb-rules 2.0
-      '@typescript-eslint/prefer-includes': 'off',
       // Позволяет работать с dev['deviceId']['controlId']
       '@typescript-eslint/dot-notation': 'off',
       // Разрешает интерполяцию базовых типов

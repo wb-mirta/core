@@ -144,7 +144,10 @@ export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
 
     getBabelOutputPlugin({
       presets: ['@babel/preset-env'],
-      plugins: ['@babel/plugin-transform-spread'],
+      plugins: [
+        '@babel/plugin-transform-spread',
+        'array-includes',
+      ],
     }),
 
     del({
