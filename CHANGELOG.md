@@ -1,3 +1,18 @@
+## [0.2.1](https://github.com/wb-mirta/core/compare/v0.2.0...v0.2.1) (2025-08-24)
+
+
+### Bug Fixes
+
+* **mirta:** add boolean conversion for mqtt values ([#20](https://github.com/wb-mirta/core/issues/20)) ([1390f0e](https://github.com/wb-mirta/core/commit/1390f0eb4c9a9b2c35e2e6a81a8b7e9394976645))
+
+
+### Features
+
+* **create-mirta:** improve dotenv support ([#16](https://github.com/wb-mirta/core/issues/16)) ([1e36e38](https://github.com/wb-mirta/core/commit/1e36e389ee25a03c1f3f09bf3c0044f73b6af913))
+* **mirta-rollup:** add array-includes support ([#19](https://github.com/wb-mirta/core/issues/19)) ([a0a92a3](https://github.com/wb-mirta/core/commit/a0a92a31b4e705a23619e74a48fc8080e06ebced))
+
+
+
 # [0.2.0](https://github.com/wb-mirta/core/compare/v0.1.2...v0.2.0) (2025-08-20)
 
 
