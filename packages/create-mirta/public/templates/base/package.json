@@ -9,10 +9,10 @@
     "build:dev": "cross-env NODE_ENV=development rollup -c"
   },
   "dependencies": {
-    "mirta": "0.2.1"
+    "mirta": "0.2.2"
   },
   "devDependencies": {
-    "@mirta/rollup": "0.2.1",
+    "@mirta/rollup": "0.2.2",
     "cross-env": "^7.0.3",
     "rollup": "^4.45.1"
   }

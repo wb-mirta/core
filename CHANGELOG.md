@@ -1,3 +1,12 @@
+## [0.2.2](https://github.com/wb-mirta/core/compare/v0.2.1...v0.2.2) (2025-08-25)
+
+
+### Features
+
+* **create-mirta:** allow JS during TS migration ([#22](https://github.com/wb-mirta/core/issues/22)) ([16e1344](https://github.com/wb-mirta/core/commit/16e1344a93bb13818c33c8db693cc4ca0b0ff412))
+
+
+
 ## [0.2.1](https://github.com/wb-mirta/core/compare/v0.2.0...v0.2.1) (2025-08-24)
 
 
