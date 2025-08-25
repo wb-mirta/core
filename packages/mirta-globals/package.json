@@ -10,12 +10,17 @@
   ],
   "files": [
     "types",
+    "eslint",
     "LICENSE",
     "README.md"
   ],
   "exports": {
     ".": {
       "types": "./types/index.d.ts"
+    },
+    "./eslint": {
+      "default": "./eslint/index.js",
+      "types": "./eslint/index.d.ts"
     }
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-globals#readme",

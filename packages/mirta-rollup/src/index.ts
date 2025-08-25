@@ -3,6 +3,7 @@ import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
 import ts from 'rollup-plugin-typescript2'
 import dotenv from '@dotenv-run/rollup'
+import copy from 'rollup-plugin-copy'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 
@@ -15,6 +16,10 @@ const isProduction = env === 'production'
 const packagesPattern = /node_modules\/@?(.+)\/(.+)/
 const modulesPattern = /(?:src\/)?wb-rules-modules\/(.*)/
 const scriptsPattern = /(?:src\/)?(?:wb-rules\/)?(.*)/
+
+const outputDir = {
+  es5: 'dist/es5',
+}
 
 function packageEntry(pkg: string, entry: string) {
 
@@ -120,6 +125,16 @@ export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
       targets: 'dist/*',
     }),
 
+    // Переносит js-файлы из src в dist без какой-либо обработки
+    // в целях обеспечения совместимости с существующими скриптами.
+    //
+    copy({
+      targets: [
+        { src: 'src/wb-rules/**/*.js', dest: `${outputDir.es5}/wb-rules` },
+        { src: 'src/wb-rules-modules/**/*.js', dest: `${outputDir.es5}/wb-rules-modules` },
+      ],
+    }),
+
     multi({
       exclude: ['src/wb-rules/*.disabled.ts'],
       preserveModules: true,
@@ -170,7 +185,7 @@ export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
       format: 'cjs',
       strict: false,
 
-      dir: 'dist/es5',
+      dir: outputDir.es5,
 
       preserveModules: true,
 
