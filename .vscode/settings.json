@@ -1,5 +1,8 @@
 {
   "files.eol": "\n",
+  "files.associations": {
+    "renovate.json": "jsonc"
+  },
   "task.autoDetect": "off",
   "todohighlight.keywords": [
     {

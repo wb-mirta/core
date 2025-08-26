@@ -1,0 +1,52 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "schedule:weekly",
+    "group:allNonMajor",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "labels": ["dependencies"],
+  "ignorePaths": ["**/tests/**"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "enabled": false
+    },
+    {
+      "groupName": "test",
+      "matchPackageNames": ["vitest", "@vitest{/,}**"]
+    },
+    {
+      "groupName": "compiler",
+      "matchPackageNames": ["magic-string", "@babel{/,}**"]
+    },
+    {
+      "groupName": "build",
+      "matchPackageNames": [
+        "rollup{/,}**",
+        "@rollup{/,}**",
+        "esbuild{/,}**"
+      ]
+    },
+    {
+      "groupName": "lint",
+      "matchPackageNames": [
+        "@stylistic{/,}**",
+        "simple-git-hooks",
+        "lint-staged",
+        "typescript-eslint{/,}**",
+        "eslint{/,}**"
+      ]
+    }
+  ],
+  "ignoreDeps": [
+    "mirta",
+    "@mirta{/,}**",
+
+    // Manually bumping
+    "node",
+    "typescript"
+  ]
+}
