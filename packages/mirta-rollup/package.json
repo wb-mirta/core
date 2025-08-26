@@ -36,8 +36,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
     "@dotenv-run/rollup": "^1.3.7",
     "@mirta/polyfills": "workspace:*",
     "@rollup/plugin-babel": "^6.0.4",
@@ -45,7 +45,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.0",
-    "magic-string": "^0.30.17",
+    "magic-string": "^0.30.18",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.8.3"
