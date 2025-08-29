@@ -1,3 +1,12 @@
+## [0.2.3](https://github.com/wb-mirta/core/compare/v0.2.2...v0.2.3) (2025-08-29)
+
+
+### Features
+
+* handle JavaScript by Rollup and Vitest ([#32](https://github.com/wb-mirta/core/issues/32)) ([67900ec](https://github.com/wb-mirta/core/commit/67900ecf6929836f8d334704da42a102cdca4d46))
+
+
+
 ## [0.2.2](https://github.com/wb-mirta/core/compare/v0.2.1...v0.2.2) (2025-08-25)
 
 
