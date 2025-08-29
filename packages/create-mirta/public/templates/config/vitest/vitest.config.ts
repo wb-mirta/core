@@ -24,7 +24,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    include: ['tests/**/*.{test,spec}.ts'],
+    include: ['tests/**/*.{test,spec}.[jt]s'],
     setupFiles: [
       fileURLToPath(
         new URL('./tests/setup/dotenv.ts', import.meta.url)

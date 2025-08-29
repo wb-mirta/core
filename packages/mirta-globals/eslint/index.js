@@ -1,4 +1,6 @@
 export default {
+  '__DEV__': 'readonly',
+  '__TEST__': 'readonly',
   'log': 'readonly',
   'dev': 'readonly',
   'timers': 'readonly',

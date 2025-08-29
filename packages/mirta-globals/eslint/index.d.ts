@@ -1,4 +1,6 @@
 declare interface GlobalsMirta {
+  readonly '__DEV__': false
+  readonly '__TEST__': false
   readonly 'log': false
   readonly 'dev': false
   readonly 'timers': false
