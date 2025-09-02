@@ -3,6 +3,7 @@ declare interface GlobalsMirta {
   readonly '__TEST__': false
   readonly 'log': false
   readonly 'dev': false
+  readonly 'cron': false
   readonly 'timers': false
   readonly 'defineRule': false
   readonly 'defineAlias': false

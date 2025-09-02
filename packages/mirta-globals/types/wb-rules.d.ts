@@ -66,6 +66,10 @@ declare namespace WbRules {
     error(message: string | undefined, ...args: (string | number | boolean)[]): void
   }
 
+  interface CronEntry {
+    spec: string
+  }
+
   interface Timer {
     firing: boolean
 
@@ -99,9 +103,12 @@ declare namespace WbRules {
     asSoonAs?(): boolean
 
     /**
-     * Функция, которая сигнализирует, что правило должно отработать
-     */
-    when?(): number | boolean
+     * Функция или экземпляр {@link CronEntry}, возвращаемый функцией {@link cron}.
+     *
+     * Сигнализирует, когда правило должно отработать.
+     *
+     **/
+    when?: CronEntry | (() => number | boolean)
 
     /**
      * Функция, которая вызывается при срабатывании правила
@@ -459,6 +466,23 @@ declare var dev: WbRules.Dev
 
 /** Объект доступа к именованным таймера. */
 declare var timers: WbRules.TimerCollection
+
+/**
+ * Используется для ввода спецификации cron-правила.
+ *
+ * Подробное описание формата выражений используемой cron-библиотеки:
+
+ * https://pkg.go.dev/github.com/robfig/cron/v3#hdr-CRON_Expression_Format
+ *
+ * @example
+ * ```ts
+ * defineRule('cron_hourly', {
+ *   when: cron('@hourly'),
+ *   then: () => log('@hourly rule raised')
+ * })
+ * ```
+ **/
+declare function cron(spec: string): WbRules.CronEntry
 
 /**
  * Создаёт правило обработки.

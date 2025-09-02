@@ -3,6 +3,7 @@ export default {
   '__TEST__': 'readonly',
   'log': 'readonly',
   'dev': 'readonly',
+  'cron': 'readonly',
   'timers': 'readonly',
   'defineRule': 'readonly',
   'defineAlias': 'readonly',
