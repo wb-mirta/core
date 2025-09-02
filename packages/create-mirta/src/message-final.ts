@@ -16,7 +16,10 @@ const finalMessageRu = `\
 Если вам нравится фреймворк, поставьте ему звёздочку на Гитхабе:
 https://github.com/wb-mirta/core
 
-Поблагодарить разработчика можно через сервис для безналичных чаевых от Т‑Банка и CloudPayments:
+Поблагодарить разработчика можно через Boosty:
+https://boosty.to/wihome/donate
+
+Также доступен сервис для безналичных чаевых от Т‑Банка и CloudPayments:
 https://pay.cloudtips.ru/p/58512cca
 `
 
