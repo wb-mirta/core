@@ -58,7 +58,7 @@ function createConfig(templateDir: string, options: CreateConfigOptions = {}) {
   if (addVitest) {
 
     additionalConfigs.unshift({
-      devDependencies: pickDependencies(['eslint-plugin-vitest']),
+      devDependencies: pickDependencies(['@vitest/eslint-plugin']),
     })
 
   }
