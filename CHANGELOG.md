@@ -1,3 +1,12 @@
+## [0.2.5](https://github.com/wb-mirta/core/compare/v0.2.4...v0.2.5) (2025-09-03)
+
+
+### Bug Fixes
+
+* **create-mirta:** change vitest plugin for eslint ([#38](https://github.com/wb-mirta/core/issues/38)) ([9770317](https://github.com/wb-mirta/core/commit/977031782fdcc3b7a7fcf20916c715b5fc72adfc))
+
+
+
 ## [0.2.4](https://github.com/wb-mirta/core/compare/v0.2.3...v0.2.4) (2025-09-03)
 
 
