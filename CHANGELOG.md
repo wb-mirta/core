@@ -1,3 +1,12 @@
+## [0.2.4](https://github.com/wb-mirta/core/compare/v0.2.3...v0.2.4) (2025-09-03)
+
+
+### Features
+
+* **mirta-globals:** add cron support ([#34](https://github.com/wb-mirta/core/issues/34)) ([b8e09cd](https://github.com/wb-mirta/core/commit/b8e09cd68b543f2899864a2209a7f4d0813e003b))
+
+
+
 ## [0.2.3](https://github.com/wb-mirta/core/compare/v0.2.2...v0.2.3) (2025-08-29)
 
 

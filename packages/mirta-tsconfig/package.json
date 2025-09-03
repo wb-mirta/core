@@ -1,7 +1,7 @@
 {
   "name": "@mirta/tsconfig",
   "description": "Base TSConfig for working with Mirta",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "license": "Unlicense",
   "keywords": [
     "mirta",
