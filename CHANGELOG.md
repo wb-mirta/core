@@ -1,3 +1,12 @@
+## [0.2.6](https://github.com/wb-mirta/core/compare/v0.2.5...v0.2.6) (2025-09-15)
+
+
+### Features
+
+* **globals:** add declaration for StorableObject ([#43](https://github.com/wb-mirta/core/issues/43)) ([3d28b0b](https://github.com/wb-mirta/core/commit/3d28b0b62ad83626df9e6f977d14c9800531c0ed))
+
+
+
 ## [0.2.5](https://github.com/wb-mirta/core/compare/v0.2.4...v0.2.5) (2025-09-03)
 
 
