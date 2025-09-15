@@ -17,6 +17,7 @@ export default {
   'readConfig': 'readonly',
   'trackMqtt': 'readonly',
   'publish': 'readonly',
+  'StorableObject': 'readonly',
   'PersistentStorage': 'readonly',
   'Notify': 'readonly',
 }

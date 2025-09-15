@@ -645,11 +645,55 @@ declare function publish(
   retain?: boolean
 ): void
 
+/**
+ * Проксирует исходный объект, обеспечивая автоматическую синхронизацию
+ * изменений в его свойствах со связанным хранилищем {@link PersistentStorage}.
+ *
+ * Важно: отслеживание изменений поддерживается только для возвращаемого функцией объекта.
+ * Исходный объект не получит никакой дополнительной функциональности.
+ *
+ * @template TObject Тип исходного объекта. Обычно выводится автоматически (type inference), но при необходимости его можно задать явно.
+ *
+ * @param source Исходный объект, который будет проксирован.
+ *
+ * @example
+ *
+ * ```ts
+ * // Оборачивание объекта в прокси.
+ * const user = StorableObject({ id: 1, name: 'Alice' })
+ *
+ * // Подключение к энергонезависимому хранилищу.
+ * const storage = new PersistentStorage('users', { global: true })
+ * storage['user'] = user
+ *
+ * // Объект автоматически отслеживает изменения и передаёт их в хранилище.
+ * user.name = 'Bob'
+ *
+ * ```
+ * @example
+ *
+ * ```ts
+ * interface User {
+ *   id: number,
+ *   name: string
+ * }
+ *
+ * // Подключение к энергонезависимому хранилищу.
+ * const storage = new PersistentStorage('users', { global: true })
+ *
+ * // Извлечение объекта.
+ * const retrievedUser = storage['user'] as User
+ *
+ * // Изменения опять будут автоматически передаваться в хранилище.
+ * retrievedUser.name = 'Charlie'
+ *
+ * ```
+ */
+declare function StorableObject<TObject>(source: TObject): TObject
+
 declare class PersistentStorage {
   constructor(name: string, options: WbRules.StorageOptions)
 }
-
-declare function StorableObject(obj: any)
 
 /**
  * Класс оповещения

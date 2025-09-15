@@ -17,6 +17,7 @@ declare interface GlobalsMirta {
   readonly 'readConfig': false
   readonly 'trackMqtt': false
   readonly 'publish': false
+  readonly 'StorableObject': false
   readonly 'PersistentStorage': false
   readonly 'Notify': false
 }
