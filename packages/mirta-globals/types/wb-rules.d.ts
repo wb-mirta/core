@@ -649,6 +649,8 @@ declare class PersistentStorage {
   constructor(name: string, options: WbRules.StorageOptions)
 }
 
+declare function StorableObject(obj: any)
+
 /**
  * Класс оповещения
  * @abstract
