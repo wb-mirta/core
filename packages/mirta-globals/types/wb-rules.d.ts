@@ -197,7 +197,18 @@ declare namespace WbRules {
 
     setMin(min: number): void
 
-    setError(order: number): void
+    setPrecision(precision: number): void
+
+    /**
+     * Позволяет указать на наличие ошибки уровня контрола.
+     * Применимо только к виртуальным устройствам.
+     *
+     * @param message Текст ошибки.
+     *
+     **/
+    setError(message: string): void
+
+    setOrder(order: number): void
 
     setValue(value: MqttValue | ControlValueOptions): void
 
@@ -221,6 +232,13 @@ declare namespace WbRules {
 
     getMin(): number
 
+    getPrecision(): number
+
+    /**
+     * Возвращает текст ошибки,
+     * а при её отсутствии - пустую строку.
+     *
+     **/
     getError(): string
 
     getOrder(): number
@@ -385,6 +403,22 @@ declare namespace WbRules {
     controlsList(): Control[]
 
     isVirtual(): boolean
+
+    /**
+     * Позволяет указать на наличие ошибки уровня устройства.
+     * Применимо только к виртуальным устройствам.
+     *
+     * @param message Текст ошибки.
+     *
+     **/
+    setError(message: string): void
+
+    /**
+     * Возвращает текст ошибки,
+     * а при её отсутствии - пустую строку.
+     *
+     **/
+    getError(): string
   }
 
   type ControlOptionsTree = Record<string, ControlOptions>
