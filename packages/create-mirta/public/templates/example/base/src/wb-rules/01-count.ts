@@ -1,4 +1,4 @@
-import { useCounter } from '@wbm/counter'
+import { useCounter } from '#wbm/counter'
 
 const counter = useCounter()
 

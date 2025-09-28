@@ -1,6 +1,7 @@
 {
   "extends": "@mirta/tsconfig",
   "compilerOptions": {
+    "rootDir": ".",
     "paths": {
       "@wbm/*": [
         "./src/wb-rules-modules/*"

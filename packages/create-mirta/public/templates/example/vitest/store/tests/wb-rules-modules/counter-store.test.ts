@@ -1,4 +1,4 @@
-import { useCounterStore } from '@wbm/counter-store'
+import { useCounterStore } from '#wbm/counter-store'
 
 test('Expect state is shared', () => {
 

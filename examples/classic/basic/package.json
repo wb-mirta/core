@@ -10,6 +10,14 @@
     "node": ">=20.6.0"
   },
   "type": "module",
+  "imports": {
+    "#wb/*": [
+      "./src/wb-rules/*.js"
+    ],
+    "#wbm/*": [
+      "./src/wb-rules-modules/*.js"
+    ]
+  },
   "dependencies": {
     "mirta": "workspace:*"
   },
