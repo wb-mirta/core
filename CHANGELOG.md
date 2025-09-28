@@ -1,3 +1,18 @@
+## [0.2.7](https://github.com/wb-mirta/core/compare/v0.2.6...v0.2.7) (2025-09-28)
+
+
+### Bug Fixes
+
+* **globals:** improve Device & Control ([#48](https://github.com/wb-mirta/core/issues/48)) ([d8d06ca](https://github.com/wb-mirta/core/commit/d8d06cac24b5a04d9fc495046d6c4a1ed58c1060))
+
+
+### Features
+
+* **create-mirta:** migrate to subpath imports ([#52](https://github.com/wb-mirta/core/issues/52)) ([1d4376b](https://github.com/wb-mirta/core/commit/1d4376b542d7607da2e5e1fff32ab7e39b12f175))
+* **create-mirta:** move examples to the repo root ([#50](https://github.com/wb-mirta/core/issues/50)) ([10b171a](https://github.com/wb-mirta/core/commit/10b171acfc705388723a9a00df7b873ed34023a8))
+
+
+
 ## [0.2.6](https://github.com/wb-mirta/core/compare/v0.2.5...v0.2.6) (2025-09-15)
 
 
