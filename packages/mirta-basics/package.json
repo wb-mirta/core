@@ -32,10 +32,6 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
-    "prepublishOnly": "pnpm run build"
-  },
-  "publishConfig": {
-    "access": "public"
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   }
 }

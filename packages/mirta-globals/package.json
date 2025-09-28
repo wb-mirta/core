@@ -31,8 +31,5 @@
   },
   "bugs": {
     "url": "https://github.com/wb-mirta/core/issues"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

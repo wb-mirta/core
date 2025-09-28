@@ -32,8 +32,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
-    "prepublishOnly": "pnpm run build"
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   },
   "dependencies": {
     "@babel/core": "^7.28.4",
@@ -51,8 +50,5 @@
   },
   "devDependencies": {
     "rollup": "^4.50.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

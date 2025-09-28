@@ -37,13 +37,9 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
-    "prepublishOnly": "pnpm run build"
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   },
   "dependencies": {
     "@mirta/polyfills": "workspace:*"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

@@ -30,8 +30,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
-    "prepublishOnly": "pnpm run build"
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",
@@ -53,8 +52,5 @@
     "@vitest/eslint-plugin": "^1.3.12",
     "globals": "^16.3.0",
     "typescript-eslint": "^8.41.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

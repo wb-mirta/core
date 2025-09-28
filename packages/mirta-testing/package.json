@@ -32,14 +32,10 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
-    "prepublishOnly": "pnpm run build"
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   },
   "dependencies": {
     "mirta": "workspace:*",
     "vitest-mock-extended": "^3.1.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }
