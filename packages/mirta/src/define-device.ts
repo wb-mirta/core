@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
+
 import type { DeviceType, DeviceContext } from './device'
 import { createControl, ChangePolicies, type ChangePolicy, type VirtualChangePolicy, type MaybeReadonlyControl } from './control'
 import type { StrictWhenSpecified, HasPropertyOfType } from './type-utils'

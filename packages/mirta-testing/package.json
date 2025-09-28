@@ -31,8 +31,8 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "clean": "rimraf dist build",
-    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "clean": "rimraf dist",
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {

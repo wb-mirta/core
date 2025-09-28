@@ -1,43 +1,48 @@
 import js from '@eslint/js'
 import globals from 'globals'
-import workspaces from 'eslint-plugin-workspaces'
+import globalsMirta from '@mirta/globals/eslint'
 import tseslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
-import vitest from '@vitest/eslint-plugin'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  { files: ['**/*.{js,mjs,cjs,ts,mts,cts}'], plugins: { js }, extends: ['js/recommended'] },
-  { files: ['**/*.{js,mjs,cjs,ts,mts,cts}'], languageOptions: { globals: globals.node } },
   {
-    ...workspaces.configs['flat/recommended'],
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    plugins: { js },
+    extends: ['js/recommended'],
+  },
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globalsMirta,
+      },
+    },
   },
   // TypeScript Defaults
   tseslint.configs.strictTypeChecked.map(config => ({
     ...config,
-    files: ['**/*.{ts,mts}'],
+    files: ['**/*.ts'],
   })),
   tseslint.configs.stylisticTypeChecked.map(config => ({
     ...config,
-    files: ['**/*.{ts,mts}'],
+    files: ['**/*.ts'],
   })),
   // TypeScript Overrides
   {
-    files: ['**/*.{ts,mts}'],
+    files: ['**/*.ts'],
     rules: {
       // Позволяет работать с dev['deviceId']['controlId']
       '@typescript-eslint/dot-notation': 'off',
       // Разрешает интерполяцию базовых типов
-      '@typescript-eslint/restrict-template-expressions': [
-        'error',
-        {
-          allowAny: false,
-          allowBoolean: true,
-          allowNullish: true,
-          allowNumber: true,
-          allowRegExp: true,
-        },
-      ],
+      '@typescript-eslint/restrict-template-expressions': ['error', {
+        allowAny: false,
+        allowBoolean: true,
+        allowNullish: true,
+        allowNumber: true,
+        allowRegExp: true,
+      }],
       // Разрешает неиспользуемые переменные с символом подчёркивания
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -51,31 +56,12 @@ export default defineConfig([
           'ignoreRestSiblings': true,
         },
       ],
-      '@typescript-eslint/no-empty-object-type': ['error', {
-        allowObjectTypes: 'always',
-      }],
     },
     languageOptions: {
       parserOptions: {
-        project: [
-          './tsconfig.json',
-          './packages/*/tsconfig.json',
-        ],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
-    },
-  },
-  // TypeScript Type Definition Overrides
-  {
-    files: ['packages/*/types/**/*.d.ts'],
-    rules: {
-      'no-var': 'off',
-      '@typescript-eslint/no-extraneous-class': 'off',
-      '@typescript-eslint/triple-slash-reference': ['error', {
-        lib: 'always',
-        path: 'always',
-        types: 'prefer-import',
-      }],
     },
   },
   // Stylistic Defaults
@@ -102,26 +88,8 @@ export default defineConfig([
       }],
     },
   },
-  // Vitest Defaults
-  {
-    files: ['tests/**'],
-    plugins: {
-      vitest,
-    },
-    rules: {
-      ...vitest.configs.recommended.rules,
-    },
-    languageOptions: {
-      globals: {
-        ...vitest.environments.env.globals,
-      },
-    },
-  },
   globalIgnores([
     'node_modules/',
     'dist/',
-    'packages/*/dist/',
-    'packages/create-mirta/public/templates/**/*',
-    'examples/*/*/dist/',
   ]),
 ])
