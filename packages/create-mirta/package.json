@@ -30,7 +30,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "pnpm clean && rollup -c ../../rollup.config.mjs",
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {

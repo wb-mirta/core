@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "wayou.vscode-todo-highlight",
+    "dbaeumer.vscode-eslint"
+  ]
+}

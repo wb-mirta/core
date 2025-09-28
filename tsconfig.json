@@ -21,7 +21,8 @@
     "*.mts",
     "packages/*/src/**/*.ts",
     "packages/*/tests/**/*.ts",
-    "packages/*/types/*.d.ts"
+    "packages/*/types/*.d.ts",
+    "examples/*/*/src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

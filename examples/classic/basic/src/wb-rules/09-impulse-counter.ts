@@ -9,7 +9,8 @@ const meterCorrection = 123120 // Корректировочное значен�
 const counterCorrection = 7 // Корректировочное значение WB-MCM8 в импульсах
 const inpulseValue = 10 // Количество литров на один импульс
 
-defineVirtualDevice('water_meters', { // Создаем виртуальный девайс для отображения в веб интерфейсе.
+// Создаем виртуальный девайс для отображения в веб интерфейсе.
+defineVirtualDevice('water_meters', {
   title: 'Счетчики воды',
   cells: {
     water_meter_1: {
@@ -38,7 +39,8 @@ defineRule('water_meter_1', {
               : 0
           )
 
-      dev['water_meters/water_meter_1'] = ((intValue - counterCorrection) * inpulseValue) + meterCorrection // Умножаем значение счетчика на количество литров/импульс и прибавляем корректировочное значение.
+      // Умножаем значение счетчика на количество литров/импульс и прибавляем корректировочное значение.
+      dev['water_meters/water_meter_1'] = ((intValue - counterCorrection) * inpulseValue) + meterCorrection
 
     }
 

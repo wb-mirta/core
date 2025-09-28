@@ -5,6 +5,7 @@ import ts from 'rollup-plugin-typescript2'
 import dotenv from '@dotenv-run/rollup'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
+import path from 'node:path'
 
 import del from './plugins/del'
 import wbRulesImports from './plugins/wb-rules-imports'
@@ -12,12 +13,52 @@ import wbRulesImports from './plugins/wb-rules-imports'
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
-const packagesPattern = /node_modules\/@?(.+)\/(.+)/
-const modulesPattern = /(?:src\/)?wb-rules-modules\/(.*)/
-const scriptsPattern = /(?:src\/)?(?:wb-rules\/)?(.*)/
+const packagesPattern = /node_modules[\\/]@?(.+)[\\/](.+)/
+const modulesPattern = /(?:src[\\/])?wb-rules-modules[\\/](.*)/
+const scriptsPattern = /(?:src[\\/])?(?:wb-rules[\\/])?(.*)/
+
+const cwd = process.cwd()
 
 const outputDir = {
   es5: 'dist/es5',
+}
+
+function pathByGlobPattern(path: string, pattern: string) {
+
+  const pathParts = path.split('/')
+  const patternParts = pattern.split('/')
+
+  let i = 0 // Индекс текущего компонента пути.
+
+  for (let j = 0; j < patternParts.length && i < pathParts.length; j++) {
+
+    switch (patternParts[j]) {
+      case '*':
+        break
+      case '**':
+        while (i < pathParts.length && !pathParts[i].startsWith(patternParts[j + 1])) {
+
+          i += 1 // Пропускаем все элементы пути до следующего элемента шаблона.
+
+        }
+        break
+      default:
+        if (patternParts[j] === pathParts[i]) {
+
+          i += 1
+
+        }
+        else {
+
+          return void 0 // Несоответствие фиксированного значения.
+
+        }
+    }
+
+  }
+
+  return pathParts.slice(i).join('/')
+
 }
 
 function packageEntry(pkg: string, entry: string) {
@@ -105,6 +146,11 @@ export interface DotenvOptions {
 }
 
 export interface RollupConfigOptions {
+  /** Настройки для монорепозитория. */
+  monorepo?: {
+    rootDir: string
+    workspaces: string[]
+  }
   dotenv?: DotenvOptions
   plugins?: Plugin[]
 }
@@ -116,7 +162,11 @@ export interface RollupConfigOptions {
  */
 export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
 
-  const { dotenv: dotenvOptions = {}, plugins = [] } = options
+  const {
+    dotenv: dotenvOptions = {},
+    plugins = [],
+    monorepo,
+  } = options
 
   const defaultPlugins = [
 
@@ -175,17 +225,45 @@ export function defineConfig(options: RollupConfigOptions = {}): RollupOptions {
       strict: false,
 
       dir: outputDir.es5,
-
       preserveModules: true,
 
       entryFileNames(chunkInfo) {
 
-        // console.log(process.cwd())
-        // console.log(chunkInfo.name)
-        // console.log(getEntry(chunkInfo.name))
-        // console.log(chunkInfo)
+        let chunkName = chunkInfo.name
 
-        return getEntry(chunkInfo.name)
+        if (monorepo) {
+
+          const { rootDir, workspaces } = monorepo
+
+          const absolutePath = path.resolve(rootDir, chunkInfo.name)
+
+          if (absolutePath.startsWith(cwd)) {
+
+            chunkName = path
+              .relative(cwd, absolutePath)
+
+          }
+          else {
+
+            for (const workspace of workspaces) {
+
+              const maybeChunkName = pathByGlobPattern(chunkName, workspace)
+
+              if (maybeChunkName) {
+
+                // Обманка для упрощённого встраивания в packages.
+                chunkName = 'node_modules/' + maybeChunkName
+                break
+
+              }
+
+            }
+
+          }
+
+        }
+
+        return getEntry(chunkName)
 
       },
     },

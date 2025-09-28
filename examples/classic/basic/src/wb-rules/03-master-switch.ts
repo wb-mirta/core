@@ -14,14 +14,11 @@ defineVirtualDevice('power_off', {
 
 const ps = new PersistentStorage('power-storage', { global: true })
 
-// Для обеспечения возможности распознавания обращения
-// к контролу в dev, после массива добавляется 'as const'.
-
 const lights = [
   'wb-mdm3_50/K1',
   'wb-mdm3_50/K2',
   'wb-mdm3_50/K3',
-] as const
+]
 
 let isPowerOff = true
 

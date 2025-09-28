@@ -45,4 +45,4 @@ jobs:
             startsWith(github.event.head_commit.message, 'fix') ||
             startsWith(github.event.head_commit.message, 'feat')
           )
-        run: pnpx pkg-pr-new publish --compact --pnpm './packages/*' --no-template
+        run: pnpx pkg-pr-new publish --compact --pnpm './packages/*' --template './examples/*/*'

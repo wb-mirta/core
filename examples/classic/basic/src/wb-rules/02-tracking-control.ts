@@ -1,7 +1,7 @@
 // Слежение за контролом
 //
 // Адаптированная версия примера
-// https://wirenboard.com/wiki/index.php?title=Rule_Examples
+// https://wiki.wirenboard.com/wiki/index.php?title=Rule_Examples
 
 defineRule({
   whenChanged: 'wb-gpio/D1_IN',

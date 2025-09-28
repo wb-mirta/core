@@ -1,12 +1,16 @@
 // Виртуальное устройство
 //
 // Адаптированная версия примера
-// https://wirenboard.com/wiki/index.php?title=Rule_Examples
+// https://wiki.wirenboard.com/wiki/index.php?title=Rule_Examples
 
 const deviceName = 'my-virtual-device'
 
+// Создаем виртуальный девайс для отображения в веб-интерфейсе.
 defineVirtualDevice(deviceName, {
-  title: { 'en': 'My Virtual Device', 'ru': 'Мое виртуальное устройство' },
+  title: {
+    'en': 'My Virtual Device',
+    'ru': 'Мое виртуальное устройство',
+  },
   cells: {
     value: {
       title: { 'en': 'Value', 'ru': 'Значение' },
