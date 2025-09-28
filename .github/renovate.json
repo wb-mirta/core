@@ -6,6 +6,8 @@
     "group:allNonMajor",
     ":semanticCommitTypeAll(chore)"
   ],
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
   "labels": ["dependencies"],
   "ignorePaths": ["**/tests/**"],
   "rangeStrategy": "bump",
