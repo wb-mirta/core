@@ -1,5 +1,5 @@
-import { useCounter } from '@wbm/counter'
-import { useCounterStore } from '@wbm/counter-store'
+import { useCounter } from '#wbm/counter'
+import { useCounterStore } from '#wbm/counter-store'
 
 const counter = useCounter()
 

@@ -1,4 +1,4 @@
-import { useCounterStore } from '@wbm/counter-store'
+import { useCounterStore } from '#wbm/counter-store'
 
 const store = useCounterStore()
 
