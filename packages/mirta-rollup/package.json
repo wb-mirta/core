@@ -49,6 +49,6 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
-    "rollup": "^4.50.0"
+    "rollup": "^4.52.3"
   }
 }
