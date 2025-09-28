@@ -75,7 +75,7 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       rollup:
-        specifier: ^4.50.0
+        specifier: ^4.52.3
         version: 4.52.3
       rollup-plugin-copy:
         specifier: ^3.5.0
@@ -148,7 +148,7 @@ importers:
         specifier: ^16.4.0
         version: 16.4.0
       rollup:
-        specifier: ^4.50.0
+        specifier: ^4.52.3
         version: 4.52.3
       typescript:
         specifier: ^5.8.3
@@ -191,7 +191,7 @@ importers:
         specifier: ^16.4.0
         version: 16.4.0
       rollup:
-        specifier: ^4.50.0
+        specifier: ^4.52.3
         version: 4.52.3
       typescript:
         specifier: ^5.8.3
@@ -313,7 +313,7 @@ importers:
         version: 5.9.2
     devDependencies:
       rollup:
-        specifier: ^4.50.0
+        specifier: ^4.52.3
         version: 4.52.3
 
   packages/mirta-store:

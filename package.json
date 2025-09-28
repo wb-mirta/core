@@ -54,7 +54,7 @@
     "lint-staged": "^16.1.5",
     "prompts": "^2.4.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.50.0",
+    "rollup": "^4.52.3",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^3.0.1",
     "rollup-plugin-dts": "^6.2.3",
