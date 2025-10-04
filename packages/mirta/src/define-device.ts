@@ -361,7 +361,7 @@ interface SharedDeviceState {
  * Используется во вспомогательных функциях, избавляя от необходимости прописывать идентификаторы вручную.
  *
  **/
-interface DeviceWithContext {
+export interface DeviceWithContext {
   /** Контекст устройства - ключевая информация. */
   context: {
     /** Идентификатор устройства. */

@@ -1,83 +1,117 @@
 import ts from '@rollup/plugin-typescript'
+
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import replace from '@rollup/plugin-replace'
-import copy from 'rollup-plugin-copy'
+// import copy from 'rollup-plugin-copy'
+
 import dts from 'rollup-plugin-dts'
-import del from 'rollup-plugin-delete'
+import del from '../plugins/del'
 
 import { resolve } from 'node:path'
 import { readFileSync } from 'fs'
+import type { RollupOptions, ModuleFormat, ImportAttributesKey, Plugin } from 'rollup'
 
-// import { fileURLToPath } from 'node:url'
+interface RollupConfigOptions {
+  /** Текущая рабочая директория. */
+  cwd?: string
+  external?: (string | RegExp)[]
+  plugins?: Plugin[]
+}
 
-// const configPath = fileURLToPath(import.meta.url)
-// const rootDir = dirname(configPath)
+interface Package {
+  exports: {
+    '.': {
+      import?: {
+        types?: string
+        default?: string
+      }
+    }
+  }
+}
 
-const packageDir = process.cwd()
-const pkgPath = resolve(packageDir, 'package.json')
-
-const pkg = JSON.parse(
-  readFileSync(pkgPath, 'utf-8')
-)
-
-const external = [
-  /node_modules/,
-  'mirta',
-  '@mirta/basics',
-  '@mirta/polyfills',
-  pkgPath,
-]
+interface BuildOptions {
+  cwd: string
+  external?: (string | RegExp)[]
+  plugins?: Plugin[]
+  output: {
+    file: string
+    format: ModuleFormat
+    importAttributesKey: ImportAttributesKey
+    sourcemap?: boolean
+    externalLiveBindings?: boolean
+  }
+}
 
 // Проверка TypeScript выполняется только для первой конфигурации.
 let hasTsChecked = false
+let typesOutFile: string | undefined
 
-const { exports: { '.': root } = {} } = pkg
+export function definePackageConfig(options: RollupConfigOptions) {
 
-const typesOutFile = root?.import?.types
+  const { cwd = process.cwd(), external = [], plugins } = options
 
-const rollupConfigs = [
-  createConfig('mjs', {
-    file: 'dist/index.mjs',
-    format: `es`,
-    importAttributesKey: 'with',
-  }),
-]
+  const pkgPath = resolve(cwd, 'package.json')
 
-if (typesOutFile) {
+  const pkg = JSON.parse(
+    readFileSync(pkgPath, 'utf-8')
+  ) as Package
 
-  rollupConfigs.push({
-    input: 'dist/dts/index.d.ts',
-    external,
-    plugins: [
-      nodeResolve(),
-      commonjs(),
-      dts(),
-      del({
-        targets: ['dist/dts'],
-        hook: 'closeBundle',
-      }),
-    ],
-    output: [{
-      file: typesOutFile, format: 'es',
-    }],
-  })
+  const { exports: { '.': root } = {} } = pkg
+
+  typesOutFile = root?.import?.types
+
+  const externalModules = [
+    /node_modules/,
+    pkgPath,
+    ...external,
+  ]
+
+  const rollupConfigs = [
+    createBuildConfig('mjs', {
+      cwd,
+      external: externalModules,
+      output: {
+        file: 'dist/index.mjs',
+        format: 'es',
+        importAttributesKey: 'with',
+      },
+      plugins,
+    }),
+  ]
+
+  if (typesOutFile) {
+
+    rollupConfigs.push({
+      input: 'dist/dts/index.d.ts',
+      external: externalModules,
+      plugins: [
+        nodeResolve(),
+        commonjs(),
+        dts(),
+        del({
+          targets: ['dist/dts'],
+          hook: 'closeBundle',
+        }),
+      ],
+      output: [{
+        file: typesOutFile, format: 'es',
+      }],
+    })
+
+  }
+
+  return rollupConfigs
 
 }
 
-export default rollupConfigs
+function createBuildConfig(
+  buildName: string,
+  options: BuildOptions,
+  plugins: Plugin[] = []
+): RollupOptions {
 
-/**
- * @returns {import('rollup').RollupOptions}
- */
-function createConfig(buildName, output, plugins = []) {
-
-  if (!output) {
-
-    console.error(`Invalid format: ${buildName}`)
-    process.exit(1)
-
-  }
+  const { cwd, external, output } = options
 
   output.sourcemap = !!process.env.SOURCE_MAP
   output.externalLiveBindings = false
@@ -89,7 +123,7 @@ function createConfig(buildName, output, plugins = []) {
   const isBundlerEsmBuild = buildName === 'mjs'
 
   const tsPlugin = ts({
-    tsconfig: resolve(packageDir, './tsconfig.build.json'),
+    tsconfig: resolve(cwd, './tsconfig.build.json'),
     // cacheRoot: resolve(rootDir, './node_modules/.rts2_cache'),
     compilerOptions: {
       noCheck: hasTsChecked,
@@ -119,11 +153,11 @@ function createConfig(buildName, output, plugins = []) {
       nodeResolve(),
       commonjs(),
       ...plugins,
-      copy({
-        targets: [
-          { src: 'public/*', dest: 'dist' },
-        ],
-      }),
+      // copy({
+      //   targets: [
+      //     { src: 'public/*', dest: 'dist' },
+      //   ],
+      // }),
     ],
     output,
   }
@@ -131,9 +165,9 @@ function createConfig(buildName, output, plugins = []) {
 }
 
 function createReplacePlugin(
-  isProduction,
-  isBundlerEsmBuild,
-  isNodeBuild
+  isProduction: boolean,
+  isBundlerEsmBuild: boolean,
+  isNodeBuild: boolean
 ) {
 
   const replacements = {
