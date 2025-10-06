@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { getLocalized } from '#utils/localization'
 import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'

@@ -38,7 +38,10 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build & Publish
+      - name: Build Mirta CLI
+        run: pnpm build:cli
+
+      - name: Publish
         id: publish
         run: pnpm mirta publish
         env:

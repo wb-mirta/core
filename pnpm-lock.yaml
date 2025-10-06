@@ -71,9 +71,6 @@ importers:
       lint-staged:
         specifier: ^16.2.3
         version: 16.2.3
-      prompts:
-        specifier: ^2.4.2
-        version: 2.4.2
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -92,9 +89,6 @@ importers:
       rollup-plugin-typescript2:
         specifier: ^0.36.0
         version: 0.36.0(rollup@4.52.3)(typescript@5.9.2)
-      semver:
-        specifier: ^7.7.2
-        version: 7.7.2
       simple-git-hooks:
         specifier: ^2.13.1
         version: 2.13.1

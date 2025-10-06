@@ -13,12 +13,13 @@
   },
   "type": "module",
   "files": [
+    "bin",
     "dist",
     "LICENSE",
     "README.md"
   ],
   "bin": {
-    "mirta": "dist/index.mjs"
+    "mirta": "bin/mirta.mjs"
   },
   "imports": {
     "#src/*": "./src/*.js",
