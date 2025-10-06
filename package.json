@@ -16,7 +16,7 @@
     "coverage": "vitest run --coverage",
     "build": "cross-env NODE_ENV=production pnpm --filter './packages/*' --filter './examples/*/*' run build:mono",
     "build:dev": "cross-env NODE_ENV=development pnpm --filter './packages/*' run build:mono",
-    "release": "node ./scripts/release.js",
+    "release": "mirta release",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
@@ -34,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@eslint/json": "^0.13.2",
+    "@mirta/cli": "workspace:*",
     "@mirta/globals": "workspace:*",
     "@mirta/rollup": "workspace:*",
     "@mirta/tsconfig": "workspace:*",

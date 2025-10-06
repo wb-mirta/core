@@ -38,9 +38,11 @@ const typesOutFile = root?.import?.types
 
 const rollupConfigs = [
   createConfig('mjs', {
-    file: 'dist/index.mjs',
+    dir: 'dist/',
     format: `es`,
     importAttributesKey: 'with',
+    entryFileNames: '[name].mjs',
+    chunkFileNames: '[name].mjs',
   }),
 ]
 
