@@ -1,3 +1,13 @@
+# [0.3.0](https://github.com/wb-mirta/core/compare/v0.2.8...v0.3.0) (2025-10-06)
+
+
+### Features
+
+* introduce & migrate to mirta-cli ([#62](https://github.com/wb-mirta/core/issues/62)) ([14bde24](https://github.com/wb-mirta/core/commit/14bde24251640a02d68b76572f8c3a6690f088f7))
+* **mirta-rollup:** add ESNext config for NPM ([#59](https://github.com/wb-mirta/core/issues/59)) ([565d730](https://github.com/wb-mirta/core/commit/565d730ccf0fe7a972121d13f1f3bf23dd59ade2))
+
+
+
 ## [0.2.8](https://github.com/wb-mirta/core/compare/v0.2.6...v0.2.8) (2025-09-28)
 
 
