@@ -33,7 +33,7 @@
   },
   "funding": {
     "type": "individual",
-    "url": "https://pay.cloudtips.ru/p/58512cca"
+    "url": "https://boosty.to/wihome/donate"
   },
   "scripts": {
     "clean": "rimraf dist",

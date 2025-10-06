@@ -37,6 +37,10 @@
     "clean": "rimraf dist",
     "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://boosty.to/wihome/donate"
+  },
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "chalk": "^5.6.2",
