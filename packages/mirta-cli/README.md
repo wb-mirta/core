@@ -31,29 +31,14 @@ You can configure additional parameters by adding a configuration file named `mi
 ```
 ### Main Configuration Options
 
-- `scope`
-
+- `scope` sets the correspondence to an account or organization name in the NPM registry.
   ```
-  Sets the correspondence to an account or organization name in the NPM registry.
-  ```
-- `scopeAsPackagePrefix`
-
-  ```
-  Enables transformation of module paths by prefixing the specified `scope` before the package name. Default is `false`.
-  ```
+- `scopeAsPackagePrefix` enables transformation of module paths by prefixing the specified `scope` before the package name. Default is `false`.
 
 Example of `scopeAsPackagePrefix` for the package `@myscope/globals`:
 
-- Value `false`
-
-  ```
-  Location: `packages/globals`
-  ```
-- Value `true`
-
-  ```
-  Location: `packages/myscope-globals`
-  ```
+- `false` - location `packages/globals`
+- `true` - location `packages/myscope-globals`
 
 Activating this option helps prevent collisions with third-party NPM packages without a `scope`.
 
@@ -174,32 +159,18 @@ The primary goal of this feature is to enhance trust and security for published 
 
 ### `release` options
 
---dry
+`--dry` runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
 
-    Runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
+`--preid <custom-pre-release-id>` sets a custom prefix for the pre-release version, which is appended to the package version number (e.g., beta.1). This option allows creating pre-release versions such as alpha, beta, RC, etc., before the official stable release.
 
---preid <custom-pre-release-id>
+`--skipPrompts` skips interactive user queries. The command runs automatically using default values or predefined settings.
 
-    Sets a custom prefix for the pre-release version, which is appended to the package version number (e.g., beta.1). This option allows creating pre-release versions such as alpha, beta, RC, etc., before the official stable release.
-
---skipPrompts
-
-    Skips interactive user queries. The command runs automatically using default values or predefined settings.
-
---skipGit
-
-    Ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
+`--skipGit` ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
 
 ### `publish` options
 
---dry
+`--dry` runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
 
-    Runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
+`--skipBuild` excludes running the build process after updating package versions. Skips executing tasks defined in the build pipeline, allowing you to decide whether recompilation is necessary after changing version numbers.
 
---skipBuild
-
-    Excludes running the build process after updating package versions. Skips executing tasks defined in the build pipeline, allowing you to decide whether recompilation is necessary after changing version numbers.
-
---skipGit
-
-    Ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
+`--skipGit` ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
