@@ -14,6 +14,9 @@ importers:
       '@eslint/json':
         specifier: ^0.13.2
         version: 0.13.2
+      '@mirta/cli':
+        specifier: workspace:*
+        version: link:packages/mirta-cli
       '@mirta/globals':
         specifier: workspace:*
         version: link:packages/mirta-globals
@@ -268,6 +271,31 @@ importers:
         version: link:../mirta-polyfills
 
   packages/mirta-basics: {}
+
+  packages/mirta-cli:
+    dependencies:
+      '@clack/prompts':
+        specifier: ^0.11.0
+        version: 0.11.0
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
+      lodash.merge:
+        specifier: ^4.6.2
+        version: 4.6.2
+      prompts:
+        specifier: ^2.4.2
+        version: 2.4.2
+      semver:
+        specifier: ^7.7.2
+        version: 7.7.2
+    devDependencies:
+      '@types/lodash.merge':
+        specifier: ^4.6.9
+        version: 4.6.9
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
 
   packages/mirta-globals: {}
 

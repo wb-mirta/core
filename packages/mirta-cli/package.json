@@ -1,0 +1,51 @@
+{
+  "name": "@mirta/cli",
+  "description": "🛠️ Mirta Framework - the CLI",
+  "version": "0.2.8",
+  "license": "Unlicense",
+  "keywords": [
+    "cli",
+    "mirta",
+    "wb-rules"
+  ],
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "bin": {
+    "mirta": "dist/index.mjs"
+  },
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#utils/*": "./src/utils/*.js"
+  },
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "chalk": "^5.6.2",
+    "prompts": "^2.4.2",
+    "semver": "^7.7.2",
+    "lodash.merge": "^4.6.2"
+  },
+  "devDependencies": {
+    "@types/semver": "^7.7.1",
+    "@types/lodash.merge": "^4.6.9"
+  }
+}

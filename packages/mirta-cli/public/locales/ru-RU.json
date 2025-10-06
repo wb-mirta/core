@@ -1,0 +1,21 @@
+{
+  "validation": {
+    "required": "Требуется указать значение"
+  },
+  "status": {
+    "info": "Инфо",
+    "note": "Примечание",
+    "success": "Успешно",
+    "warn": "Внимание",
+    "error": "Ошибка",
+    "canceled": "Отменено"
+  },
+  "accent": {
+    "recommended": "(рекомендуется)",
+    "ifConfigured": "(если настроен)"
+  },
+  "errors": {
+    "operationCanceled": "Операция прервана",
+    "rootIsNotRelative": "Расположение находится вне рабочей директории"
+  }
+}
