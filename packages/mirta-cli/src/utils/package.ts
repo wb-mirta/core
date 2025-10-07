@@ -15,7 +15,7 @@ type DepType = 'dependencies' | 'devDependencies'
 
 interface MirtaConfig {
   scope?: string
-  scopedPackagePrefix?: boolean
+  scopeAsPackagePrefix?: boolean
   templates?: string[]
 }
 
@@ -98,14 +98,19 @@ if (existsSync(mirtaConfigFilePath)) {
     readFileSync(mirtaConfigFilePath, 'utf-8')
   ) as MirtaConfig
 
-  scope = config.scope
-  scopeAsPackagePrefix = config.scopedPackagePrefix === true
+  if (config.scope) {
 
-  if (scope?.startsWith('@'))
-    scope = scope.slice(1)
+    scope = config.scope
 
-  if (scope)
-    scoped = `@${scope}/`
+    if (scope.startsWith('@'))
+      scope = scope.slice(1)
+
+    if (scope)
+      scoped = `@${scope}/`
+
+  }
+
+  scopeAsPackagePrefix = config.scopeAsPackagePrefix === true
 
   if (config.templates && Array.isArray(config.templates)) {
 
@@ -180,6 +185,8 @@ function updateDependencies(
       return
 
     deps[dep] = version
+
+    logger.step(`- ${dep}`)
 
   })
 

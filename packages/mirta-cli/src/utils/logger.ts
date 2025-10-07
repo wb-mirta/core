@@ -19,7 +19,6 @@ const redBanner = red(banner)
 const cyanBanner = cyan(banner)
 const greenBanner = green(banner)
 const yellowBanner = yellow(banner)
-const dimmedBanner = dim(banner)
 
 const infoPill = (message?: string) =>
   message ? bgCyan.black(` ${message} `) + (` ${cyan(dot)} `) : ''
@@ -58,7 +57,7 @@ export function useLogger(localized: Localized) {
   function step(message: string) {
 
     if (message)
-      console.log(`${dimmedBanner} ${dim(message)}`)
+      console.log(dim(message))
 
   }
 
