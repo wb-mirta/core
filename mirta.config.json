@@ -1,4 +1,5 @@
 {
+  "scope": "mirta",
   "scopeAsPackagePrefix": true,
   "templates": [
     "packages/create-mirta/public/templates"

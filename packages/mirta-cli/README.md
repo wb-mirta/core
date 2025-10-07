@@ -32,7 +32,6 @@ You can configure additional parameters by adding a configuration file named `mi
 ### Main Configuration Options
 
 - `scope` sets the correspondence to an account or organization name in the NPM registry.
-  ```
 - `scopeAsPackagePrefix` enables transformation of module paths by prefixing the specified `scope` before the package name. Default is `false`.
 
 Example of `scopeAsPackagePrefix` for the package `@myscope/globals`:
