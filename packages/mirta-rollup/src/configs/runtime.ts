@@ -1,4 +1,4 @@
-import type { ExternalOption, Plugin, RollupOptions, NullValue } from 'rollup'
+import type { ExternalOption, Plugin, RollupOptions } from 'rollup'
 
 import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
@@ -15,7 +15,7 @@ import nodePath from 'node:path'
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
-const packagesPattern = /node_modules[\\/]@?(.+)[\\/](.+)/
+const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
 const modulesPattern = /(?:src[\\/])?wb-rules-modules[\\/](.*)/
 const scriptsPattern = /(?:src[\\/])?(?:wb-rules[\\/])?(.*)/
 
@@ -61,32 +61,57 @@ function globRelative(path: string, pattern: string) {
 
 }
 
-function packageEntry(pkg: string, entry: string) {
+function tryGetPackageEntry(sourcePath: string) {
 
-  const key = entry ? `${pkg}/${entry}` : pkg
+  const pathParts: string[] = []
 
-  // if (__DEV__)
-  //   console.debug(`Package Entry: ${key}`)
+  do {
 
-  return `wb-rules-modules/packages/${key}.js`
+    const match = packagesPattern.exec(sourcePath)
+
+    if (!match)
+      break
+
+    if (match[3])
+      pathParts.unshift(match[3])
+
+    pathParts.unshift('packages/' + match[2].replace(/\/dist$/, ''))
+
+    sourcePath = match[1]
+
+  }
+  while (sourcePath)
+
+  if (pathParts.length)
+    return `wb-rules-modules/${pathParts.join('/')}.js`
 
 }
 
-function moduleEntry(entry: string) {
+function tryGetModuleEntry(sourcePath: string) {
+
+  const match = modulesPattern.exec(sourcePath)
+
+  if (!match)
+    return
 
   // if (__DEV__)
   //   console.debug(`Module Entry: ${entry}`)
 
-  return `wb-rules-modules/${entry}.js`
+  return `wb-rules-modules/${match[1]}.js`
 
 }
 
-function scriptEntry(entry: string) {
+function tryGetScriptEntry(sourcePath: string) {
+
+  const match = scriptsPattern.exec(sourcePath)
+
+  if (!match)
+    return
 
   // if (__DEV__)
   //   console.debug(`Script Entry: ${entry}`)
 
-  return `wb-rules/${entry}.js`
+  return `wb-rules/${match[1]}.js`
 
 }
 
@@ -95,44 +120,9 @@ function getEntry(path: string) {
   if (path.startsWith('_virtual'))
     return path
 
-  let match: RegExpExecArray | NullValue
-
-  match = packagesPattern.exec(path)
-
-  if (match) {
-
-    // if (__DEV__)
-    //   console.debug(match)
-
-    return packageEntry(match[1].replace(/\/dist$/, ''), match[2])
-
-  }
-
-  match = modulesPattern.exec(path)
-
-  if (match) {
-
-    // if (__DEV__)
-    //   console.debug(match)
-
-    return moduleEntry(match[1])
-
-  }
-
-  match = scriptsPattern.exec(path)
-
-  if (match) {
-
-    // if (__DEV__)
-    //   console.debug(match)
-
-    return scriptEntry(match[1])
-
-  }
-
-  // console.log(`No one! ${path}`)
-
-  return path
+  return tryGetPackageEntry(path) ?? tryGetModuleEntry(path) ?? tryGetScriptEntry(path)
+    // None of the above matched.
+    ?? path
 
 }
 
