@@ -14,7 +14,7 @@ import { mock } from 'vitest-mock-extended'
 
 const createLogger = () => {
 
-  const logger: WbRules.Log = vi.fn() as WbRules.LogFunc as WbRules.Log
+  const logger = vi.fn() as unknown as WbRules.Log
 
   logger.info = vi.fn()
   logger.debug = vi.fn()
@@ -28,6 +28,7 @@ const createLogger = () => {
 global.module = mock<NodeJS.Module>()
 
 global.log = createLogger()
+global.debug = vi.fn() as WbRules.Debug
 global.dev = mock<WbRules.Dev>()
 global.defineVirtualDevice = vi.fn()
 global.getDevice = vi.fn(() => mock<WbRules.Device>({

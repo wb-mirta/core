@@ -16,6 +16,7 @@
  * // }
  * ```
  * @since 0.0.4
+ *
  **/
 declare type Expand<T> = { [K in keyof T]: T[K] } & {}
 
@@ -25,46 +26,113 @@ declare namespace WbRules {
   /** Расширение для поддержки module.static */
   type ModuleStatic = Record<string, unknown>
 
-  type LogFunc = (
-    message: string | undefined, ...args: (string | number | boolean)[]
-  ) => void
-
-  interface Log {
-    /**
-     * Запись в лог информационного сообщения, полезного в долгосрочной перспективе.
-     * @param message
-     * @param args
-     */
-    (message: string | undefined, ...args: (string | number | boolean)[]): void
-
-    /**
-     * Запись в лог сообщения, полезного при отладке в процессе разработки и не представляющего ценности в долгосрочной перспективе.
-     * @param message
-     * @param args
-     */
-    debug(message: unknown, ...args: (string | number | boolean)[]): void
+  /**
+   * Набор методов для логирования.
+   *
+   * @since 0.3.2
+   *
+   **/
+  interface LogMethods {
 
     /**
      * Запись в лог информационного сообщения, полезного в долгосрочной перспективе.
-     * @param message
-     * @param args
-     */
-    info(message: string | undefined, ...args: (string | number | boolean)[]): void
+     * Используется форматированный вывод.
+     *
+     * @param format Форматируемый шаблон сообщения.
+     * @param args Параметры для заполнения формата.
+     *
+     * @example
+     * ```ts
+     * log.info('Свет в комнате включён на {} мин.', 30)
+     * ```
+     **/
+    info(format: string, ...args: unknown[]): void
 
     /**
-     * Запись ненормального или неожиданного события в потоке приложения, но не прекращение выполнения.
-     * @param message
-     * @param args
-     */
-    warning(message: string | undefined, ...args: (string | number | boolean)[]): void
+     * Запись в лог произвольного значения, полезного в долгосрочной перспективе.
+     * @param value Значение для записи в лог.
+     *
+     **/
+    info(value: unknown): void
 
     /**
-     * Запись события остановки выполнения из-за сбоя текущего действия.
-     * @param message
-     * @param args
-     */
-    error(message: string | undefined, ...args: (string | number | boolean)[]): void
+     * Запись в лог сообщения, полезного при отладке и не имеющего долгосрочной ценности.
+     *
+     * @param format Форматируемый шаблон сообщения.
+     * @param args Параметры для заполнения формата.
+     *
+     * @example
+     * ```ts
+     * log.debug('Значение сенсора "{}": температура {} °C, влажность {} %', 'bathroom', 25, 40)
+     **/
+    debug(format: string, ...args: unknown[]): void
+
+    /**
+     * Запись в лог произвольного значения, полезного при отладке и не имеющего долгосрочной ценности.
+     *
+     * @param value Значение для записи в лог.
+     *
+     * @example
+     * ```ts
+     * log.debug(JSON.stringify({ location: 'bathroom', temperature: 25, humidity: 40 }))
+     * ```
+     **/
+    debug(value: unknown): void
+
+    /**
+     * Запись в лог предупреждения о ненормальном или неожиданном событии,
+     * не приводящем к остановке программы.
+     *
+     * Используется форматированный вывод.
+     *
+     * @param format Форматируемый шаблон сообщения.
+     * @param args Параметры для заполнения формата.
+     *
+     * @example
+     * ```ts
+     * log.warning('Движение в охраняемой зоне: {}', 'hallway_sensor_1')
+     * ```
+     **/
+    warning(format: string, ...args: unknown[]): void
+
+    /**
+     * Запись в лог предупреждения о ненормальном или неожиданном значении,
+     * не приводящем к остановке программы.
+     *
+     * @param value Значение для записи в лог.
+     *
+     **/
+    warning(value: unknown): void
+
+    /**
+     * Запись в лог критического события, приведшего к сбою и остановке выполнения.
+     * Используется форматированный вывод.
+     *
+     * @param format Форматируемый шаблон сообщения.
+     * @param args Параметры для заполнения формата.
+     *
+     * @example
+     * ```ts
+     * log.error('Перегев тёплого пола: {} °C, выключение', 30)
+     * ```
+     **/
+    error(format: string, ...args: unknown[]): void
+
+    /**
+     * Запись в лог критического значения, приведшего к сбою и остановке выполнения.
+     *
+     * @param value Значение для записи в лог.
+     *
+     **/
+    error(value: unknown): void
   }
+
+  /** @deprecated since version 0.3.2 */
+  type LogFunc = (format: string, ...args: unknown[]) => void
+
+  type Log = LogMethods['info'] & LogMethods
+
+  type Debug = LogMethods['debug']
 
   interface CronEntry {
     spec: string
@@ -550,6 +618,14 @@ declare var __filename: string
 
 /** Используется для вывода сообщений в журнал контроллера и отладочную консоль. */
 declare var log: WbRules.Log
+
+/**
+ * Используется для вывода отладочных сообщений в журнал контроллера и отладочную консоль.
+ *
+ * @since 0.3.2
+ *
+ **/
+declare var debug: WbRules.Debug
 
 /** Объект доступа к MQTT-топикам устройства. */
 declare var dev: WbRules.Dev
