@@ -2,6 +2,7 @@ export default {
   '__DEV__': 'readonly',
   '__TEST__': 'readonly',
   'log': 'readonly',
+  'debug': 'readonly',
   'dev': 'readonly',
   'cron': 'readonly',
   'timers': 'readonly',
