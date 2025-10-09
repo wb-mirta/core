@@ -1,3 +1,19 @@
+## [0.3.2](https://github.com/wb-mirta/core/compare/v0.3.1...v0.3.2) (2025-10-09)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** normalize nested deps paths ([#66](https://github.com/wb-mirta/core/issues/66)) ([1393d3c](https://github.com/wb-mirta/core/commit/1393d3c3bd614cead5bbc80649f7aeb1179769bd))
+
+
+### Features
+
+* **mirta-globals:** add control-specific types ([#68](https://github.com/wb-mirta/core/issues/68)) ([2bf7b1c](https://github.com/wb-mirta/core/commit/2bf7b1c1cbe9c7d5327cbe84a6aab47e01ae5134))
+* **mirta-globals:** allow to log any data type ([#70](https://github.com/wb-mirta/core/issues/70)) ([4d7992c](https://github.com/wb-mirta/core/commit/4d7992ca7cd2b2ee21784a4d7355fd22bf91e6f7))
+* **mirta-globals:** support Telegram messages ([#72](https://github.com/wb-mirta/core/issues/72)) ([9f1dc25](https://github.com/wb-mirta/core/commit/9f1dc2542c932418cf2d5233c249a072605c5f4d))
+
+
+
 # [0.3.0](https://github.com/wb-mirta/core/compare/v0.2.8...v0.3.0) (2025-10-06)
 
 
