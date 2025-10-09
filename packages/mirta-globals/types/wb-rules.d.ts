@@ -862,28 +862,40 @@ declare class PersistentStorage {
 }
 
 /**
- * Класс оповещения
- * @abstract
- */
+ * Класс оповещения.
+ *
+ **/
 declare abstract class Notify {
   /**
-   * Отправляет почту указанному адресату
-   * @static
-   * @param to адресат
-   * @param subject тема
-   * @param text содержимое
-   * @memberof Notify
-   */
+   * Отправляет электронное письмо указанному адресату.
+   *
+   * @param to Адресат.
+   * @param subject Тема письма.
+   * @param text Текст письма.
+   *
+   **/
   static sendEmail(to: string, subject: string, text: string): void
 
   /**
    * Отправляет SMS на указанный номер
    * Для отправки SMS используется ModemManager, а если он не установлен, то gammu.
-   * @static
-   * @param to номер адресата
-   * @param text содержимое
-   * @param command используя команду
-   * @memberof Notify
-   */
+   *
+   * @param to Номер адресата.
+   * @param text Текст сообщения.
+   * @param command Используя команду.
+   *
+   **/
   static sendSMS(to: string, text: string, command?: string): void
+
+  /**
+   * Отправляет сообщение в указанный чат или канал Telegram.
+   *
+   * @param token Токен вашего бота Telegram.
+   * @param chatId Уникальный идентификатор целевого чата или username целевого канала (в формате `@channelusername`).
+   * @param text Текст сообщения.
+   *
+   * @since 0.3.2
+   *
+   **/
+  static sendTelegramMessage(token: string, chatId: string, text: string): void
 }
