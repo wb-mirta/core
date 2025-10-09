@@ -385,6 +385,62 @@ declare namespace WbRules {
   }>
 
   /**
+   * Опции контрола типа `text`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type TextControlOptions = Extract<ControlOptions, { type: 'text' }>
+
+  /**
+   * Опции контрола типа `value`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type ValueControlOptions = Extract<ControlOptions, { type: 'value' }>
+
+  /**
+   * Опции контрола типа `range`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type RangeControlOptions = Extract<ControlOptions, { type: 'range' }>
+
+  /**
+   * Опции контрола типа `switch`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type SwitchControlOptions = Extract<ControlOptions, { type: 'switch' }>
+
+  /**
+   * Опции контрола типа `pushbutton`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type PushButtonControlOptions = Extract<ControlOptions, { type: 'pushbutton' }>
+
+  /**
+   * Опции контрола типа `rgb`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type RgbControlOptions = Extract<ControlOptions, { type: 'rgb' }>
+
+  /**
+   * Опции контрола типа `alarm`.
+   *
+   * @since 0.3.2
+   *
+   **/
+  type AlarmControlOptions = Extract<ControlOptions, { type: 'alarm' }>
+
+  /**
    * Интерфейс устройства
    */
   interface Device {
