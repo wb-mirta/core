@@ -21,4 +21,5 @@ export default {
   'StorableObject': 'readonly',
   'PersistentStorage': 'readonly',
   'Notify': 'readonly',
+  'Alarms': 'readonly',
 }

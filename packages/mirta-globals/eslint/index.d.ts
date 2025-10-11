@@ -21,6 +21,7 @@ declare interface GlobalsMirta {
   readonly 'StorableObject': false
   readonly 'PersistentStorage': false
   readonly 'Notify': false
+  readonly 'Alarms': false
 }
 
 declare const globals: GlobalsMirta
