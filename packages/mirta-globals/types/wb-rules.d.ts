@@ -1,3 +1,5 @@
+/// <reference path="./wb-rules/alarms.d.ts" />
+
 /**
  * Используется для нормализации составных типов.
  *
@@ -19,6 +21,29 @@
  *
  **/
 declare type Expand<T> = { [K in keyof T]: T[K] } & {}
+
+/**
+ * Разрешает частичное заполнение полей объекта, но требует наличия хотя бы одного поля.
+ *
+ * @example
+ * ```ts
+ * interface SafeRange {
+ *   minValue: number
+ *   maxValue: number
+ * }
+ *
+ * // Корректное объявление
+ * const a: AtLeastOne<SafeRange> = {
+ *   minValue: 0
+ * }
+ *
+ * // Ошибка - требуется хотя бы одно из обязательных полей
+ * const b: AtLeastOne<SafeRange> = { }
+ * ```
+ * @since 0.3.3
+ *
+ **/
+declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U]
 
 /** Типы и интерфейсы правил wb-rules */
 declare namespace WbRules {
@@ -902,3 +927,29 @@ declare class PersistentStorage {
  *
  **/
 declare var Notify: WbRules.Notify
+
+/**
+ * Сервис оповещений Alarms — инструмент для автоматической отправки
+ * шаблонных сообщений по разным каналам коммуникации (почта, SMS, Telegram)
+ * при обнаружении отклонения от нормы в значениях отслеживаемых контролов.
+ *
+ * @example
+ * Загрузка конфигурации из JSON-файла:
+ * ```ts
+ * Alarms.load('/etc/wb-rules/alarms.conf')
+ * ```
+ * @example
+ * Непосредственная настройка блока алармов через объект конфигурации:
+ * ```ts
+ * Alarms.load({
+ *   deviceName: 'example_alarms',
+ *   deviceTitle: 'Example Alarms',
+ *   recipients: [],
+ *   alarms: []
+ * })
+ * ```
+ *
+ * @since 0.3.3
+ *
+ **/
+declare var Alarms: WbRules.Alarms
