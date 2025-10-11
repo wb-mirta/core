@@ -600,6 +600,41 @@ declare namespace WbRules {
   interface StorageOptions {
     global: boolean
   }
+
+  interface Notify {
+    /**
+     * Отправляет электронное письмо указанному адресату.
+     *
+     * @param to Адресат.
+     * @param subject Тема письма.
+     * @param text Текст письма.
+     *
+     **/
+    sendEmail(to: string, subject: string, text: string): void
+
+    /**
+     * Отправляет SMS на указанный номер
+     * Для отправки SMS используется ModemManager, а если он не установлен, то gammu.
+     *
+     * @param to Номер адресата.
+     * @param text Текст сообщения.
+     * @param command Используя команду.
+     *
+     **/
+    sendSMS(to: string, text: string, command?: string): void
+
+    /**
+     * Отправляет сообщение в указанный чат или канал Telegram.
+     *
+     * @param token Токен вашего бота Telegram.
+     * @param chatId Уникальный идентификатор целевого чата или username целевого канала (в формате `@channelusername`).
+     * @param text Текст сообщения.
+     *
+     * @since 0.3.2
+     *
+     **/
+    sendTelegramMessage(token: string, chatId: string, text: string): void
+  }
 }
 
 declare namespace NodeJS {
@@ -862,40 +897,8 @@ declare class PersistentStorage {
 }
 
 /**
- * Класс оповещения.
+ * Сервис уведомлений Notify — инструмент для отправки произвольных
+ * сообщений по разным каналам коммуникации (почта, SMS, Telegram).
  *
  **/
-declare abstract class Notify {
-  /**
-   * Отправляет электронное письмо указанному адресату.
-   *
-   * @param to Адресат.
-   * @param subject Тема письма.
-   * @param text Текст письма.
-   *
-   **/
-  static sendEmail(to: string, subject: string, text: string): void
-
-  /**
-   * Отправляет SMS на указанный номер
-   * Для отправки SMS используется ModemManager, а если он не установлен, то gammu.
-   *
-   * @param to Номер адресата.
-   * @param text Текст сообщения.
-   * @param command Используя команду.
-   *
-   **/
-  static sendSMS(to: string, text: string, command?: string): void
-
-  /**
-   * Отправляет сообщение в указанный чат или канал Telegram.
-   *
-   * @param token Токен вашего бота Telegram.
-   * @param chatId Уникальный идентификатор целевого чата или username целевого канала (в формате `@channelusername`).
-   * @param text Текст сообщения.
-   *
-   * @since 0.3.2
-   *
-   **/
-  static sendTelegramMessage(token: string, chatId: string, text: string): void
-}
+declare var Notify: WbRules.Notify

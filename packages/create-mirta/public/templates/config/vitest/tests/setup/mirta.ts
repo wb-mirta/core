@@ -37,3 +37,4 @@ global.getDevice = vi.fn(() => mock<WbRules.Device>({
 global.getControl = vi.fn()
 global.trackMqtt = vi.fn()
 global.defineRule = vi.fn()
+global.Notify = mock<WbRules.Notify>()
