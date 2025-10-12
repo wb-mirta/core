@@ -64,6 +64,6 @@ run().catch((e: unknown) => {
 
   }
 
-  process.exit()
+  process.exit(1)
 
 })
