@@ -32,8 +32,10 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version-file: '.node-version'
-          registry-url: 'https://registry.npmjs.com'
           cache: 'pnpm'
+
+      - name: Update npm
+        run: npm install -g npm@11.6.2
 
       - name: Install Dependencies
         run: pnpm install
@@ -44,8 +46,6 @@ jobs:
       - name: Publish
         id: publish
         run: pnpm mirta publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Github Release
         id: release_tag
