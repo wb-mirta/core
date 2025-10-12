@@ -1,3 +1,18 @@
+## [0.3.3](https://github.com/wb-mirta/core/compare/v0.3.2...v0.3.3) (2025-10-12)
+
+
+### Bug Fixes
+
+* **mirta-cli:** use proper exit code for errors ([#77](https://github.com/wb-mirta/core/issues/77)) ([e24cbea](https://github.com/wb-mirta/core/commit/e24cbea53e5c4d0b4b0303447bd5fcfdc4e1e85e))
+
+
+### Features
+
+* **mirta-globals:** allow mocking of Notify ([#74](https://github.com/wb-mirta/core/issues/74)) ([001af48](https://github.com/wb-mirta/core/commit/001af4829eff85d0955624fdfdf5d96ed62de253))
+* **mirta-globals:** introduce Alarms definitions ([#76](https://github.com/wb-mirta/core/issues/76)) ([57480f4](https://github.com/wb-mirta/core/commit/57480f40faeec83dd7235690bd04efde7dd07838))
+
+
+
 ## [0.3.2](https://github.com/wb-mirta/core/compare/v0.3.1...v0.3.2) (2025-10-09)
 
 
