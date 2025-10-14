@@ -160,8 +160,6 @@ export function defineRuntimeConfig(
 
   } = options
 
-  const rootDir = monorepo?.rootDir
-
   const defaultPlugins = [
     del({
       targets: 'dist/*',
@@ -175,9 +173,7 @@ export function defineRuntimeConfig(
     resolve(),
 
     ts({
-      cacheRoot: rootDir
-        ? nodePath.resolve(rootDir, './node_modules/.rts2_cache')
-        : void 0,
+      clean: true,
     }),
 
     wbRulesImports(),
