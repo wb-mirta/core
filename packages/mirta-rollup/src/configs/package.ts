@@ -19,6 +19,22 @@ import type {
   PreRenderedChunk
 } from 'rollup'
 
+class BuildError extends Error {
+  constructor(message: string) {
+
+    super(message)
+
+    // Убедимся, что экземпляр имеет правильный прототип
+    Object.setPrototypeOf(this, BuildError.prototype)
+
+    this.name = 'BuildError'
+    this.message = message
+
+    Error.captureStackTrace(this, BuildError)
+
+  }
+}
+
 interface RollupConfigOptions {
   /** Текущая рабочая директория. */
   cwd?: string
@@ -161,8 +177,9 @@ function getInputBindings(
 
     const entry = candidates[input]
 
+    // Если точка входа не ассоциирована с конфигурацией `package.json` — выбрасываем ошибку и прерываем сборку.
     if (!entry)
-      continue
+      throw new BuildError(`[Mirta Rollup] The input file "${input}" is not associated with corresponding export in the package.json`)
 
     // Формирует итоговый объект result, где ключи — это точки входа из package.exports,
     // а значения — связи между исходными файлами, выходными файлами и источниками типов.
@@ -174,6 +191,13 @@ function getInputBindings(
       dtsSource: entry.dtsSource,
 
     }
+
+  }
+
+  for (const key of Object.keys(exports)) {
+
+    if (!(key in result))
+      throw new BuildError(`[Mirta Rollup] Export "${key}" defined in package.json has no corresponding input file in Rollup configuration`)
 
   }
 
@@ -189,7 +213,7 @@ function getInputBindings(
  * @param exports
  * @returns
  */
-function getDtsMappings(inputBindings: Record<string, InputBinding>, exports?: PackageExports) {
+function getDtsMappings(inputBindings: Record<string, InputBinding | undefined>, exports?: PackageExports) {
 
   if (!exports)
     return {}
@@ -211,9 +235,15 @@ function getDtsMappings(inputBindings: Record<string, InputBinding>, exports?: P
       ? value.import.types.slice(7)
       : value.import.types
 
+    const binding = inputBindings[key]
+
+    // Если для указанного ключа отсутствует точка входа — выбрасываем ошибку и прерываем сборку.
+    if (!binding)
+      throw new BuildError(`[Mirta Rollup] Type definition "${outputFile}" has no corresponding input file`)
+
     // Связывает с исходным файлом типов.
     //
-    const dtsSource = inputBindings[key].dtsSource
+    const dtsSource = binding.dtsSource
 
     result[`dist/dts/${dtsSource}.d.ts`] = outputFile
 
