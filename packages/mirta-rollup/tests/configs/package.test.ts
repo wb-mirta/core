@@ -844,7 +844,6 @@ describe('package.ts - BuildError class', () => {
   it('should create BuildError with correct name', () => {
 
     const error = new BuildError('[Mirta Rollup] Test error')
-    error.name = 'BuildError'
 
     expect(error.name).toBe('BuildError')
     expect(error.message).toContain('[Mirta Rollup]')
