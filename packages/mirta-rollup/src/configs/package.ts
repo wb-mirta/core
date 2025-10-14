@@ -8,58 +8,240 @@ import replace from '@rollup/plugin-replace'
 import dts from 'rollup-plugin-dts'
 import del from '../plugins/del'
 
-import { resolve } from 'node:path'
+import nodePath from 'node:path'
 import { readFileSync } from 'fs'
-import type { RollupOptions, ModuleFormat, ImportAttributesKey, Plugin } from 'rollup'
+
+import type {
+  RollupOptions,
+  ModuleFormat,
+  ImportAttributesKey,
+  Plugin,
+  PreRenderedChunk
+} from 'rollup'
 
 interface RollupConfigOptions {
   /** Текущая рабочая директория. */
   cwd?: string
+  input?: string | string[] | Record<string, string>
   external?: (string | RegExp)[]
   plugins?: Plugin[]
 }
 
-interface Package {
-  exports: {
-    '.': {
-      import?: {
-        types?: string
-        default?: string
-      }
-    }
+type PackageExports = Record<string, {
+  import?: {
+    types?: string
+    default?: string
   }
+}>
+
+interface Package {
+  exports?: PackageExports
 }
 
 interface BuildOptions {
   cwd: string
+  input: string | string[] | Record<string, string>
+  emitDeclarations: boolean
   external?: (string | RegExp)[]
   plugins?: Plugin[]
   output: {
-    file: string
+    dir: string
     format: ModuleFormat
     importAttributesKey: ImportAttributesKey
+    entryFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined
+    chunkFileNames: string
     sourcemap?: boolean
     externalLiveBindings?: boolean
   }
 }
 
+interface InputBinding {
+  sourceFile: string
+  dtsSource: string
+  outputFile: string
+}
+
+function normalizeInput(input: string | string[] | Record<string, string>) {
+
+  const inputs: string[] = []
+
+  // Нормализация входных данных.
+  // Строка, массив или объект преобразуются в единый массив строк inputs.
+
+  if (typeof input === 'string') {
+
+    inputs.push(input)
+
+  }
+  else if (Array.isArray(input)) {
+
+    inputs.push(...input)
+
+  }
+  else if (typeof input === 'object') {
+
+    inputs.push(...Object.values(input))
+
+  }
+
+  return inputs
+
+}
+
+/**
+ * Связывает исходные файлы проекта (`src/...`) с точками входа,
+ * определенными в `package.exports`. Ее основная цель — создать
+ * отображение между входными файлами (например, `src/index.ts`)
+ * и их выходными файлами (например, `dist/index.js`), а также источниками типов (`.d.ts`).
+ *
+ * @param inputs Массив путей к исходным файлам (например, `['src/index.ts', 'src/utils.ts']`)
+ * @param exports Объект из `package.exports`, описывающий точки входа пакета.
+ *
+ **/
+function getInputBindings(
+  inputs: string[],
+  exports?: PackageExports
+) {
+
+  if (!inputs.length || !exports)
+    return {}
+
+  const candidates: Record<
+    string,
+    {
+      key: string
+      outputFile: string
+      dtsSource: string
+    } | undefined
+  > = {}
+
+  for (const [key, value] of Object.entries(exports)) {
+
+    if (!value.import?.default || !key.startsWith('.'))
+      continue
+
+    // Формируем outputFile на основе данных package.json,
+    // убирая префикс `dist/` из путей, так как он
+    // уже указан в настройках сборки (output.dir).
+    //
+    const outputFile = value.import.default.startsWith('./dist/')
+      ? value.import.default.slice(7)
+      : value.import.default
+
+    const source = key === '.' ? 'index' : key.slice(2)
+
+    // Генерация кандидатов для входных файлов.
+    //
+    // Для каждого ключа экспорта создает возможные пути
+    // к исходным файлам (например, `src/utils.ts` и `src/utils/index.ts`),
+    // учитывая как явные, так и неявные структуры каталогов.
+
+    Object.assign(candidates, {
+
+      // Варианты явного пути (например, `src/setup.ts`)
+
+      [`src/${source}.ts`]: { key, outputFile, dtsSource: source },
+      [`src/${source}.js`]: { key, outputFile, dtsSource: source },
+
+      // Варианты неявного пути (например, `src/setup/index.ts`):
+
+      [`src/${source}/index.ts`]: { key, outputFile, dtsSource: `${source}/index` },
+      [`src/${source}/index.js`]: { key, outputFile, dtsSource: `${source}/index` },
+    })
+
+  }
+
+  const result: Record<string, InputBinding> = {}
+
+  // Сопоставление с реальными входными файлами.
+  //
+  // Ппроверяет, какие из сгенерированных путей действительно существуют в массиве inputs.
+  //
+  for (const input of inputs) {
+
+    const entry = candidates[input]
+
+    if (!entry)
+      continue
+
+    // Формирует итоговый объект result, где ключи — это точки входа из package.exports,
+    // а значения — связи между исходными файлами, выходными файлами и источниками типов.
+    //
+    result[entry.key] = {
+
+      sourceFile: input,
+      outputFile: entry.outputFile,
+      dtsSource: entry.dtsSource,
+
+    }
+
+  }
+
+  return result
+
+}
+
+/**
+ * Создаёт отображение между файлами типов `.d.ts` и их выходными путями
+ * на основе данных из `package.exports` и ранее сформированных связей ({@link inputBindings})
+ *
+ * @param inputBindings
+ * @param exports
+ * @returns
+ */
+function getDtsMappings(inputBindings: Record<string, InputBinding>, exports?: PackageExports) {
+
+  if (!exports)
+    return {}
+
+  const result: Record<string, string> = {}
+
+  // Для каждой точки входа из package.exports
+  //
+  for (const [key, value] of Object.entries(exports)) {
+
+    // Где указан import.types
+    //
+    if (!value.import?.types || !key.startsWith('.'))
+      continue
+
+    // Определяет путь к выходному файлу типов, убирая префикс `./dist/`
+    //
+    const outputFile = value.import.types.startsWith('./dist/')
+      ? value.import.types.slice(7)
+      : value.import.types
+
+    // Связывает с исходным файлом типов.
+    //
+    const dtsSource = inputBindings[key].dtsSource
+
+    result[`dist/dts/${dtsSource}.d.ts`] = outputFile
+
+  }
+
+  return result
+
+}
+
 // Проверка TypeScript выполняется только для первой конфигурации.
 let hasTsChecked = false
-let typesOutFile: string | undefined
 
 export function definePackageConfig(options: RollupConfigOptions) {
 
-  const { cwd = process.cwd(), external = [], plugins } = options
+  const {
+    cwd = process.cwd(),
+    input = 'src/index.ts',
+    external = [],
+    plugins,
+  } = options
 
-  const pkgPath = resolve(cwd, 'package.json')
+  const pkgPath = nodePath.resolve(cwd, 'package.json')
 
   const pkg = JSON.parse(
     readFileSync(pkgPath, 'utf-8')
   ) as Package
 
-  const { exports: { '.': root } = {} } = pkg
-
-  typesOutFile = root?.import?.types
+  const { exports = {} } = pkg
 
   const externalModules = [
     /node_modules/,
@@ -67,23 +249,61 @@ export function definePackageConfig(options: RollupConfigOptions) {
     ...external,
   ]
 
+  const inputBindings = getInputBindings(
+    normalizeInput(input),
+    exports
+  )
+
+  const outputMappings = Object.keys(inputBindings)
+    .reduce<Record<string, string>>((mappings, nextKey) => {
+
+      const inputMap = inputBindings[nextKey]
+      mappings[inputMap.sourceFile] = inputMap.outputFile
+
+      return mappings
+
+    }, {})
+
+  const dtsMappings = getDtsMappings(inputBindings, exports)
+
+  const dtsInputs = Object.keys(dtsMappings)
+
   const rollupConfigs = [
     createBuildConfig('mjs', {
       cwd,
+      input,
       external: externalModules,
+      emitDeclarations: dtsInputs.length > 0,
       output: {
-        file: 'dist/index.mjs',
+        dir: 'dist/',
         format: 'es',
         importAttributesKey: 'with',
+        entryFileNames(chunk) {
+
+          if (chunk.facadeModuleId) {
+
+            const localPath = nodePath
+              .relative(cwd, chunk.facadeModuleId)
+              .replaceAll(nodePath.sep, nodePath.posix.sep)
+
+            if (outputMappings[localPath])
+              return outputMappings[localPath]
+
+          }
+
+          return `${chunk.name}.mjs`
+
+        },
+        chunkFileNames: '[name].mjs',
       },
       plugins,
     }),
   ]
 
-  if (typesOutFile) {
+  if (dtsInputs.length > 0) {
 
     rollupConfigs.push({
-      input: 'dist/dts/index.d.ts',
+      input: dtsInputs,
       external: externalModules,
       plugins: [
         nodeResolve(),
@@ -94,9 +314,26 @@ export function definePackageConfig(options: RollupConfigOptions) {
           hook: 'closeBundle',
         }),
       ],
-      output: [{
-        file: typesOutFile, format: 'es',
-      }],
+      output: {
+        dir: 'dist/',
+        format: 'es',
+        entryFileNames(chunk) {
+
+          if (chunk.facadeModuleId) {
+
+            const localPath = nodePath
+              .relative(cwd, chunk.facadeModuleId)
+              .replaceAll(nodePath.sep, nodePath.posix.sep)
+
+            if (dtsMappings[localPath])
+              return dtsMappings[localPath]
+
+          }
+
+          return `${chunk.name}.mts`
+
+        },
+      },
     })
 
   }
@@ -111,25 +348,23 @@ function createBuildConfig(
   plugins: Plugin[] = []
 ): RollupOptions {
 
-  const { cwd, external, output } = options
+  const { cwd, external, input, emitDeclarations, output } = options
 
   output.sourcemap = !!process.env.SOURCE_MAP
   output.externalLiveBindings = false
 
-  const isProductionBuild = /\.prod\.[cm]?js$/.test(output.file)
+  const isProductionBuild = process.env.NODE_ENV === 'production'
   // Конечный билд для запуска в окружении Node.
   const isNodeBuild = buildName === 'cjs'
   // Билд для дальнейшей сборки с использованием бандлеров.
   const isBundlerEsmBuild = buildName === 'mjs'
 
   const tsPlugin = ts({
-    tsconfig: resolve(cwd, './tsconfig.build.json'),
-    // cacheRoot: resolve(rootDir, './node_modules/.rts2_cache'),
+    tsconfig: nodePath.resolve(cwd, './tsconfig.build.json'),
     compilerOptions: {
       noCheck: hasTsChecked,
-
-      declaration: !!typesOutFile,
-      declarationDir: typesOutFile ? 'dist/dts' : void 0,
+      declaration: emitDeclarations,
+      declarationDir: emitDeclarations ? 'dist/dts' : void 0,
     },
     exclude: [
       'packages/*/tests',
@@ -141,7 +376,7 @@ function createBuildConfig(
   hasTsChecked = true
 
   return {
-    input: 'src/index.ts',
+    input,
     external,
     plugins: [
       tsPlugin,
@@ -172,8 +407,9 @@ function createReplacePlugin(
 
   const replacements = {
 
+    // Preserve to be handled by bundlers
+
     __DEV__: isBundlerEsmBuild || (isNodeBuild && !isProduction)
-      // Preserve to be handled by bundlers
       ? `(process.env.NODE_ENV !== 'production')`
       : JSON.stringify(!isProduction),
 
