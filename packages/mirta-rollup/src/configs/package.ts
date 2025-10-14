@@ -19,7 +19,7 @@ import type {
   PreRenderedChunk
 } from 'rollup'
 
-class BuildError extends Error {
+export class BuildError extends Error {
   constructor(message: string) {
 
     super(message)
@@ -199,10 +199,15 @@ function getInputBindings(
 
   }
 
-  for (const key of Object.keys(exports)) {
+  for (const [key, value] of Object.entries(exports)) {
+
+    if ((!value.import?.default && value.import?.types))
+      continue
 
     if (!(key in result))
-      throw new BuildError(`[Mirta Rollup] Export "${key}" defined in package.json has no corresponding input file in Rollup configuration`)
+      throw new BuildError(
+        `[Mirta Rollup] Export "${key}" defined in package.json has no corresponding input file in Rollup configuration`
+      )
 
   }
 
@@ -309,6 +314,7 @@ export function definePackageConfig(options: RollupConfigOptions) {
       input,
       external: externalModules,
       emitDeclarations: dtsInputs.length > 0,
+      plugins,
       output: {
         dir: 'dist/',
         format: 'es',
@@ -331,7 +337,6 @@ export function definePackageConfig(options: RollupConfigOptions) {
         },
         chunkFileNames: '[name].mjs',
       },
-      plugins,
     }),
   ]
 
@@ -379,11 +384,10 @@ export function definePackageConfig(options: RollupConfigOptions) {
 
 function createBuildConfig(
   buildName: string,
-  options: BuildOptions,
-  plugins: Plugin[] = []
+  options: BuildOptions
 ): RollupOptions {
 
-  const { cwd, external, input, emitDeclarations, output } = options
+  const { cwd, external, input, emitDeclarations, plugins = [], output } = options
 
   output.sourcemap = !!process.env.SOURCE_MAP
   output.externalLiveBindings = false
