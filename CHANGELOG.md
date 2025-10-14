@@ -1,3 +1,17 @@
+## [0.3.4](https://github.com/wb-mirta/core/compare/v0.3.3...v0.3.4) (2025-10-14)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** disable the cache for rpt2 ([#81](https://github.com/wb-mirta/core/issues/81)) ([0a0d5b8](https://github.com/wb-mirta/core/commit/0a0d5b81f8743438b315484457ad29739a13e8bd))
+
+
+### Features
+
+* **mirta-rollup:** add multi-entry npm build mode ([#83](https://github.com/wb-mirta/core/issues/83)) ([6e71fce](https://github.com/wb-mirta/core/commit/6e71fce9e5f3d0f93a42c6e4c0f724a7760cf851))
+
+
+
 ## [0.3.3](https://github.com/wb-mirta/core/compare/v0.3.2...v0.3.3) (2025-10-12)
 
 
