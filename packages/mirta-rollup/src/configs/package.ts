@@ -77,6 +77,8 @@ interface InputBinding {
   outputFile: string
 }
 
+const dtsOutputDir = 'dist/dts'
+
 function normalizeInput(input: string | string[] | Record<string, string>) {
 
   const inputs: string[] = []
@@ -99,6 +101,9 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
     inputs.push(...Object.values(input))
 
   }
+
+  if (inputs.length === 0)
+    throw new BuildError('[Mirta Rollup] Input configuration cannot be empty')
 
   return inputs
 
@@ -245,7 +250,7 @@ function getDtsMappings(inputBindings: Record<string, InputBinding | undefined>,
     //
     const dtsSource = binding.dtsSource
 
-    result[`dist/dts/${dtsSource}.d.ts`] = outputFile
+    result[`${dtsOutputDir}/${dtsSource}.d.ts`] = outputFile
 
   }
 
@@ -340,7 +345,7 @@ export function definePackageConfig(options: RollupConfigOptions) {
         commonjs(),
         dts(),
         del({
-          targets: ['dist/dts'],
+          targets: [dtsOutputDir],
           hook: 'closeBundle',
         }),
       ],
@@ -394,7 +399,7 @@ function createBuildConfig(
     compilerOptions: {
       noCheck: hasTsChecked,
       declaration: emitDeclarations,
-      declarationDir: emitDeclarations ? 'dist/dts' : void 0,
+      declarationDir: emitDeclarations ? dtsOutputDir : void 0,
     },
     exclude: [
       'packages/*/tests',
