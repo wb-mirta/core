@@ -1,6 +1,8 @@
 import { type OutputOptions, type PreRenderedChunk, type Plugin } from 'rollup'
-import { readFileSync } from 'fs'
-import nodePath from 'node:path'
+
+const fs = await import('fs')
+const readFileSync = vi.mocked(fs.readFileSync)
+const nodePath = vi.mocked((await import('node:path')).default, true)
 
 // Mock fs module
 vi.mock('fs', () => ({
