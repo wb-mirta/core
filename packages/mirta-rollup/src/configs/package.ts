@@ -6,7 +6,7 @@ import replace from '@rollup/plugin-replace'
 // import copy from 'rollup-plugin-copy'
 
 import dts from 'rollup-plugin-dts'
-import del from '../plugins/del'
+import del from '#plugins/del'
 
 import nodePath from 'node:path'
 import { readFileSync } from 'fs'
@@ -19,22 +19,14 @@ import type {
   PreRenderedChunk
 } from 'rollup'
 
-export class BuildError extends Error {
-  constructor(message: string) {
+import { NpmBuildError } from '#utils/errors'
 
-    super(message)
-
-    // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, BuildError.prototype)
-
-    this.name = 'BuildError'
-    this.message = message
-
-    Error.captureStackTrace(this, BuildError)
-
-  }
-}
-
+/**
+ * Опции конфигурации Rollup.
+ *
+ * @since 0.3.0
+ *
+ **/
 interface RollupConfigOptions {
   /** Текущая рабочая директория. */
   cwd?: string
@@ -43,17 +35,12 @@ interface RollupConfigOptions {
   plugins?: Plugin[]
 }
 
-type PackageExports = Record<string, {
-  import?: {
-    types?: string
-    default?: string
-  }
-}>
-
-interface Package {
-  exports?: PackageExports
-}
-
+/**
+ * Параметры сборки.
+ *
+ * @since 0.3.0
+ *
+ **/
 interface BuildOptions {
   cwd: string
   input: string | string[] | Record<string, string>
@@ -71,14 +58,56 @@ interface BuildOptions {
   }
 }
 
+/**
+ * Описатель экспорта.
+ *
+ * @since 0.3.5
+ *
+ **/
+interface ExportDescriptor {
+  dtsOutputFile?: string
+}
+
+/**
+ * Связь входного файла с выходным.
+ *
+ * @since 0.3.4
+ *
+ **/
 interface InputBinding {
-  sourceFile: string
-  dtsSource: string
   outputFile: string
+  dtsSourceFile: string
+  dtsOutputFile?: string
 }
 
 const dtsOutputDir = 'dist/dts'
 
+/**
+ * Удаляет префикс './dist/' из пути.
+ * @param path Путь к файлу.
+ * @returns Нормализованный путь.
+ *
+ * @since 0.3.5
+ *
+ **/
+function sliceDistPrefix(path: string) {
+
+  return path.startsWith('./dist/')
+    ? path.slice(7)
+    : path
+
+}
+
+/**
+ * Нормализует входные данные в массив строк.
+ *
+ * @param input Входные данные (строка, массив или объект).
+ * @returns Массив путей к входным файлам.
+ * @throws {NpmBuildError} Если входная конфигурация пуста.
+ *
+ * @since 0.3.4
+ *
+ **/
 function normalizeInput(input: string | string[] | Record<string, string>) {
 
   const inputs: string[] = []
@@ -103,111 +132,59 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
   }
 
   if (inputs.length === 0)
-    throw new BuildError('[Mirta Rollup] Input configuration cannot be empty')
+    throw NpmBuildError.get('inputEmpty')
 
   return inputs
 
 }
 
 /**
- * Связывает исходные файлы проекта (`src/...`) с точками входа,
- * определенными в `package.exports`. Ее основная цель — создать
- * отображение между входными файлами (например, `src/index.ts`)
- * и их выходными файлами (например, `dist/index.js`), а также источниками типов (`.d.ts`).
+ * Проверяет, является ли объект условной записью экспорта.
  *
- * @param inputs Массив путей к исходным файлам (например, `['src/index.ts', 'src/utils.ts']`)
- * @param exports Объект из `package.exports`, описывающий точки входа пакета.
+ * @param source Объект для проверки.
+ * @returns `true`, если объект содержит поле `import`.
+ *
+ * @since 0.3.5
  *
  **/
-function getInputBindings(
-  inputs: string[],
-  exports?: PackageExports
-) {
+function isConditionalEntry(source: object): source is PackageExports.ConditionalEntry {
 
-  if (!inputs.length || !exports)
-    return {}
+  return 'import' in source
 
-  const candidates: Record<
-    string,
-    {
-      key: string
-      outputFile: string
-      dtsSource: string
-    } | undefined
-  > = {}
+}
 
-  for (const [key, value] of Object.entries(exports)) {
+/**
+ * Обрабатывает условную запись экспорта.
+ *
+ * @param source Условная запись.
+ * @returns Объект с полями entry и types.
+ *
+ * @since 0.3.5
+ *
+ **/
+function processConditionalEntry(source: PackageExports.ConditionalEntry) {
 
-    if (!value.import?.default || !key.startsWith('.'))
-      continue
+  const result: {
 
-    // Формируем outputFile на основе данных package.json,
-    // убирая префикс `dist/` из путей, так как он
-    // уже указан в настройках сборки (output.dir).
-    //
-    const outputFile = value.import.default.startsWith('./dist/')
-      ? value.import.default.slice(7)
-      : value.import.default
+    entry?: PackageExports.Path
+    types?: PackageExports.Path
 
-    const source = key === '.' ? 'index' : key.slice(2)
+  } = {}
 
-    // Генерация кандидатов для входных файлов.
-    //
-    // Для каждого ключа экспорта создает возможные пути
-    // к исходным файлам (например, `src/utils.ts` и `src/utils/index.ts`),
-    // учитывая как явные, так и неявные структуры каталогов.
+  if (source.import) {
 
-    Object.assign(candidates, {
+    if (typeof source.import === 'string') {
 
-      // Варианты явного пути (например, `src/setup.ts`)
-
-      [`src/${source}.ts`]: { key, outputFile, dtsSource: source },
-      [`src/${source}.js`]: { key, outputFile, dtsSource: source },
-
-      // Варианты неявного пути (например, `src/setup/index.ts`):
-
-      [`src/${source}/index.ts`]: { key, outputFile, dtsSource: `${source}/index` },
-      [`src/${source}/index.js`]: { key, outputFile, dtsSource: `${source}/index` },
-    })
-
-  }
-
-  const result: Record<string, InputBinding> = {}
-
-  // Сопоставление с реальными входными файлами.
-  //
-  // Ппроверяет, какие из сгенерированных путей действительно существуют в массиве inputs.
-  //
-  for (const input of inputs) {
-
-    const entry = candidates[input]
-
-    // Если точка входа не ассоциирована с конфигурацией `package.json` — выбрасываем ошибку и прерываем сборку.
-    if (!entry)
-      throw new BuildError(`[Mirta Rollup] The input file "${input}" is not associated with corresponding export in the package.json`)
-
-    // Формирует итоговый объект result, где ключи — это точки входа из package.exports,
-    // а значения — связи между исходными файлами, выходными файлами и источниками типов.
-    //
-    result[entry.key] = {
-
-      sourceFile: input,
-      outputFile: entry.outputFile,
-      dtsSource: entry.dtsSource,
+      // Путь точки входа определён, типизация отсутствует.
+      result.entry = source.import
 
     }
+    else {
 
-  }
+      result.entry = source.import.default
+      result.types = source.import.types
 
-  for (const [key, value] of Object.entries(exports)) {
-
-    if ((!value.import?.default && value.import?.types))
-      continue
-
-    if (!(key in result))
-      throw new BuildError(
-        `[Mirta Rollup] Export "${key}" defined in package.json has no corresponding input file in Rollup configuration`
-      )
+    }
 
   }
 
@@ -216,46 +193,170 @@ function getInputBindings(
 }
 
 /**
- * Создаёт отображение между файлами типов `.d.ts` и их выходными путями
- * на основе данных из `package.exports` и ранее сформированных связей ({@link inputBindings})
+ * Проверяет наличие точки входа для типизации.
  *
- * @param inputBindings
- * @param exports
- * @returns
- */
-function getDtsMappings(inputBindings: Record<string, InputBinding | undefined>, exports?: PackageExports) {
+ * @param entry Путь к точке входа.
+ * @param types Путь к файлу типов.
+ * @throws {NpmBuildError} Если отсутствует точка входа.
+ *
+ * @since 0.3.5
+ *
+ **/
+function ensureTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.Path) {
 
-  if (!exports)
-    return {}
+  if (types && !entry)
+    throw NpmBuildError.get('exportTypesOnly', types)
 
-  const result: Record<string, string> = {}
+}
 
-  // Для каждой точки входа из package.exports
-  //
-  for (const [key, value] of Object.entries(exports)) {
+/**
+ * Нормализует поле `exports` из package.json в словарь точек входа.
+ *
+ * @param exportsField Значение поля `exports`.
+ * @returns Словарь точек входа с метаданными.
+ * @throws {NpmBuildError} Если конфигурация экспорта отсутствует или некорректна.
+ *
+ * @since 0.3.5
+ *
+ **/
+function normalizeExports(exportsField: PackageExports) {
 
-    // Где указан import.types
-    //
-    if (!value.import?.types || !key.startsWith('.'))
+  if (!exportsField)
+    throw NpmBuildError.get('exportEmpty')
+
+  if (Array.isArray(exportsField))
+    throw NpmBuildError.get('exportDisallowArrayType')
+
+  const result: Record<string, ExportDescriptor> = {}
+
+  if (typeof exportsField === 'string') {
+
+    result[exportsField] = {}
+
+    return result
+
+  }
+
+  if (isConditionalEntry(exportsField)) {
+
+    const { entry, types } = processConditionalEntry(exportsField)
+
+    ensureTypesHaveEntry(entry, types)
+
+    if (entry)
+      result[entry] = types
+        ? { dtsOutputFile: types }
+        : {}
+
+    return result
+
+  }
+
+  for (const [key, value] of Object.entries<PackageExports.Entry>(exportsField)) {
+
+    if (!value)
       continue
 
-    // Определяет путь к выходному файлу типов, убирая префикс `./dist/`
-    //
-    const outputFile = value.import.types.startsWith('./dist/')
-      ? value.import.types.slice(7)
-      : value.import.types
+    if (!key.startsWith('.'))
+      throw NpmBuildError.get('exportMustStartWithDot', key)
 
-    const binding = inputBindings[key]
+    let
+      entry: PackageExports.Path,
+      types: PackageExports.Path
 
-    // Если для указанного ключа отсутствует точка входа — выбрасываем ошибку и прерываем сборку.
-    if (!binding)
-      throw new BuildError(`[Mirta Rollup] Type definition "${outputFile}" has no corresponding input file`)
+    if (typeof value === 'string') {
 
-    // Связывает с исходным файлом типов.
-    //
-    const dtsSource = binding.dtsSource
+      // Путь точки входа определён, типизация отсутствует.
+      entry = value
 
-    result[`${dtsOutputDir}/${dtsSource}.d.ts`] = outputFile
+    }
+    else if (isConditionalEntry(value)) {
+
+      ({ entry, types } = processConditionalEntry(value))
+
+    }
+    else {
+
+      entry = value.default
+      types = value.types
+
+    }
+
+    ensureTypesHaveEntry(entry, types)
+
+    if (entry)
+      result[entry] = types
+        ? { dtsOutputFile: types }
+        : {}
+
+  }
+
+  return result
+
+}
+
+/**
+ * Создаёт отображение между входными файлами и выходными путями.
+ *
+ * @param inputs Массив исходных файлов.
+ * @param normalizedExports Нормализованные дескрипторы экспорта.
+ * @returns Словарь связей вход-выход.
+ * @throws {NpmBuildError} Если входной файл не связан с экспортом.
+ *
+ * @since 0.3.4
+ *
+ **/
+function getInputBindings(
+  inputs: string[],
+  normalizedExports: Record<string, ExportDescriptor | undefined>
+) {
+
+  const bodyPattern = /^src\/(.*)\.[jt]s$/
+
+  const result: Record<string, InputBinding | undefined> = {}
+
+  const usedExports = new Set<string>()
+  const producingOutputs = new Set<string>()
+
+  for (const input of inputs) {
+
+    if (!input.startsWith('src/'))
+      throw NpmBuildError.get('inputPathRequiresPrefix', input, 'src/')
+
+    const match = bodyPattern.exec(input)
+
+    if (!match)
+      throw NpmBuildError.get('inputFileExtensionNotSupported', input)
+
+    const outputFile = `${match[1]}.mjs`
+
+    if (producingOutputs.has(outputFile))
+      throw NpmBuildError.get('inputGeneratesDuplicateOutput', outputFile)
+
+    producingOutputs.add(outputFile)
+
+    const exportEntry = `./dist/${outputFile}`
+
+    usedExports.add(exportEntry)
+
+    const descriptor = normalizedExports[exportEntry]
+
+    // Проверяем наличие ключа в словаре.
+    if (!descriptor)
+      throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
+
+    result[input] = {
+      outputFile,
+      dtsSourceFile: `${dtsOutputDir}/${match[1]}.d.ts`,
+      dtsOutputFile: descriptor.dtsOutputFile,
+    }
+
+  }
+
+  for (const key of Object.keys(normalizedExports)) {
+
+    if (!usedExports.has(key))
+      throw NpmBuildError.get('exportHasNoInput', key)
 
   }
 
@@ -266,6 +367,15 @@ function getDtsMappings(inputBindings: Record<string, InputBinding | undefined>,
 // Проверка TypeScript выполняется только для первой конфигурации.
 let hasTsChecked = false
 
+/**
+ * Определяет конфигурацию сборки на основе package.json.
+ *
+ * @param options Опции конфигурации Rollup.
+ * @returns Массив конфигураций Rollup.
+ *
+ * @since 0.3.0
+ *
+ **/
 export function definePackageConfig(options: RollupConfigOptions) {
 
   const {
@@ -277,34 +387,35 @@ export function definePackageConfig(options: RollupConfigOptions) {
 
   const pkgPath = nodePath.resolve(cwd, 'package.json')
 
-  const pkg = JSON.parse(
-    readFileSync(pkgPath, 'utf-8')
-  ) as Package
-
-  const { exports = {} } = pkg
-
   const externalModules = [
     /node_modules/,
     pkgPath,
     ...external,
   ]
 
+  const pkg = JSON.parse(
+    readFileSync(pkgPath, 'utf-8')
+  ) as Package
+
+  const { exports = {} } = pkg
+
+  const normalizedExports = normalizeExports(exports)
+
   const inputBindings = getInputBindings(
     normalizeInput(input),
-    exports
+    normalizedExports
   )
 
-  const outputMappings = Object.keys(inputBindings)
-    .reduce<Record<string, string>>((mappings, nextKey) => {
+  // Создаёт отображение между файлами типов `.d.ts` и их выходными путями
+  const dtsMappings = Object.values(inputBindings)
+    .reduce<Record<string, string>>((mappings, nextValue) => {
 
-      const inputMap = inputBindings[nextKey]
-      mappings[inputMap.sourceFile] = inputMap.outputFile
+      if (nextValue?.dtsOutputFile)
+        mappings[nextValue.dtsSourceFile] = sliceDistPrefix(nextValue.dtsOutputFile)
 
       return mappings
 
     }, {})
-
-  const dtsMappings = getDtsMappings(inputBindings, exports)
 
   const dtsInputs = Object.keys(dtsMappings)
 
@@ -327,8 +438,10 @@ export function definePackageConfig(options: RollupConfigOptions) {
               .relative(cwd, chunk.facadeModuleId)
               .replaceAll(nodePath.sep, nodePath.posix.sep)
 
-            if (outputMappings[localPath])
-              return outputMappings[localPath]
+            const binding = inputBindings[localPath]
+
+            if (binding)
+              return binding.outputFile
 
           }
 
@@ -382,6 +495,16 @@ export function definePackageConfig(options: RollupConfigOptions) {
 
 }
 
+/**
+ * Создаёт конфигурацию сборки Rollup.
+ *
+ * @param buildName Имя сборки.
+ * @param options Параметры сборки.
+ * @returns Конфигурация Rollup.
+ *
+ * @since 0.3.0
+ *
+ **/
 function createBuildConfig(
   buildName: string,
   options: BuildOptions
@@ -438,6 +561,17 @@ function createBuildConfig(
 
 }
 
+/**
+ * Создаёт плагин замены значений.
+ *
+ * @param isProduction Признак production-сборки.
+ * @param isBundlerEsmBuild Признак сборки для bundler ESM.
+ * @param isNodeBuild Признак сборки для Node.js.
+ * @returns Плагин замены.
+ *
+ * @since 0.3.0
+ *
+ **/
 function createReplacePlugin(
   isProduction: boolean,
   isBundlerEsmBuild: boolean,

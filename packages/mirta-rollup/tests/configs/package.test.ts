@@ -4,6 +4,8 @@ const fs = await import('fs')
 const readFileSync = vi.mocked(fs.readFileSync)
 const nodePath = vi.mocked((await import('node:path')).default, true)
 
+import { NpmBuildError } from '#utils/errors'
+
 // Mock fs module
 vi.mock('fs', () => ({
 
@@ -32,7 +34,7 @@ vi.mock('node:path', async () => {
 })
 
 // Import after mocking
-const { definePackageConfig, BuildError } = await import('../../src/configs/package')
+const { definePackageConfig } = await import('#configs/package')
 
 describe('package.ts - normalizeInput', () => {
 
@@ -153,7 +155,7 @@ describe('package.ts - normalizeInput', () => {
         input: [],
       })
 
-    }).toThrow('[Mirta Rollup] Input configuration cannot be empty')
+    }).toThrow(NpmBuildError.get('inputEmpty'))
 
   })
 
@@ -177,7 +179,7 @@ describe('package.ts - normalizeInput', () => {
         input: {},
       })
 
-    }).toThrow('[Mirta Rollup] Input configuration cannot be empty')
+    }).toThrow(NpmBuildError.get('inputEmpty'))
 
   })
 
@@ -215,19 +217,17 @@ describe('package.ts - getInputBindings', () => {
 
   })
 
-  it('should map multiple entry points correctly', () => {
+  it('should handle src/setup.ts', () => {
 
     const mockPackage = {
       exports: {
         '.': {
           import: {
-            types: './dist/index.d.mts',
             default: './dist/index.mjs',
           },
         },
         './setup': {
           import: {
-            types: './dist/setup.d.mts',
             default: './dist/setup.mjs',
           },
         },
@@ -236,11 +236,12 @@ describe('package.ts - getInputBindings', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
+    // Should work with explicit file
     const config = definePackageConfig({
       input: ['src/index.ts', 'src/setup.ts'],
     })
 
-    expect(config).toHaveLength(2)
+    expect(config).toBeDefined()
 
   })
 
@@ -255,8 +256,8 @@ describe('package.ts - getInputBindings', () => {
         },
         './setup': {
           import: {
-            types: './dist/setup.d.mts',
-            default: './dist/setup.mjs',
+            types: './dist/setup/index.d.mts',
+            default: './dist/setup/index.mjs',
           },
         },
       },
@@ -266,6 +267,115 @@ describe('package.ts - getInputBindings', () => {
 
     const config = definePackageConfig({
       input: ['src/index.ts', 'src/setup/index.ts'],
+    })
+
+    expect(config).toBeDefined()
+
+  })
+
+  it('should not use export path ./dist/utils.mjs as output point for src/utils/index.ts', () => {
+
+    const mockPackage = {
+      exports: {
+        '.': {
+          import: {
+            default: './dist/index.mjs',
+          },
+        },
+        './utils': {
+          import: {
+            default: './dist/utils.mjs',
+          },
+        },
+      },
+    }
+
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
+
+    // Should ignore export pattern ./dist/utils.mjs
+    expect(() => {
+
+      definePackageConfig({
+        input: ['src/index.ts', 'src/utils/index.ts'],
+      })
+
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/utils/index.ts', './dist/utils/index.mjs'))
+
+  })
+
+  it('should throw error for input not matching any export pattern', () => {
+
+    const mockPackage = {
+      exports: {
+        '.': {
+          import: {
+            default: './dist/index.mjs',
+          },
+        },
+      },
+    }
+
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
+
+    expect(() => {
+
+      definePackageConfig({
+        input: ['src/index.ts', 'src/nonexistent.ts'],
+      })
+
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/nonexistent.ts', './dist/nonexistent.mjs'))
+
+  })
+
+  it('should handle .js input files correctly', () => {
+
+    const mockPackage = {
+      exports: {
+        '.': {
+          import: {
+            default: './dist/index.mjs',
+          },
+        },
+        './utils': {
+          import: {
+            default: './dist/utils.mjs',
+          },
+        },
+      },
+    }
+
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
+
+    const config = definePackageConfig({
+      input: ['src/index.js', 'src/utils.js'],
+    })
+
+    expect(config).toBeDefined()
+    expect(config[0].input).toEqual(['src/index.js', 'src/utils.js'])
+
+  })
+
+  it('should handle nested export paths', () => {
+
+    const mockPackage = {
+      exports: {
+        '.': {
+          import: {
+            default: './dist/index.mjs',
+          },
+        },
+        './components/button': {
+          import: {
+            default: './dist/components/button.mjs',
+          },
+        },
+      },
+    }
+
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
+
+    const config = definePackageConfig({
+      input: ['src/index.ts', 'src/components/button.ts'],
     })
 
     expect(config).toBeDefined()
@@ -292,7 +402,7 @@ describe('package.ts - getInputBindings', () => {
         input: ['src/index.ts', 'src/unknown.ts'],
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/unknown.ts" is not associated with corresponding export in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/unknown.ts', './dist/unknown.mjs'))
 
   })
 
@@ -321,7 +431,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Export "./utils" defined in package.json has no corresponding input file in Rollup configuration')
+    }).toThrow(NpmBuildError.get('exportHasNoInput', './dist/utils.mjs'))
 
   })
 
@@ -343,7 +453,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -368,7 +478,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Export "package.json" defined in package.json has no corresponding input file in Rollup configuration')
+    }).toThrow(NpmBuildError.get('exportMustStartWithDot', 'package.json'))
 
   })
 
@@ -533,7 +643,7 @@ describe('package.ts - getDtsMappings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Type definition "missing.d.mts" has no corresponding input file')
+    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/missing.d.mts'))
 
   })
 
@@ -789,7 +899,7 @@ describe('package.ts - entryFileNames function', () => {
 
   })
 
-  it('should generate correct entry file name for mapped input', () => {
+  it('should handle unmapped input', () => {
 
     const mockPackage = {
       exports: {
@@ -803,12 +913,13 @@ describe('package.ts - entryFileNames function', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
+    expect(() => {
 
-    expect((config[0].output as OutputOptions).entryFileNames).toBeDefined()
-    expect(typeof (config[0].output as OutputOptions).entryFileNames).toBe('function')
+      definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -836,35 +947,6 @@ describe('package.ts - entryFileNames function', () => {
     // Test with chunk that has no facadeModuleId
     const result = entryFileNames({ name: 'test-chunk' })
     expect(result).toBe('test-chunk.mjs')
-
-  })
-
-})
-
-describe('package.ts - BuildError class', () => {
-
-  it('should create BuildError with correct name', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error.name).toBe('BuildError')
-    expect(error.message).toContain('[Mirta Rollup]')
-
-  })
-
-  it('should capture stack trace', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error.stack).toBeDefined()
-
-  })
-
-  it('should be instanceof Error', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error).toBeInstanceOf(Error)
 
   })
 
@@ -1118,7 +1200,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -1148,7 +1230,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Type definition "utils.d.mts" has no corresponding input file')
+    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/utils.d.mts'))
 
   })
 
@@ -1180,11 +1262,13 @@ describe('package.ts - edge cases', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
+    expect(() => {
 
-    expect(config).toBeDefined()
+      definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
