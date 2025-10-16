@@ -6,7 +6,7 @@ import replace from '@rollup/plugin-replace'
 // import copy from 'rollup-plugin-copy'
 
 import dts from 'rollup-plugin-dts'
-import del from '../plugins/del'
+import del from '#plugins/del'
 
 import nodePath from 'node:path'
 import { readFileSync } from 'fs'
@@ -19,27 +19,7 @@ import type {
   PreRenderedChunk
 } from 'rollup'
 
-/**
- * Класс ошибки сборки, расширяющий стандартный Error.
- *
- * @since 0.3.4
- *
- **/
-export class BuildError extends Error {
-  constructor(message: string) {
-
-    super(message)
-
-    // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, BuildError.prototype)
-
-    this.name = 'BuildError'
-    this.message = message
-
-    Error.captureStackTrace(this, BuildError)
-
-  }
-}
+import { NpmBuildError } from '#utils/errors'
 
 /**
  * Опции конфигурации Rollup.
@@ -123,7 +103,7 @@ function sliceDistPrefix(path: string) {
  *
  * @param input Входные данные (строка, массив или объект).
  * @returns Массив путей к входным файлам.
- * @throws {BuildError} Если входная конфигурация пуста.
+ * @throws {NpmBuildError} Если входная конфигурация пуста.
  *
  * @since 0.3.4
  *
@@ -152,7 +132,7 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
   }
 
   if (inputs.length === 0)
-    throw new BuildError('[Mirta Rollup] Input configuration cannot be empty')
+    throw NpmBuildError.get('inputEmpty')
 
   return inputs
 
@@ -217,7 +197,7 @@ function processConditionalEntry(source: PackageExports.ConditionalEntry) {
  *
  * @param entry Путь к точке входа.
  * @param types Путь к файлу типов.
- * @throws {BuildError} Если отсутствует точка входа.
+ * @throws {NpmBuildError} Если отсутствует точка входа.
  *
  * @since 0.3.5
  *
@@ -225,7 +205,7 @@ function processConditionalEntry(source: PackageExports.ConditionalEntry) {
 function ensureTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.Path) {
 
   if (types && !entry)
-    throw new BuildError(`[Mirta Rollup] Input file for "${types}" is missing in package.json`)
+    throw NpmBuildError.get('exportTypesOnly', types)
 
 }
 
@@ -234,7 +214,7 @@ function ensureTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.
  *
  * @param exportsField Значение поля `exports`.
  * @returns Словарь точек входа с метаданными.
- * @throws {BuildError} Если конфигурация экспорта отсутствует или некорректна.
+ * @throws {NpmBuildError} Если конфигурация экспорта отсутствует или некорректна.
  *
  * @since 0.3.5
  *
@@ -242,10 +222,10 @@ function ensureTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.
 function normalizeExports(exportsField: PackageExports) {
 
   if (!exportsField)
-    throw new BuildError('[Mirta Rollup] Missing export configuration in package.json. Please define the "exports" field')
+    throw NpmBuildError.get('exportEmpty')
 
   if (Array.isArray(exportsField))
-    throw new BuildError('[Mirta Rollup] The field "exports" in package.json must be either a string or an object, but found an array')
+    throw NpmBuildError.get('exportDisallowArrayType')
 
   const result: Record<string, ExportDescriptor> = {}
 
@@ -278,7 +258,7 @@ function normalizeExports(exportsField: PackageExports) {
       continue
 
     if (!key.startsWith('.'))
-      throw new BuildError(`[Mirta Rollup] Invalid export path "${key}" in package.json. Exports must start with "."`)
+      throw NpmBuildError.get('exportMustStartWithDot', key)
 
     let
       entry: PackageExports.Path,
@@ -321,7 +301,7 @@ function normalizeExports(exportsField: PackageExports) {
  * @param inputs Массив исходных файлов.
  * @param normalizedExports Нормализованные дескрипторы экспорта.
  * @returns Словарь связей вход-выход.
- * @throws {BuildError} Если входной файл не связан с экспортом.
+ * @throws {NpmBuildError} Если входной файл не связан с экспортом.
  *
  * @since 0.3.4
  *
@@ -335,26 +315,35 @@ function getInputBindings(
 
   const result: Record<string, InputBinding | undefined> = {}
 
-  const usedExports: string[] = []
+  const usedExports = new Set<string>()
+  const producingOutputs = new Set<string>()
 
   for (const input of inputs) {
 
     if (!input.startsWith('src/'))
-      throw new BuildError(`[Mirta Rollup] Input path "${input}" must start with required prefix "src/"`)
+      throw NpmBuildError.get('inputPathRequiresPrefix', input, 'src/')
 
     const match = bodyPattern.exec(input)
 
     if (!match)
-      throw new BuildError(`[Mirta Rollup] Unsupported input "${input}". Please use valid JS or TS file extension`)
+      throw NpmBuildError.get('inputFileExtensionNotSupported', input)
 
     const outputFile = `${match[1]}.mjs`
+
+    if (producingOutputs.has(outputFile))
+      throw NpmBuildError.get('inputGeneratesDuplicateOutput', outputFile)
+
+    producingOutputs.add(outputFile)
+
     const exportEntry = `./dist/${outputFile}`
+
+    usedExports.add(exportEntry)
 
     const descriptor = normalizedExports[exportEntry]
 
     // Проверяем наличие ключа в словаре.
     if (!descriptor)
-      throw new BuildError(`[Mirta Rollup] The input file "${input}" is not associated with corresponding export "${exportEntry}" in the package.json`)
+      throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
 
     result[input] = {
       outputFile,
@@ -362,16 +351,12 @@ function getInputBindings(
       dtsOutputFile: descriptor.dtsOutputFile,
     }
 
-    usedExports.push(exportEntry)
-
   }
 
   for (const key of Object.keys(normalizedExports)) {
 
-    if (!usedExports.includes(key))
-      throw new BuildError(
-        `[Mirta Rollup] Export "${key}" defined in package.json has no corresponding input file in Rollup configuration`
-      )
+    if (!usedExports.has(key))
+      throw NpmBuildError.get('exportHasNoInput', key)
 
   }
 

@@ -21,6 +21,11 @@
       }
     }
   },
+  "imports": {
+    "#configs/*": "./src/configs/*.js",
+    "#plugins/*": "./src/plugins/*.js",
+    "#utils/*": "./src/utils/*.js"
+  },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
   "repository": {
     "type": "git",

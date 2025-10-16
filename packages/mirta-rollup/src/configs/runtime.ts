@@ -7,8 +7,8 @@ import dotenv from '@dotenv-run/rollup'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 
-import del from '../plugins/del'
-import wbRulesImports from '../plugins/wb-rules-imports'
+import del from '#plugins/del'
+import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 

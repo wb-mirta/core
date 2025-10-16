@@ -4,6 +4,8 @@ const fs = await import('fs')
 const readFileSync = vi.mocked(fs.readFileSync)
 const nodePath = vi.mocked((await import('node:path')).default, true)
 
+import { NpmBuildError } from '#utils/errors'
+
 // Mock fs module
 vi.mock('fs', () => ({
 
@@ -32,7 +34,7 @@ vi.mock('node:path', async () => {
 })
 
 // Import after mocking
-const { definePackageConfig, BuildError } = await import('../../src/configs/package')
+const { definePackageConfig } = await import('#configs/package')
 
 describe('package.ts - normalizeInput', () => {
 
@@ -153,7 +155,7 @@ describe('package.ts - normalizeInput', () => {
         input: [],
       })
 
-    }).toThrow('[Mirta Rollup] Input configuration cannot be empty')
+    }).toThrow(NpmBuildError.get('inputEmpty'))
 
   })
 
@@ -177,7 +179,7 @@ describe('package.ts - normalizeInput', () => {
         input: {},
       })
 
-    }).toThrow('[Mirta Rollup] Input configuration cannot be empty')
+    }).toThrow(NpmBuildError.get('inputEmpty'))
 
   })
 
@@ -292,7 +294,7 @@ describe('package.ts - getInputBindings', () => {
         input: ['src/index.ts', 'src/unknown.ts'],
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/unknown.ts" is not associated with corresponding export "./dist/unknown.mjs" in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/unknown.ts', './dist/unknown.mjs'))
 
   })
 
@@ -321,7 +323,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Export "./dist/utils.mjs" defined in package.json has no corresponding input file in Rollup configuration')
+    }).toThrow(NpmBuildError.get('exportHasNoInput', './dist/utils.mjs'))
 
   })
 
@@ -343,7 +345,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -368,7 +370,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Invalid export path "package.json" in package.json. Exports must start with "."')
+    }).toThrow(NpmBuildError.get('exportMustStartWithDot', 'package.json'))
 
   })
 
@@ -533,7 +535,7 @@ describe('package.ts - getDtsMappings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Input file for "./dist/missing.d.mts" is missing in package.json')
+    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/missing.d.mts'))
 
   })
 
@@ -809,7 +811,7 @@ describe('package.ts - entryFileNames function', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -837,35 +839,6 @@ describe('package.ts - entryFileNames function', () => {
     // Test with chunk that has no facadeModuleId
     const result = entryFileNames({ name: 'test-chunk' })
     expect(result).toBe('test-chunk.mjs')
-
-  })
-
-})
-
-describe('package.ts - BuildError class', () => {
-
-  it('should create BuildError with correct name', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error.name).toBe('BuildError')
-    expect(error.message).toContain('[Mirta Rollup]')
-
-  })
-
-  it('should capture stack trace', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error.stack).toBeDefined()
-
-  })
-
-  it('should be instanceof Error', () => {
-
-    const error = new BuildError('[Mirta Rollup] Test error')
-
-    expect(error).toBeInstanceOf(Error)
 
   })
 
@@ -1119,7 +1092,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
@@ -1149,7 +1122,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Input file for "./dist/utils.d.mts" is missing in package.json')
+    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/utils.d.mts'))
 
   })
 
@@ -1187,7 +1160,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
+    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
 
   })
 
