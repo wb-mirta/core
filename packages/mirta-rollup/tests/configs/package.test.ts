@@ -255,8 +255,8 @@ describe('package.ts - getInputBindings', () => {
         },
         './setup': {
           import: {
-            types: './dist/setup.d.mts',
-            default: './dist/setup.mjs',
+            types: './dist/setup/index.d.mts',
+            default: './dist/setup/index.mjs',
           },
         },
       },
@@ -292,7 +292,7 @@ describe('package.ts - getInputBindings', () => {
         input: ['src/index.ts', 'src/unknown.ts'],
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/unknown.ts" is not associated with corresponding export in the package.json')
+    }).toThrow('[Mirta Rollup] The input file "src/unknown.ts" is not associated with corresponding export "./dist/unknown.mjs" in the package.json')
 
   })
 
@@ -321,7 +321,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Export "./utils" defined in package.json has no corresponding input file in Rollup configuration')
+    }).toThrow('[Mirta Rollup] Export "./dist/utils.mjs" defined in package.json has no corresponding input file in Rollup configuration')
 
   })
 
@@ -343,7 +343,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export in the package.json')
+    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
 
   })
 
@@ -368,7 +368,7 @@ describe('package.ts - getInputBindings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Export "package.json" defined in package.json has no corresponding input file in Rollup configuration')
+    }).toThrow('[Mirta Rollup] Invalid export path "package.json" in package.json. Exports must start with "."')
 
   })
 
@@ -533,7 +533,7 @@ describe('package.ts - getDtsMappings', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Type definition "missing.d.mts" has no corresponding input file')
+    }).toThrow('[Mirta Rollup] Input file for "./dist/missing.d.mts" is missing in package.json')
 
   })
 
@@ -789,7 +789,7 @@ describe('package.ts - entryFileNames function', () => {
 
   })
 
-  it('should generate correct entry file name for mapped input', () => {
+  it('should handle unmapped input', () => {
 
     const mockPackage = {
       exports: {
@@ -803,12 +803,13 @@ describe('package.ts - entryFileNames function', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
+    expect(() => {
 
-    expect((config[0].output as OutputOptions).entryFileNames).toBeDefined()
-    expect(typeof (config[0].output as OutputOptions).entryFileNames).toBe('function')
+      definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
 
   })
 
@@ -1118,7 +1119,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export in the package.json')
+    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
 
   })
 
@@ -1148,7 +1149,7 @@ describe('package.ts - edge cases', () => {
         input: 'src/index.ts',
       })
 
-    }).toThrow('[Mirta Rollup] Type definition "utils.d.mts" has no corresponding input file')
+    }).toThrow('[Mirta Rollup] Input file for "./dist/utils.d.mts" is missing in package.json')
 
   })
 
@@ -1180,11 +1181,13 @@ describe('package.ts - edge cases', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
+    expect(() => {
 
-    expect(config).toBeDefined()
+      definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+    }).toThrow('[Mirta Rollup] The input file "src/index.ts" is not associated with corresponding export "./dist/index.mjs" in the package.json')
 
   })
 
