@@ -10,7 +10,7 @@ export class NpmBuildError extends Error {
    * Приватный конструктор для создания экземпляра ошибки.
    *
    * @param message - Сообщение об ошибке
-   * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup AST')
+   * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup NPM')
    *
    **/
   private constructor(message: string, scope = '@mirta/rollup NPM') {
@@ -116,7 +116,7 @@ export class AstTransformError extends Error {
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, NpmBuildError.get)
+      Error.captureStackTrace(this, AstTransformError.get)
 
   }
 

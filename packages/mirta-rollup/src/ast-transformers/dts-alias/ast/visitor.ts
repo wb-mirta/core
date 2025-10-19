@@ -100,7 +100,10 @@ export function nodeVisitor(this: VisitorContext, node: ts.Node): ts.Node | unde
     return visitChildren(this, node)
 
   const cachedNewPath = this.pathsCache.get(oldPath)
-  const newPath = cachedNewPath ?? resolveNewModulePath(this, oldPath)
+
+  const newPath = cachedNewPath === undefined
+    ? resolveNewModulePath(this, oldPath)
+    : cachedNewPath
 
   if (cachedNewPath === undefined)
     this.pathsCache.set(oldPath, newPath)

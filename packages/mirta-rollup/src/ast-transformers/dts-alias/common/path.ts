@@ -14,7 +14,7 @@ import { AstTransformError } from '#src/utils/errors'
  *
  **/
 export const removeFileExtension = (fileName: string): string =>
-  fileName.replace(/\.d\.ts|\.[tj]s$/i, '')
+  fileName.replace(/\.(?:d\.)?(?:[cm]?[tj]s)$/i, '')
 
 /**
  * Находит общий префикс двух путей.
@@ -73,13 +73,17 @@ export function getRelativeOutputPath(
 ) {
 
   // Шаг 1: Получаем директорию исходного файла.
-  const sourceDir = nodePath.dirname(sourceFilePath)
+  const sourceDir = nodePath
+    .dirname(sourceFilePath)
 
   // Шаг 2: Вычисляем относительный путь от директории исходного файла до целевого файла.
-  const relativeDir = nodePath.dirname(nodePath.relative(sourceDir, targetFilePath))
+  const relativeDir = nodePath
+    .dirname(nodePath.relative(sourceDir, targetFilePath))
 
   // Шаг 3: Объединяем относительную директорию с именем выходного файла.
-  let relativePath = nodePath.posix.join(relativeDir, outputFileName)
+  let relativePath = nodePath
+    .join(relativeDir, outputFileName)
+    .replace(nodePath.sep, nodePath.posix.sep)
 
   // Шаг 4: Гарантируем, что путь является относительным.
   if (!relativePath.startsWith('.'))
@@ -114,9 +118,13 @@ export function getRootDir(
     const sortedRoots = [...compilerOptions.rootDirs]
       .sort((a, b) => b.length - a.length)
 
+    const normalizedFile = nodePath.resolve(sourceFile.fileName)
+
     for (const rootDir of sortedRoots) {
 
-      if (sourceFile.fileName.startsWith(rootDir))
+      const normalizedRoot = nodePath.resolve(rootDir)
+
+      if (normalizedFile.startsWith(normalizedRoot + nodePath.sep))
         return rootDir
 
     }

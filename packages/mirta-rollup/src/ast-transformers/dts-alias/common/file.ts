@@ -36,7 +36,7 @@ function createSourceFilesCache(program: ts.Program): Map<string, ts.SourceFile>
  **/
 export function resolveSourceFile(context: VisitorContext, fileName: string): ts.SourceFile {
 
-  const { program } = context
+  const { program, compilerOptions } = context
 
   let result: ts.SourceFile | undefined
     = program.getSourceFile(fileName)
@@ -56,7 +56,7 @@ export function resolveSourceFile(context: VisitorContext, fileName: string): ts
 
   if (!result) {
 
-    result = ts.createSourceFile(fileName, '', ts.ScriptTarget.ESNext, false)
+    result = ts.createSourceFile(fileName, '', compilerOptions.target ?? ts.ScriptTarget.ESNext, false)
     sourceFilesCache.set(normalizedFileName, result)
 
   }

@@ -54,7 +54,7 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
         sourceFile,
         rootDir: getRootDir(visitorContextBase, sourceFile),
 
-        pathsCache: new Map<string, string>(),
+        pathsCache: new Map<string, string | null>(),
 
         getVisitor() {
 

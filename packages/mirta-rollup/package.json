@@ -39,7 +39,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c --configPlugin typescript={tsconfig:'./tsconfig.build.json'}"
+    "build:mono": "pnpm clean && rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
   },
   "dependencies": {
     "@babel/core": "^7.28.4",
