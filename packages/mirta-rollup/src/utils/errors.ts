@@ -6,7 +6,14 @@
  **/
 export class NpmBuildError extends Error {
 
-  private constructor(message: string, scope = 'Mirta Rollup for NPM') {
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке
+   * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup AST')
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup NPM') {
 
     super(`[${scope}] ${message}`)
 
@@ -18,13 +25,14 @@ export class NpmBuildError extends Error {
 
   }
 
+  /** Карта кодов ошибок с соответствующими сообщениями. */
   private static codeMappings = {
 
     /** Ошибка, возникающая когда конфигурация input-файлов Rollup пуста. */
     inputEmpty: () =>
       'Rollup Config: Input configuration cannot be empty',
 
-    /** Ошибка, когда input-файл не начинается с требуемого префикса. */
+    /** Ошибка, возникающая когда input-файл не начинается с требуемого префикса. */
     inputPathRequiresPrefix: (input: string, prefix: string) =>
       `Rollup Config: Input path "${input}" must start with required prefix "${prefix}"`,
 
@@ -62,6 +70,15 @@ export class NpmBuildError extends Error {
 
   } as const
 
+  /**
+   * Статический метод для получения экземпляра ошибки по коду.
+   *
+   * @template T - Тип ключа из codeMappings
+   * @param code - Код ошибки
+   * @param args - Аргументы для формирования сообщения
+   * @returns Экземпляр {@link NpmBuildError}
+   *
+   **/
   static get<T extends keyof typeof NpmBuildError['codeMappings']>(
     code: T,
     ...args: Parameters<typeof NpmBuildError['codeMappings'][T]>
@@ -72,9 +89,78 @@ export class NpmBuildError extends Error {
 
     const message = messageFn(...args)
 
-    const error = new NpmBuildError(message)
+    return new NpmBuildError(message)
 
-    return error
+  }
+}
+
+/**
+ * Класс ошибки трансформации AST, расширяющий стандартный Error.
+ *
+ * @since 0.3.5
+ *
+ **/
+export class AstTransformError extends Error {
+
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке
+   * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup AST')
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup AST') {
+
+    super(`[${scope}] ${message}`)
+    this.name = 'AstTransformError'
+
+    if ('captureStackTrace' in Error)
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      Error.captureStackTrace(this, NpmBuildError.get)
+
+  }
+
+  /** Карта кодов ошибок с соответствующими сообщениями. */
+  private static codeMappings = {
+
+    /** Ошибка, возникающая при отсутствии root-файлов в проекте. */
+    noRootFilesInProject: () =>
+      'No root files found in the project. Check your TypeScript configuration (tsconfig.json)',
+
+    /** Ошибка, возникающая при отсутствии модуля для указанного спецификатора. */
+    moduleNotFound: (modulePath: string, sourceFileName: string) =>
+      `Module "${modulePath}" not found in "${sourceFileName}"`,
+
+    /** Ошибка, возникающая когда modulePath содержит недопустимые символы. */
+    invalidPathFormat: (modulePath: string) =>
+      `Invalid format of module path: "${modulePath}"`,
+
+    /** Ошибка, возникающая когда путь выходит за пределы корневой директории. */
+    pathOutsideRootDirectory: (path: string) =>
+      `Path "${path}" is outside the root directory`,
+
+  }
+
+  /**
+   * Статический метод для получения экземпляра ошибки по коду.
+   *
+   * @template T - Тип ключа из codeMappings
+   * @param code - Код ошибки
+   * @param args - Аргументы для формирования сообщения
+   * @returns Экземпляр {@link AstTransformError}
+   *
+   **/
+  static get<T extends keyof typeof AstTransformError['codeMappings']>(
+    code: T,
+    ...args: Parameters<typeof AstTransformError['codeMappings'][T]>
+  ): AstTransformError {
+
+    const messageFn
+      = this.codeMappings[code] as ((...args: unknown[]) => string)
+
+    const message = messageFn(...args)
+
+    return new AstTransformError(message)
 
   }
 }

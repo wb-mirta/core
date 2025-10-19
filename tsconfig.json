@@ -19,6 +19,7 @@
   "include": [
     "*.ts",
     "*.mts",
+    "packages/*/*.ts",
     "packages/*/src/**/*.ts",
     "packages/*/tests/**/*.ts",
     "packages/*/types/*.d.ts",

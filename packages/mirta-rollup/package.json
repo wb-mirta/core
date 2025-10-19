@@ -22,9 +22,11 @@
     }
   },
   "imports": {
-    "#configs/*": "./src/configs/*.js",
+    "#src/*": "./src/*.js",
+    "#ast/*": "./src/ast-transformers/*.js",
+    "#utils/*": "./src/utils/*.js",
     "#plugins/*": "./src/plugins/*.js",
-    "#utils/*": "./src/utils/*.js"
+    "#configs/*": "./src/configs/*.js"
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
   "repository": {
@@ -37,7 +39,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
+    "build:mono": "pnpm clean && rollup -c --configPlugin typescript={tsconfig:'./tsconfig.build.json'}"
   },
   "dependencies": {
     "@babel/core": "^7.28.4",

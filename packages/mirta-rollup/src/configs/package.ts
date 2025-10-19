@@ -8,6 +8,8 @@ import replace from '@rollup/plugin-replace'
 import dts from 'rollup-plugin-dts'
 import del from '#plugins/del'
 
+import { dtsAlias } from '#ast/index'
+
 import nodePath from 'node:path'
 import { readFileSync } from 'fs'
 
@@ -376,7 +378,7 @@ let hasTsChecked = false
  * @since 0.3.0
  *
  **/
-export function definePackageConfig(options: RollupConfigOptions) {
+export function definePackageConfig(options: RollupConfigOptions = {}) {
 
   const {
     cwd = process.cwd(),
@@ -531,6 +533,11 @@ function createBuildConfig(
     exclude: [
       'packages/*/tests',
     ],
+    transformers: {
+      afterDeclarations: [
+        dtsAlias(),
+      ],
+    },
   })
 
   // При запуске команды build, проверки TS и генерация определений
