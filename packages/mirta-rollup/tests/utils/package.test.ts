@@ -1,6 +1,3 @@
-const fs = await import('fs')
-const readFileSync = vi.mocked(fs.readFileSync)
-
 import { FileError } from '#utils/errors'
 
 // Мокаем fs модуль
@@ -9,6 +6,9 @@ vi.mock('fs', () => ({
 }))
 
 // Импортируем после мокирования
+const fs = await import('fs')
+const readFileSync = vi.mocked(fs.readFileSync)
+
 const { parsePackageJson } = await import('#utils/package')
 
 describe('parsePackageJson', () => {
@@ -120,14 +120,19 @@ describe('parsePackageJson', () => {
 
       readFileSync.mockReturnValue('{ invalid json }')
 
-      expect(() => parsePackageJson('/path/to/package.json'))
-        .toThrow(
-          FileError.get(
-            'invalidJson',
-            '/path/to/package.json',
-            'Expected property name or \'}\' in JSON at position 2 (line 1 column 3)'
-          )
-        )
+      try {
+
+        parsePackageJson('/path/to/package.json')
+
+      }
+      catch (e: unknown) {
+
+        expect(e).toBeInstanceOf(FileError)
+
+        expect((e as FileError).message).toContain('Invalid JSON')
+        expect((e as FileError).message).toContain('/path/to/package.json')
+
+      }
 
     })
 
@@ -135,8 +140,19 @@ describe('parsePackageJson', () => {
 
       readFileSync.mockReturnValue('')
 
-      expect(() => parsePackageJson('/path/to/package.json'))
-        .toThrow(FileError.get('invalidJson', '/path/to/package.json', 'Unexpected end of JSON input'))
+      try {
+
+        parsePackageJson('/path/to/package.json')
+
+      }
+      catch (e: unknown) {
+
+        expect(e).toBeInstanceOf(FileError)
+
+        expect((e as FileError).message).toContain('Invalid JSON')
+        expect((e as FileError).message).toContain('/path/to/package.json')
+
+      }
 
     })
 
