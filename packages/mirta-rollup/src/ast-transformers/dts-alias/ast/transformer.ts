@@ -18,7 +18,7 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
 
   return (context) => {
 
-    const compilerOptions = context.getCompilerOptions()
+    const compilerOptions = program.getCompilerOptions()
 
     /**
      * Базовый контекст для работы с AST-трансформером.

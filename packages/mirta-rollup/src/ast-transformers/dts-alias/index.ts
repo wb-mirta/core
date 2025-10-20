@@ -26,7 +26,7 @@ import { dtsAliasTransformerFactory } from './ast/transformer'
  * }
  *
  * ```
- * @sice 0.3.5
+ * @since 0.3.5
  *
  **/
 export const dtsAlias = (): TransformerFactory<'afterDeclarations'> => ({

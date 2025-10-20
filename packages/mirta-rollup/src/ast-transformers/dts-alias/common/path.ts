@@ -83,7 +83,10 @@ export function getRelativeOutputPath(
   // Шаг 3: Объединяем относительную директорию с именем выходного файла.
   let relativePath = nodePath
     .join(relativeDir, outputFileName)
-    .replace(nodePath.sep, nodePath.posix.sep)
+
+  relativePath = relativePath
+    .split(nodePath.sep)
+    .join(nodePath.posix.sep)
 
   // Шаг 4: Гарантируем, что путь является относительным.
   if (!relativePath.startsWith('.'))
