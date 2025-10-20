@@ -1,3 +1,77 @@
+import nodePath from 'node:path'
+
+/**
+ * Класс ошибки для обработки проблем с файлами, расширяюший стандартный Error.
+ *
+ * @since 0.3.5
+ *
+ **/
+export class FileError extends Error {
+
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке.
+   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup') {
+
+    super(`[${scope}] ${message}`)
+
+    this.name = 'FileError'
+
+    if ('captureStackTrace' in Error)
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      Error.captureStackTrace(this, FileError.get)
+
+  }
+
+  /** Карта кодов ошибок с соответствующими сообщениями. */
+  private static codeMappings = {
+
+    /** Ошибка, возникающая при отсутствии файла в указанном расположении. */
+    notFound: (filePath: string) =>
+      `File not found: "${filePath}"`,
+
+    /** Ошибка, возникающая при отсутствии доступа к указанному файлу. */
+    noAccess: (filePath: string) =>
+      `No access to file "${filePath}""`,
+
+    /** Ошибка, возникающая при невалидном JSON в файле. */
+    invalidJson: (filePath: string) =>
+      `Invalid JSON in file "${filePath}"`,
+
+    /** Ошибка парсинга, возникающая по неуточненным причинам. */
+    failedToParse: (filePath: string, message: string) =>
+      `Failed to parse "${nodePath.basename(filePath)}": ${message}`,
+
+  }
+
+  /**
+   * Статический метод для получения экземпляра ошибки по коду.
+   *
+   * @template T - Тип ключа из codeMappings
+   * @param code - Код ошибки
+   * @param args - Аргументы для формирования сообщения
+   * @returns Экземпляр {@link FileError}
+   *
+   **/
+  static get<T extends keyof typeof FileError['codeMappings']>(
+    code: T,
+    ...args: Parameters<typeof FileError['codeMappings'][T]>
+  ): FileError {
+
+    const messageFn
+      = this.codeMappings[code] as ((...args: unknown[]) => string)
+
+    const message = messageFn(...args)
+
+    return new FileError(message)
+
+  }
+}
+
 /**
  * Класс ошибки сборки под NPM, расширяющий стандартный Error.
  *
