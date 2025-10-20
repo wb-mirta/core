@@ -16,16 +16,14 @@ export function parsePackageJson(filePath: string) {
     return JSON.parse(content) as Package
 
   }
-  catch (e) {
+  catch (e: unknown) {
+
+    if (e instanceof SyntaxError)
+      throw FileError.get('invalidJson', filePath, e.message)
 
     if (e instanceof Error) {
 
-      if (e.name === 'SyntaxError') {
-
-        throw FileError.get('invalidJson', filePath)
-
-      }
-      else if ('code' in e) {
+      if ('code' in e) {
 
         switch (e.code) {
 
@@ -33,6 +31,7 @@ export function parsePackageJson(filePath: string) {
             throw FileError.get('notFound', filePath)
 
           case 'EACCES':
+          case 'EPERM':
             throw FileError.get('noAccess', filePath)
 
         }
@@ -42,6 +41,8 @@ export function parsePackageJson(filePath: string) {
       throw FileError.get('failedToParse', filePath, e.message)
 
     }
+
+    throw FileError.get('failedToParse', filePath, String(e))
 
   }
 

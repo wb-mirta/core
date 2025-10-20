@@ -28,7 +28,7 @@ export class FileError extends Error {
   }
 
   /** Карта кодов ошибок с соответствующими сообщениями. */
-  private static codeMappings = {
+  private static readonly codeMappings = {
 
     /** Ошибка, возникающая при отсутствии файла в указанном расположении. */
     notFound: (filePath: string) =>
@@ -39,14 +39,14 @@ export class FileError extends Error {
       `No access to file "${filePath}"`,
 
     /** Ошибка, возникающая при невалидном JSON в файле. */
-    invalidJson: (filePath: string) =>
-      `Invalid JSON in file "${filePath}"`,
+    invalidJson: (filePath: string, message: string) =>
+      `Invalid JSON in file "${filePath}": ${message}`,
 
     /** Ошибка парсинга, возникающая по неуточненным причинам. */
     failedToParse: (filePath: string, message: string) =>
       `Failed to parse "${nodePath.basename(filePath)}": ${message}`,
 
-  }
+  } as const
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
@@ -100,7 +100,7 @@ export class NpmBuildError extends Error {
   }
 
   /** Карта кодов ошибок с соответствующими сообщениями. */
-  private static codeMappings = {
+  private static readonly codeMappings = {
 
     /** Ошибка, возникающая когда конфигурация input-файлов Rollup пуста. */
     inputEmpty: () =>
@@ -195,7 +195,7 @@ export class AstTransformError extends Error {
   }
 
   /** Карта кодов ошибок с соответствующими сообщениями. */
-  private static codeMappings = {
+  private static readonly codeMappings = {
 
     /** Ошибка, возникающая при отсутствии root-файлов в проекте. */
     noRootFilesInProject: () =>
@@ -213,7 +213,7 @@ export class AstTransformError extends Error {
     pathOutsideRootDirectory: (path: string) =>
       `Path "${path}" is outside the root directory`,
 
-  }
+  } as const
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
