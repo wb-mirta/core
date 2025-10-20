@@ -146,7 +146,7 @@ export function getRootDir(
   if (!fileNames.length)
     throw AstTransformError.get('noRootFilesInProject')
 
-  let commonPrefix = fileNames[0]
+  let commonPrefix = nodePath.dirname(fileNames[0])
 
   for (const fileName of fileNames.slice(1)) {
 
