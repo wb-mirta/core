@@ -1,7 +1,7 @@
 import nodePath from 'node:path'
 
 /**
- * Класс ошибки для обработки проблем с файлами, расширяюший стандартный Error.
+ * Класс ошибки для обработки проблем с файлами, расширяющий стандартный Error.
  *
  * @since 0.3.5
  *
@@ -36,7 +36,7 @@ export class FileError extends Error {
 
     /** Ошибка, возникающая при отсутствии доступа к указанному файлу. */
     noAccess: (filePath: string) =>
-      `No access to file "${filePath}""`,
+      `No access to file "${filePath}"`,
 
     /** Ошибка, возникающая при невалидном JSON в файле. */
     invalidJson: (filePath: string) =>
