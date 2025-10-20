@@ -57,7 +57,7 @@ export function getCommonPrefix(a: string, b: string): string {
  *
  * ```ts
  * const sourceFilePath = '/project/src/index.ts'
- * const targetFilePath = '/project/utils/index.ts'
+ * const targetFilePath = '/project/src/utils/index.ts'
  * const outputName = 'utils.d.ts'
  *
  * getRelativeOutputPath(sourceFilePath, targetFilePath, outputName) // Возвращает './utils.d.ts'
