@@ -11,7 +11,6 @@ import del from '#plugins/del'
 import { dtsAlias } from '#ast/index'
 
 import nodePath from 'node:path'
-import { readFileSync } from 'fs'
 
 import type {
   RollupOptions,
@@ -22,6 +21,7 @@ import type {
 } from 'rollup'
 
 import { NpmBuildError } from '#utils/errors'
+import { parsePackageJson } from '#utils/package'
 
 /**
  * Опции конфигурации Rollup.
@@ -30,11 +30,29 @@ import { NpmBuildError } from '#utils/errors'
  *
  **/
 interface RollupConfigOptions {
+
   /** Текущая рабочая директория. */
   cwd?: string
+
   input?: string | string[] | Record<string, string>
+
   external?: (string | RegExp)[]
+
   plugins?: Plugin[]
+
+  /**
+   * Игнорирует отсутствие или некорректность секции `exports`,
+   * если пакет собирается для целей запуска исполняемых файлов (поле `bin`).
+   *
+   * Полезно при сборке проектов, которые распространяются
+   * только как готовые приложения, а не как модули,
+   * содержащие экспортируемый API.
+   *
+   * @since 0.3.5
+   *
+   **/
+  skipExports?: boolean
+
 }
 
 /**
@@ -302,6 +320,7 @@ function normalizeExports(exportsField: PackageExports) {
  *
  * @param inputs Массив исходных файлов.
  * @param normalizedExports Нормализованные дескрипторы экспорта.
+ * @param skipExports Позволяет пропустить проверку экспорта.
  * @returns Словарь связей вход-выход.
  * @throws {NpmBuildError} Если входной файл не связан с экспортом.
  *
@@ -310,7 +329,8 @@ function normalizeExports(exportsField: PackageExports) {
  **/
 function getInputBindings(
   inputs: string[],
-  normalizedExports: Record<string, ExportDescriptor | undefined>
+  normalizedExports: Record<string, ExportDescriptor | undefined>,
+  skipExports: boolean
 ) {
 
   const bodyPattern = /^src\/(.*)\.[jt]s$/
@@ -343,20 +363,21 @@ function getInputBindings(
 
     const descriptor = normalizedExports[exportEntry]
 
-    // Проверяем наличие ключа в словаре.
-    if (!descriptor)
+    // Проверяем наличие ключа в словаре экспорта (при необходимости).
+    if (!descriptor && !skipExports)
       throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
 
     result[input] = {
       outputFile,
       dtsSourceFile: `${dtsOutputDir}/${match[1]}.d.ts`,
-      dtsOutputFile: descriptor.dtsOutputFile,
+      dtsOutputFile: descriptor?.dtsOutputFile,
     }
 
   }
 
   for (const key of Object.keys(normalizedExports)) {
 
+    // Выявляем незадействованные ключи в словаре экспорта (обратная проверка).
     if (!usedExports.has(key))
       throw NpmBuildError.get('exportHasNoInput', key)
 
@@ -385,6 +406,7 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
     input = 'src/index.ts',
     external = [],
     plugins,
+    skipExports = false,
   } = options
 
   const pkgPath = nodePath.resolve(cwd, 'package.json')
@@ -395,17 +417,16 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
     ...external,
   ]
 
-  const pkg = JSON.parse(
-    readFileSync(pkgPath, 'utf-8')
-  ) as Package
+  const { exports = {} } = parsePackageJson(pkgPath)
 
-  const { exports = {} } = pkg
-
-  const normalizedExports = normalizeExports(exports)
+  const normalizedExports = !skipExports
+    ? normalizeExports(exports)
+    : {}
 
   const inputBindings = getInputBindings(
     normalizeInput(input),
-    normalizedExports
+    normalizedExports,
+    skipExports
   )
 
   // Создаёт отображение между файлами типов `.d.ts` и их выходными путями
