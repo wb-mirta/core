@@ -125,7 +125,7 @@ async function getBranchAsync() {
 }
 
 /** Проверяет, синхронизирован ли текущий HEAD с удаленным. */
-export async function ensureIsSyncedWithRemoteAsync(repository: string) {
+export async function assertIsSyncedWithRemoteAsync(repository: string) {
 
   let isSynced = false
 
@@ -152,7 +152,7 @@ export async function ensureIsSyncedWithRemoteAsync(repository: string) {
 }
 
 /** Проверяет успешность CI-построения последнего коммита. */
-export async function ensureWorkflowResultAsync(repository: string, name: string) {
+export async function assertWorkflowResultAsync(repository: string, name: string) {
 
   let isBuildPassed = false
 

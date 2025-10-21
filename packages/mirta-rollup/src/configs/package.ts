@@ -222,7 +222,7 @@ function processConditionalEntry(source: PackageExports.ConditionalEntry) {
  * @since 0.3.5
  *
  **/
-function ensureTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.Path) {
+function assertTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.Path) {
 
   if (types && !entry)
     throw NpmBuildError.get('exportTypesOnly', types)
@@ -261,7 +261,7 @@ function normalizeExports(exportsField: PackageExports) {
 
     const { entry, types } = processConditionalEntry(exportsField)
 
-    ensureTypesHaveEntry(entry, types)
+    assertTypesHaveEntry(entry, types)
 
     if (entry)
       result[entry] = types
@@ -302,7 +302,7 @@ function normalizeExports(exportsField: PackageExports) {
 
     }
 
-    ensureTypesHaveEntry(entry, types)
+    assertTypesHaveEntry(entry, types)
 
     if (entry)
       result[entry] = types
