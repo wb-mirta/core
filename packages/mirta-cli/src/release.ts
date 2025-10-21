@@ -3,8 +3,8 @@ import { prerelease, inc, valid, type ReleaseType } from 'semver'
 import { helpMessage } from './message-help'
 import {
   checkIsInWorkTreeAsync,
-  ensureIsSyncedWithRemoteAsync,
-  ensureWorkflowResultAsync,
+  assertIsSyncedWithRemoteAsync,
+  assertWorkflowResultAsync,
   getRepositoryDetails,
   type ConnectionType
 } from '#utils/github'
@@ -124,7 +124,7 @@ if (inWorkTree) {
   if (repository)
     logger.info(`Repository: ${repository}`)
 
-  await ensureIsSyncedWithRemoteAsync(repository)
+  await assertIsSyncedWithRemoteAsync(repository)
 
 }
 else {
@@ -217,7 +217,7 @@ async function runAsync() {
   if (inWorkTree) {
 
     logger.log('Ensuring CI status for HEAD...')
-    await ensureWorkflowResultAsync(repository, 'build')
+    await assertWorkflowResultAsync(repository, 'build')
 
   }
 

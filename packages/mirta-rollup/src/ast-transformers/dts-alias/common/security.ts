@@ -15,14 +15,14 @@ import { AstTransformError } from '#utils/errors'
  *
  * @example
  * ```ts
- * ensurePathIsValid('./utils') // OK
- * ensurePathIsValid('http://malicious.com') // Выбросит ошибку
+ * assertPathIsValid('./utils') // OK
+ * assertPathIsValid('http://malicious.com') // Выбросит ошибку
  *
  * ```
  * @since 0.3.5
  *
  **/
-export function ensurePathIsValid(path: string) {
+export function assertPathIsValid(path: string) {
 
   if (path.includes(':') || path.includes('~'))
     throw AstTransformError.get('invalidPathFormat', path)
@@ -43,14 +43,14 @@ export function ensurePathIsValid(path: string) {
  * @example
  *
  * ```ts
- * ensurePathWithinRoot('/project/src', '/project/src/utils/index.ts') // OK
- * ensurePathWithinRoot('/project/src', '/project/../README.md') // Выбросит ошибку
+ * assertPathWithinRoot('/project/src', '/project/src/utils/index.ts') // OK
+ * assertPathWithinRoot('/project/src', '/project/../README.md') // Выбросит ошибку
  *
  * ```
  * @since 0.3.5
  *
  **/
-export function ensurePathWithinRoot(rootDir: string, fileName: string) {
+export function assertPathWithinRoot(rootDir: string, fileName: string) {
 
   if (nodePath.relative(rootDir, fileName).startsWith('..'))
     throw AstTransformError.get('pathOutsideRootDirectory', fileName)

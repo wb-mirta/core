@@ -3,7 +3,7 @@ import nodePath from 'node:path'
 
 import { IndexType, type VisitorContext } from './types'
 import { removeFileExtension, getRelativeOutputPath } from './path'
-import { ensurePathIsValid, ensurePathWithinRoot } from './security'
+import { assertPathIsValid, assertPathWithinRoot } from './security'
 import { resolveSourceFile } from './file'
 
 import { AstTransformError } from '#src/utils/errors'
@@ -138,7 +138,7 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
  **/
 export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
 
-  ensurePathIsValid(oldPath)
+  assertPathIsValid(oldPath)
 
   const {
 
@@ -165,7 +165,7 @@ export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
   if (importedModule.resolvedFileName.includes('node_modules'))
     return null
 
-  ensurePathWithinRoot(context.rootDir, importedModule.resolvedFileName)
+  assertPathWithinRoot(context.rootDir, importedModule.resolvedFileName)
 
   // Получает детали пути импортированного модуля.
   const pathDetails = getPathDetails(oldPath, importedModule)
