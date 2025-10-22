@@ -726,7 +726,7 @@ describe('package.ts - definePackageConfig', () => {
 
   })
 
-  it('should include external modules in configuration', () => {
+  it('should correctly configure external using createExternalFilter', () => {
 
     const mockPackage = {
       exports: {
@@ -740,14 +740,20 @@ describe('package.ts - definePackageConfig', () => {
 
     vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
 
-    const customExternal = [/^custom-module/]
-
     const config = definePackageConfig({
       input: 'src/index.ts',
-      external: customExternal,
+      external: ['lodash', /^react/],
     })
 
-    expect(config[0].external).toContain(customExternal[0])
+    // external теперь функция, а не массив
+    expect(typeof config[0].external).toBe('function')
+
+    // Проверяем, что функция работает правильно
+    const externalFn = config[0].external as (id: string) => boolean
+
+    expect(externalFn('lodash')).toBe(true)
+    expect(externalFn('react-dom')).toBe(true)
+    expect(externalFn('vue')).toBe(false)
 
   })
 
@@ -1128,7 +1134,7 @@ describe('package.ts - complex scenarios', () => {
 
   })
 
-  it('should include node_modules in external by default', () => {
+  it('should correctly handle external dependencies', () => {
 
     const mockPackage = {
       exports: {
@@ -1146,11 +1152,7 @@ describe('package.ts - complex scenarios', () => {
       input: 'src/index.ts',
     })
 
-    const external = config[0].external as (string | RegExp)[]
-    const hasNodeModulesPattern = external.some(ext =>
-      ext instanceof RegExp && ext.source === 'node_modules'
-    )
-    expect(hasNodeModulesPattern).toBe(true)
+    expect(typeof config[0].external).toBe('function')
 
   })
 
