@@ -14,6 +14,7 @@ import nodePath from 'node:path'
 
 import type {
   RollupOptions,
+  ExternalOption,
   ModuleFormat,
   ImportAttributesKey,
   Plugin,
@@ -22,6 +23,7 @@ import type {
 
 import { NpmBuildError } from '#utils/errors'
 import { parsePackageJson } from '#utils/package'
+import { createExternalFilter } from '#utils/external-filter'
 
 /**
  * Опции конфигурации Rollup.
@@ -36,7 +38,7 @@ interface RollupConfigOptions {
 
   input?: string | string[] | Record<string, string>
 
-  external?: (string | RegExp)[]
+  external?: ExternalOption
 
   plugins?: Plugin[]
 
@@ -65,7 +67,7 @@ interface BuildOptions {
   cwd: string
   input: string | string[] | Record<string, string>
   emitDeclarations: boolean
-  external?: (string | RegExp)[]
+  external?: ExternalOption
   plugins?: Plugin[]
   output: {
     dir: string
@@ -411,11 +413,14 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
 
   const pkgPath = nodePath.resolve(cwd, 'package.json')
 
-  const externalModules = [
-    /node_modules/,
-    pkgPath,
-    ...external,
-  ]
+  const externalFilter = createExternalFilter(
+    cwd,
+    [
+      /node_modules/,
+      pkgPath,
+    ],
+    external
+  )
 
   const { exports = {} } = parsePackageJson(pkgPath)
 
@@ -446,7 +451,7 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
     createBuildConfig('mjs', {
       cwd,
       input,
-      external: externalModules,
+      external: externalFilter,
       emitDeclarations: dtsInputs.length > 0,
       plugins,
       output: {
@@ -480,7 +485,7 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
 
     rollupConfigs.push({
       input: dtsInputs,
-      external: externalModules,
+      external: externalFilter,
       plugins: [
         nodeResolve(),
         commonjs(),
