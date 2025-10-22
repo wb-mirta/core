@@ -209,10 +209,6 @@ export class AstTransformError extends Error {
     invalidPathFormat: (modulePath: string) =>
       `Invalid format of module path: "${modulePath}"`,
 
-    /** Ошибка, возникающая когда путь выходит за пределы корневой директории. */
-    pathOutsideRootDirectory: (path: string) =>
-      `Path "${path}" is outside the root directory`,
-
   } as const
 
   /**
