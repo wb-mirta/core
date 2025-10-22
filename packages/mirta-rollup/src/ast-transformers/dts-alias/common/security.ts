@@ -1,5 +1,3 @@
-import nodePath from 'node:path'
-
 import { AstTransformError } from '#utils/errors'
 
 /**
@@ -26,33 +24,5 @@ export function assertPathIsValid(path: string) {
 
   if (path.includes(':') || path.includes('~'))
     throw AstTransformError.get('invalidPathFormat', path)
-
-}
-
-/**
- * Проверяет, находится ли указанный файл внутри корневой директории проекта.
- *
- * Эта функция гарантирует, что файл `fileName` не выходит за пределы корневой директории `rootDir`.
- * Если относительный путь от `rootDir` к `fileName` содержит `..`, это означает, что файл находится вне
- * корня, и функция выбрасывает ошибку для предотвращения небезопасного доступа.
- *
- * @param rootDir - Корневая директория проекта.
- * @param fileName - Путь к файлу, который необходимо проверить.
- * @throws {AstTransformError} Если файл находится вне корневой директории.
- *
- * @example
- *
- * ```ts
- * assertPathWithinRoot('/project/src', '/project/src/utils/index.ts') // OK
- * assertPathWithinRoot('/project/src', '/project/../README.md') // Выбросит ошибку
- *
- * ```
- * @since 0.3.5
- *
- **/
-export function assertPathWithinRoot(rootDir: string, fileName: string) {
-
-  if (nodePath.relative(rootDir, fileName).startsWith('..'))
-    throw AstTransformError.get('pathOutsideRootDirectory', fileName)
 
 }

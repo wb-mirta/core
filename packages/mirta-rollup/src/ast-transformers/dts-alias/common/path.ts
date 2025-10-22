@@ -45,6 +45,32 @@ export function getCommonPrefix(a: string, b: string): string {
 }
 
 /**
+ * Проверяет, является ли указанный файл частью проекта.
+ *
+ * Файл считается проектным, если он:
+ * - Не находится в директории `node_modules`;
+ * - Расположен внутри указанной корневой директории.
+ *
+ * @param fileName - Полный путь к проверяемому файлу.
+ * @param rootDir - Корневая директория проекта.
+ * @returns `true`, если файл принадлежит проекту, иначе false.
+ *
+ * @since 0.3.5
+ *
+ **/
+export function isProjectFile(fileName: string, rootDir: string) {
+
+  if (fileName.includes('node_modules'))
+    return false
+
+  if (nodePath.relative(rootDir, fileName).startsWith('..'))
+    return false
+
+  return true
+
+}
+
+/**
  * Вычисляет относительный путь от директории исходного файла к целевому файлу,
  * добавляет имя выходного файла и нормализует путь для совместимости с POSIX-системами.
  *

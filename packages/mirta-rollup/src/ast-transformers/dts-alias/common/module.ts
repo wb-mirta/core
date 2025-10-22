@@ -2,8 +2,8 @@ import ts from 'typescript'
 import nodePath from 'node:path'
 
 import { IndexType, type VisitorContext } from './types'
-import { removeFileExtension, getRelativeOutputPath } from './path'
-import { assertPathIsValid, assertPathWithinRoot } from './security'
+import { isProjectFile, removeFileExtension, getRelativeOutputPath } from './path'
+import { assertPathIsValid } from './security'
 import { resolveSourceFile } from './file'
 
 import { AstTransformError } from '#src/utils/errors'
@@ -162,10 +162,8 @@ export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
   if (!importedModule)
     throw AstTransformError.get('moduleNotFound', oldPath, currentSourceFile.fileName)
 
-  if (importedModule.resolvedFileName.includes('node_modules'))
+  if (!isProjectFile(importedModule.resolvedFileName, context.rootDir))
     return null
-
-  assertPathWithinRoot(context.rootDir, importedModule.resolvedFileName)
 
   // Получает детали пути импортированного модуля.
   const pathDetails = getPathDetails(oldPath, importedModule)
