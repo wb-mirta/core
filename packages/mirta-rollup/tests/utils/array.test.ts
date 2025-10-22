@@ -59,12 +59,12 @@ describe('ensureCompactArray', () => {
 
     })
 
-    it('should not filter 0 or empty strings (truthy check)', () => {
+    it('should filter 0 and empty strings (falsy values)', () => {
 
       const input = [1, 0, '', 'test', null]
       const result = ensureCompactArray(input)
 
-      // Boolean(0) === false, Boolean('') === false
+      // Boolean(0) === false, Boolean('') === false - these are filtered out
       expect(result).toEqual([1, 'test'])
 
     })
