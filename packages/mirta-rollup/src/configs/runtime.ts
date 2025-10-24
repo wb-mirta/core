@@ -160,6 +160,7 @@ export async function defineRuntimeConfig(
             // Путь в текущем проекте, не требует встраивания отдельным пакетом.
             chunkName = nodePath
               .relative(cwd, absolutePath)
+              .replaceAll(nodePath.sep, nodePath.posix.sep)
 
           }
           else {
