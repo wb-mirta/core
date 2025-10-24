@@ -47,6 +47,7 @@
     "@dotenv-run/rollup": "^1.3.7",
     "@mirta/polyfills": "workspace:*",
     "@pnpm/find-workspace-dir": "^1000.1.3",
+    "@pnpm/workspace.find-packages": "^1000.0.42",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-multi-entry": "^6.0.1",

@@ -12,8 +12,7 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 
-import { getWorkspaceContextAsync } from '#utils/workspace'
-import { globRelative } from '#utils/path'
+import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
 
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
@@ -157,7 +156,7 @@ export async function defineRuntimeConfig(
 
   } = options
 
-  const workspaceContext = await getWorkspaceContextAsync(cwd)
+  const monorepoContext = await getMonorepoContextAsync(cwd)
 
   const defaultPlugins = [
 
@@ -233,35 +232,27 @@ export async function defineRuntimeConfig(
 
         let chunkName = chunkInfo.name
 
-        if (workspaceContext) {
+        // Адаптация путей при сборке в монорепозитории.
+        if (monorepoContext) {
 
-          const { rootDir, workspaces } = workspaceContext
+          const { rootDir } = monorepoContext
 
           const absolutePath = nodePath.resolve(rootDir, chunkInfo.name)
 
           if (absolutePath.startsWith(cwd)) {
 
-            // Путь в текущем проекте.
-
+            // Путь в текущем проекте, не требует встраивания отдельным пакетом.
             chunkName = nodePath
               .relative(cwd, absolutePath)
 
           }
           else {
 
-            for (const workspace of workspaces) {
+            // Ищем пакет монорепозитория, в котором находится указанный путь.
+            const pkgDefinition = findMonorepoPackageByChunkName(monorepoContext, chunkName)
 
-              const maybeChunkName = globRelative(chunkName, workspace)
-
-              if (maybeChunkName) {
-
-                // Обманка для упрощённого встраивания в packages.
-                chunkName = 'node_modules/' + maybeChunkName
-                break
-
-              }
-
-            }
+            if (pkgDefinition)
+              chunkName = mapChunkToPackage(chunkName, pkgDefinition)
 
           }
 
