@@ -13,101 +13,13 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 import nodePath from 'node:path'
 
 import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
+import { getEntryPath } from '#utils/entry-path'
 
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
-const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
-
-const entryMatchers = {
-
-  'wb-rules': /(?:src[\\/])?wb-rules[\\/](.*)/,
-  'wb-rules-modules': /(?:src[\\/])?wb-rules-modules[\\/](.*)/,
-
-} as const
-
 const outputDir = {
   es5: 'dist/es5',
-}
-
-/**
- * Парсит путь к исходному файлу и возвращает имя модуля формата `wb-rules-modules/...`.
- * Используется для обработки путей внутри node_modules.
- *
- * @param sourcePath - путь к исходному файлу
- * @returns Строка с именем модуля или undefined
- *
- * @since 0.3.2
- *
- **/
-function tryGetPackageEntry(sourcePath: string) {
-
-  const pathParts: string[] = []
-
-  do {
-
-    const match = packagesPattern.exec(sourcePath)
-
-    if (!match)
-      break
-
-    if (match[3])
-      pathParts.unshift(match[3])
-
-    pathParts.unshift('packages/' + match[2].replace(/\/dist$/, ''))
-
-    sourcePath = match[1]
-
-  }
-  while (sourcePath)
-
-  if (pathParts.length)
-    return `wb-rules-modules/${pathParts.join('/')}.js`
-
-}
-
-/**
- * Определяет имя входного файла для типов `wb-rules` и `wb-rules-modules`.
- *
- * @param sourcePath - путь к исходному файлу
- * @param type - тип модуля (wb-rules или wb-rules-modules)
- * @returns Строка с именем файла или undefined
- *
- * @since 0.3.5
- *
- **/
-function tryGetEntry(sourcePath: string, type: 'wb-rules' | 'wb-rules-modules') {
-
-  const match = entryMatchers[type].exec(sourcePath)
-
-  if (!match)
-    return
-
-  return `${type}/${match[1]}.js`
-
-}
-
-/**
- * Финальная функция определения имени выходного файла.
- * Проверяет разные сценарии и возвращает корректный путь.
- *
- * @param path - исходный путь
- * @returns Строка с финальным именем файла
- *
- * @since 0.3.0
- *
- **/
-function getEntry(path: string) {
-
-  if (path.startsWith('_virtual'))
-    return path
-
-  return tryGetPackageEntry(path)
-    ?? tryGetEntry(path, 'wb-rules-modules')
-    ?? tryGetEntry(path, 'wb-rules')
-    // None of the above matched.
-    ?? path
-
 }
 
 /**
@@ -262,7 +174,7 @@ export async function defineRuntimeConfig(
 
         }
 
-        return getEntry(chunkName)
+        return getEntryPath(chunkName)
 
       },
     },
