@@ -71,11 +71,11 @@ function getWorkspacePath(workspaceDir: string, packageRootDir: string): string 
 }
 
 /**
- * Получает полную информацию о структуре монорепозитория
+ * Получает полную информацию о структуре монорепозитория.
  *
  * @param cwd - Текущая рабочая директория для поиска
  * @returns Объект контекста {@link MonorepoContext} или undefined
- * @throws {WorkspaceError} Если отсутствует секция workspaces в package.json
+ * @throws {WorkspaceError} Если проект определён как монорепозиторий и отсутствует секция `workspaces` в package.json
  *
  * @since 0.3.5
  *

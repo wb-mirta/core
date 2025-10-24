@@ -84,7 +84,7 @@ export class PackageManagerError extends Error {
   private static readonly codeMappings = {
 
     pnpmOnly: () =>
-      'At this time, support is limited to PNPM only',
+      'PNPM is required for building. Other package managers are not supported at this time',
 
   } as const
 

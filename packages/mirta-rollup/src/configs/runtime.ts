@@ -19,6 +19,13 @@ const isProduction = env === 'production'
 
 const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
 
+const entryMatchers = {
+
+  'wb-rules': /(?:src[\\/])?wb-rules[\\/](.*)/,
+  'wb-rules-modules': /(?:src[\\/])?wb-rules-modules[\\/](.*)/,
+
+} as const
+
 const outputDir = {
   es5: 'dist/es5',
 }
@@ -71,13 +78,10 @@ function tryGetPackageEntry(sourcePath: string) {
  **/
 function tryGetEntry(sourcePath: string, type: 'wb-rules' | 'wb-rules-modules') {
 
-  const match = new RegExp(`(?:src[\\\\/])?${type}[\\\\/](.*)`).exec(sourcePath)
+  const match = entryMatchers[type].exec(sourcePath)
 
   if (!match)
     return
-
-  // if (__DEV__)
-  //   console.debug(`${type} Entry: ${sourcePath}`)
 
   return `${type}/${match[1]}.js`
 
