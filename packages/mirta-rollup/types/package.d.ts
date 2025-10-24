@@ -75,4 +75,10 @@ interface Package {
    **/
   exports: PackageExports
 
+  /**
+   * Список рабочих пространств монорепозитория.
+   *
+   **/
+  workspaces?: string[]
+
 }

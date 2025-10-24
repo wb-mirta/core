@@ -12,55 +12,28 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 
+import { getWorkspaceContextAsync } from '#utils/workspace'
+import { globRelative } from '#utils/path'
+
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
 
 const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
-const modulesPattern = /(?:src[\\/])?wb-rules-modules[\\/](.*)/
-const scriptsPattern = /(?:src[\\/])?(?:wb-rules[\\/])?(.*)/
 
 const outputDir = {
   es5: 'dist/es5',
 }
 
-function globRelative(path: string, pattern: string) {
-
-  const pathParts = path.split('/')
-  const patternParts = pattern.split('/')
-
-  let i = 0 // Индекс текущего компонента пути.
-
-  for (let j = 0; j < patternParts.length && i < pathParts.length; j++) {
-
-    switch (patternParts[j]) {
-      case '*':
-        break
-      case '**':
-        while (i < pathParts.length && !pathParts[i].startsWith(patternParts[j + 1])) {
-
-          i += 1 // Пропускаем все элементы пути до следующего элемента шаблона.
-
-        }
-        break
-      default:
-        if (patternParts[j] === pathParts[i]) {
-
-          i += 1
-
-        }
-        else {
-
-          return void 0 // Несоответствие фиксированного значения.
-
-        }
-    }
-
-  }
-
-  return pathParts.slice(i).join('/')
-
-}
-
+/**
+ * Парсит путь к исходному файлу и возвращает имя модуля формата `wb-rules-modules/...`.
+ * Используется для обработки путей внутри node_modules.
+ *
+ * @param sourcePath - путь к исходному файлу
+ * @returns Строка с именем модуля или undefined
+ *
+ * @since 0.3.2
+ *
+ **/
 function tryGetPackageEntry(sourcePath: string) {
 
   const pathParts: string[] = []
@@ -87,99 +60,131 @@ function tryGetPackageEntry(sourcePath: string) {
 
 }
 
-function tryGetModuleEntry(sourcePath: string) {
+/**
+ * Определяет имя входного файла для типов `wb-rules` и `wb-rules-modules`.
+ *
+ * @param sourcePath - путь к исходному файлу
+ * @param type - тип модуля (wb-rules или wb-rules-modules)
+ * @returns Строка с именем файла или undefined
+ *
+ * @since 0.3.5
+ *
+ **/
+function tryGetEntry(sourcePath: string, type: 'wb-rules' | 'wb-rules-modules') {
 
-  const match = modulesPattern.exec(sourcePath)
-
-  if (!match)
-    return
-
-  // if (__DEV__)
-  //   console.debug(`Module Entry: ${entry}`)
-
-  return `wb-rules-modules/${match[1]}.js`
-
-}
-
-function tryGetScriptEntry(sourcePath: string) {
-
-  const match = scriptsPattern.exec(sourcePath)
+  const match = new RegExp(`(?:src[\\\\/])?${type}[\\\\/](.*)`).exec(sourcePath)
 
   if (!match)
     return
 
   // if (__DEV__)
-  //   console.debug(`Script Entry: ${entry}`)
+  //   console.debug(`${type} Entry: ${sourcePath}`)
 
-  return `wb-rules/${match[1]}.js`
+  return `${type}/${match[1]}.js`
 
 }
 
+/**
+ * Финальная функция определения имени выходного файла.
+ * Проверяет разные сценарии и возвращает корректный путь.
+ *
+ * @param path - исходный путь
+ * @returns Строка с финальным именем файла
+ *
+ * @since 0.3.0
+ *
+ **/
 function getEntry(path: string) {
 
   if (path.startsWith('_virtual'))
     return path
 
-  return tryGetPackageEntry(path) ?? tryGetModuleEntry(path) ?? tryGetScriptEntry(path)
+  return tryGetPackageEntry(path)
+    ?? tryGetEntry(path, 'wb-rules-modules')
+    ?? tryGetEntry(path, 'wb-rules')
     // None of the above matched.
     ?? path
 
 }
 
+/**
+ * Опции для загрузки переменных окружения через dotenv.
+ *
+ **/
 export interface DotenvOptions {
-  /** Prefix to filter environment variables. */
+  /** Префикс для фильтрации переменных окружения. */
   prefix?: string
-  /** Print environment variables values. */
+  /** Вывод в консоль значений переменных окружения. */
   unsecure?: boolean
-  /** Print debug information. */
+  /** Вывод в консоль отладочной информации. */
   verbose: boolean
 }
 
+/**
+ * Опции конфигурации сборки.
+ *
+ **/
 export interface RuntimeConfigOptions {
+  /** Корневая директория проекта. */
   cwd?: string
+  /** Внешние зависимости, исключённые из сборки. */
   external?: ExternalOption
-  /** Настройки для сборки в монорепозитории. */
-  monorepo?: {
-    rootDir: string
-    workspaces: string[]
-  }
+  /** Опции dotenv. */
   dotenv?: DotenvOptions
+  /** Дополнительные плагины. */
   plugins?: Plugin[]
 }
 
-export function defineRuntimeConfig(
+/**
+ * Основная функция, возвращающая конфигурацию Rollup.
+ * Обрабатывает входные файлы, плагины и настройку выходных путей.
+ *
+ * @param options - опции конфигурации
+ * @returns Объект RollupOptions
+ *
+ * @since 0.3.0
+ *
+ **/
+export async function defineRuntimeConfig(
   options: RuntimeConfigOptions = {}
-): RollupOptions {
+): Promise<RollupOptions> {
 
   const {
     cwd = process.cwd(),
     external,
-    monorepo,
     dotenv: dotenvOptions = {},
     plugins = [],
 
   } = options
 
+  const workspaceContext = await getWorkspaceContextAsync(cwd)
+
   const defaultPlugins = [
+
+    // Очистка директории dist перед сборкой
     del({
       targets: 'dist/*',
     }),
 
+    // Поддержка множественных входных файлов
     multi({
       exclude: ['src/wb-rules/*.disabled.[jt]s'],
       preserveModules: true,
     }),
 
+    // Поиск зависимостей в node_modules
     resolve(),
 
-    ts({
-      clean: true,
-    }),
+    // Транспиляция TypeScript
+    ts({ clean: true }),
 
+    // Обработка импортов для wb-rules
     wbRulesImports(),
 
+    // Загрузка переменных окружения
     dotenv(dotenvOptions),
 
+    // Замена условных флагов в коде
     replace({
       preventAssignment: true,
       values: {
@@ -189,6 +194,7 @@ export function defineRuntimeConfig(
       },
     }),
 
+    // Транспиляция через Babel
     getBabelOutputPlugin({
       presets: ['@babel/preset-env'],
       plugins: [
@@ -197,6 +203,7 @@ export function defineRuntimeConfig(
       ],
     }),
 
+    // Очистка виртуальных файлов после сборки
     del({
       targets: 'dist/*/_virtual',
       hook: 'closeBundle',
@@ -226,13 +233,15 @@ export function defineRuntimeConfig(
 
         let chunkName = chunkInfo.name
 
-        if (monorepo) {
+        if (workspaceContext) {
 
-          const { rootDir, workspaces } = monorepo
+          const { rootDir, workspaces } = workspaceContext
 
           const absolutePath = nodePath.resolve(rootDir, chunkInfo.name)
 
           if (absolutePath.startsWith(cwd)) {
+
+            // Путь в текущем проекте.
 
             chunkName = nodePath
               .relative(cwd, absolutePath)

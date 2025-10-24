@@ -1,6 +1,59 @@
 import nodePath from 'node:path'
 
 /**
+ * Класс ошибки для обработки проблем с менеджерами пакетов,
+ * расширяющий стандартный Error.
+ *
+ * @since 0.3.5
+ *
+ **/
+export class PackageManagerError extends Error {
+
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке.
+   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup') {
+
+    super(`[${scope}] ${message}`)
+
+    this.name = 'PackageManagerError'
+
+    if ('captureStackTrace' in Error)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+      Error.captureStackTrace(this, PackageManagerError.get)
+
+  }
+
+  private static readonly codeMappings = {
+
+    pnpmOnly: () =>
+      'At this time, support is limited to PNPM only',
+
+    noWorkspaces: () =>
+      'No workspaces configured in root package.json',
+
+  }
+
+  static get<T extends keyof typeof PackageManagerError['codeMappings']>(
+    code: T,
+    ...args: Parameters<typeof PackageManagerError['codeMappings'][T]>
+  ): PackageManagerError {
+
+    const messageFn
+      = this.codeMappings[code] as (...args: unknown[]) => string
+
+    const message = messageFn(...args)
+
+    return new PackageManagerError(message)
+
+  }
+}
+
+/**
  * Класс ошибки для обработки проблем с файлами, расширяющий стандартный Error.
  *
  * @since 0.3.5
