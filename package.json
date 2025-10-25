@@ -14,9 +14,10 @@
   "scripts": {
     "test": "vitest run",
     "coverage": "vitest run --coverage",
+    "prebuild:cli": "pnpm prebuild",
     "build:cli": "cross-env NODE_ENV=production pnpm --filter './packages/mirta-cli' run build:mono",
-    "build": "cross-env NODE_ENV=production pnpm --filter './packages/*' --filter './examples/*/*' run build:mono",
-    "build:dev": "cross-env NODE_ENV=development pnpm --filter './packages/*' run build:mono",
+    "prebuild": "cross-env NODE_ENV=production pnpm --filter '@mirta/rollup' run build:mono",
+    "build": "cross-env NODE_ENV=production pnpm --filter './packages/*' --filter '!@mirta/rollup' --filter './examples/*/*' run build:mono",
     "release": "mirta release",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "preinstall": "npx only-allow pnpm",

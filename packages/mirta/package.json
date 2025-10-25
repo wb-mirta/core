@@ -37,7 +37,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
+    "build:mono": "pnpm clean && rollup -c node:@mirta/rollup/config --config-package"
   },
   "dependencies": {
     "@mirta/basics": "workspace:*",
