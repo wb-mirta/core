@@ -15,7 +15,7 @@ import { defineRuntimeConfig } from './runtime'
  * @since 0.3.5
  *
  **/
-export default function (args: Record<string, string>) {
+export default function resolveConfig(args: Record<string, unknown>) {
 
   // Признак использования пакетной конфигурации.
   const usePackageConfig = 'config-package' in args
