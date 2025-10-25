@@ -42,18 +42,16 @@ function mockProject(mockImplementation: { rootDir: string, manifest: ProjectMan
 
 describe('monorepo utilities', () => {
 
-  const originalPnpmHome = process.env.PNPM_HOME
-
   beforeEach(() => {
 
     vi.clearAllMocks()
-    process.env.PNPM_HOME = '/usr/local/pnpm'
+    vi.stubEnv('PNPM_HOME', '/usr/local/pnpm')
 
   })
 
   afterEach(() => {
 
-    process.env.PNPM_HOME = originalPnpmHome
+    vi.unstubAllEnvs()
 
   })
 
