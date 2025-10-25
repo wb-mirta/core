@@ -1,10 +1,12 @@
+import nodePath from 'node:path'
+
 const { getEntryPath } = await import('#utils/entry-path')
 
 describe('getEntryPath', () => {
 
-  describe('виртуальные пути', () => {
+  describe('virtual paths', () => {
 
-    it('должен вернуть виртуальный путь без изменений', () => {
+    it('should return virtual path unchanged', () => {
 
       const virtualPath = '_virtual:some-module'
       const result = getEntryPath(virtualPath)
@@ -13,7 +15,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать виртуальные пути с параметрами', () => {
+    it('should handle virtual paths with parameters', () => {
 
       const virtualPath = '_virtual:module?param=value'
       const result = getEntryPath(virtualPath)
@@ -24,9 +26,9 @@ describe('getEntryPath', () => {
 
   })
 
-  describe('пути через node_modules', () => {
+  describe('node_modules paths', () => {
 
-    it('должен преобразовать путь из node_modules в wb-rules-modules', () => {
+    it('should convert node_modules path to wb-rules-modules format', () => {
 
       const sourcePath = 'some/path/node_modules/@scope/package/dist/index'
       const result = getEntryPath(sourcePath)
@@ -35,7 +37,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать множественные уровни node_modules', () => {
+    it('should handle multiple node_modules levels', () => {
 
       const sourcePath = 'path/node_modules/@scope/pkg/node_modules/nested/module'
       const result = getEntryPath(sourcePath)
@@ -44,7 +46,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать пакеты без скоупа', () => {
+    it('should handle packages without scope', () => {
 
       const sourcePath = 'node_modules/simple-package/dist/lib'
       const result = getEntryPath(sourcePath)
@@ -53,7 +55,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен удалять /dist из пути пакета', () => {
+    it('should remove /dist from package path', () => {
 
       const sourcePath = 'node_modules/@scope/package/dist/index'
       const result = getEntryPath(sourcePath)
@@ -62,9 +64,12 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать Windows-пути с обратными слешами', () => {
+    it('should handle Windows paths with backslashes', () => {
 
-      const sourcePath = 'path\\node_modules\\@scope\\package\\dist\\index'
+      const sourcePath = 'path/node_modules/@scope/package/dist/index'
+        .split(nodePath.posix.sep)
+        .join(nodePath.sep)
+
       const result = getEntryPath(sourcePath)
 
       expect(result).toBe('wb-rules-modules/packages/scope/package/index.js')
@@ -73,9 +78,9 @@ describe('getEntryPath', () => {
 
   })
 
-  describe('пути wb-rules-modules', () => {
+  describe('wb-rules-modules paths', () => {
 
-    it('должен преобразовать путь с wb-rules-modules', () => {
+    it('should convert path with wb-rules-modules', () => {
 
       const sourcePath = 'src/wb-rules-modules/counter'
       const result = getEntryPath(sourcePath)
@@ -84,7 +89,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать путь без src/', () => {
+    it('should handle path without src/', () => {
 
       const sourcePath = 'wb-rules-modules/utils/helper'
       const result = getEntryPath(sourcePath)
@@ -93,7 +98,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать вложенные пути', () => {
+    it('should handle nested paths', () => {
 
       const sourcePath = 'src/wb-rules-modules/features/auth/login'
       const result = getEntryPath(sourcePath)
@@ -102,7 +107,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать Windows-пути', () => {
+    it('should handle Windows paths', () => {
 
       const sourcePath = 'src\\wb-rules-modules\\counter'
       const result = getEntryPath(sourcePath)
@@ -113,9 +118,9 @@ describe('getEntryPath', () => {
 
   })
 
-  describe('пути wb-rules', () => {
+  describe('wb-rules paths', () => {
 
-    it('должен преобразовать путь с wb-rules', () => {
+    it('should convert path with wb-rules', () => {
 
       const sourcePath = 'src/wb-rules/main'
       const result = getEntryPath(sourcePath)
@@ -124,7 +129,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать путь без src/', () => {
+    it('should handle path without src/', () => {
 
       const sourcePath = 'wb-rules/controller'
       const result = getEntryPath(sourcePath)
@@ -133,7 +138,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать вложенные структуры', () => {
+    it('should handle nested structures', () => {
 
       const sourcePath = 'src/wb-rules/devices/sensors/temperature'
       const result = getEntryPath(sourcePath)
@@ -144,9 +149,9 @@ describe('getEntryPath', () => {
 
   })
 
-  describe('приоритет обработки', () => {
+  describe('priority handling', () => {
 
-    it('должен отдавать приоритет виртуальным путям', () => {
+    it('should prioritize virtual paths', () => {
 
       const sourcePath = '_virtual:wb-rules-modules/counter'
       const result = getEntryPath(sourcePath)
@@ -155,7 +160,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен отдавать приоритет node_modules перед wb-rules-modules', () => {
+    it('should prioritize node_modules over wb-rules-modules', () => {
 
       const sourcePath = 'node_modules/@scope/pkg/wb-rules-modules/counter'
       const result = getEntryPath(sourcePath)
@@ -164,7 +169,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен отдавать приоритет wb-rules-modules перед wb-rules', () => {
+    it('should prioritize wb-rules-modules over wb-rules', () => {
 
       // Если путь содержит wb-rules-modules, он обработается как wb-rules-modules
       const sourcePath = 'src/wb-rules-modules/counter'
@@ -176,9 +181,9 @@ describe('getEntryPath', () => {
 
   })
 
-  describe('обработка неизвестных путей', () => {
+  describe('unknown paths handling', () => {
 
-    it('должен вернуть исходный путь если ничего не подошло', () => {
+    it('should return original path if nothing matches', () => {
 
       const sourcePath = 'some/unknown/path/file.ts'
       const result = getEntryPath(sourcePath)
@@ -187,7 +192,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен вернуть путь с точкой в начале', () => {
+    it('should return path with leading dot', () => {
 
       const sourcePath = './relative/path/file.ts'
       const result = getEntryPath(sourcePath)
@@ -196,7 +201,7 @@ describe('getEntryPath', () => {
 
     })
 
-    it('должен обрабатывать абсолютные пути', () => {
+    it('should handle absolute paths', () => {
 
       const sourcePath = '/absolute/path/to/file.ts'
       const result = getEntryPath(sourcePath)

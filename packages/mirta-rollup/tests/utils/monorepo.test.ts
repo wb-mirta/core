@@ -59,7 +59,7 @@ describe('monorepo utilities', () => {
 
   describe('findMonorepoDirAsync', () => {
 
-    it('должен найти директорию монорепозитория с PNPM', async () => {
+    it('should find monorepo directory with PNPM', async () => {
 
       const expectedDir = '/home/user/my-monorepo'
       pnpmFindWorkspaceDir.mockResolvedValue(expectedDir)
@@ -71,7 +71,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен вернуть undefined если монорепозиторий не найден', async () => {
+    it('should return undefined if monorepo is not found', async () => {
 
       pnpmFindWorkspaceDir.mockResolvedValue(undefined)
 
@@ -81,7 +81,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен выбросить ошибку если PNPM_HOME не установлен', async () => {
+    it('should throw error if PNPM_HOME is not set', async () => {
 
       delete process.env.PNPM_HOME
 
@@ -95,7 +95,7 @@ describe('monorepo utilities', () => {
 
   describe('getMonorepoContextAsync', () => {
 
-    it('должен вернуть контекст монорепозитория с пакетами', async () => {
+    it('should return monorepo context with packages', async () => {
 
       const monorepoDir = '/home/user/monorepo'
       const mockPackages: Project[] = [
@@ -138,7 +138,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен отсортировать пакеты по длине пути (самые длинные первыми)', async () => {
+    it('should sort packages by path length (longest first)', async () => {
 
       const monorepoDir = '/home/user/monorepo'
       const mockPackages: Project[] = [
@@ -170,7 +170,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен вернуть undefined если не является монорепозиторием', async () => {
+    it('should return undefined if not a monorepo', async () => {
 
       pnpmFindWorkspaceDir.mockResolvedValue(undefined)
 
@@ -180,7 +180,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен выбросить ошибку если workspaces не определены', async () => {
+    it('should throw error if workspaces are not defined', async () => {
 
       const monorepoDir = '/home/user/monorepo'
       pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
@@ -194,7 +194,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен исключить корневую директорию из списка пакетов', async () => {
+    it('should exclude root directory from package list', async () => {
 
       const monorepoDir = '/home/user/monorepo'
       const mockPackages = [
@@ -222,7 +222,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен обрабатывать пакеты без имени', async () => {
+    it('should handle packages without names', async () => {
 
       const monorepoDir = '/home/user/monorepo'
       const mockPackages = [
@@ -272,7 +272,7 @@ describe('monorepo utilities', () => {
       ],
     }
 
-    it('должен найти пакет по имени чанка', () => {
+    it('should find package by chunk name', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -285,7 +285,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен найти самый длинный совпадающий путь', () => {
+    it('should find longest matching path', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -297,7 +297,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен вернуть undefined если пакет не найден', () => {
+    it('should return undefined if package is not found', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -308,7 +308,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен работать с точным совпадением пути', () => {
+    it('should work with exact path match', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -323,7 +323,7 @@ describe('monorepo utilities', () => {
 
   describe('mapChunkToPackage', () => {
 
-    it('должен преобразовать путь чанка в путь node_modules', () => {
+    it('should convert chunk path to node_modules path', () => {
 
       const pkgDefinition = {
         workspacePath: 'packages/app/',
@@ -339,7 +339,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен обрабатывать вложенные пути', () => {
+    it('should handle nested paths', () => {
 
       const pkgDefinition = {
         workspacePath: 'packages/nested/lib/',
@@ -355,7 +355,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен выбросить ошибку если имя пакета отсутствует', () => {
+    it('should throw error if package name is missing', () => {
 
       const pkgDefinition = {
         workspacePath: 'packages/unnamed/',
@@ -366,7 +366,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('должен обрабатывать пакеты с простыми именами (без @scope)', () => {
+    it('should handle packages with simple names (without @scope)', () => {
 
       const pkgDefinition = {
         workspacePath: 'packages/simple/',
