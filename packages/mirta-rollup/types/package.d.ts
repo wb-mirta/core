@@ -70,10 +70,16 @@ type PackageExports
 interface Package {
 
   /**
+   * Имя пакета.
+   *
+   **/
+  name?: string
+
+  /**
    * Конфигурация экспорта модуля, определённая в поле `exports` файла package.json.
    *
    **/
-  exports: PackageExports
+  exports?: PackageExports
 
   /**
    * Список рабочих пространств монорепозитория.

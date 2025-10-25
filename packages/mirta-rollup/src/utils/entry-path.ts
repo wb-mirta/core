@@ -1,3 +1,5 @@
+import nodePath from 'node:path'
+
 const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
 
 const entryMatchers = {
@@ -18,6 +20,8 @@ const entryMatchers = {
  *
  **/
 function tryGetPackageEntryPath(sourcePath: string) {
+
+  sourcePath = sourcePath.replaceAll(nodePath.sep, nodePath.posix.sep)
 
   const pathParts: string[] = []
 
