@@ -30,7 +30,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c ../../rollup.config.mjs"
+    "build:mono": "pnpm clean && rollup -c node:@mirta/rollup/config --config-package --config-skip-exports"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",

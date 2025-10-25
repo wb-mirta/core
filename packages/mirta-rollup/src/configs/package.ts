@@ -3,7 +3,7 @@ import ts from '@rollup/plugin-typescript'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import replace from '@rollup/plugin-replace'
-// import copy from 'rollup-plugin-copy'
+import copy from 'rollup-plugin-copy'
 
 import dts from 'rollup-plugin-dts'
 import del from '#plugins/del'
@@ -583,11 +583,11 @@ function createBuildConfig(
       nodeResolve(),
       commonjs(),
       ...plugins,
-      // copy({
-      //   targets: [
-      //     { src: 'public/*', dest: 'dist' },
-      //   ],
-      // }),
+      copy({
+        targets: [
+          { src: 'public/*', dest: 'dist' },
+        ],
+      }),
     ],
     output,
   }
