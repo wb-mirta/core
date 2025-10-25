@@ -1,3 +1,22 @@
+## [0.3.5](https://github.com/wb-mirta/core/compare/v0.3.4...v0.3.5) (2025-10-25)
+
+
+### Bug Fixes
+
+* **ast:** skip mono/external resolved source paths ([#94](https://github.com/wb-mirta/core/issues/94)) ([1be783e](https://github.com/wb-mirta/core/commit/1be783e01a2592558885b6ea7a9787db4f9b70c3))
+* **mirta-rollup:** resolve dts paths using AST ([#87](https://github.com/wb-mirta/core/issues/87)) ([0e16daf](https://github.com/wb-mirta/core/commit/0e16daf2b50786e76e02e04e7226ef7aeb817439))
+
+
+### Features
+
+* **build:** exclude monorepo deps from bundle ([#96](https://github.com/wb-mirta/core/issues/96)) ([173551b](https://github.com/wb-mirta/core/commit/173551b798f99e0f5165769fd85494ba5a5fad22))
+* **mirta-rollup:** add skipExports option ([#91](https://github.com/wb-mirta/core/issues/91)) ([60d3929](https://github.com/wb-mirta/core/commit/60d3929ac214c6de18249243de581598f32c9ac9))
+* **mirta-rollup:** autodetect workspaces via pnpm ([#98](https://github.com/wb-mirta/core/issues/98)) ([cb04fdf](https://github.com/wb-mirta/core/commit/cb04fdfc9cef2fb9dff4cdb98078aabdba301274))
+* **mirta-rollup:** revamp exports & bindings ([#85](https://github.com/wb-mirta/core/issues/85)) ([92e552a](https://github.com/wb-mirta/core/commit/92e552a389a5193f489b760555c510da299c45fd))
+* switch to @mirta/rollup, add public copy ([#100](https://github.com/wb-mirta/core/issues/100)) ([9994d4f](https://github.com/wb-mirta/core/commit/9994d4f0fb59f2f8bd1f3635dd9fbd6f63feac78))
+
+
+
 ## [0.3.4](https://github.com/wb-mirta/core/compare/v0.3.3...v0.3.4) (2025-10-14)
 
 
