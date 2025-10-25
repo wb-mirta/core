@@ -1,6 +1,109 @@
 import nodePath from 'node:path'
 
 /**
+ * Класс ошибки для обработки проблем с монорепозиторием,
+ * расширяющий стандартный Error.
+ *
+ * @since 0.3.5
+ *
+ **/
+export class WorkspaceError extends Error {
+
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке.
+   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup') {
+
+    super(`[${scope}] ${message}`)
+
+    this.name = 'WorkspaceError'
+
+    if ('captureStackTrace' in Error)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+      Error.captureStackTrace(this, WorkspaceError.get)
+
+  }
+
+  private static readonly codeMappings = {
+
+    noPackageName: (packagePath: string) =>
+      `Package with path "${packagePath}" missing required 'name' field in package.json`,
+
+    noWorkspaces: () =>
+      'No workspaces configured in root package.json',
+
+  } as const
+
+  static get<T extends keyof typeof WorkspaceError['codeMappings']>(
+    code: T,
+    ...args: Parameters<typeof WorkspaceError['codeMappings'][T]>
+  ): WorkspaceError {
+
+    const messageFn
+      = this.codeMappings[code] as (...args: unknown[]) => string
+
+    const message = messageFn(...args)
+
+    return new WorkspaceError(message)
+
+  }
+}
+
+/**
+ * Класс ошибки для обработки проблем с менеджерами пакетов,
+ * расширяющий стандартный Error.
+ *
+ * @since 0.3.5
+ *
+ **/
+export class PackageManagerError extends Error {
+
+  /**
+   * Приватный конструктор для создания экземпляра ошибки.
+   *
+   * @param message - Сообщение об ошибке.
+   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
+   *
+   **/
+  private constructor(message: string, scope = '@mirta/rollup') {
+
+    super(`[${scope}] ${message}`)
+
+    this.name = 'PackageManagerError'
+
+    if ('captureStackTrace' in Error)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+      Error.captureStackTrace(this, PackageManagerError.get)
+
+  }
+
+  private static readonly codeMappings = {
+
+    pnpmOnly: () =>
+      'PNPM is required for building. Other package managers are not supported at this time',
+
+  } as const
+
+  static get<T extends keyof typeof PackageManagerError['codeMappings']>(
+    code: T,
+    ...args: Parameters<typeof PackageManagerError['codeMappings'][T]>
+  ): PackageManagerError {
+
+    const messageFn
+      = this.codeMappings[code] as (...args: unknown[]) => string
+
+    const message = messageFn(...args)
+
+    return new PackageManagerError(message)
+
+  }
+}
+
+/**
  * Класс ошибки для обработки проблем с файлами, расширяющий стандартный Error.
  *
  * @since 0.3.5

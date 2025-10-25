@@ -12,174 +12,94 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 
+import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
+import { getEntryPath } from '#utils/entry-path'
+
 const env = process.env.NODE_ENV
 const isProduction = env === 'production'
-
-const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
-const modulesPattern = /(?:src[\\/])?wb-rules-modules[\\/](.*)/
-const scriptsPattern = /(?:src[\\/])?(?:wb-rules[\\/])?(.*)/
 
 const outputDir = {
   es5: 'dist/es5',
 }
 
-function globRelative(path: string, pattern: string) {
-
-  const pathParts = path.split('/')
-  const patternParts = pattern.split('/')
-
-  let i = 0 // Индекс текущего компонента пути.
-
-  for (let j = 0; j < patternParts.length && i < pathParts.length; j++) {
-
-    switch (patternParts[j]) {
-      case '*':
-        break
-      case '**':
-        while (i < pathParts.length && !pathParts[i].startsWith(patternParts[j + 1])) {
-
-          i += 1 // Пропускаем все элементы пути до следующего элемента шаблона.
-
-        }
-        break
-      default:
-        if (patternParts[j] === pathParts[i]) {
-
-          i += 1
-
-        }
-        else {
-
-          return void 0 // Несоответствие фиксированного значения.
-
-        }
-    }
-
-  }
-
-  return pathParts.slice(i).join('/')
-
-}
-
-function tryGetPackageEntry(sourcePath: string) {
-
-  const pathParts: string[] = []
-
-  do {
-
-    const match = packagesPattern.exec(sourcePath)
-
-    if (!match)
-      break
-
-    if (match[3])
-      pathParts.unshift(match[3])
-
-    pathParts.unshift('packages/' + match[2].replace(/\/dist$/, ''))
-
-    sourcePath = match[1]
-
-  }
-  while (sourcePath)
-
-  if (pathParts.length)
-    return `wb-rules-modules/${pathParts.join('/')}.js`
-
-}
-
-function tryGetModuleEntry(sourcePath: string) {
-
-  const match = modulesPattern.exec(sourcePath)
-
-  if (!match)
-    return
-
-  // if (__DEV__)
-  //   console.debug(`Module Entry: ${entry}`)
-
-  return `wb-rules-modules/${match[1]}.js`
-
-}
-
-function tryGetScriptEntry(sourcePath: string) {
-
-  const match = scriptsPattern.exec(sourcePath)
-
-  if (!match)
-    return
-
-  // if (__DEV__)
-  //   console.debug(`Script Entry: ${entry}`)
-
-  return `wb-rules/${match[1]}.js`
-
-}
-
-function getEntry(path: string) {
-
-  if (path.startsWith('_virtual'))
-    return path
-
-  return tryGetPackageEntry(path) ?? tryGetModuleEntry(path) ?? tryGetScriptEntry(path)
-    // None of the above matched.
-    ?? path
-
-}
-
+/**
+ * Опции для загрузки переменных окружения через dotenv.
+ *
+ **/
 export interface DotenvOptions {
-  /** Prefix to filter environment variables. */
+  /** Префикс для фильтрации переменных окружения. */
   prefix?: string
-  /** Print environment variables values. */
+  /** Вывод в консоль значений переменных окружения. */
   unsecure?: boolean
-  /** Print debug information. */
+  /** Вывод в консоль отладочной информации. */
   verbose: boolean
 }
 
+/**
+ * Опции конфигурации сборки.
+ *
+ **/
 export interface RuntimeConfigOptions {
+  /** Корневая директория проекта. */
   cwd?: string
+  /** Внешние зависимости, исключённые из сборки. */
   external?: ExternalOption
-  /** Настройки для сборки в монорепозитории. */
-  monorepo?: {
-    rootDir: string
-    workspaces: string[]
-  }
+  /** Опции dotenv. */
   dotenv?: DotenvOptions
+  /** Дополнительные плагины. */
   plugins?: Plugin[]
 }
 
-export function defineRuntimeConfig(
+/**
+ * Основная функция, возвращающая конфигурацию Rollup.
+ * Обрабатывает входные файлы, плагины и настройку выходных путей.
+ *
+ * @param options - опции конфигурации
+ * @returns Объект RollupOptions
+ *
+ * @since 0.3.0
+ *
+ **/
+export async function defineRuntimeConfig(
   options: RuntimeConfigOptions = {}
-): RollupOptions {
+): Promise<RollupOptions> {
 
   const {
     cwd = process.cwd(),
     external,
-    monorepo,
     dotenv: dotenvOptions = {},
     plugins = [],
 
   } = options
 
+  const monorepoContext = await getMonorepoContextAsync(cwd)
+
   const defaultPlugins = [
+
+    // Очистка директории dist перед сборкой
     del({
       targets: 'dist/*',
     }),
 
+    // Поддержка множественных входных файлов
     multi({
       exclude: ['src/wb-rules/*.disabled.[jt]s'],
       preserveModules: true,
     }),
 
+    // Поиск зависимостей в node_modules
     resolve(),
 
-    ts({
-      clean: true,
-    }),
+    // Транспиляция TypeScript
+    ts({ clean: true }),
 
+    // Обработка импортов для wb-rules
     wbRulesImports(),
 
+    // Загрузка переменных окружения
     dotenv(dotenvOptions),
 
+    // Замена условных флагов в коде
     replace({
       preventAssignment: true,
       values: {
@@ -189,6 +109,7 @@ export function defineRuntimeConfig(
       },
     }),
 
+    // Транспиляция через Babel
     getBabelOutputPlugin({
       presets: ['@babel/preset-env'],
       plugins: [
@@ -197,6 +118,7 @@ export function defineRuntimeConfig(
       ],
     }),
 
+    // Очистка виртуальных файлов после сборки
     del({
       targets: 'dist/*/_virtual',
       hook: 'closeBundle',
@@ -226,39 +148,34 @@ export function defineRuntimeConfig(
 
         let chunkName = chunkInfo.name
 
-        if (monorepo) {
+        // Адаптация путей при сборке в монорепозитории.
+        if (monorepoContext) {
 
-          const { rootDir, workspaces } = monorepo
+          const { rootDir } = monorepoContext
 
           const absolutePath = nodePath.resolve(rootDir, chunkInfo.name)
 
           if (absolutePath.startsWith(cwd)) {
 
+            // Путь в текущем проекте, не требует встраивания отдельным пакетом.
             chunkName = nodePath
               .relative(cwd, absolutePath)
+              .replaceAll(nodePath.sep, nodePath.posix.sep)
 
           }
           else {
 
-            for (const workspace of workspaces) {
+            // Ищем пакет монорепозитория, в котором находится указанный путь.
+            const pkgDefinition = findMonorepoPackageByChunkName(monorepoContext, chunkName)
 
-              const maybeChunkName = globRelative(chunkName, workspace)
-
-              if (maybeChunkName) {
-
-                // Обманка для упрощённого встраивания в packages.
-                chunkName = 'node_modules/' + maybeChunkName
-                break
-
-              }
-
-            }
+            if (pkgDefinition)
+              chunkName = mapChunkToPackage(chunkName, pkgDefinition)
 
           }
 
         }
 
-        return getEntry(chunkName)
+        return getEntryPath(chunkName)
 
       },
     },
