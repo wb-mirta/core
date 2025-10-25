@@ -349,6 +349,9 @@ importers:
         specifier: ^5.8.3
         version: 5.9.2
     devDependencies:
+      '@pnpm/types':
+        specifier: ^1000.9.0
+        version: 1000.9.0
       rollup:
         specifier: ^4.52.4
         version: 4.52.4
