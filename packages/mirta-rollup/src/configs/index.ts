@@ -18,12 +18,10 @@ import { defineRuntimeConfig } from './runtime'
 export default function (args: Record<string, string>) {
 
   // Признак использования пакетной конфигурации.
-  const usePackageConfig = Object.keys(args)
-    .includes('config-package')
+  const usePackageConfig = 'config-package' in args
 
   // Пропуск проверки секции экспорта.
-  const skipExports = Object.keys(args)
-    .includes('config-skip-exports')
+  const skipExports = 'config-skip-exports' in args
 
   return usePackageConfig
     ? definePackageConfig({
