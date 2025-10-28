@@ -15,8 +15,5 @@ pnpm add -D @mirta/rollup
 // rollup.config.mjs
 import { defineConfig } from '@mirta/rollup'
 
-export default defineConfig({
-  dotenv: {
-    prefix: '^APP_'
-  }
-})
+export default defineConfig()
+```
