@@ -213,7 +213,7 @@ describe('package.ts - getInputBindings', () => {
     })
 
     expect(config).toBeDefined()
-    expect((config[0]?.output as OutputOptions).dir).toBe('dist/')
+    expect((config[0]?.output as OutputOptions).dir).toBe('dist')
 
   })
 
@@ -524,7 +524,7 @@ describe('package.ts - getInputBindings', () => {
     })
 
     // The output should be relative to dist/ directory
-    expect((config[0].output as OutputOptions).dir).toBe('dist/')
+    expect((config[0].output as OutputOptions).dir).toBe('dist')
 
   })
 
@@ -666,7 +666,7 @@ describe('package.ts - getDtsMappings', () => {
       input: 'src/index.ts',
     })
 
-    expect((config[1].output as OutputOptions).dir).toBe('dist/')
+    expect((config[1].output as OutputOptions).dir).toBe('dist')
 
   })
 
@@ -841,7 +841,7 @@ describe('package.ts - definePackageConfig', () => {
       input: 'src/index.ts',
     })
 
-    expect((config[0].output as OutputOptions).dir).toBe('dist/')
+    expect((config[0].output as OutputOptions).dir).toBe('dist')
 
   })
 
