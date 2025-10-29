@@ -102,7 +102,8 @@ interface InputBinding {
   dtsOutputFile?: string
 }
 
-const dtsOutputDir = 'dist/dts'
+const outDir = 'dist'
+const dtsOutDir = 'dist/dts'
 
 /**
  * Удаляет префикс './dist/' из пути.
@@ -359,7 +360,7 @@ function getInputBindings(
 
     producingOutputs.add(outputFile)
 
-    const exportEntry = `./dist/${outputFile}`
+    const exportEntry = `./${outDir}/${outputFile}`
 
     usedExports.add(exportEntry)
 
@@ -371,7 +372,7 @@ function getInputBindings(
 
     result[input] = {
       outputFile,
-      dtsSourceFile: `${dtsOutputDir}/${match[1]}.d.ts`,
+      dtsSourceFile: `${dtsOutDir}/${match[1]}.d.ts`,
       dtsOutputFile: descriptor?.dtsOutputFile,
     }
 
@@ -455,7 +456,7 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
       emitDeclarations: dtsInputs.length > 0,
       plugins,
       output: {
-        dir: 'dist/',
+        dir: outDir,
         format: 'es',
         importAttributesKey: 'with',
         entryFileNames(chunk) {
@@ -491,12 +492,12 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
         commonjs(),
         dts(),
         del({
-          targets: [dtsOutputDir],
+          targets: [dtsOutDir],
           hook: 'closeBundle',
         }),
       ],
       output: {
-        dir: 'dist/',
+        dir: outDir,
         format: 'es',
         entryFileNames(chunk) {
 
@@ -553,8 +554,9 @@ function createBuildConfig(
     tsconfig: nodePath.resolve(cwd, './tsconfig.build.json'),
     compilerOptions: {
       noCheck: hasTsChecked,
+      outDir: outDir,
       declaration: emitDeclarations,
-      declarationDir: emitDeclarations ? dtsOutputDir : void 0,
+      declarationDir: emitDeclarations ? dtsOutDir : void 0,
     },
     exclude: [
       'packages/*/tests',
@@ -585,7 +587,7 @@ function createBuildConfig(
       ...plugins,
       copy({
         targets: [
-          { src: 'public/*', dest: 'dist' },
+          { src: 'public/*', dest: outDir },
         ],
       }),
     ],
