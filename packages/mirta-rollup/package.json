@@ -51,8 +51,8 @@
     "build:mono": "pnpm clean && rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
   },
   "dependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "@dotenvx/dotenvx": "^1.51.0",
     "@mirta/polyfills": "workspace:*",
     "@pnpm/find-workspace-dir": "^1000.1.3",
@@ -65,7 +65,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.1",
-    "magic-string": "^0.30.19",
+    "magic-string": "^0.30.21",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-typescript2": "^0.36.0",
