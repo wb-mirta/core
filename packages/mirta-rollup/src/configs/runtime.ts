@@ -3,9 +3,9 @@ import type { ExternalOption, Plugin, RollupOptions } from 'rollup'
 import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
 import ts from 'rollup-plugin-typescript2'
-import dotenv from '@dotenv-run/rollup'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
+import { loadEnvReplacements, type EnvLoaderOptions } from '#utils/env-loader'
 
 import del from '#plugins/del'
 import wbRulesImports from '#plugins/wb-rules-imports'
@@ -15,24 +15,11 @@ import nodePath from 'node:path'
 import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
 import { getEntryPath } from '#utils/entry-path'
 
-const env = process.env.NODE_ENV
-const isProduction = env === 'production'
+const mode = process.env.NODE_ENV
+const isProduction = mode === 'production'
 
 const outputDir = {
   es5: 'dist/es5',
-}
-
-/**
- * Опции для загрузки переменных окружения через dotenv.
- *
- **/
-export interface DotenvOptions {
-  /** Префикс для фильтрации переменных окружения. */
-  prefix?: string
-  /** Вывод в консоль значений переменных окружения. */
-  unsecure?: boolean
-  /** Вывод в консоль отладочной информации. */
-  verbose: boolean
 }
 
 /**
@@ -44,8 +31,10 @@ export interface RuntimeConfigOptions {
   cwd?: string
   /** Внешние зависимости, исключённые из сборки. */
   external?: ExternalOption
-  /** Опции dotenv. */
-  dotenv?: DotenvOptions
+
+  /** Конфигурация загрузчика `.env`-файлов `dotenvx`, {@link EnvLoaderOptions}. */
+  envLoader?: EnvLoaderOptions
+
   /** Дополнительные плагины. */
   plugins?: Plugin[]
 }
@@ -67,7 +56,7 @@ export async function defineRuntimeConfig(
   const {
     cwd = process.cwd(),
     external,
-    dotenv: dotenvOptions = {},
+    envLoader: envLoaderOptions,
     plugins = [],
 
   } = options
@@ -96,13 +85,14 @@ export async function defineRuntimeConfig(
     // Обработка импортов для wb-rules
     wbRulesImports(),
 
-    // Загрузка переменных окружения
-    dotenv(dotenvOptions),
-
-    // Замена условных флагов в коде
+    // Подстановка переменных окружения
     replace({
       preventAssignment: true,
       values: {
+        // Загрузка переменных окружения
+        ...loadEnvReplacements({ mode, ...envLoaderOptions }),
+
+        // Признак сборки в режиме разработки
         __DEV__: JSON.stringify(!isProduction),
         // Автоматически меняется в процессе тестирования
         __TEST__: 'false',

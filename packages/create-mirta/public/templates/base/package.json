@@ -13,8 +13,8 @@
     ]
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production rollup -c",
-    "build:dev": "cross-env NODE_ENV=development rollup -c"
+    "build": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config",
+    "build:dev": "cross-env NODE_ENV=development rollup -c node:@mirta/rollup/config"
   },
   "dependencies": {
     "mirta": "0.3.5"

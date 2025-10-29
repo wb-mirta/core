@@ -7,16 +7,22 @@
 Supplies a ready-to-use Rollup configuration for compiling wb-rules projects.
 
 ## Installation
+
 ```sh
 pnpm add -D @mirta/rollup
+
 ```
 ## Usage
+
 ```mjs
 // rollup.config.mjs
 import { defineConfig } from '@mirta/rollup'
 
+// With custom environment variable filtering setup
 export default defineConfig({
-  dotenv: {
-    prefix: '^APP_'
-  }
+  envLoader: {
+    prefix: '^APP_',
+  },
 })
+
+```

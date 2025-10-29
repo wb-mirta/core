@@ -1,7 +1,8 @@
 import { defineConfig } from 'vitest/config'
 import { fileURLToPath } from 'node:url'
+import { loadEnv } from '@mirta/rollup/env-loader'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   define: {
     __DEV__: true,
     __TEST__: true,
@@ -24,14 +25,12 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    env: loadEnv({ mode }),
     include: ['tests/**/*.{test,spec}.[jt]s'],
     setupFiles: [
-      fileURLToPath(
-        new URL('./tests/setup/dotenv.ts', import.meta.url)
-      ),
       fileURLToPath(
         new URL('./tests/setup/mirta.ts', import.meta.url)
       ),
     ],
   },
-})
+}))

@@ -2,6 +2,7 @@
   "name": "@mirta/rollup",
   "description": "Predefined Rollup configuration for wb-rules project builds.",
   "version": "0.3.5",
+  "sideEffects": false,
   "license": "Unlicense",
   "keywords": [
     "mirta",
@@ -23,6 +24,10 @@
     "./config": {
       "types": "./dist/configs/index.d.mts",
       "default": "./dist/configs/index.mjs"
+    },
+    "./env-loader": {
+      "types": "./dist/utils/env-loader.d.mts",
+      "default": "./dist/utils/env-loader.mjs"
     }
   },
   "imports": {
@@ -48,7 +53,7 @@
   "dependencies": {
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
-    "@dotenv-run/rollup": "^1.3.7",
+    "@dotenvx/dotenvx": "^1.51.0",
     "@mirta/polyfills": "workspace:*",
     "@pnpm/find-workspace-dir": "^1000.1.3",
     "@pnpm/workspace.find-packages": "^1000.0.42",
