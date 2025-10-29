@@ -40,11 +40,10 @@
     "build:mono": "pnpm clean && rollup -c"
   },
   "dependencies": {
-    "@mirta/rollup": "workspace:*",
     "mirta": "workspace:*",
     "vitest-mock-extended": "^3.1.0"
   },
-  "peerDependencies": {
+  "devDependencies": {
     "@mirta/rollup": "workspace:*"
   }
 }
