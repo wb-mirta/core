@@ -346,6 +346,9 @@ importers:
 
   packages/mirta-testing:
     dependencies:
+      '@mirta/rollup':
+        specifier: workspace:*
+        version: link:../mirta-rollup
       mirta:
         specifier: workspace:*
         version: link:../mirta

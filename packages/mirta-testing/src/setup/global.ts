@@ -1,0 +1,71 @@
+/**
+ * @file Конфигурационный файл для настройки глобальных моков в тестах.
+ *
+ * Этот файл:
+ * - Выполняется перед каждым тестовым файлом через `setupFiles` в конфигурации Vitest;
+ * - Заменяет заглушками отсутствующие конструкции движка `wb-rules`;
+ *
+ * Позволяет:
+ * - Тестировать логику без реального оборудования;
+ *
+ * @see https://vitest.dev/config/#setupfiles
+ *
+ * @since 0.4.0
+ *
+ **/
+
+import { vi } from 'vitest'
+import { mock } from 'vitest-mock-extended'
+
+/**
+ * Создаёт базовый логгер с моками методов журналирования.
+ * @returns Типизированный мок логгера с методами `info`, `debug`, `warning`, `error`.
+ *
+ **/
+const createLogger = () => {
+
+  const logger = vi.fn() as unknown as WbRules.Log
+
+  logger.info = vi.fn()
+  logger.debug = vi.fn()
+  logger.warning = vi.fn()
+  logger.error = vi.fn()
+
+  return logger
+
+}
+
+// Мок модуля NodeJs.
+global.module = mock<NodeJS.Module>()
+
+// Мок логгера для тестирования.
+global.log = createLogger()
+
+// Мок отладочного логирования (алиас для `log.debug`).
+global.debug = vi.fn() as WbRules.Debug
+
+// Мок виртуального устройства.
+global.dev = mock<WbRules.Dev>()
+
+// Мок создания виртуальных устройств.
+global.defineVirtualDevice = vi.fn()
+
+// Мок получения устройства.
+global.getDevice = vi.fn(() => mock<WbRules.Device>({
+  getControl: () => mock<WbRules.Control>(),
+}))
+
+// Мок получения контрола устройства.
+global.getControl = vi.fn()
+
+// Мок отслеживания MQTT-сообщений.
+global.trackMqtt = vi.fn()
+
+// Мок определения правил.
+global.defineRule = vi.fn()
+
+// Мок сервиса уведомлений.
+global.Notify = mock<WbRules.Notify>()
+
+// Мок сервиса оповещения.
+global.Alarms = mock<WbRules.Alarms>()

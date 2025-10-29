@@ -19,6 +19,11 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
+    },
+    "./setup-global": {
+      "import": {
+        "default": "./dist/setup/global.mjs"
+      }
     }
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-testing#readme",
@@ -32,10 +37,14 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c node:@mirta/rollup/config --config-package"
+    "build:mono": "pnpm clean && rollup -c"
   },
   "dependencies": {
+    "@mirta/rollup": "workspace:*",
     "mirta": "workspace:*",
     "vitest-mock-extended": "^3.1.0"
+  },
+  "peerDependencies": {
+    "@mirta/rollup": "workspace:*"
   }
 }

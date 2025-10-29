@@ -28,9 +28,7 @@ export default defineConfig(({ mode }) => ({
     env: loadEnv({ mode }),
     include: ['tests/**/*.{test,spec}.[jt]s'],
     setupFiles: [
-      fileURLToPath(
-        new URL('./tests/setup/mirta.ts', import.meta.url)
-      ),
+      '@mirta/testing/setup-global'
     ],
   },
 }))
