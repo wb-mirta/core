@@ -1,5 +1,6 @@
 import nodePath from 'node:path'
 import dotenvx from '@dotenvx/dotenvx'
+import { ensureCompactArray } from './array'
 
 /**
  * Регулярное выражение, определяющее допустимые префиксы для переменных окружения,
@@ -24,7 +25,7 @@ import dotenvx from '@dotenvx/dotenvx'
  * @since 0.4.0
  *
  **/
-export const DEFAULT_ENV_PREFIX = /^MIRTA_|^APP_/
+export const DEFAULT_ENV_PREFIXES = ['MIRTA_', 'APP_'] as const
 
 /**
  * Интерфейс для настройки параметров `dotenvx`.
@@ -142,7 +143,7 @@ export interface EnvLoaderOptions {
    *
    * ```
    **/
-  prefix?: string | RegExp
+  prefix?: string | string[]
 
   /**
    * Текущая рабочая директория для поиска файлов `.env`.
@@ -291,12 +292,14 @@ function resolveEnvFiles(options: EnvResolutionOptions) {
 }
 
 /**
- * Фильтрует и сортирует переменные окружения в соответствии с заданными критериями.
+ * Фильтрует и сортирует переменные окружения по заданным префиксам и правилам.
  *
- * @param env - Объект переменных окружения, где ключи — строки, а значения — строки или `undefined`.
- * @param prefix - Регулярное выражение для фильтрации ключей. Ключ включается, если он соответствует этому шаблону.
- * @param isNodeEnv - Флаг, указывающий, должна ли быть включена переменная окружения `NODE_ENV` независимо от `prefix`.
- * @returns Объект, содержащий отфильтрованные и отсортированные пары "ключ-значение".
+ * @param env Объект переменных окружения в формате `{ ключ: значение | undefined }`.
+ * @param prefixes Массив строковых префиксов (например, `['MIRTA_', 'APP_']`).
+ *                 Ключ будет включен, если начинается с любого из этих префиксов.
+ * @param keepNodeEnv Определяет, включать ли переменную `NODE_ENV` в результат,
+ *                    независимо от наличия префикса.
+ * @returns Объект с отфильтрованными и отсортированными ключами в лексикографическом порядке.
  *
  * @since 0.4.0
  *
@@ -304,8 +307,8 @@ function resolveEnvFiles(options: EnvResolutionOptions) {
 function filterEnvKeys(
 
   env: Record<string, string | undefined>,
-  prefix: RegExp,
-  includeNodeEnv: boolean
+  prefixes: string[],
+  keepNodeEnv: boolean
 
 ) {
 
@@ -314,8 +317,13 @@ function filterEnvKeys(
 
     const [key, value] = entry
 
-    return value !== undefined
-      && ((includeNodeEnv && key === 'NODE_ENV') || prefix.test(key))
+    if (value === undefined)
+      return false
+
+    if (key === 'NODE_ENV')
+      return keepNodeEnv
+
+    return prefixes.some(prefix => key.startsWith(prefix))
 
   }
 
@@ -329,7 +337,9 @@ function filterEnvKeys(
       numeric: true, // Числа в строках сравниваются как числа
     }))
 
-  // Преобразует отфильтрованный и отсортированный массив обратно в объект.
+  // Преобразует массив `[ключ, значение]` обратно в объект.
+  // Гарантирует детерминированный порядок ключей.
+  //
   return Object.fromEntries(filteredEntries)
 
 }
@@ -347,7 +357,7 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
   const {
 
     mode = process.env.NODE_ENV,
-    prefix = DEFAULT_ENV_PREFIX,
+    prefix = [...DEFAULT_ENV_PREFIXES],
 
     cwd = process.cwd(),
     monorepoDir,
@@ -381,13 +391,7 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
 
   // Фильтрация переменных, если задан префикс.
   if (prefix)
-    processEnv = filterEnvKeys(
-      processEnv,
-      typeof prefix === 'string'
-        ? new RegExp(prefix, 'i')
-        : prefix,
-      keepNodeEnv
-    )
+    processEnv = filterEnvKeys(processEnv, ensureCompactArray(prefix), keepNodeEnv)
 
   return processEnv
 
