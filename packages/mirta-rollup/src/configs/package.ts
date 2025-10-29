@@ -103,10 +103,10 @@ interface InputBinding {
 }
 
 const outDir = 'dist'
-const dtsOutDir = 'dist/dts'
+const dtsOutDir = `${outDir}/dts`
 
 /**
- * Удаляет префикс './dist/' из пути.
+ * Удаляет префикс каталога вывода (`./${outDir}/`) из пути.
  * @param path Путь к файлу.
  * @returns Нормализованный путь.
  *
@@ -115,8 +115,10 @@ const dtsOutDir = 'dist/dts'
  **/
 function sliceDistPrefix(path: string) {
 
-  return path.startsWith('./dist/')
-    ? path.slice(7)
+  const prefix = `./${outDir}/`
+
+  return path.startsWith(prefix)
+    ? path.slice(prefix.length)
     : path
 
 }
