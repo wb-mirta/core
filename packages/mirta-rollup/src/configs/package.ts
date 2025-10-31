@@ -494,7 +494,7 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
         commonjs(),
         dts(),
         del({
-          targets: [dtsOutDir],
+          targets: dtsOutDir,
           hook: 'closeBundle',
         }),
       ],
@@ -578,6 +578,10 @@ function createBuildConfig(
     input,
     external,
     plugins: [
+      // Очистка директории dist перед сборкой
+      del({
+        targets: outDir,
+      }),
       tsPlugin,
       createReplacePlugin(
         isProductionBuild,

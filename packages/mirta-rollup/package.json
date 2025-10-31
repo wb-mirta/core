@@ -48,8 +48,7 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
+    "build:mono": "rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
   },
   "dependencies": {
     "@babel/core": "^7.28.5",
