@@ -37,8 +37,7 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c"
+    "build:mono": "rollup -c"
   },
   "dependencies": {
     "mirta": "workspace:*",

@@ -18,9 +18,7 @@ import { getEntryPath } from '#utils/entry-path'
 const mode = process.env.NODE_ENV
 const isProduction = mode === 'production'
 
-const outputDir = {
-  es5: 'dist/es5',
-}
+const outDir = 'dist/es5'
 
 /**
  * Опции конфигурации сборки.
@@ -67,7 +65,7 @@ export async function defineRuntimeConfig(
 
     // Очистка директории dist перед сборкой
     del({
-      targets: 'dist/*',
+      targets: outDir,
     }),
 
     // Поддержка множественных входных файлов
@@ -110,7 +108,7 @@ export async function defineRuntimeConfig(
 
     // Очистка виртуальных файлов после сборки
     del({
-      targets: 'dist/*/_virtual',
+      targets: `${outDir}/_virtual`,
       hook: 'closeBundle',
     }),
   ]
@@ -131,7 +129,7 @@ export async function defineRuntimeConfig(
       format: 'cjs',
       strict: false,
 
-      dir: outputDir.es5,
+      dir: outDir,
       preserveModules: true,
 
       entryFileNames(chunkInfo) {

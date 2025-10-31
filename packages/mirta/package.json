@@ -37,8 +37,7 @@
     "url": "https://boosty.to/wihome/donate"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build:mono": "pnpm clean && rollup -c node:@mirta/rollup/config --config-package"
+    "build:mono": "rollup -c node:@mirta/rollup/config --config-package"
   },
   "dependencies": {
     "@mirta/basics": "workspace:*",
