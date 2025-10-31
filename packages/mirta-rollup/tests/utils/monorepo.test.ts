@@ -1,250 +1,266 @@
-import { mock } from 'vitest-mock-extended'
+import { glob } from 'node:fs/promises'
+import { WorkspaceError } from '#utils/errors'
+import type { WorkspaceContext } from '#utils/workspace'
 
-import type { Project, ProjectManifest, ProjectRootDir, ProjectRootDirRealPath } from '@pnpm/types'
-import { PackageManagerError, WorkspaceError } from '#utils/errors'
-
-// Мокаем внешние зависимости
-vi.mock('@pnpm/find-workspace-dir', () => ({
-  findWorkspaceDir: vi.fn(),
-}))
-
-vi.mock('@pnpm/workspace.find-packages', () => ({
-  findWorkspacePackages: vi.fn(),
+vi.mock('node:fs/promises', () => ({
+  glob: vi.fn(),
 }))
 
 vi.mock('#utils/package', () => ({
   parsePackageJson: vi.fn(),
 }))
 
-const { findWorkspaceDir } = await import('@pnpm/find-workspace-dir')
-const { findWorkspacePackages } = await import('@pnpm/workspace.find-packages')
-const { parsePackageJson } = await import('#utils/package')
+vi.mock('#utils/workspace', () => ({
+  resolveWorkspaceContextAsync: vi.fn(),
+}))
 
-const pnpmFindWorkspaceDir = vi.mocked(findWorkspaceDir)
-const pnpmFindWorkspacePackages = vi.mocked(findWorkspacePackages)
-const mockParsePackageJson = vi.mocked(parsePackageJson)
+// eslint-disable-next-line @typescript-eslint/require-await
+async function* createAsyncIterator<T>(...items: T[]): NodeJS.AsyncIterator<T> {
 
-const {
-  findMonorepoDirAsync,
-  getMonorepoContextAsync,
-  findMonorepoPackageByChunkName,
-  mapChunkToPackage,
-} = await import('#utils/monorepo')
-
-function mockProject(mockImplementation: { rootDir: string, manifest: ProjectManifest }) {
-
-  return mock<Project>({
-    rootDir: mockImplementation.rootDir as ProjectRootDir,
-    manifest: mockImplementation.manifest,
-  })
+  for (const item of items)
+    yield item
 
 }
+
+const mockGlob = vi.mocked(glob)
+const { parsePackageJson } = await import('#utils/package')
+const mockParsePackageJson = vi.mocked(parsePackageJson)
+const { resolveWorkspaceContextAsync } = await import('#utils/workspace')
+const mockResolveWorkspaceContext = vi.mocked(resolveWorkspaceContextAsync)
+
+const {
+  getMonorepoContextAsync,
+  tryGetMonorepoPackagesAsync,
+  findMonorepoPackageByChunkName,
+  mapChunkToPackage,
+  __resetInternalState,
+} = await import('#utils/monorepo')
 
 describe('monorepo utilities', () => {
 
   beforeEach(() => {
 
     vi.clearAllMocks()
-    vi.stubEnv('PNPM_HOME', '/usr/local/pnpm')
-
-  })
-
-  afterEach(() => {
-
-    vi.unstubAllEnvs()
-
-  })
-
-  describe('findMonorepoDirAsync', () => {
-
-    it('should find monorepo directory with PNPM', async () => {
-
-      const expectedDir = '/home/user/my-monorepo'
-      pnpmFindWorkspaceDir.mockResolvedValue(expectedDir)
-
-      const result = await findMonorepoDirAsync('/home/user/my-monorepo/packages/app')
-
-      expect(pnpmFindWorkspaceDir).toHaveBeenCalledWith('/home/user/my-monorepo/packages/app')
-      expect(result).toBe(expectedDir)
-
-    })
-
-    it('should return undefined if monorepo is not found', async () => {
-
-      pnpmFindWorkspaceDir.mockResolvedValue(undefined)
-
-      const result = await findMonorepoDirAsync('/home/user/standalone-project')
-
-      expect(result).toBeUndefined()
-
-    })
-
-    it('should throw error if PNPM_HOME is not set', async () => {
-
-      delete process.env.PNPM_HOME
-
-      await expect(findMonorepoDirAsync('/some/path'))
-        .rejects
-        .toThrow(PackageManagerError.get('pnpmOnly'))
-
-    })
+    __resetInternalState()
 
   })
 
   describe('getMonorepoContextAsync', () => {
 
-    it('should return monorepo context with packages', async () => {
+    it('should return full monorepo context', async () => {
 
-      const monorepoDir = '/home/user/monorepo'
-      const mockPackages: Project[] = [
-        {
-          rootDir: monorepoDir as ProjectRootDir,
-          rootDirRealPath: '' as ProjectRootDirRealPath,
-          manifest: { name: 'root' },
-          writeProjectManifest: vi.fn(),
-        },
-        {
-          rootDir: `${monorepoDir}/packages/app` as ProjectRootDir,
-          rootDirRealPath: '' as ProjectRootDirRealPath,
-          manifest: { name: '@scope/app' },
-          writeProjectManifest: vi.fn(),
-        },
-        {
-          rootDir: `${monorepoDir}/packages/lib` as ProjectRootDir,
-          rootDirRealPath: '' as ProjectRootDirRealPath,
-          manifest: { name: '@scope/lib' },
-          writeProjectManifest: vi.fn(),
-        },
-      ]
-
-      pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
-      mockParsePackageJson.mockReturnValue({
-        name: 'root',
+      const rootDir = '/home/user/monorepo'
+      const workspaceContext: WorkspaceContext = {
+        rootDir,
+        manager: 'pnpm',
         workspaces: ['packages/*'],
+      }
+
+      mockResolveWorkspaceContext.mockResolvedValue(workspaceContext)
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator(
+          'packages/app/package.json',
+          'packages/lib/package.json'
+        )
+      )
+
+      mockParsePackageJson
+        .mockReturnValueOnce({ name: '@scope/app' })
+        .mockReturnValueOnce({ name: '@scope/lib' })
+
+      const result = await getMonorepoContextAsync(rootDir)
+
+      expect(result).toEqual({
+        rootDir,
+        packages: [
+          { name: '@scope/app', workspacePath: 'packages/app' },
+          { name: '@scope/lib', workspacePath: 'packages/lib' },
+        ],
       })
-      pnpmFindWorkspacePackages.mockResolvedValue(mockPackages)
-
-      const result = await getMonorepoContextAsync(monorepoDir)
-
-      expect(result).toBeDefined()
-      expect(result?.rootDir).toBe(monorepoDir)
-      expect(result?.packages).toHaveLength(2)
-      expect(result?.packages[0].name).toBe('@scope/app')
-      expect(result?.packages[0].workspacePath).toBe('packages/app/')
-      expect(result?.packages[1].name).toBe('@scope/lib')
-      expect(result?.packages[1].workspacePath).toBe('packages/lib/')
 
     })
 
-    it('should sort packages by path length (longest first)', async () => {
+    it('should return undefined if workspace not found', async () => {
 
-      const monorepoDir = '/home/user/monorepo'
-      const mockPackages: Project[] = [
-        mockProject({
-          rootDir: monorepoDir as ProjectRootDir,
-          manifest: { name: 'root' },
-        }),
-        mockProject({
-          rootDir: `${monorepoDir}/packages/app`,
-          manifest: { name: '@scope/app' },
-        }),
-        mockProject({
-          rootDir: `${monorepoDir}/packages/nested/lib`,
-          manifest: { name: '@scope/nested-lib' },
-        }),
-      ]
+      mockResolveWorkspaceContext.mockResolvedValue(undefined)
 
-      pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
-      mockParsePackageJson.mockReturnValue({
-        name: 'root',
-        workspaces: ['packages/*', 'packages/nested/*'],
-      })
-      pnpmFindWorkspacePackages.mockResolvedValue(mockPackages)
-
-      const result = await getMonorepoContextAsync(monorepoDir)
-
-      expect(result?.packages[0].workspacePath).toBe('packages/nested/lib/')
-      expect(result?.packages[1].workspacePath).toBe('packages/app/')
-
-    })
-
-    it('should return undefined if not a monorepo', async () => {
-
-      pnpmFindWorkspaceDir.mockResolvedValue(undefined)
-
-      const result = await getMonorepoContextAsync('/standalone/project')
+      const result = await getMonorepoContextAsync('/standalone')
 
       expect(result).toBeUndefined()
 
     })
 
-    it('should throw error if workspaces are not defined', async () => {
+    it('should return undefined if workspaces not declared', async () => {
 
-      const monorepoDir = '/home/user/monorepo'
-      pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
-      mockParsePackageJson.mockReturnValue({
-        name: 'root',
-      })
+      const workspaceContext: WorkspaceContext = {
+        rootDir: '/standalone',
+        manager: 'npm',
+        workspaces: undefined,
+      }
 
-      await expect(getMonorepoContextAsync(monorepoDir))
+      mockResolveWorkspaceContext.mockResolvedValue(workspaceContext)
+
+      const result = await getMonorepoContextAsync('/standalone')
+
+      expect(result).toBeUndefined()
+
+    })
+
+  })
+
+  describe('tryGetMonorepoPackagesAsync', () => {
+
+    it('should discover packages using glob patterns', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'pnpm',
+        workspaces: ['packages/*', 'apps/*'],
+      }
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator(
+          'packages/ui/package.json',
+          'apps/web/package.json'
+        )
+      )
+
+      mockParsePackageJson
+        .mockReturnValueOnce({ name: '@scope/ui' })
+        .mockReturnValueOnce({ name: '@scope/web' })
+
+      const result = await tryGetMonorepoPackagesAsync(context)
+
+      expect(result).toHaveLength(2)
+      expect(result).toContainEqual({ name: '@scope/ui', workspacePath: 'packages/ui' })
+      expect(result).toContainEqual({ name: '@scope/web', workspacePath: 'apps/web' })
+
+    })
+
+    it('should return undefined if workspaces not declared', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/standalone',
+        manager: 'npm',
+        workspaces: undefined,
+      }
+
+      const result = await tryGetMonorepoPackagesAsync(context)
+
+      expect(result).toBeUndefined()
+
+    })
+
+    it('should sort packages by path length (longest first)', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'yarn',
+        workspaces: ['packages/*', 'packages/nested/*'],
+      }
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator(
+          'packages/a/package.json',
+          'packages/nested/b/package.json',
+          'packages/c/package.json'
+        )
+      )
+
+      mockParsePackageJson
+        .mockReturnValueOnce({ name: 'pkg-a' })
+        .mockReturnValueOnce({ name: 'pkg-b' })
+        .mockReturnValueOnce({ name: 'pkg-c' })
+
+      const result = await tryGetMonorepoPackagesAsync(context)
+
+      expect(result?.[0].workspacePath).toBe('packages/nested/b')
+      expect(result?.[1].workspacePath).toBe('packages/a')
+      expect(result?.[2].workspacePath).toBe('packages/c')
+
+    })
+
+    it('should throw error if package name is missing', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'pnpm',
+        workspaces: ['packages/*'],
+      }
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator('packages/unnamed/package.json')
+      )
+
+      mockParsePackageJson.mockReturnValue({ name: undefined })
+
+      await expect(tryGetMonorepoPackagesAsync(context))
         .rejects
-        .toThrow(WorkspaceError.get('noWorkspaces'))
+        .toThrow(WorkspaceError.get('noPackageName', 'packages/unnamed/package.json'))
 
     })
 
-    it('should exclude root directory from package list', async () => {
+    it('should cache results by rootDir', async () => {
 
-      const monorepoDir = '/home/user/monorepo'
-      const mockPackages = [
-        mockProject({
-          rootDir: monorepoDir,
-          manifest: { name: 'root' },
-        }),
-        mockProject({
-          rootDir: `${monorepoDir}/packages/app`,
-          manifest: { name: '@scope/app' },
-        }),
-      ]
+      const context: WorkspaceContext = {
+        rootDir: '/cached',
+        manager: 'npm',
+        workspaces: ['libs/*'],
+      }
 
-      pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
-      mockParsePackageJson.mockReturnValue({
-        name: 'root',
-        workspaces: ['packages/*'],
-      })
-      pnpmFindWorkspacePackages.mockResolvedValue(mockPackages)
+      mockGlob.mockReturnValue(
+        createAsyncIterator('libs/util/package.json')
+      )
 
-      const result = await getMonorepoContextAsync(monorepoDir)
+      mockParsePackageJson.mockReturnValue({ name: 'util' })
 
-      expect(result?.packages).toHaveLength(1)
-      expect(result?.packages.every(pkg => pkg.name !== 'root')).toBe(true)
+      const result1 = await tryGetMonorepoPackagesAsync(context)
+      const result2 = await tryGetMonorepoPackagesAsync(context)
+
+      expect(result1).toBe(result2)
+      expect(mockGlob).toHaveBeenCalledTimes(1)
 
     })
 
-    it('should handle packages without names', async () => {
+    it('should normalize Windows paths to POSIX', async () => {
 
-      const monorepoDir = '/home/user/monorepo'
-      const mockPackages = [
-        mockProject({
-          rootDir: monorepoDir,
-          manifest: { name: 'root' },
-        }),
-        mockProject({
-          rootDir: `${monorepoDir}/packages/unnamed`,
-          manifest: { name: undefined },
-        }),
-      ]
+      const context: WorkspaceContext = {
+        rootDir: 'C:\\monorepo',
+        manager: 'pnpm',
+        workspaces: ['packages\\*'],
+      }
 
-      pnpmFindWorkspaceDir.mockResolvedValue(monorepoDir)
-      mockParsePackageJson.mockReturnValue({
-        name: 'root',
-        workspaces: ['packages/*'],
-      })
-      pnpmFindWorkspacePackages.mockResolvedValue(mockPackages)
+      mockGlob.mockReturnValue(
+        createAsyncIterator('packages\\app\\package.json')
+      )
 
-      const result = await getMonorepoContextAsync(monorepoDir)
+      mockParsePackageJson.mockReturnValue({ name: 'app' })
 
-      expect(result?.packages[0].name).toBeUndefined()
-      expect(result?.packages[0].workspacePath).toBe('packages/unnamed/')
+      const result = await tryGetMonorepoPackagesAsync(context)
+
+      expect(result?.[0].workspacePath).toBe('packages/app')
+
+    })
+
+    it('should exclude node_modules from glob search', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'yarn',
+        workspaces: ['**/*'],
+      }
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator()
+      )
+
+      await tryGetMonorepoPackagesAsync(context)
+
+      expect(mockGlob).toHaveBeenCalledWith(
+        ['**/*/package.json'],
+        expect.objectContaining({ exclude: ['node_modules/**'] })
+      )
 
     })
 
@@ -253,37 +269,29 @@ describe('monorepo utilities', () => {
   describe('findMonorepoPackageByChunkName', () => {
 
     const mockContext = {
-      rootDir: '/home/user/monorepo',
+      rootDir: '/monorepo',
       packages: [
-        {
-          workspacePath: 'packages/nested/lib/',
-          name: '@scope/nested-lib',
-        },
-        {
-          workspacePath: 'packages/app/',
-          name: '@scope/app',
-        },
-        {
-          workspacePath: 'packages/lib/',
-          name: '@scope/lib',
-        },
+        { name: '@scope/nested-lib', workspacePath: 'packages/nested/lib' },
+        { name: '@scope/app', workspacePath: 'packages/app' },
+        { name: '@scope/lib', workspacePath: 'packages/lib' },
       ],
     }
 
-    it('should find package by chunk name', () => {
+    it('should find package by chunk name prefix', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
         'packages/app/src/index.ts'
       )
 
-      expect(result).toBeDefined()
-      expect(result?.name).toBe('@scope/app')
-      expect(result?.workspacePath).toBe('packages/app/')
+      expect(result).toEqual({
+        name: '@scope/app',
+        workspacePath: 'packages/app',
+      })
 
     })
 
-    it('should find longest matching path', () => {
+    it('should match longest path first', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -291,11 +299,10 @@ describe('monorepo utilities', () => {
       )
 
       expect(result?.name).toBe('@scope/nested-lib')
-      expect(result?.workspacePath).toBe('packages/nested/lib/')
 
     })
 
-    it('should return undefined if package is not found', () => {
+    it('should return undefined if no match found', () => {
 
       const result = findMonorepoPackageByChunkName(
         mockContext,
@@ -321,62 +328,55 @@ describe('monorepo utilities', () => {
 
   describe('mapChunkToPackage', () => {
 
-    it('should convert chunk path to node_modules path', () => {
+    it('should map chunk to node_modules path', () => {
 
-      const pkgDefinition = {
-        workspacePath: 'packages/app/',
+      const pkgDef = {
         name: '@scope/app',
+        workspacePath: 'packages/app',
       }
 
-      const result = mapChunkToPackage(
-        'packages/app/src/index.ts',
-        pkgDefinition
-      )
+      const result = mapChunkToPackage('packages/app/src/index.ts', pkgDef)
 
       expect(result).toBe('node_modules/@scope/app/src/index.ts')
 
     })
 
-    it('should handle nested paths', () => {
+    it('should handle nested workspace paths', () => {
 
-      const pkgDefinition = {
-        workspacePath: 'packages/nested/lib/',
-        name: '@scope/nested-lib',
+      const pkgDef = {
+        name: '@org/nested',
+        workspacePath: 'libs/nested/module',
       }
 
-      const result = mapChunkToPackage(
-        'packages/nested/lib/src/utils/helper.ts',
-        pkgDefinition
-      )
+      const result = mapChunkToPackage('libs/nested/module/src/main.ts', pkgDef)
 
-      expect(result).toBe('node_modules/@scope/nested-lib/src/utils/helper.ts')
+      expect(result).toBe('node_modules/@org/nested/src/main.ts')
 
     })
 
-    it('should throw error if package name is missing', () => {
+    it('should handle packages without scope', () => {
 
-      const pkgDefinition = {
-        workspacePath: 'packages/unnamed/',
-      }
-
-      expect(() => mapChunkToPackage('packages/unnamed/index.ts', pkgDefinition))
-        .toThrow(WorkspaceError.get('noPackageName', 'packages/unnamed/'))
-
-    })
-
-    it('should handle packages with simple names (without @scope)', () => {
-
-      const pkgDefinition = {
-        workspacePath: 'packages/simple/',
+      const pkgDef = {
         name: 'simple-package',
+        workspacePath: 'packages/simple',
       }
 
-      const result = mapChunkToPackage(
-        'packages/simple/lib/index.ts',
-        pkgDefinition
-      )
+      const result = mapChunkToPackage('packages/simple/lib/index.ts', pkgDef)
 
       expect(result).toBe('node_modules/simple-package/lib/index.ts')
+
+    })
+
+    it('should handle root-level files', () => {
+
+      const pkgDef = {
+        name: '@scope/root',
+        workspacePath: 'packages/root',
+      }
+
+      const result = mapChunkToPackage('packages/root/index.ts', pkgDef)
+
+      expect(result).toBe('node_modules/@scope/root/index.ts')
 
     })
 

@@ -62,6 +62,28 @@ export interface PackageDefinition {
 const packagesCache = new Map<string, readonly PackageDefinition[]>()
 
 /**
+ * Сбрасывает внутреннее состояние модуля, очищая кэш обнаруженных пакетов.
+ *
+ * @remarks
+ *
+ * Функция предназначена исключительно для использования во время выполнения тестов.
+ * В production-среде (когда глобальная переменная `__TEST__` равна `false`) функция не выполняет никаких действий.
+ *
+ * @internal
+ *
+ * @since 0.4.0
+ *
+ **/
+export function __resetInternalState() {
+
+  if (!__TEST__)
+    return
+
+  packagesCache.clear()
+
+}
+
+/**
  * Получает полный контекст монорепозитория.
  *
  * Включает корневую директорию и все найденные пакеты.

@@ -88,7 +88,7 @@ function assertWorkspacesIsOptionalArray(workspaces: unknown, pkgPath: string): 
   if (Array.isArray(workspaces) && workspaces.every(item => typeof item === 'string'))
     return
 
-  throw WorkspaceError.get('invalidWorkspaces', pkgPath)
+  throw WorkspaceError.get('invalidWorkspaces', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
 
 }
 
