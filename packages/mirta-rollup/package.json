@@ -56,8 +56,6 @@
     "@babel/preset-env": "^7.28.5",
     "@dotenvx/dotenvx": "^1.51.0",
     "@mirta/polyfills": "workspace:*",
-    "@pnpm/find-workspace-dir": "^1000.1.3",
-    "@pnpm/workspace.find-packages": "^1000.0.42",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-multi-entry": "^6.0.1",
@@ -70,10 +68,14 @@
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.8.3"
+    "find-up": "^8.0.0"
   },
   "devDependencies": {
     "rollup": "^4.52.5",
-    "@pnpm/types": "^1000.9.0"
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "rollup": ">= 4.52.5 < 5",
+    "typescript": ">= 5.8.3 < 6"
   }
 }
