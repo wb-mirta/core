@@ -2,6 +2,7 @@ import nodePath from 'node:path'
 import { findUp } from 'find-up'
 import { parsePackageJson } from './package'
 import { WorkspaceError } from './errors'
+import { toPosix } from './path'
 
 /**
  * Тип пакетного менеджера.
@@ -59,28 +60,18 @@ const lockFileMappings: Record<string, PackageManager> = {
 } as const
 
 /**
- * Проверяет, что поле `workspaces` в package.json имеет корректный формат.
+ * Проверяет, что поле `workspaces` в `package.json` имеет корректный формат.
+ * Должно быть массивом строк или отсутствовать. Использование объекта (например, `{ packages: [...] }`) недопустимо.
  *
- * @param workspaces - Значение поля `workspaces`
- * @param pkgPath - Путь к package.json (для ошибки)
+ * @param workspaces - Значение поля `workspaces` для проверки.
+ * @param pkgPath - Путь к package.json (используется в сообщении об ошибке).
  *
- * @remarks
+ * @throws {WorkspaceError} Если формат неверен.
  *
- * ИИ-ассистенты иногда советуют использовать `workspaces: { packages: [...] }`
- * в package.json — это ошибка.
- *
- * Такой формат поддерживается только в:
- * - .yarnrc.yml
- * - pnpm-workspace.yaml
- *
- * В package.json всегда используйте массив:
- * ```json
- * { "workspaces": ["packages/*"] }
- * ```
  * @since 0.4.0
  *
  **/
-function assertWorkspacesIsOptionalArray(workspaces: unknown, pkgPath: string): asserts workspaces is string[] | undefined {
+function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asserts workspaces is string[] | undefined {
 
   if (workspaces === null || workspaces === undefined)
     return
@@ -117,24 +108,25 @@ export async function resolveWorkspaceContextAsync(cwd: string): Promise<Workspa
 
   const lockFiles = Object.keys(lockFileMappings)
 
-  const lockFilePath = await findUp(lockFiles, { cwd })
+  const lockFilePath = toPosix(
+    await findUp(lockFiles, { cwd })
+  )
 
   if (!lockFilePath)
     return
 
   const fileName = nodePath.basename(lockFilePath)
-  const manager = lockFileMappings[fileName]
-
   const rootDir = nodePath.dirname(lockFilePath)
 
-  const pkgPath = nodePath.join(rootDir, 'package.json')
-
+  const pkgPath = `${rootDir}/package.json`
   const pkg = parsePackageJson(pkgPath)
 
-  assertWorkspacesIsOptionalArray(pkg.workspaces, pkgPath)
+  assertWorkspacesFieldFormat(pkg.workspaces, pkgPath)
 
-  const workspaces = pkg.workspaces
-
-  return { rootDir, manager, workspaces }
+  return {
+    rootDir,
+    manager: lockFileMappings[fileName],
+    workspaces: pkg.workspaces,
+  }
 
 }

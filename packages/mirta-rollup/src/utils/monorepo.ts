@@ -4,6 +4,7 @@ import { glob } from 'node:fs/promises'
 import { parsePackageJson } from './package'
 import { WorkspaceError } from './errors'
 import { resolveWorkspaceContextAsync, type WorkspaceContext } from './workspace'
+import { toPosix } from './path'
 
 /**
  * Контекст монорепозитория, содержащий корневую директорию и список пакетов.
@@ -160,22 +161,20 @@ export async function tryGetMonorepoPackagesAsync(
 
   const packages: PackageDefinition[] = []
 
-  for await (const innerPkgPath of glob(pkgPatterns, {
+  for await (const rawPkgPath of glob(pkgPatterns, {
     cwd: rootDir,
     exclude: ['node_modules/**'],
   })) {
 
-    const innerPkg = parsePackageJson(
-      nodePath.join(rootDir, innerPkgPath)
-    )
+    const pkgPath = toPosix(rawPkgPath)
+    const pkg = parsePackageJson(`${rootDir}/${pkgPath}`)
 
-    if (!innerPkg.name)
-      throw WorkspaceError.get('noPackageName', innerPkgPath)
+    if (!pkg.name)
+      throw WorkspaceError.get('noPackageName', pkgPath)
 
     packages.push({
-      name: innerPkg.name,
-      workspacePath: nodePath.dirname(innerPkgPath)
-        .replaceAll('\\', nodePath.posix.sep),
+      name: pkg.name,
+      workspacePath: nodePath.dirname(pkgPath),
     })
 
   }

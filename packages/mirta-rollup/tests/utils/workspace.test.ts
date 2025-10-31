@@ -1,6 +1,6 @@
-import nodePath from 'node:path'
 import { findUp } from 'find-up'
 import { WorkspaceError } from '#utils/errors'
+import { toPosix } from '#utils/path'
 
 vi.mock('find-up', () => ({
   findUp: vi.fn(),
@@ -47,9 +47,7 @@ describe('workspace utilities', () => {
         workspaces: ['packages/*'],
       })
 
-      expect(mockParsePackageJson).toHaveBeenCalledWith(
-        nodePath.join(workspaceRoot, 'package.json')
-      )
+      expect(mockParsePackageJson).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
 
     })
 
@@ -178,6 +176,7 @@ describe('workspace utilities', () => {
     it('should normalize Windows paths correctly', async () => {
 
       const workspaceRoot = 'C:\\Users\\repos\\project'
+
       mockFindUp.mockResolvedValue(`${workspaceRoot}\\pnpm-lock.yaml`)
       mockParsePackageJson.mockReturnValue({
         name: 'win-project',
@@ -186,7 +185,7 @@ describe('workspace utilities', () => {
 
       const result = await resolveWorkspaceContextAsync(workspaceRoot)
 
-      expect(result?.rootDir).toBe(workspaceRoot)
+      expect(result?.rootDir).toBe(toPosix(workspaceRoot))
       expect(result?.manager).toBe('pnpm')
 
     })
