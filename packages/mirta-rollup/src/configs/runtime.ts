@@ -15,7 +15,7 @@ import nodePath from 'node:path'
 import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
 import { getEntryPath } from '#utils/entry-path'
 
-const mode = process.env.NODE_ENV
+const mode = process.env.NODE_ENV ?? 'development'
 const isProduction = mode === 'production'
 
 const outDir = 'dist/es5'

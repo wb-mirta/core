@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "cross-env NODE_ENV=production rollup -c",
-    "build:mono": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config"
+    "build": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config",
+    "build:mono": "rollup -c node:@mirta/rollup/config"
   },
   "engines": {
     "node": ">=20.6.0"

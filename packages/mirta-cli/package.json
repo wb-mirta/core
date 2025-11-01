@@ -35,7 +35,7 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config --config-package --config-skip-exports"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports"
   },
   "funding": {
     "type": "individual",

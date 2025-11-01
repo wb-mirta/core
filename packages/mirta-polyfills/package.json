@@ -27,6 +27,6 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config --config-package"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
   }
 }

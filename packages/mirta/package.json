@@ -37,7 +37,7 @@
     "url": "https://boosty.to/wihome/donate"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config --config-package"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
   },
   "dependencies": {
     "@mirta/basics": "workspace:*",
