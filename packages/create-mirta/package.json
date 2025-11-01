@@ -29,7 +29,7 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config --config-package --config-skip-exports"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",
