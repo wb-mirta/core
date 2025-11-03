@@ -97,7 +97,7 @@ export function __resetInternalState() {
  *
  * @param cwd - Рабочая директория, с которой начинается поиск.
  * @returns Объект {@link MonorepoContext} с информацией о монорепе.
- * @throws {WorkspaceError} Если корень не найден или поле `workspaces` отсутствует.
+ * @throws {WorkspaceError} Если корень не найден или какой-либо из пакетов не имеет имени.
  * @throws {FileError} Если `package.json` недоступен или содержит невалидный JSON.
  *
  * @remarks
@@ -130,7 +130,7 @@ export async function resolveMonorepoContextAsync(
  *
  * @param context - Контекст workspace.
  * @returns Массив пакетов, отсортированный по длине пути (от самых вложенных).
- * @throws {WorkspaceError} Если `workspaces` не объявлен или пакет не имеет имени.
+ * @throws {WorkspaceError} Если пакет не имеет имени.
  *
  * @remarks
  * - Результат кэшируется по `rootDir` для производительности.
@@ -145,11 +145,7 @@ export async function resolveMonorepoPackagesAsync(
 
 ): Promise<readonly PackageDefinition[]> {
 
-  const { rootDir, workspaces } = context
-
-  // Если workspaces не объявлен — это НЕ монорепозиторий.
-  if (!workspaces)
-    throw WorkspaceError.get('noWorkspaces')
+  const { rootDir, workspaces = [] } = context
 
   const cachedPackages = packagesCache.get(rootDir)
 

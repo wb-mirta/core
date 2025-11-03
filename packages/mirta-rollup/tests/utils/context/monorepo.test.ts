@@ -70,22 +70,6 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('should throw error if workspace found but workspaces field is missing', async () => {
-
-      const workspaceContext: WorkspaceContext = {
-        rootDir: '/monorepo',
-        manager: 'npm',
-        workspaces: undefined,
-      }
-
-      mockResolveWorkspaceContext.mockResolvedValue(workspaceContext)
-
-      await expect(resolveMonorepoContextAsync('/monorepo'))
-        .rejects
-        .toThrow(WorkspaceError.get('noWorkspaces'))
-
-    })
-
   })
 
   describe('resolveMonorepoPackagesAsync', () => {
@@ -117,7 +101,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('should throw error if workspaces field is missing', async () => {
+    it('should return empty packages array if workspaces is undefined', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/standalone',
@@ -125,9 +109,14 @@ describe('monorepo utilities', () => {
         workspaces: undefined,
       }
 
-      await expect(resolveMonorepoPackagesAsync(context))
-        .rejects
-        .toThrow(WorkspaceError.get('noWorkspaces'))
+      mockGlob.mockReturnValue(createAsyncIterator())
+
+      const result = await resolveMonorepoPackagesAsync(context)
+
+      expect(result).toHaveLength(0)
+      expect(mockGlob).toHaveBeenCalledWith([], expect.objectContaining({
+        exclude: ['node_modules/**'],
+      }))
 
     })
 
