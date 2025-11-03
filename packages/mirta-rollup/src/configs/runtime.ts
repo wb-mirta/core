@@ -12,7 +12,7 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 
-import { getMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/monorepo'
+import { resolveMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/context/monorepo'
 import { getEntryPath } from '#utils/entry-path'
 
 const mode = process.env.NODE_ENV ?? 'development'
@@ -59,7 +59,7 @@ export async function defineRuntimeConfig(
 
   } = options
 
-  const monorepoContext = await getMonorepoContextAsync(cwd)
+  const monorepoContext = await resolveMonorepoContextAsync(cwd)
 
   const defaultPlugins = [
 
@@ -137,7 +137,7 @@ export async function defineRuntimeConfig(
         let chunkName = chunkInfo.name
 
         // Адаптация путей при сборке в монорепозитории.
-        if (monorepoContext) {
+        if (monorepoContext.packages.length !== 0) {
 
           const { rootDir } = monorepoContext
 

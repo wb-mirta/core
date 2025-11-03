@@ -1,10 +1,10 @@
 import nodePath from 'node:path'
 import { glob } from 'node:fs/promises'
+import { parsePackageJson } from '#utils/package'
+import { WorkspaceError } from '#utils/errors'
+import { toPosix } from '#utils/path'
 
-import { parsePackageJson } from './package'
-import { WorkspaceError } from './errors'
-import { resolveWorkspaceContextAsync, type WorkspaceContext } from './workspace'
-import { toPosix } from './path'
+import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace'
 
 /**
  * Контекст монорепозитория, содержащий корневую директорию и список пакетов.
@@ -21,6 +21,12 @@ export interface MonorepoContext {
    *
    **/
   readonly rootDir: string
+
+  /**
+   * Определённый пакетный менеджер, используемый в проекте.
+   *
+   **/
+  readonly manager: PackageManager
 
   /**
    * Список всех пакетов, объявленных в рабочих пространствах.
@@ -85,77 +91,71 @@ export function __resetInternalState() {
 }
 
 /**
- * Получает полный контекст монорепозитория.
+ * Асинхронно разрешает контекст монорепозитория.
  *
- * Включает корневую директорию и все найденные пакеты.
- * Если проект не является монорепозиторием — возвращает `undefined`.
+ * Находит корень проекта, пакетный менеджер и все пакеты, объявленные в `workspaces`.
  *
- * @param cwd - Текущая рабочая директория, с которой начинается поиск.
- * @returns Объект {@link MonorepoContext} или `undefined`, если монорепа не найдена.
+ * @param cwd - Рабочая директория, с которой начинается поиск.
+ * @returns Объект {@link MonorepoContext} с информацией о монорепе.
+ * @throws {WorkspaceError} Если корень не найден или поле `workspaces` отсутствует.
+ * @throws {FileError} Если `package.json` недоступен или содержит невалидный JSON.
  *
  * @remarks
- * Использует {@link resolveWorkspaceContextAsync} для определения корня
- * и {@link tryGetMonorepoPackagesAsync} для получения списка пакетов.
+ * - Требуется наличие lock-файла и поля `workspaces` в корневом `package.json`.
+ * - Все пути возвращаются в POSIX-формате.
  *
- * @since 0.3.5
+ * @since 0.4.0
  *
  **/
-export async function getMonorepoContextAsync(
+export async function resolveMonorepoContextAsync(
   cwd: string
-): Promise<MonorepoContext | undefined> {
+): Promise<MonorepoContext> {
 
   const context = await resolveWorkspaceContextAsync(cwd)
 
-  if (!context)
-    return undefined
-
-  const packages = await tryGetMonorepoPackagesAsync(context)
-
-  if (!packages)
-    return undefined
+  const packages = await resolveMonorepoPackagesAsync(context)
 
   return {
     rootDir: context.rootDir,
+    manager: context.manager,
     packages,
   }
 
 }
 
 /**
- * Возвращает список всех пакетов, объявленных в рабочих пространствах.
+ * Асинхронно разрешает список пакетов монорепы.
  *
- * Результат кэшируется по корневой директории для производительности.
- * Если `workspaces` не объявлено в `package.json`, возвращает `undefined`.
+ * Находит все `package.json` в директориях, указанных в `workspaces`.
  *
- * @param context - Контекст рабочей области, содержащий корень и `workspaces`.
- * @returns Массив пакетов или `undefined`, если это не монорепозиторий.
+ * @param context - Контекст workspace.
+ * @returns Массив пакетов, отсортированный по длине пути (от самых вложенных).
+ * @throws {WorkspaceError} Если `workspaces` не объявлен или пакет не имеет имени.
  *
  * @remarks
- * Для каждого паттерна из `workspaces` ищутся файлы `package.json`.
- * Каждый найденный пакет добавляется в результат с именем и путём.
- * Результат сортируется по убыванию длины пути — это важно для корректного
- * сопоставления вложенных пакетов (например, `packages/a/b` до `packages/a`).
+ * - Результат кэшируется по `rootDir` для производительности.
+ * - Сортировка нужна, чтобы при сопоставлении по пути сначала проверялись более специфичные пакеты.
  *
  * @since 0.4.0
  *
  **/
-export async function tryGetMonorepoPackagesAsync(
+export async function resolveMonorepoPackagesAsync(
 
   context: WorkspaceContext
 
-): Promise<readonly PackageDefinition[] | undefined> {
+): Promise<readonly PackageDefinition[]> {
 
   const { rootDir, workspaces } = context
+
+  // Если workspaces не объявлен — это НЕ монорепозиторий.
+  if (!workspaces)
+    throw WorkspaceError.get('noWorkspaces')
 
   const cachedPackages = packagesCache.get(rootDir)
 
   // 1. Проверяем кэш
   if (cachedPackages !== undefined)
     return cachedPackages
-
-  // Если workspaces не объявлен — это НЕ монорепозиторий.
-  if (!workspaces)
-    return undefined
 
   const pkgPatterns = workspaces.map(w => `${w}/package.json`)
 
@@ -179,12 +179,22 @@ export async function tryGetMonorepoPackagesAsync(
 
   }
 
-  // Сортируем по убыванию длины пути, чтобы сначала проверялись
-  // более вложенные пакеты (например, packages/heat/thermostat перед packages/heat)
+  // Сортируем по убыванию длины пути, чтобы сначала шли более вложенные пакеты
+  // (например, packages/heat/thermostat перед packages/heat).
   //
+  // При равной длине — по лексикографическому порядку, чтобы порядок был детерминирован.
   // Это необходимо для корректной идентификации пакета по chunkName.
   //
-  packages.sort((a, b) => b.workspacePath.length - a.workspacePath.length)
+  packages.sort((a, b) => {
+
+    const lengthDiff = b.workspacePath.length - a.workspacePath.length
+
+    if (lengthDiff !== 0)
+      return lengthDiff
+
+    return a.workspacePath.localeCompare(b.workspacePath) // Лексикографически
+
+  })
 
   const frozenPackages = Object.freeze(packages)
 
@@ -218,11 +228,8 @@ export function findMonorepoPackageByChunkName(
 
   for (const pkg of context.packages) {
 
-    if (chunkName.startsWith(pkg.workspacePath)) {
-
+    if (chunkName.startsWith(pkg.workspacePath))
       return pkg
-
-    }
 
   }
 

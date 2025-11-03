@@ -30,6 +30,10 @@
       "types": "./dist/config-package.d.mts",
       "default": "./dist/config-package.mjs"
     },
+    "./context": {
+      "types": "./dist/utils/context/index.d.mts",
+      "default": "./dist/utils/context/index.mjs"
+    },
     "./env-loader": {
       "types": "./dist/utils/env-loader.d.mts",
       "default": "./dist/utils/env-loader.mjs"
