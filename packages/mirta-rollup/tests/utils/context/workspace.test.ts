@@ -102,6 +102,18 @@ describe('workspace utilities', () => {
 
     })
 
+    it('should handle missing workspaces field', async () => {
+
+      const workspaceRoot = '/standalone'
+      mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+      mockParsePackageJson.mockReturnValue({ name: 'standalone' }) // без workspaces
+
+      const result = await resolveWorkspaceContextAsync(workspaceRoot)
+      expect(result.manager).toBe('pnpm')
+      expect(result.workspaces).toBeUndefined()
+
+    })
+
     it('should throw error for bad workspaces format (object)', async () => {
 
       const workspaceRoot = '/bad/config'

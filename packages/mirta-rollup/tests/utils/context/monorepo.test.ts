@@ -149,6 +149,36 @@ describe('monorepo utilities', () => {
 
     })
 
+    it('should sort packages lexicographically when paths have equal length', async () => {
+
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'pnpm',
+        workspaces: ['packages/*'],
+      }
+
+      mockGlob.mockReturnValue(
+        createAsyncIterator(
+          'packages/zebra/package.json',
+          'packages/alpha/package.json',
+          'packages/gamma/package.json'
+        )
+      )
+
+      mockParsePackageJson
+        .mockReturnValueOnce({ name: 'zebra' })
+        .mockReturnValueOnce({ name: 'alpha' })
+        .mockReturnValueOnce({ name: 'gamma' })
+
+      const result = await resolveMonorepoPackagesAsync(context)
+
+      // Одинаковая длина → лексикографический порядок
+      expect(result[0].workspacePath).toBe('packages/alpha')
+      expect(result[1].workspacePath).toBe('packages/gamma')
+      expect(result[2].workspacePath).toBe('packages/zebra')
+
+    })
+
     it('should throw error if package name is missing', async () => {
 
       const context: WorkspaceContext = {
