@@ -1,8 +1,8 @@
 import nodePath from 'node:path'
 import { findUp } from 'find-up'
-import { parsePackageJson } from './package'
-import { WorkspaceError } from './errors'
-import { toPosix } from './path'
+import { parsePackageJson } from '#utils/package'
+import { WorkspaceError } from '#utils/errors'
+import { toPosix } from '#utils/path'
 
 /**
  * Тип пакетного менеджера.
@@ -50,14 +50,14 @@ export interface WorkspaceContext {
  * @since 0.4.0
  *
  **/
-const lockFileMappings: Record<string, PackageManager> = {
+const lockFileMappings = {
 
   'pnpm-lock.yaml': 'pnpm',
   'yarn.lock': 'yarn',
   'bun.lock': 'bun',
   'package-lock.json': 'npm',
 
-} as const
+} as const satisfies Record<string, PackageManager>
 
 /**
  * Проверяет, что поле `workspaces` в `package.json` имеет корректный формат.
@@ -79,32 +79,29 @@ function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asse
   if (Array.isArray(workspaces) && workspaces.every(item => typeof item === 'string'))
     return
 
-  throw WorkspaceError.get('invalidWorkspaces', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
+  throw WorkspaceError.get('badWorkspacesFormat', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
 
 }
 
 /**
  * Асинхронно определяет контекст рабочей области (workspace), начиная с заданной директории.
  *
- * Поиск выполняется через обнаружение lock-файла (`package-lock.json`, `yarn.lock` и др.).
+ * Находит корень проекта по наличию lock-файла (pnpm/yarn/npm/bun), читает `package.json`
+ * и извлекает информацию о пакетном менеджере и рабочих пространствах.
  *
- * На его основе определяются:
- * - Корневая директория;
- * - Пакетный менеджер;
- * - Список рабочих пространств из `package.json`.
- *
- * @param cwd - Текущая рабочая директория, с которой начинается поиск.
- * @returns Объект {@link WorkspaceContext} или `undefined`, если workspace не найден.
+ * @param cwd - Рабочая директория, с которой начинается поиск.
+ * @returns Объект {@link WorkspaceContext} с корнем, менеджером и полем `workspaces` (если есть).
+ * @throws {WorkspaceError} Если lock-файл не найден или `workspaces` имеет недопустимый формат.
+ * @throws {FileError} Если `package.json` отсутствует, недоступен или содержит невалидный JSON.
  *
  * @remarks
- * Функция требует наличия `package.json` в корневой директории для чтения поля `workspaces`.
- * Если `package.json` отсутствует или повреждён — выбрасывается {@link FileError}.
- * Если `workspaces` имеет недопустимый формат — выбрасывается {@link WorkspaceError}.
+ * - Поле `workspaces` может отсутствовать — это не ошибка.
+ * - Все пути возвращаются в POSIX-формате.
  *
  * @since 0.4.0
  *
  **/
-export async function resolveWorkspaceContextAsync(cwd: string): Promise<WorkspaceContext | undefined> {
+export async function resolveWorkspaceContextAsync(cwd: string): Promise<WorkspaceContext> {
 
   const lockFiles = Object.keys(lockFileMappings)
 
@@ -113,15 +110,16 @@ export async function resolveWorkspaceContextAsync(cwd: string): Promise<Workspa
   )
 
   if (!lockFilePath)
-    return
+    throw WorkspaceError.get('noLockfile')
 
-  const fileName = nodePath.basename(lockFilePath)
   const rootDir = nodePath.dirname(lockFilePath)
 
   const pkgPath = `${rootDir}/package.json`
   const pkg = parsePackageJson(pkgPath)
 
   assertWorkspacesFieldFormat(pkg.workspaces, pkgPath)
+
+  const fileName = nodePath.basename(lockFilePath) as keyof typeof lockFileMappings
 
   return {
     rootDir,

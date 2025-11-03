@@ -30,14 +30,22 @@ export class WorkspaceError extends Error {
 
   private static readonly codeMappings = {
 
+    /**
+     * Ошибка, возникающая, когда не найден ни один из lock-файлов пакетных менеджеров
+     * (pnpm-lock.yaml, yarn.lock, package-lock.json, bun.lockb) в текущей или родительских директориях.
+     *
+     **/
+    noLockfile: () =>
+      'No lockfile (pnpm/yarn/bun/npm) found. Required to detect workspace root',
+
     noPackageName: (packagePath: string) =>
       `Package with path "${packagePath}" missing required 'name' field in package.json`,
 
     noWorkspaces: () =>
       'No workspaces configured in root package.json',
 
-    invalidWorkspaces: (pkgPath: string) =>
-      `Invalid workspaces in "${pkgPath}": must be array of strings.`,
+    badWorkspacesFormat: (pkgPath: string) =>
+      `Bad workspaces format in "${pkgPath}": it must be array of strings`,
 
   } as const
 
