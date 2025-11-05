@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => ({
     // однако тесты должны выполняться до сборки.
     //
     // Здесь осуществляется перенаправление на src/index.ts
-    alias: packages.reduce((items, nextItem) => {
+    alias: packages.reduce<Record<string, string>>((items, nextItem) => {
 
       items[nextItem.name] = nodePath.join(cwd, nextItem.workspacePath, 'src', 'index.ts')
 

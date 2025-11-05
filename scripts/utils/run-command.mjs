@@ -37,6 +37,7 @@ export function runCommand(command, args, options = {}) {
 
       if (options.signal.aborted) {
 
+        child.kill('SIGTERM')
         reject(new Error('Operation aborted'))
         return
 
