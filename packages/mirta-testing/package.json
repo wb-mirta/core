@@ -21,10 +21,11 @@
         "default": "./dist/index.mjs"
       }
     },
+    "./config": {
+      "import": "./dist/config/index.mjs"
+    },
     "./setup-global": {
-      "import": {
-        "default": "./dist/setup/global.mjs"
-      }
+      "import": "./dist/setup/global.mjs"
     }
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-testing#readme",
