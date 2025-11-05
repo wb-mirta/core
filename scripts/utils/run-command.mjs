@@ -1,24 +1,29 @@
 import { spawn } from 'node:child_process'
 
 /**
- * Запускает указанную команду в дочернем процессе и возвращает объект с ссылкой на процесс и промисом результата.
+ * Запускает команду в дочернем процессе с поддержкой таймаута, отмены и обработки ошибок.
  *
- * Поддерживает:
- * - таймаут выполнения,
- * - отмену через AbortSignal,
- * - обработку ошибок.
- *
- * @param {string} command - Имя команды (например, 'npm', 'git').
+ * @param {string} command - Имя команды (например, 'git', 'npm').
  * @param {string[]} args - Аргументы команды.
- * @param {Object} options - Опции выполнения.
+ * @param {Object} [options] - Опции выполнения.
  * @param {string} [options.cwd] - Рабочая директория.
- * @param {Object} [options.env] - Переменные окружения.
+ * @param {Object} [options.env] - Переменные окружения. По умолчанию — process.env.
  * @param {number} [options.timeout] - Таймаут в миллисекундах.
- * @param {AbortSignal} [options.signal] - Сигнал отмены.
- * @param {'inherit'|'pipe'|'ignore'} [options.stdio='pipe'] - Потоки ввода/вывода.
- * @param {boolean} [options.shell=false] - Запуск через оболочку.
+ * @param {AbortSignal} [options.signal] - Сигнал для отмены выполнения.
+ * @param {'inherit'|'pipe'|'ignore'} [options.stdio='pipe'] - Поведение потоков ввода/вывода.
+ * @param {boolean} [options.shell=false] - Запускать ли команду через оболочку.
  * @returns {{ child: import('child_process').ChildProcess, result: Promise<void> }}
- */
+ *          Объект с процессом и промисом результата.
+ *
+ * @example
+ * ```ts
+ * const { result } = runCommand('ls', ['-l'], { cwd: '/project' });
+ * await result; // выбросит ошибку при ненулевом коде возврата
+ *
+ * ```
+ * @since 0.4.0
+ *
+ **/
 export function runCommand(command, args, options = {}) {
 
   const child = spawn(command, args, {
@@ -31,32 +36,58 @@ export function runCommand(command, args, options = {}) {
   const result = new Promise((resolve, reject) => {
 
     let timeoutId
+    let abortHandler
+
+    const cleanup = () => {
+
+      if (timeoutId != null) {
+
+        clearTimeout(timeoutId)
+        timeoutId = undefined
+
+      }
+
+      if (!abortHandler || !options.signal)
+        return
+
+      options.signal.removeEventListener('abort', abortHandler)
+      abortHandler = undefined
+
+    }
 
     // Обработка сигнала отмены
     if (options.signal) {
 
+      // Проверка немедленной отмены
       if (options.signal.aborted) {
 
+        cleanup()
         child.kill('SIGTERM')
+
         reject(new Error('Operation aborted'))
         return
 
       }
 
-      options.signal.addEventListener('abort', () => {
+      abortHandler = () => {
+
+        cleanup()
 
         child.kill('SIGTERM')
         reject(new Error('Operation aborted'))
 
-      })
+      }
+
+      options.signal.addEventListener('abort', abortHandler, { once: true })
 
     }
 
-    // Таймаут
+    // Установка таймаута
     if (options.timeout) {
 
       timeoutId = setTimeout(() => {
 
+        cleanup()
         child.kill('SIGTERM')
         reject(new Error(`Process timed out after ${options.timeout}ms`))
 
@@ -64,10 +95,10 @@ export function runCommand(command, args, options = {}) {
 
     }
 
-    // Ошибки запуска
+    // Ошибка запуска процесса
     child.on('error', (err) => {
 
-      clearTimeout(timeoutId)
+      cleanup()
       reject(err)
 
     })
@@ -75,7 +106,8 @@ export function runCommand(command, args, options = {}) {
     // Завершение процесса
     child.on('close', (code, signal) => {
 
-      clearTimeout(timeoutId)
+      cleanup()
+
       if (code === 0) {
 
         resolve()
