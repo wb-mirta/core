@@ -23,6 +23,9 @@ importers:
       '@mirta/rollup':
         specifier: workspace:*
         version: link:packages/mirta-rollup
+      '@mirta/testing':
+        specifier: workspace:*
+        version: link:packages/mirta-testing
       '@mirta/tsconfig':
         specifier: workspace:*
         version: link:packages/mirta-tsconfig

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run --config @mirta/testing/config"
   },
   "devDependencies": {
     "@mirta/testing": "0.3.5",
