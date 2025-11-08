@@ -3,49 +3,154 @@ import { PackageError } from '#src/errors/package-error'
 
 describe('resolvePackagePath', () => {
 
-  describe('valid paths — returns package.json path', () => {
+  describe('valid paths returning package.json path', () => {
 
-    it('should return path as is if ends with package.json', () => {
+    describe('paths already ending with package.json', () => {
 
-      expect(resolvePackagePath('package.json')).toBe('package.json')
-      expect(resolvePackagePath('packages/core/package.json')).toBe('packages/core/package.json')
+      it('should return path as-is when it ends with package.json', () => {
+
+        expect(resolvePackagePath('package.json')).toBe('package.json')
+
+      })
+
+      it('should return nested path as-is when it ends with package.json', () => {
+
+        expect(resolvePackagePath('packages/core/package.json'))
+          .toBe('packages/core/package.json')
+
+      })
+
+      it('should handle deeply nested paths', () => {
+
+        expect(resolvePackagePath('apps/web/src/utils/package.json'))
+          .toBe('apps/web/src/utils/package.json')
+
+      })
 
     })
 
-    it('should append package.json to directory path', () => {
+    describe('directory paths', () => {
 
-      expect(resolvePackagePath('.')).toBe('package.json')
-      expect(resolvePackagePath('./')).toBe('package.json')
-      expect(resolvePackagePath('.\\')).toBe('package.json')
+      it('should append package.json to current directory (.)', () => {
 
-      expect(resolvePackagePath('packages/core')).toBe('packages/core/package.json')
+        expect(resolvePackagePath('.')).toBe('package.json')
 
-      expect(resolvePackagePath('..')).toBe('../package.json')
-      expect(resolvePackagePath('../../shared')).toBe('../../shared/package.json')
+      })
+
+      it('should append package.json to current directory with trailing slash', () => {
+
+        expect(resolvePackagePath('./')).toBe('package.json')
+
+      })
+
+      it('should handle Windows-style current directory path', () => {
+
+        expect(resolvePackagePath('.\\')).toBe('package.json')
+
+      })
+
+      it('should append package.json to subdirectory path', () => {
+
+        expect(resolvePackagePath('packages/core')).toBe('packages/core/package.json')
+
+      })
+
+      it('should handle parent directory (..)', () => {
+
+        expect(resolvePackagePath('..')).toBe('../package.json')
+
+      })
+
+      it('should handle multiple parent directories', () => {
+
+        expect(resolvePackagePath('../../shared')).toBe('../../shared/package.json')
+
+      })
+
+      it('should handle directory path with trailing slash', () => {
+
+        expect(resolvePackagePath('packages/core/')).toBe('packages/core/package.json')
+
+      })
 
     })
 
   })
 
-  describe('invalid paths — throws PackageError with code invalidPath', () => {
+  describe('invalid paths throwing PackageError with code invalidPath', () => {
 
-    it('should throw for file with extension (not package.json)', () => {
+    describe('files with extensions (not package.json)', () => {
 
-      expect(() => resolvePackagePath('src/index.ts'))
-        .toThrow(PackageError.get('invalidPath', 'src/index.ts'))
+      it('should throw for TypeScript file', () => {
 
-      expect(() => resolvePackagePath('lib/utils.js'))
-        .toThrow(PackageError.get('invalidPath', 'lib/utils.js'))
+        expect(() => resolvePackagePath('src/index.ts'))
+          .toThrow(PackageError.get('invalidPath', 'src/index.ts'))
 
-      expect(() => resolvePackagePath('config.json'))
-        .toThrow(PackageError.get('invalidPath', 'config.json'))
+      })
+
+      it('should throw for JavaScript file', () => {
+
+        expect(() => resolvePackagePath('lib/utils.js'))
+          .toThrow(PackageError.get('invalidPath', 'lib/utils.js'))
+
+      })
+
+      it('should throw for JSON file (not package.json)', () => {
+
+        expect(() => resolvePackagePath('config.json'))
+          .toThrow(PackageError.get('invalidPath', 'config.json'))
+
+      })
+
+      it('should throw for markdown file', () => {
+
+        expect(() => resolvePackagePath('README.md'))
+          .toThrow(PackageError.get('invalidPath', 'README.md'))
+
+      })
+
+      it('should throw for text file', () => {
+
+        expect(() => resolvePackagePath('LICENSE.txt'))
+          .toThrow(PackageError.get('invalidPath', 'LICENSE.txt'))
+
+      })
 
     })
 
-    it('should throw for file in parent dir', () => {
+    describe('files in parent directories', () => {
 
-      expect(() => resolvePackagePath('../app/main.ts'))
-        .toThrow(PackageError.get('invalidPath', '../app/main.ts'))
+      it('should throw for file in parent directory', () => {
+
+        expect(() => resolvePackagePath('../app/main.ts'))
+          .toThrow(PackageError.get('invalidPath', '../app/main.ts'))
+
+      })
+
+      it('should throw for nested file in parent directory', () => {
+
+        expect(() => resolvePackagePath('../../src/utils/helper.js'))
+          .toThrow(PackageError.get('invalidPath', '../../src/utils/helper.js'))
+
+      })
+
+    })
+
+    describe('edge cases', () => {
+
+      it('should throw for file with multiple extensions', () => {
+
+        expect(() => resolvePackagePath('archive.tar.gz'))
+          .toThrow(PackageError.get('invalidPath', 'archive.tar.gz'))
+
+      })
+
+      it('should throw for hidden file', () => {
+
+        expect(() => resolvePackagePath('.gitignore'))
+          .toThrow(PackageError.get('invalidPath', '.gitignore'))
+
+      })
 
     })
 

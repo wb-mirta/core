@@ -10,10 +10,10 @@ vi.mock('@mirta/package', async () => {
 
   const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
 
-  return ({
+  return {
     ...actual,
     readPackageAsync: vi.fn(),
-  })
+  }
 
 })
 
@@ -21,9 +21,7 @@ const mockFindUp = vi.mocked(findUp)
 const { readPackageAsync } = await import('@mirta/package')
 const mockReadPackageAsync = vi.mocked(readPackageAsync)
 
-const {
-  resolveWorkspaceContextAsync,
-} = await import('#context/workspace')
+const { resolveWorkspaceContextAsync } = await import('#context/workspace')
 
 describe('workspace utilities', () => {
 
@@ -35,134 +33,254 @@ describe('workspace utilities', () => {
 
   describe('resolveWorkspaceContextAsync', () => {
 
-    it('should detect pnpm workspace', async () => {
+    describe('package manager detection', () => {
 
-      const workspaceRoot = '/home/user/monorepo'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'root',
-        workspaces: ['packages/*'],
+      it('should detect pnpm workspace from lockfile', async () => {
+
+        const workspaceRoot = '/home/user/monorepo'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'root',
+          workspaces: ['packages/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(`${workspaceRoot}/packages/app`)
+
+        expect(result).toEqual({
+          rootDir: workspaceRoot,
+          manager: 'pnpm',
+          workspaces: ['packages/*'],
+        })
+        expect(mockReadPackageAsync).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
+
       })
 
-      const result = await resolveWorkspaceContextAsync(`${workspaceRoot}/packages/app`)
+      it('should detect yarn workspace from lockfile', async () => {
 
-      expect(result).toEqual({
-        rootDir: workspaceRoot,
-        manager: 'pnpm',
-        workspaces: ['packages/*'],
+        const workspaceRoot = '/home/user/monorepo'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'root',
+          workspaces: ['apps/*', 'libs/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.manager).toBe('yarn')
+        expect(result.workspaces).toEqual(['apps/*', 'libs/*'])
+
       })
-      expect(mockReadPackageAsync).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
+
+      it('should detect npm workspace from lockfile', async () => {
+
+        const workspaceRoot = '/projects/app'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/package-lock.json`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'app',
+          workspaces: ['modules/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.manager).toBe('npm')
+        expect(result.rootDir).toBe(workspaceRoot)
+
+      })
+
+      it('should detect bun workspace from lockfile', async () => {
+
+        const workspaceRoot = '/dev/project'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/bun.lock`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'project',
+          workspaces: ['src/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.manager).toBe('bun')
+
+      })
 
     })
 
-    it('should detect yarn workspace', async () => {
+    describe('workspaces field handling', () => {
 
-      const workspaceRoot = '/home/user/monorepo'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'root',
-        workspaces: ['apps/*', 'libs/*'],
+      it('should handle missing workspaces field gracefully', async () => {
+
+        const workspaceRoot = '/standalone'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({ name: 'standalone' })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.manager).toBe('pnpm')
+        expect(result.workspaces).toBeUndefined()
+
       })
 
-      const result = await resolveWorkspaceContextAsync(workspaceRoot)
-      expect(result.manager).toBe('yarn')
-      expect(result.workspaces).toEqual(['apps/*', 'libs/*'])
+      it('should handle multiple workspace patterns', async () => {
 
-    })
+        const workspaceRoot = '/complex'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'complex',
+          workspaces: ['packages/*', 'apps/*', 'tools/*'],
+        })
 
-    it('should detect npm workspace', async () => {
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
 
-      const workspaceRoot = '/projects/app'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/package-lock.json`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'app',
-        workspaces: ['modules/*'],
+        expect(result.workspaces).toHaveLength(3)
+        expect(result.workspaces).toContain('packages/*')
+        expect(result.workspaces).toContain('apps/*')
+        expect(result.workspaces).toContain('tools/*')
+
       })
 
-      const result = await resolveWorkspaceContextAsync(workspaceRoot)
-      expect(result.manager).toBe('npm')
-      expect(result.rootDir).toBe(workspaceRoot)
+      it('should handle empty workspaces array', async () => {
 
-    })
+        const workspaceRoot = '/empty'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'empty',
+          workspaces: [],
+        })
 
-    it('should detect bun workspace', async () => {
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
 
-      const workspaceRoot = '/dev/project'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/bun.lock`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'project',
-        workspaces: ['src/*'],
+        expect(result.workspaces).toEqual([])
+
       })
 
-      const result = await resolveWorkspaceContextAsync(workspaceRoot)
-      expect(result.manager).toBe('bun')
-
     })
 
-    it('should throw error if no lockfile found', async () => {
+    describe('error handling', () => {
 
-      mockFindUp.mockResolvedValue(undefined)
+      it('should throw error when no lockfile is found', async () => {
 
-      await expect(resolveWorkspaceContextAsync('/some/path'))
-        .rejects
-        .toThrow(WorkspaceError.get('noLockfile'))
+        mockFindUp.mockResolvedValue(undefined)
 
-    })
+        await expect(resolveWorkspaceContextAsync('/some/path'))
+          .rejects
+          .toThrow(WorkspaceError.get('noLockfile'))
 
-    it('should handle missing workspaces field', async () => {
-
-      const workspaceRoot = '/standalone'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackageAsync.mockResolvedValue({ name: 'standalone' }) // без workspaces
-
-      const result = await resolveWorkspaceContextAsync(workspaceRoot)
-      expect(result.manager).toBe('pnpm')
-      expect(result.workspaces).toBeUndefined()
-
-    })
-
-    it('should throw error for invalid workspaces format (object)', async () => {
-
-      const workspaceRoot = '/bad/config'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'bad',
-        workspaces: { packages: ['apps/*'] } as unknown as string[],
       })
 
-      await expect(resolveWorkspaceContextAsync(workspaceRoot))
-        .rejects
-        .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
+      it('should throw error for invalid workspaces format (object)', async () => {
+
+        const workspaceRoot = '/bad/config'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'bad',
+          workspaces: { packages: ['apps/*'] } as unknown as string[],
+        })
+
+        await expect(resolveWorkspaceContextAsync(workspaceRoot))
+          .rejects
+          .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
+
+      })
+
+      it('should throw error for workspaces array with non-string values', async () => {
+
+        const workspaceRoot = '/bad/config'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'bad',
+          workspaces: ['valid', 123, null] as unknown as string[],
+        })
+
+        await expect(resolveWorkspaceContextAsync(workspaceRoot))
+          .rejects
+          .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
+
+      })
+
+      it('should throw error for workspaces array with mixed types', async () => {
+
+        const workspaceRoot = '/mixed'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'mixed',
+          workspaces: ['packages/*', false, undefined] as unknown as string[],
+        })
+
+        await expect(resolveWorkspaceContextAsync(workspaceRoot))
+          .rejects
+          .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
+
+      })
 
     })
 
-    it('should throw error for invalid workspaces format (non-string array)', async () => {
+    describe('path normalization', () => {
 
-      const workspaceRoot = '/bad/config'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'bad',
-        workspaces: ['valid', 123, null] as unknown as string[],
+      it('should normalize Windows paths to POSIX format', async () => {
+
+        const workspaceRoot = 'C:\\Users\\repos\\project'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}\\pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'win-project',
+          workspaces: ['packages/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.rootDir).toBe(toPosix(workspaceRoot))
+        expect(result.manager).toBe('pnpm')
+
       })
 
-      await expect(resolveWorkspaceContextAsync(workspaceRoot))
-        .rejects
-        .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
+      it('should handle mixed path separators', async () => {
+
+        const workspaceRoot = 'D:/dev\\projects\\app'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'mixed-paths',
+          workspaces: ['libs/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.rootDir).toBe(toPosix(workspaceRoot))
+
+      })
 
     })
 
-    it('should normalize Windows paths correctly', async () => {
+    describe('real-world scenarios', () => {
 
-      const workspaceRoot = 'C:\\Users\\repos\\project'
-      mockFindUp.mockResolvedValue(`${workspaceRoot}\\pnpm-lock.yaml`)
-      mockReadPackageAsync.mockResolvedValue({
-        name: 'win-project',
-        workspaces: ['packages/*'],
+      it('should resolve context from deeply nested package', async () => {
+
+        const workspaceRoot = '/home/user/mono'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'mono',
+          workspaces: ['packages/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(
+          `${workspaceRoot}/packages/nested/deep/pkg`
+        )
+
+        expect(result.rootDir).toBe(workspaceRoot)
+
       })
 
-      const result = await resolveWorkspaceContextAsync(workspaceRoot)
-      expect(result.rootDir).toBe(toPosix(workspaceRoot))
-      expect(result.manager).toBe('pnpm')
+      it('should handle workspace root as current directory', async () => {
+
+        const workspaceRoot = '/workspace'
+        mockFindUp.mockResolvedValue(`${workspaceRoot}/bun.lock`)
+        mockReadPackageAsync.mockResolvedValue({
+          name: 'current',
+          workspaces: ['src/*'],
+        })
+
+        const result = await resolveWorkspaceContextAsync(workspaceRoot)
+
+        expect(result.rootDir).toBe(workspaceRoot)
+
+      })
 
     })
 

@@ -21,11 +21,8 @@ function handleError(e: unknown, path: string) {
   if (e instanceof PackageError)
     return e
 
-  if (e instanceof SyntaxError) {
-
+  if (e instanceof SyntaxError)
     return PackageError.get('invalidJson', path, e.message)
-
-  }
 
   if (e && typeof e === 'object' && 'code' in e) {
 
@@ -40,8 +37,11 @@ function handleError(e: unknown, path: string) {
 
   }
 
-  const msg = e instanceof Error ? e.message : String(e)
-  return PackageError.get('failedToRead', path, msg)
+  const message = e instanceof Error
+    ? e.message
+    : String(e)
+
+  return PackageError.get('failedToRead', path, message)
 
 }
 
@@ -76,14 +76,14 @@ export function readPackage(path: string) {
 
     content = readFileSync(resolvedPath, 'utf-8')
 
+    return parsePackageJson(content)
+
   }
   catch (e: unknown) {
 
     throw handleError(e, resolvedPath)
 
   }
-
-  return parsePackageJson(content)
 
 }
 

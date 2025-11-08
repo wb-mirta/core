@@ -1,10 +1,11 @@
 import { parsePackageJson } from '#src/parse-package-json'
+import { PackageError } from '#src/errors/package-error'
 
 describe('parsePackageJson', () => {
 
-  describe('valid JSON', () => {
+  describe('valid JSON inputs', () => {
 
-    it('should parse a valid package.json object', () => {
+    it('should parse a complete package.json object with exports', () => {
 
       const json = `{
         "name": "test-package",
@@ -26,7 +27,7 @@ describe('parsePackageJson', () => {
 
     })
 
-    it('should parse minimal package.json', () => {
+    it('should parse minimal package.json with only name', () => {
 
       const json = `{"name": "minimal"}`
 
@@ -36,23 +37,47 @@ describe('parsePackageJson', () => {
 
     })
 
+    it('should parse package.json with workspaces array', () => {
+
+      const json = `{
+        "name": "monorepo",
+        "workspaces": ["packages/*", "apps/*"]
+      }`
+
+      const result = parsePackageJson(json)
+
+      expect(result).toEqual({
+        name: 'monorepo',
+        workspaces: ['packages/*', 'apps/*'],
+      })
+
+    })
+
+    it('should handle empty object', () => {
+
+      const json = '{}'
+
+      const result = parsePackageJson(json)
+
+      expect(result).toEqual({})
+
+    })
+
   })
 
-  describe('invalid JSON', () => {
+  describe('malformed JSON syntax', () => {
 
-    it('should throw SyntaxError for malformed JSON', () => {
+    it('should throw SyntaxError for invalid property syntax', () => {
 
       const invalidJson = '{ name: invalid }'
 
-      expect(() => parsePackageJson(invalidJson))
-        .toThrow(SyntaxError)
+      expect(() => parsePackageJson(invalidJson)).toThrow(SyntaxError)
 
     })
 
     it('should throw SyntaxError for empty string', () => {
 
-      expect(() => parsePackageJson(''))
-        .toThrow(SyntaxError)
+      expect(() => parsePackageJson('')).toThrow(SyntaxError)
 
     })
 
@@ -63,33 +88,54 @@ describe('parsePackageJson', () => {
         "version": "1.0.0",
       }`
 
-      expect(() => parsePackageJson(json))
-        .toThrow(SyntaxError)
+      expect(() => parsePackageJson(json)).toThrow(SyntaxError)
+
+    })
+
+    it('should throw SyntaxError for unquoted keys', () => {
+
+      const json = `{name: "test"}`
+
+      expect(() => parsePackageJson(json)).toThrow(SyntaxError)
 
     })
 
   })
 
-  describe('invalid JSON', () => {
+  describe('invalid root type', () => {
 
-    it('should throw error for array as root', () => {
+    it('should throw PackageError when root is an array', () => {
 
       expect(() => parsePackageJson('[]'))
-        .toThrow()
+        .toThrow(PackageError.get('invalidJsonRoot'))
 
     })
 
-    it('should throw error for null as root', () => {
+    it('should throw PackageError when root is null', () => {
 
       expect(() => parsePackageJson('null'))
-        .toThrow()
+        .toThrow(PackageError.get('invalidJsonRoot'))
 
     })
 
-    it('should throw error for primitive as root', () => {
+    it('should throw PackageError when root is a string primitive', () => {
 
       expect(() => parsePackageJson('"string"'))
-        .toThrow()
+        .toThrow(PackageError.get('invalidJsonRoot'))
+
+    })
+
+    it('should throw PackageError when root is a number primitive', () => {
+
+      expect(() => parsePackageJson('42'))
+        .toThrow(PackageError.get('invalidJsonRoot'))
+
+    })
+
+    it('should throw PackageError when root is a boolean primitive', () => {
+
+      expect(() => parsePackageJson('true'))
+        .toThrow(PackageError.get('invalidJsonRoot'))
 
     })
 

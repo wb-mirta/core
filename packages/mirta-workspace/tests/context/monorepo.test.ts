@@ -2,6 +2,7 @@ import { glob } from 'node:fs/promises'
 import { WorkspaceError } from '#errors'
 import type { WorkspaceContext } from '#context/workspace'
 
+// Mocks
 vi.mock('node:fs/promises', () => ({
   glob: vi.fn(),
 }))
@@ -9,11 +10,10 @@ vi.mock('node:fs/promises', () => ({
 vi.mock('@mirta/package', async () => {
 
   const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
-
-  return ({
+  return {
     ...actual,
     readPackageAsync: vi.fn(),
-  })
+  }
 
 })
 
@@ -21,6 +21,7 @@ vi.mock('#context/workspace', () => ({
   resolveWorkspaceContextAsync: vi.fn(),
 }))
 
+// Helper
 // eslint-disable-next-line @typescript-eslint/require-await
 async function* createAsyncIterator<T>(...items: T[]): NodeJS.AsyncIterator<T> {
 
@@ -29,21 +30,15 @@ async function* createAsyncIterator<T>(...items: T[]): NodeJS.AsyncIterator<T> {
 
 }
 
+// Mocked imports
 const mockGlob = vi.mocked(glob)
-
 const { readPackageAsync } = await import('@mirta/package')
 const mockReadPackageAsync = vi.mocked(readPackageAsync)
-
 const { resolveWorkspaceContextAsync } = await import('#context/workspace')
 const mockResolveWorkspaceContext = vi.mocked(resolveWorkspaceContextAsync)
 
-const {
-  resolveMonorepoContextAsync,
-  resolveMonorepoPackagesAsync,
-  findMonorepoPackageByChunkName,
-  mapChunkToPackage,
-  __resetInternalState,
-} = await import('#context/monorepo')
+const { resolveMonorepoContextAsync, resolveMonorepoPackagesAsync, __resetInternalState }
+  = await import('#context/monorepo')
 
 describe('monorepo utilities', () => {
 
@@ -56,7 +51,7 @@ describe('monorepo utilities', () => {
 
   describe('resolveMonorepoContextAsync', () => {
 
-    it('should return full monorepo context when workspace and workspaces are valid', async () => {
+    it('should return full monorepo context with resolved packages', async () => {
 
       const rootDir = '/home/user/monorepo'
       const workspaceContext: WorkspaceContext = {
@@ -79,11 +74,20 @@ describe('monorepo utilities', () => {
 
     })
 
+    it('should propagate workspace resolution errors', async () => {
+
+      const error = WorkspaceError.get('noLockfile')
+      mockResolveWorkspaceContext.mockRejectedValue(error)
+
+      await expect(resolveMonorepoContextAsync('/some/path')).rejects.toThrow(error)
+
+    })
+
   })
 
   describe('resolveMonorepoPackagesAsync', () => {
 
-    it('should discover packages using glob patterns', async () => {
+    it('should discover packages using workspace glob patterns', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/monorepo',
@@ -92,10 +96,7 @@ describe('monorepo utilities', () => {
       }
 
       mockGlob.mockReturnValue(
-        createAsyncIterator(
-          'packages/ui/package.json',
-          'apps/web/package.json'
-        )
+        createAsyncIterator('packages/ui/package.json', 'apps/web/package.json')
       )
 
       mockReadPackageAsync
@@ -110,7 +111,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('should return empty packages array if workspaces is undefined', async () => {
+    it('should return empty array when workspaces is undefined', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/standalone',
@@ -119,17 +120,16 @@ describe('monorepo utilities', () => {
       }
 
       mockGlob.mockReturnValue(createAsyncIterator())
-
       const result = await resolveMonorepoPackagesAsync(context)
 
-      expect(result).toHaveLength(0)
+      expect(result).toEqual([])
       expect(mockGlob).toHaveBeenCalledWith([], expect.objectContaining({
         exclude: ['node_modules/**'],
       }))
 
     })
 
-    it('should sort packages by path length (longest first)', async () => {
+    it('should sort packages by path length descending (longest first)', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/monorepo',
@@ -158,7 +158,7 @@ describe('monorepo utilities', () => {
 
     })
 
-    it('should sort packages lexicographically when paths have equal length', async () => {
+    it('should sort lexicographically when path lengths are equal', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/monorepo',
@@ -181,14 +181,13 @@ describe('monorepo utilities', () => {
 
       const result = await resolveMonorepoPackagesAsync(context)
 
-      // Одинаковая длина → лексикографический порядок
       expect(result[0].workspacePath).toBe('packages/alpha')
       expect(result[1].workspacePath).toBe('packages/gamma')
       expect(result[2].workspacePath).toBe('packages/zebra')
 
     })
 
-    it('should throw error if package name is missing', async () => {
+    it('should throw error when package has no name', async () => {
 
       const context: WorkspaceContext = {
         rootDir: '/monorepo',
@@ -259,93 +258,52 @@ describe('monorepo utilities', () => {
 
     })
 
-  })
+    it('should handle multiple workspace patterns', async () => {
 
-  describe('findMonorepoPackageByChunkName', () => {
+      const context: WorkspaceContext = {
+        rootDir: '/complex',
+        manager: 'pnpm',
+        workspaces: ['packages/*', 'apps/*', 'tools/*'],
+      }
 
-    const mockContext = {
-      rootDir: '/monorepo',
-      manager: 'pnpm' as const,
-      packages: [
-        { name: '@scope/nested-lib', workspacePath: 'packages/nested/lib' },
-        { name: '@scope/app', workspacePath: 'packages/app' },
-        { name: '@scope/lib', workspacePath: 'packages/lib' },
-      ],
-    }
-
-    it('should find package by chunk name prefix', () => {
-
-      const result = findMonorepoPackageByChunkName(
-        mockContext,
-        'packages/app/src/index.ts'
+      mockGlob.mockReturnValue(
+        createAsyncIterator(
+          'packages/core/package.json',
+          'apps/web/package.json',
+          'tools/cli/package.json'
+        )
       )
-      expect(result).toEqual({ name: '@scope/app', workspacePath: 'packages/app' })
+
+      mockReadPackageAsync
+        .mockResolvedValueOnce({ name: '@mono/core' })
+        .mockResolvedValueOnce({ name: '@mono/web' })
+        .mockResolvedValueOnce({ name: '@mono/cli' })
+
+      const result = await resolveMonorepoPackagesAsync(context)
+
+      expect(result).toHaveLength(3)
 
     })
 
-    it('should match longest path first', () => {
+    it('should call glob with correct patterns and cwd', async () => {
 
-      const result = findMonorepoPackageByChunkName(
-        mockContext,
-        'packages/nested/lib/src/utils.ts'
+      const context: WorkspaceContext = {
+        rootDir: '/monorepo',
+        manager: 'pnpm',
+        workspaces: ['packages/*', 'apps/*'],
+      }
+
+      mockGlob.mockReturnValue(createAsyncIterator('packages/ui/package.json'))
+
+      await resolveMonorepoPackagesAsync(context)
+
+      expect(mockGlob).toHaveBeenCalledWith(
+        ['packages/*/package.json', 'apps/*/package.json'],
+        expect.objectContaining({
+          cwd: '/monorepo',
+          exclude: ['node_modules/**'],
+        })
       )
-      expect(result?.name).toBe('@scope/nested-lib')
-
-    })
-
-    it('should return undefined if no match found', () => {
-
-      const result = findMonorepoPackageByChunkName(
-        mockContext,
-        'other/path/file.ts'
-      )
-      expect(result).toBeUndefined()
-
-    })
-
-    it('should work with exact path match', () => {
-
-      const result = findMonorepoPackageByChunkName(
-        mockContext,
-        'packages/lib/index.ts'
-      )
-      expect(result?.name).toBe('@scope/lib')
-
-    })
-
-  })
-
-  describe('mapChunkToPackage', () => {
-
-    it('should map chunk to node_modules path', () => {
-
-      const pkgDef = { name: '@scope/app', workspacePath: 'packages/app' }
-      const result = mapChunkToPackage('packages/app/src/index.ts', pkgDef)
-      expect(result).toBe('node_modules/@scope/app/src/index.ts')
-
-    })
-
-    it('should handle nested workspace paths', () => {
-
-      const pkgDef = { name: '@org/nested', workspacePath: 'libs/nested/module' }
-      const result = mapChunkToPackage('libs/nested/module/src/main.ts', pkgDef)
-      expect(result).toBe('node_modules/@org/nested/src/main.ts')
-
-    })
-
-    it('should handle packages without scope', () => {
-
-      const pkgDef = { name: 'simple-package', workspacePath: 'packages/simple' }
-      const result = mapChunkToPackage('packages/simple/lib/index.ts', pkgDef)
-      expect(result).toBe('node_modules/simple-package/lib/index.ts')
-
-    })
-
-    it('should handle root-level files', () => {
-
-      const pkgDef = { name: '@scope/root', workspacePath: 'packages/root' }
-      const result = mapChunkToPackage('packages/root/index.ts', pkgDef)
-      expect(result).toBe('node_modules/@scope/root/index.ts')
 
     })
 

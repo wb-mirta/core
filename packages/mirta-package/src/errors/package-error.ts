@@ -58,7 +58,7 @@ export class PackageError extends Error {
 
     /** Ошибка чтения, возникающая по неуточненным причинам. */
     failedToRead: (filePath: string, message: string) =>
-      `Failed to read "${nodePath.basename(filePath)}": ${message}`,
+      `Failed to read "${nodePath.basename(filePath)}": ${message ? message : 'unknown reason'}`,
 
   } as const
 
