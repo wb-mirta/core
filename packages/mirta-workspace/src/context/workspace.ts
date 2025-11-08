@@ -1,8 +1,7 @@
 import nodePath from 'node:path'
 import { findUp } from 'find-up'
-import { readPackage } from '@mirta/package'
+import { readPackage, toPosix } from '@mirta/package'
 import { WorkspaceError } from '../errors'
-import { toPosix } from '../path'
 
 /**
  * Тип пакетного менеджера.

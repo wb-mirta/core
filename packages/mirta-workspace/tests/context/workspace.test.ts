@@ -1,14 +1,21 @@
 import { findUp } from 'find-up'
 import { WorkspaceError } from '#errors'
-import { toPosix } from '#path'
+import { toPosix } from '@mirta/package'
 
 vi.mock('find-up', () => ({
   findUp: vi.fn(),
 }))
 
-vi.mock('@mirta/package', () => ({
-  readPackage: vi.fn(),
-}))
+vi.mock('@mirta/package', async () => {
+
+  const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
+
+  return ({
+    ...actual,
+    readPackage: vi.fn(),
+  })
+
+})
 
 const mockFindUp = vi.mocked(findUp)
 const { readPackage } = await import('@mirta/package')

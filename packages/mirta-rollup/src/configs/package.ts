@@ -38,14 +38,13 @@ import type {
 import {
 
   readPackage,
+  toPosix,
   type ExportsConditional,
   type ExportsEntry,
   type ExportsPath,
   type PackageExports
 
 } from '@mirta/package'
-
-import { toPosix } from '@mirta/workspace'
 
 import { NpmBuildError } from '../utils/errors'
 import { createExternalFilter } from '../utils/external-filter'
@@ -691,6 +690,8 @@ function createBuildConfig(
   // выполняются единожды - для первой конфигурации.
   hasTsChecked = true
 
+  const assetsSrc = toPosix(nodePath.join(cwd, 'public/*'))
+
   return {
     input,
     external,
@@ -710,7 +711,7 @@ function createBuildConfig(
       ...plugins,
       copy({
         targets: [
-          { src: 'public/*', dest: outPath },
+          { src: assetsSrc, dest: outPath },
         ],
       }),
     ],

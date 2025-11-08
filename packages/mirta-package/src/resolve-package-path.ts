@@ -1,5 +1,6 @@
-import nodePath, { basename, join } from 'node:path'
+import { basename, posix } from 'node:path'
 import { PackageError } from './errors/package-error'
+import { toPosix } from './path'
 
 /**
  * Резолвит путь к `package.json` на основе входного пути.
@@ -33,16 +34,17 @@ import { PackageError } from './errors/package-error'
  **/
 export function resolvePackagePath(path: string): string {
 
-  if (path.endsWith('package.json'))
-    return path
+  const normalizedPath = toPosix(path)
 
-  const base = basename(path)
+  if (normalizedPath.endsWith('package.json'))
+    return normalizedPath
+
+  const base = basename(normalizedPath)
 
   // Проверяем последний фрагмент пути, не допуская файлы.
   if (base !== '.' && base !== '..' && base.includes('.'))
-    throw PackageError.get('invalidPath', path)
+    throw PackageError.get('invalidPath', normalizedPath)
 
-  return join(path, 'package.json')
-    .replaceAll(nodePath.win32.sep, nodePath.posix.sep)
+  return posix.join(normalizedPath, 'package.json')
 
 }

@@ -1,6 +1,34 @@
 {
   "name": "@mirta/workspace",
-  "version": "0.3.5",
+  "version": "0.4.0",
+  "sideEffects": false,
+  "description": "Internal resolver for workspace and monorepo context, used by Mirta Framework.",
+  "keywords": [
+    "mirta",
+    "workspace",
+    "monorepo",
+    "context",
+    "utility",
+    "nodejs",
+    "resolver"
+  ],
+  "license": "Unlicense",
+  "homepage": "https://github.com/wb-mirta/core#readme",
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-workspace"
+  },
+  "type": "module",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "exports": {
     ".": {
       "import": {
@@ -11,8 +39,10 @@
   },
   "imports": {
     "#context/*": "./src/context/*.js",
-    "#errors": "./src/errors/index.js",
-    "#path": "./src/path/index.js"
+    "#errors": "./src/errors/index.js"
+  },
+  "engines": {
+    "node": ">=20.6.0"
   },
   "dependencies": {
     "@mirta/package": "workspace:*",

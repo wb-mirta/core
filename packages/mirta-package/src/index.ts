@@ -10,3 +10,4 @@ export type {
 export { readPackage } from './read-package'
 export { parsePackageJson } from './parse-package-json'
 export { PackageError } from './errors/package-error'
+export { toPosix } from './path'

@@ -70,4 +70,29 @@ describe('parsePackageJson', () => {
 
   })
 
+  describe('invalid JSON', () => {
+
+    it('should throw error for array as root', () => {
+
+      expect(() => parsePackageJson('[]'))
+        .toThrow()
+
+    })
+
+    it('should throw error for null as root', () => {
+
+      expect(() => parsePackageJson('null'))
+        .toThrow()
+
+    })
+
+    it('should throw error for primitive as root', () => {
+
+      expect(() => parsePackageJson('"string"'))
+        .toThrow()
+
+    })
+
+  })
+
 })

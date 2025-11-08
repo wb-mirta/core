@@ -37,6 +37,9 @@ export function readPackage(path: string) {
   }
   catch (e: unknown) {
 
+    if (e instanceof PackageError)
+      throw e
+
     if (e instanceof SyntaxError)
       throw PackageError.get('invalidJson', resolvedPath, e.message)
 

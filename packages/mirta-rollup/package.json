@@ -1,20 +1,29 @@
 {
   "name": "@mirta/rollup",
-  "description": "Predefined Rollup configuration for wb-rules project builds.",
   "version": "0.3.5",
   "sideEffects": false,
-  "license": "Unlicense",
+  "description": "Predefined Rollup configuration for wb-rules project builds.",
   "keywords": [
     "mirta",
     "wb-rules"
   ],
+  "license": "Unlicense",
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-rollup"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
   "type": "module",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist",
     "LICENSE",
     "README.md"
   ],
-  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": {
@@ -42,15 +51,6 @@
     "#utils/monorepo": "./src/utils/monorepo/index.js",
     "#plugins/*": "./src/plugins/*.js",
     "#configs/*": "./src/configs/*.js"
-  },
-  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wb-mirta/core.git",
-    "directory": "packages/mirta-rollup"
-  },
-  "bugs": {
-    "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
     "build:mono": "rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"

@@ -6,9 +6,16 @@ vi.mock('node:fs/promises', () => ({
   glob: vi.fn(),
 }))
 
-vi.mock('@mirta/package', () => ({
-  readPackage: vi.fn(),
-}))
+vi.mock('@mirta/package', async () => {
+
+  const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
+
+  return ({
+    ...actual,
+    readPackage: vi.fn(),
+  })
+
+})
 
 vi.mock('#context/workspace', () => ({
   resolveWorkspaceContextAsync: vi.fn(),

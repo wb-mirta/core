@@ -1,13 +1,19 @@
 import nodePath from 'node:path'
 
-import { readPackage, type PackageExports } from '@mirta/package'
-import { toPosix } from '@mirta/workspace'
+import { readPackage, toPosix, type PackageExports } from '@mirta/package'
 
 // === Моки ===
 
-vi.mock('@mirta/package', () => ({
-  readPackage: vi.fn(),
-}))
+vi.mock('@mirta/package', async () => {
+
+  const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
+
+  return ({
+    ...actual,
+    readPackage: vi.fn(),
+  })
+
+})
 
 vi.mock('@rollup/plugin-typescript', () => ({
   default: vi.fn().mockReturnValue({ name: 'mock-typescript' }),
@@ -31,12 +37,6 @@ function mockPackageExports(exports: PackageExports) {
 const { definePackageConfig } = await import('#configs/package')
 
 describe('definePackageConfig — integration', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
 
   afterEach(() => {
 

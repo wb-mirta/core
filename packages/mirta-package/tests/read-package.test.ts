@@ -108,7 +108,7 @@ describe('readPackage', () => {
 
     })
 
-    it('should throw noAccess error on EACCES', () => {
+    it('should throw accessDenied error on EACCES', () => {
 
       const error = Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' })
       mockReadFileSync.mockImplementation(() => {

@@ -1,8 +1,7 @@
 import nodePath from 'node:path'
 import { glob } from 'node:fs/promises'
-import { readPackage } from '@mirta/package'
+import { readPackage, toPosix } from '@mirta/package'
 import { WorkspaceError } from '../errors'
-import { toPosix } from '../path'
 
 import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace'
 

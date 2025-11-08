@@ -71,12 +71,12 @@ Use if the file content is already loaded (e.g. from cache or test).
 Error class with clear messages and codes. Helps quickly identify what went wrong.
 
 Possible error codes:
-
-- `notFound` — `package.json` file not found;
-- `noAccess` — no permission to read the file;
-- `invalidJson` — malformed or invalid JSON;
-- `failedToParse` — failed to process content;
-- `invalidPath` — the provided path does not point to `package.json` or a package directory.
+- `notFound`: the package.json file was not found,
+- `accessDenied`: permission denied to read the file,
+- `invalidPath`: the path does not point to a package.json file or package directory,
+- `invalidJson`: the file contains invalid or malformed JSON,
+- `invalidJsonRoot`: the JSON root is not an object,
+- `failedToParse`: failed to parse the file content.
 
 Example usage:
 

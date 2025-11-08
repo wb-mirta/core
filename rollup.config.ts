@@ -18,7 +18,7 @@
  *
  **/
 
-import { toPosix } from '@mirta/workspace'
+import { toPosix } from '@mirta/package'
 import { definePackageConfig } from '@mirta/rollup'
 import { compactArray } from '@mirta/basics/array'
 
