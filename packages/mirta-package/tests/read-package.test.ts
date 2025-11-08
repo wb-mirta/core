@@ -1,7 +1,7 @@
 import { PackageError } from '#src/errors/package-error'
 
 // Mock fs module
-vi.mock('fs', () => ({
+vi.mock('node:fs', () => ({
   readFileSync: vi.fn(),
 }))
 

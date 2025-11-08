@@ -117,13 +117,13 @@ export async function readPackageAsync(path: string) {
 
     content = await readFile(resolvedPath, 'utf-8')
 
+    return parsePackageJson(content)
+
   }
   catch (e: unknown) {
 
     throw handleError(e, resolvedPath)
 
   }
-
-  return parsePackageJson(content)
 
 }
