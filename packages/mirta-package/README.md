@@ -62,7 +62,7 @@ Supports:
 - Path to package directory: `'.'`, `'packages/mirta-testing'`
 
 Returns: an object of type `Package`.<br/>
-Throws: `PackageError` if the file is not found, inaccessible, or contains invalid JSON.
+Throws: `PackageError` with one of the error codes listed in the "[Possible error codes](#possible-error-codes)" section.
 
 ---
 
@@ -73,7 +73,7 @@ Asynchronously reads and parses `package.json` from the specified path.
 Fully equivalent to `readPackage`, but works asynchronously. Recommended for use in async contexts (e.g. bundler plugins).
 
 Returns: a Promise resolving to a `Package` object.<br/>
-Throws: `PackageError` on read or parse errors.
+Throws: `PackageError` with one of the error codes listed in the "[Possible error codes](#possible-error-codes)" section.
 
 ---
 
@@ -89,6 +89,7 @@ Use if the file content is already loaded (e.g. from cache or test).
 
 Error class with clear messages and codes. Helps quickly identify what went wrong.
 
+<a name="#possible-error-codes"></a>
 Possible error codes:
 - `notFound`: the package.json file was not found,
 - `accessDenied`: permission denied to read the file,
