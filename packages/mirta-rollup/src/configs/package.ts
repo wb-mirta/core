@@ -367,7 +367,7 @@ export function createInputBindings(
   skipExports: boolean
 ) {
 
-  // Извлекает имя файла без расширения и префикса src.
+  // Извлекает относительный путь после префикса `src/` (без расширения).
   const filePattern = /^(?:.*\/)?src\/(.*)\.[jt]s$/
 
   const result: Record<string, InputBinding | undefined> = {}
@@ -398,7 +398,7 @@ export function createInputBindings(
 
     const descriptor = normalizedExports[exportEntry]
 
-    // Проверяем наличие ключа в словаре экспорта (при необходимости).
+    // Проверяет наличие ключа в словаре экспорта (при необходимости).
     if (!descriptor && !skipExports)
       throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
 
@@ -412,7 +412,7 @@ export function createInputBindings(
 
   for (const key of Object.keys(normalizedExports)) {
 
-    // Выявляем незадействованные ключи в словаре экспорта (обратная проверка).
+    // Выявляет незадействованные ключи в словаре экспорта (обратная проверка).
     if (!usedExports.has(key))
       throw NpmBuildError.get('exportHasNoInput', key)
 

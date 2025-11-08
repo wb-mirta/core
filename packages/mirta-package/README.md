@@ -76,7 +76,7 @@ Possible error codes:
 - `invalidPath`: the path does not point to a package.json file or package directory,
 - `invalidJson`: the file contains invalid or malformed JSON,
 - `invalidJsonRoot`: the JSON root is not an object,
-- `failedToParse`: failed to parse the file content.
+- `failedToRead`: failed to read the file.
 
 Example usage:
 
