@@ -1,6 +1,6 @@
 import nodePath from 'node:path'
 import { glob } from 'node:fs/promises'
-import { readPackage, toPosix } from '@mirta/package'
+import { readPackageAsync, toPosix } from '@mirta/package'
 import { WorkspaceError } from '../errors'
 
 import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace'
@@ -163,7 +163,7 @@ export async function resolveMonorepoPackagesAsync(
   })) {
 
     const pkgPath = toPosix(rawPkgPath)
-    const pkg = readPackage(`${rootDir}/${pkgPath}`)
+    const pkg = await readPackageAsync(`${rootDir}/${pkgPath}`)
 
     if (!pkg.name)
       throw WorkspaceError.get('noPackageName', pkgPath)

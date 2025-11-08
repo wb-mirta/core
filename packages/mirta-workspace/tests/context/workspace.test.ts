@@ -12,14 +12,14 @@ vi.mock('@mirta/package', async () => {
 
   return ({
     ...actual,
-    readPackage: vi.fn(),
+    readPackageAsync: vi.fn(),
   })
 
 })
 
 const mockFindUp = vi.mocked(findUp)
-const { readPackage } = await import('@mirta/package')
-const mockReadPackage = vi.mocked(readPackage)
+const { readPackageAsync } = await import('@mirta/package')
+const mockReadPackageAsync = vi.mocked(readPackageAsync)
 
 const {
   resolveWorkspaceContextAsync,
@@ -39,7 +39,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/home/user/monorepo'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'root',
         workspaces: ['packages/*'],
       })
@@ -51,7 +51,7 @@ describe('workspace utilities', () => {
         manager: 'pnpm',
         workspaces: ['packages/*'],
       })
-      expect(mockReadPackage).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
+      expect(mockReadPackageAsync).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
 
     })
 
@@ -59,7 +59,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/home/user/monorepo'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'root',
         workspaces: ['apps/*', 'libs/*'],
       })
@@ -74,7 +74,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/projects/app'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/package-lock.json`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'app',
         workspaces: ['modules/*'],
       })
@@ -89,7 +89,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/dev/project'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/bun.lock`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'project',
         workspaces: ['src/*'],
       })
@@ -113,7 +113,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/standalone'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackage.mockReturnValue({ name: 'standalone' }) // без workspaces
+      mockReadPackageAsync.mockResolvedValue({ name: 'standalone' }) // без workspaces
 
       const result = await resolveWorkspaceContextAsync(workspaceRoot)
       expect(result.manager).toBe('pnpm')
@@ -125,7 +125,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/bad/config'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'bad',
         workspaces: { packages: ['apps/*'] } as unknown as string[],
       })
@@ -140,7 +140,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/bad/config'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'bad',
         workspaces: ['valid', 123, null] as unknown as string[],
       })
@@ -155,7 +155,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = 'C:\\Users\\repos\\project'
       mockFindUp.mockResolvedValue(`${workspaceRoot}\\pnpm-lock.yaml`)
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'win-project',
         workspaces: ['packages/*'],
       })

@@ -11,6 +11,7 @@
 - TypeScript-типизацию
 - Чёткую обработку ошибок
 - Работу только с нужными полями: `name`, `exports`, `workspaces`
+- Синхронный и асинхронный API
 
 Используется внутри `@mirta/workspace`, `@mirta/rollup` и других инструментов Mirta для анализа структуры проекта.<br/>
 
@@ -27,21 +28,29 @@ pnpm add -D @mirta/package
 ## 🚀 Быстрый старт
 
 ```ts
-import { readPackage, PackageError } from '@mirta/package'
+import { readPackage, readPackageAsync, PackageError } from '@mirta/package'
+
+// Синхронное чтение
 
 try {
-
-  const pkg = readPackage('packages/core') // Путь к директории или файлу
+  const pkg = readPackage('packages/mirta-basics')
   console.log(pkg.name)
-  console.log(pkg.exports)
-
 } catch (err) {
-
   if (err instanceof PackageError)
     console.error('Ошибка:', err.message)
+}
 
+// Асинхронное чтение
+
+try {
+  const pkg = await readPackageAsync('packages/mirta-basics')
+  console.log(pkg.name)
+} catch (err) {
+  if (err instanceof PackageError)
+    console.error('Ошибка:', err.message)
 }
 ```
+
 ## 🧰 API
 
 `readPackage(path: string): Package`
@@ -56,6 +65,18 @@ try {
 Выбрасывает: `PackageError`, если файл не найден, недоступен или содержит невалидный JSON.
 
 ---
+
+`readPackageAsync(path: string): Promise<Package>`
+
+Асинхронно читает и парсит `package.json` по указанному пути.
+
+Полностью аналогичен `readPackage`, но работает асинхронно. Рекомендуется для использования в асинхронных контекстах (например, в плагинах сборщиков).
+
+Возвращает: промис с объектом типа Package.<br/>
+Выбрасывает: `PackageError`, если файл не найден, недоступен или содержит невалидный JSON.
+
+---
+
 `parsePackageJson(content: string): Package`
 
 Парсит строку с содержимым `package.json` в объект `Package`.
@@ -132,14 +153,16 @@ if (err.code === 'notFound') {
 - Обработка всех типов ошибок: файл не найден, нет доступа, невалидный JSON
 - Поддержка разных путей
 - Корректная миграция ошибок в `PackageError`
-- Используется Vitest, моки зависимостей, изолированные тесты.
+
+Используется Vitest, моки зависимостей, изолированные тесты.
 
 ## ⚠️ Ограничения
 
 - Работает только в Node.js (не в Duktape).
 - Поддерживает только `import` в `exports`.
 - Поле `workspaces` должно быть массивом строк.
-- Синхронный API — не используйте в асинхронных средах без оборачивания.
+- Для асинхронных операций используйте `readPackageAsync`.
+- Синхронные операции не рекомендуются в асинхронных средах (используйте `readPackageAsync`).
 
 ## 🔄 Использование в `@mirta/workspace`
 
@@ -151,6 +174,6 @@ if (err.code === 'notFound') {
 Пример:
 
 ```ts
-const pkg = readPackage(`${rootDir}/packages/mirta-basics`)
+const pkg = await readPackageAsync(`${rootDir}/packages/mirta-basics`)
 ```
 Это обеспечивает единый, надёжный способ доступа к метаданным пакетов.

@@ -10,9 +10,10 @@
 `@mirta/package` is a utility for safely reading `package.json` in the development environment. It supports:
 - TypeScript typing
 - Clear error handling
-- Working only with the fields needed by the framework: `name`, `exports`, `workspaces`
+- Reading only required fields: `name`, `exports`, `workspaces`
+- Synchronous and asynchronous APIs
 
-Used internally by `@mirta/workspace`, `@mirta/rollup`, and other Mirta tools for analyzing project structure.<br/>
+Used internally by `@mirta/workspace`, `@mirta/rollup`, and other Mirta tools for project structure analysis.<br/>
 
 **Not intended for execution in the Duktape environment on Wiren Board controllers.**
 
@@ -27,19 +28,26 @@ pnpm add -D @mirta/package
 ## 🚀 Quick Start
 
 ```ts
-import { readPackage, PackageError } from '@mirta/package'
+import { readPackage, readPackageAsync, PackageError } from '@mirta/package'
+
+// Synchronous reading
 
 try {
-
-  const pkg = readPackage('packages/core') // Path to directory or file
+  const pkg = readPackage('packages/mirta-testing')
   console.log(pkg.name)
-  console.log(pkg.exports)
-
 } catch (err) {
-
   if (err instanceof PackageError)
     console.error('Error:', err.message)
+}
 
+// Asynchronous reading
+
+try {
+  const pkg = await readPackageAsync('packages/mirta-testing')
+  console.log(pkg.name)
+} catch (err) {
+  if (err instanceof PackageError)
+    console.error('Error:', err.message)
 }
 ```
 
@@ -50,11 +58,22 @@ try {
 Synchronously reads and parses `package.json` from the given path.
 
 Supports:
-- Path to file: `'package.json'`, `'packages/core/package.json'`
-- Path to package directory: `'.'`, `'packages/core'`
+- Path to file: `'package.json'`, `'packages/mirta-testing/package.json'`
+- Path to package directory: `'.'`, `'packages/mirta-testing'`
 
 Returns: an object of type `Package`.<br/>
 Throws: `PackageError` if the file is not found, inaccessible, or contains invalid JSON.
+
+---
+
+`readPackageAsync(path: string): Promise<Package>`
+
+Asynchronously reads and parses `package.json` from the specified path.
+
+Fully equivalent to `readPackage`, but works asynchronously. Recommended for use in async contexts (e.g. bundler plugins).
+
+Returns: a Promise resolving to a `Package` object.<br/>
+Throws: `PackageError` on read or parse errors.
 
 ---
 
@@ -91,7 +110,7 @@ The package reads only the `package.json` fields required by the framework:
 
 `name`
 
-Package name, e.g.: `"@mirta/basics"`
+Package name, e.g.: `"@mirta/testing"`
 
 `exports`
 
@@ -136,14 +155,16 @@ The package is fully tested:
 - Handling all error types: file not found, no access, invalid JSON
 - Support for various paths
 - Correct error mapping to `PackageError`
-- Uses Vitest, dependency mocks, and isolated tests.
+
+Uses Vitest, dependency mocks, and isolated tests.
 
 ⚠️ Limitations
 
 - Works only in Node.js (not in Duktape).
 - Supports only `import` in `exports`.
 - The `workspaces` field must be an array of strings.
-- Synchronous API — do not use in asynchronous environments without wrapping.
+- Use `readPackageAsync` in asynchronous environments.
+- Synchronous operations are not recommended in async contexts (use `readPackageAsync`).
 
 ## 🔄 Usage in `@mirta/workspace`
 
@@ -154,6 +175,6 @@ This package is used in `@mirta/workspace` to:
 
 Example:
 ```ts
-const pkg = readPackage(`${rootDir}/packages/core/package.json`)
+const pkg = await readPackageAsync(`${rootDir}/packages/mirta-testing/package.json`)
 ```
 Ensures a consistent and reliable way to access package metadata.

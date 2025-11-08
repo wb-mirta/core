@@ -7,7 +7,7 @@ export type {
   ExportsConditional
 } from './types'
 
-export { readPackage } from './read-package'
+export { readPackage, readPackageAsync } from './read-package'
 export { parsePackageJson } from './parse-package-json'
 export { PackageError } from './errors/package-error'
 export { toPosix } from './path'

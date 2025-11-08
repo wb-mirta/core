@@ -1,6 +1,6 @@
 import nodePath from 'node:path'
 import { findUp } from 'find-up'
-import { readPackage, toPosix } from '@mirta/package'
+import { readPackageAsync, toPosix } from '@mirta/package'
 import { WorkspaceError } from '../errors'
 
 /**
@@ -114,7 +114,7 @@ export async function resolveWorkspaceContextAsync(cwd: string): Promise<Workspa
   const rootDir = nodePath.dirname(lockFilePath)
 
   const pkgPath = `${rootDir}/package.json`
-  const pkg = readPackage(pkgPath)
+  const pkg = await readPackageAsync(pkgPath)
 
   assertWorkspacesFieldFormat(pkg.workspaces, pkgPath)
 
