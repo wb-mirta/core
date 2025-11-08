@@ -23,6 +23,6 @@ import { AstTransformError } from '#utils/errors'
 export function assertPathIsValid(path: string) {
 
   if (path.includes(':') || path.includes('~'))
-    throw AstTransformError.get('invalidPathFormat', path)
+    throw AstTransformError.get('invalidChars', path)
 
 }

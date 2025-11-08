@@ -20,7 +20,16 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
+    },
+    "./array": {
+      "import": {
+        "types": "./dist/array/index.d.mts",
+        "default": "./dist/array/index.mjs"
+      }
     }
+  },
+  "imports": {
+    "#array/*": "./src/array/*.js"
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-basics#readme",
   "repository": {

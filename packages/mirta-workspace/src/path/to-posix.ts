@@ -7,8 +7,8 @@ import nodePath from 'node:path'
  * совместимости, особенно при сравнении путей или работе с инструментами сборки,
  * которые ожидают стандартизированный формат пути.
  *
- * @param {string} path - Входной путь, который может содержать разделители Windows (`\`).
- * @returns {string} Путь, в котором все разделители заменены на `/`.
+ * @param path - Входной путь, который может содержать разделители Windows (`\`).
+ * @returns Путь, в котором все разделители заменены на `/`.
  *
  * @example
  * ```ts
@@ -28,8 +28,8 @@ export function toPosix(path: string): string
 export function toPosix(path: string | undefined): string | undefined
 export function toPosix(path: string | undefined): string | undefined {
 
-  if (!path)
-    return
+  if (path === '' || path === undefined)
+    return path
 
   return path.replaceAll(
     nodePath.win32.sep,

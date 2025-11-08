@@ -1,16 +1,16 @@
 import { glob } from 'node:fs/promises'
-import { WorkspaceError } from '#utils/errors'
-import type { WorkspaceContext } from '#utils/context/workspace'
+import { WorkspaceError } from '#errors'
+import type { WorkspaceContext } from '#context/workspace'
 
 vi.mock('node:fs/promises', () => ({
   glob: vi.fn(),
 }))
 
-vi.mock('#utils/package', () => ({
-  parsePackageJson: vi.fn(),
+vi.mock('@mirta/package', () => ({
+  readPackage: vi.fn(),
 }))
 
-vi.mock('#utils/context/workspace', () => ({
+vi.mock('#context/workspace', () => ({
   resolveWorkspaceContextAsync: vi.fn(),
 }))
 
@@ -23,9 +23,9 @@ async function* createAsyncIterator<T>(...items: T[]): NodeJS.AsyncIterator<T> {
 }
 
 const mockGlob = vi.mocked(glob)
-const { parsePackageJson } = await import('#utils/package')
-const mockParsePackageJson = vi.mocked(parsePackageJson)
-const { resolveWorkspaceContextAsync } = await import('#utils/context/workspace')
+const { readPackage } = await import('@mirta/package')
+const mockReadPackage = vi.mocked(readPackage)
+const { resolveWorkspaceContextAsync } = await import('#context/workspace')
 const mockResolveWorkspaceContext = vi.mocked(resolveWorkspaceContextAsync)
 
 const {
@@ -34,7 +34,7 @@ const {
   findMonorepoPackageByChunkName,
   mapChunkToPackage,
   __resetInternalState,
-} = await import('#utils/context/monorepo')
+} = await import('#context/monorepo')
 
 describe('monorepo utilities', () => {
 
@@ -58,7 +58,7 @@ describe('monorepo utilities', () => {
 
       mockResolveWorkspaceContext.mockResolvedValue(workspaceContext)
       mockGlob.mockReturnValue(createAsyncIterator('packages/app/package.json'))
-      mockParsePackageJson.mockReturnValue({ name: '@scope/app' })
+      mockReadPackage.mockReturnValue({ name: '@scope/app' })
 
       const result = await resolveMonorepoContextAsync(rootDir)
 
@@ -89,7 +89,7 @@ describe('monorepo utilities', () => {
         )
       )
 
-      mockParsePackageJson
+      mockReadPackage
         .mockReturnValueOnce({ name: '@scope/ui' })
         .mockReturnValueOnce({ name: '@scope/web' })
 
@@ -136,7 +136,7 @@ describe('monorepo utilities', () => {
         )
       )
 
-      mockParsePackageJson
+      mockReadPackage
         .mockReturnValueOnce({ name: 'pkg-a' })
         .mockReturnValueOnce({ name: 'pkg-b' })
         .mockReturnValueOnce({ name: 'pkg-c' })
@@ -165,7 +165,7 @@ describe('monorepo utilities', () => {
         )
       )
 
-      mockParsePackageJson
+      mockReadPackage
         .mockReturnValueOnce({ name: 'zebra' })
         .mockReturnValueOnce({ name: 'alpha' })
         .mockReturnValueOnce({ name: 'gamma' })
@@ -188,7 +188,7 @@ describe('monorepo utilities', () => {
       }
 
       mockGlob.mockReturnValue(createAsyncIterator('packages/unnamed/package.json'))
-      mockParsePackageJson.mockReturnValue({ name: undefined })
+      mockReadPackage.mockReturnValue({ name: undefined })
 
       await expect(resolveMonorepoPackagesAsync(context))
         .rejects
@@ -205,7 +205,7 @@ describe('monorepo utilities', () => {
       }
 
       mockGlob.mockReturnValue(createAsyncIterator('libs/util/package.json'))
-      mockParsePackageJson.mockReturnValue({ name: 'util' })
+      mockReadPackage.mockReturnValue({ name: 'util' })
 
       const result1 = await resolveMonorepoPackagesAsync(context)
       const result2 = await resolveMonorepoPackagesAsync(context)
@@ -224,7 +224,7 @@ describe('monorepo utilities', () => {
       }
 
       mockGlob.mockReturnValue(createAsyncIterator('packages\\app\\package.json'))
-      mockParsePackageJson.mockReturnValue({ name: 'app' })
+      mockReadPackage.mockReturnValue({ name: 'app' })
 
       const result = await resolveMonorepoPackagesAsync(context)
 

@@ -1,22 +1,22 @@
 import { findUp } from 'find-up'
-import { WorkspaceError } from '#utils/errors'
-import { toPosix } from '#utils/path'
+import { WorkspaceError } from '#errors'
+import { toPosix } from '#path'
 
 vi.mock('find-up', () => ({
   findUp: vi.fn(),
 }))
 
-vi.mock('#utils/package', () => ({
-  parsePackageJson: vi.fn(),
+vi.mock('@mirta/package', () => ({
+  readPackage: vi.fn(),
 }))
 
 const mockFindUp = vi.mocked(findUp)
-const { parsePackageJson } = await import('#utils/package')
-const mockParsePackageJson = vi.mocked(parsePackageJson)
+const { readPackage } = await import('@mirta/package')
+const mockReadPackage = vi.mocked(readPackage)
 
 const {
   resolveWorkspaceContextAsync,
-} = await import('#utils/context/workspace')
+} = await import('#context/workspace')
 
 describe('workspace utilities', () => {
 
@@ -32,7 +32,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/home/user/monorepo'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'root',
         workspaces: ['packages/*'],
       })
@@ -44,7 +44,7 @@ describe('workspace utilities', () => {
         manager: 'pnpm',
         workspaces: ['packages/*'],
       })
-      expect(mockParsePackageJson).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
+      expect(mockReadPackage).toHaveBeenCalledWith(`${workspaceRoot}/package.json`)
 
     })
 
@@ -52,7 +52,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/home/user/monorepo'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'root',
         workspaces: ['apps/*', 'libs/*'],
       })
@@ -67,7 +67,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/projects/app'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/package-lock.json`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'app',
         workspaces: ['modules/*'],
       })
@@ -82,7 +82,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/dev/project'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/bun.lock`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'project',
         workspaces: ['src/*'],
       })
@@ -106,7 +106,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = '/standalone'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockParsePackageJson.mockReturnValue({ name: 'standalone' }) // без workspaces
+      mockReadPackage.mockReturnValue({ name: 'standalone' }) // без workspaces
 
       const result = await resolveWorkspaceContextAsync(workspaceRoot)
       expect(result.manager).toBe('pnpm')
@@ -114,33 +114,33 @@ describe('workspace utilities', () => {
 
     })
 
-    it('should throw error for bad workspaces format (object)', async () => {
+    it('should throw error for invalid workspaces format (object)', async () => {
 
       const workspaceRoot = '/bad/config'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/yarn.lock`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'bad',
         workspaces: { packages: ['apps/*'] } as unknown as string[],
       })
 
       await expect(resolveWorkspaceContextAsync(workspaceRoot))
         .rejects
-        .toThrow(WorkspaceError.get('badWorkspacesFormat', `${workspaceRoot}/package.json`))
+        .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
 
     })
 
-    it('should throw error for bad workspaces format (non-string array)', async () => {
+    it('should throw error for invalid workspaces format (non-string array)', async () => {
 
       const workspaceRoot = '/bad/config'
       mockFindUp.mockResolvedValue(`${workspaceRoot}/pnpm-lock.yaml`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'bad',
         workspaces: ['valid', 123, null] as unknown as string[],
       })
 
       await expect(resolveWorkspaceContextAsync(workspaceRoot))
         .rejects
-        .toThrow(WorkspaceError.get('badWorkspacesFormat', `${workspaceRoot}/package.json`))
+        .toThrow(WorkspaceError.get('invalidWorkspaces', `${workspaceRoot}/package.json`))
 
     })
 
@@ -148,7 +148,7 @@ describe('workspace utilities', () => {
 
       const workspaceRoot = 'C:\\Users\\repos\\project'
       mockFindUp.mockResolvedValue(`${workspaceRoot}\\pnpm-lock.yaml`)
-      mockParsePackageJson.mockReturnValue({
+      mockReadPackage.mockReturnValue({
         name: 'win-project',
         workspaces: ['packages/*'],
       })

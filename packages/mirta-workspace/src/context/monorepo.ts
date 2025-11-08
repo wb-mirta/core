@@ -1,8 +1,8 @@
 import nodePath from 'node:path'
 import { glob } from 'node:fs/promises'
-import { parsePackageJson } from '#utils/package'
-import { WorkspaceError } from '#utils/errors'
-import { toPosix } from '#utils/path'
+import { readPackage } from '@mirta/package'
+import { WorkspaceError } from '../errors'
+import { toPosix } from '../path'
 
 import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace'
 
@@ -98,7 +98,7 @@ export function __resetInternalState() {
  * @param cwd - Рабочая директория, с которой начинается поиск.
  * @returns Объект {@link MonorepoContext} с информацией о монорепе.
  * @throws {WorkspaceError} Если корень не найден или какой-либо из пакетов не имеет имени.
- * @throws {FileError} Если `package.json` недоступен или содержит невалидный JSON.
+ * @throws {PackageError} Если `package.json` недоступен или содержит невалидный JSON.
  *
  * @remarks
  * - Требуется наличие lock-файла и поля `workspaces` в корневом `package.json`.
@@ -153,6 +153,7 @@ export async function resolveMonorepoPackagesAsync(
   if (cachedPackages !== undefined)
     return cachedPackages
 
+  // 2. Пробуем найти пакеты, фиксируясь на обязательном наличии `package.json`
   const pkgPatterns = workspaces.map(w => `${w}/package.json`)
 
   const packages: PackageDefinition[] = []
@@ -163,7 +164,7 @@ export async function resolveMonorepoPackagesAsync(
   })) {
 
     const pkgPath = toPosix(rawPkgPath)
-    const pkg = parsePackageJson(`${rootDir}/${pkgPath}`)
+    const pkg = readPackage(`${rootDir}/${pkgPath}`)
 
     if (!pkg.name)
       throw WorkspaceError.get('noPackageName', pkgPath)
@@ -224,7 +225,7 @@ export function findMonorepoPackageByChunkName(
 
   for (const pkg of context.packages) {
 
-    if (chunkName.startsWith(pkg.workspacePath))
+    if (chunkName.startsWith(pkg.workspacePath + '/'))
       return pkg
 
   }

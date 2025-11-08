@@ -1,6 +1,6 @@
 import nodePath from 'node:path'
 import dotenvx from '@dotenvx/dotenvx'
-import { ensureCompactArray } from './array'
+import { compactArray } from '@mirta/basics/array'
 
 /**
  * Регулярное выражение, определяющее допустимые префиксы для переменных окружения,
@@ -391,7 +391,7 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
 
   // Фильтрация переменных, если задан префикс.
   if (prefix)
-    processEnv = filterEnvKeys(processEnv, ensureCompactArray(prefix), keepNodeEnv)
+    processEnv = filterEnvKeys(processEnv, compactArray(prefix), keepNodeEnv)
 
   return processEnv
 

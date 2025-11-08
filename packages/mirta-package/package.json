@@ -1,0 +1,48 @@
+{
+  "name": "@mirta/package",
+  "version": "0.4.0",
+  "description": "Internal type-safe reader & parser for package.json, used by Mirta Framework.",
+  "keywords": [
+    "package.json",
+    "read",
+    "parse",
+    "exports",
+    "monorepo",
+    "mirta",
+    "typescript",
+    "config",
+    "utility"
+  ],
+  "homepage": "https://github.com/wb-mirta/core#readme",
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-package"
+  },
+  "license": "Unlicense",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#src/errors": "./src/errors/index.js"
+  },
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.17.1"
+  }
+}

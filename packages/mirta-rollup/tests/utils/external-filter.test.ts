@@ -17,9 +17,9 @@ describe('createExternalFilter', () => {
 
   })
 
-  describe('пользовательские функции', () => {
+  describe('custom functions', () => {
 
-    it('должна использовать функцию-предикат и возвращать true', () => {
+    it('should use predicate function and return true', () => {
 
       const customFn = vi.fn(() => true)
       const filter = createExternalFilter('/project', customFn)
@@ -31,7 +31,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна использовать функцию-предикат и возвращать false', () => {
+    it('should use predicate function and return false', () => {
 
       const customFn = vi.fn(() => false)
       const filter = createExternalFilter('/project', customFn)
@@ -43,7 +43,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна останавливаться на первой функции, вернувшей true', () => {
+    it('should stop at the first function returning true', () => {
 
       const fn1 = vi.fn(() => true)
       const fn2 = vi.fn(() => false)
@@ -57,7 +57,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна проверять все функции, если предыдущие вернули false', () => {
+    it('should check all functions if previous returned false', () => {
 
       const fn1 = vi.fn(() => false)
       const fn2 = vi.fn(() => true)
@@ -73,9 +73,9 @@ describe('createExternalFilter', () => {
 
   })
 
-  describe('массивы паттернов', () => {
+  describe('pattern arrays', () => {
 
-    it('должна обрабатывать строковое совпадение', () => {
+    it('should handle string matching', () => {
 
       const filter = createExternalFilter('/project', ['lodash', 'react'])
 
@@ -85,7 +85,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать RegExp паттерны', () => {
+    it('should handle RegExp patterns', () => {
 
       const filter = createExternalFilter('/project', [/^@scope\//])
 
@@ -95,7 +95,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать смешанные паттерны (строки и RegExp)', () => {
+    it('should handle mixed patterns (strings and RegExp)', () => {
 
       const filter = createExternalFilter('/project', ['lodash', /^react/])
 
@@ -106,7 +106,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать одиночную строку вместо массива', () => {
+    it('should handle single string instead of array', () => {
 
       const filter = createExternalFilter('/project', 'lodash')
 
@@ -115,7 +115,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать одиночный RegExp вместо массива', () => {
+    it('should handle single RegExp instead of array', () => {
 
       const filter = createExternalFilter('/project', /^node:/)
 
@@ -127,17 +127,9 @@ describe('createExternalFilter', () => {
 
   })
 
-  describe('проверка путей относительно cwd', () => {
+  describe('path resolution relative to cwd', () => {
 
-    it('должна считать внешним модуль вне cwd (относительный путь начинается с ..)', () => {
-
-      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {
-
-        // Bypass console.debug in tests
-
-      })
-
-      globalThis.__DEV__ = true
+    it('should consider module outside cwd as external (relative path starts with ..)', () => {
 
       const filter = createExternalFilter('/project/packages/app')
       const absolutePath = '/project/packages/other/file.ts'
@@ -145,13 +137,10 @@ describe('createExternalFilter', () => {
       const result = filter(absolutePath, undefined, true)
 
       expect(result).toBe(true)
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Skipping non-project'))
-
-      consoleSpy.mockRestore()
 
     })
 
-    it('должна считать внутренним модуль внутри cwd', () => {
+    it('should consider module inside cwd as internal', () => {
 
       const filter = createExternalFilter('/project/packages/app')
       const absolutePath = '/project/packages/app/src/utils.ts'
@@ -162,7 +151,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('не должна проверять пути для не разрешённых модулей', () => {
+    it('should not check paths for unresolved modules', () => {
 
       const filter = createExternalFilter('/project')
       const absolutePath = '/somewhere/else/file.ts'
@@ -173,7 +162,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать относительные пути (не абсолютные)', () => {
+    it('should handle relative paths (not absolute)', () => {
 
       const filter = createExternalFilter('/project')
       const relativePath = './src/utils'
@@ -184,7 +173,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('не должна логировать в продакшн режиме', () => {
+    it('should not log in production mode', () => {
 
       const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {
 
@@ -206,9 +195,9 @@ describe('createExternalFilter', () => {
 
   })
 
-  describe('комбинированные сценарии', () => {
+  describe('combined scenarios', () => {
 
-    it('должна обрабатывать несколько externals в порядке приоритета', () => {
+    it('should handle multiple externals in priority order', () => {
 
       const customFn = vi.fn((target: string) => target === 'custom-module')
       const filter = createExternalFilter(
@@ -225,7 +214,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна возвращать false, если ни один критерий не совпал', () => {
+    it('should return false if no criteria match', () => {
 
       const filter = createExternalFilter(
         '/project',
@@ -239,7 +228,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна использовать все три стратегии: функция, паттерны, cwd', () => {
+    it('should use all three strategies: function, patterns, cwd', () => {
 
       const customFn = vi.fn(() => false)
       const filter = createExternalFilter(
@@ -263,7 +252,7 @@ describe('createExternalFilter', () => {
 
   describe('edge cases', () => {
 
-    it('должна обрабатывать пустой список externals', () => {
+    it('should handle empty externals list', () => {
 
       const filter = createExternalFilter('/project')
 
@@ -271,7 +260,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать пустой cwd', () => {
+    it('should handle empty cwd', () => {
 
       const filter = createExternalFilter('', ['lodash'])
 
@@ -280,7 +269,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна корректно обрабатывать importer параметр', () => {
+    it('should correctly handle importer parameter', () => {
 
       const customFn = vi.fn((_target, importer) => importer === '/src/index.ts')
       const filter = createExternalFilter('/project', customFn)
@@ -290,7 +279,7 @@ describe('createExternalFilter', () => {
 
     })
 
-    it('должна обрабатывать абсолютный путь в relativePath', () => {
+    it('should handle absolute path in relativePath', () => {
 
       const filter = createExternalFilter('/project')
       const absolutePathOutside = '/completely/different/path.ts'

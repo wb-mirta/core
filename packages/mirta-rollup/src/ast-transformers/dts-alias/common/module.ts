@@ -6,7 +6,7 @@ import { isProjectFile, removeFileExtension, getRelativeOutputPath } from './pat
 import { assertPathIsValid } from './security'
 import { resolveSourceFile } from './file'
 
-import { AstTransformError } from '#src/utils/errors'
+import { AstTransformError } from '#utils/errors'
 
 /**
  * Анализирует путь модуля и определяет его тип (явный, неявный, пакетный или обычный).

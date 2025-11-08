@@ -2,7 +2,7 @@ import ts from 'typescript'
 import nodePath from 'node:path'
 
 import type { VisitorContextBase } from './types'
-import { AstTransformError } from '#src/utils/errors'
+import { AstTransformError } from '#utils/errors'
 
 /**
  * Удаляет расширение файла `.ts`, `.d.ts` или `.js`.
@@ -170,7 +170,7 @@ export function getRootDir(
   const fileNames = program.getRootFileNames()
 
   if (!fileNames.length)
-    throw AstTransformError.get('noRootFilesInProject')
+    throw AstTransformError.get('noRootFiles')
 
   let commonPrefix = nodePath.dirname(fileNames[0])
 

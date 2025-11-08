@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: ^1.51.1
+        version: 1.51.1
       '@eslint/js':
         specifier: ^9.38.0
         version: 9.38.0
@@ -29,6 +32,24 @@ importers:
       '@mirta/tsconfig':
         specifier: workspace:*
         version: link:packages/mirta-tsconfig
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.52.5)
+      '@rollup/plugin-commonjs':
+        specifier: ^29.0.0
+        version: 29.0.0(rollup@4.52.5)
+      '@rollup/plugin-multi-entry':
+        specifier: ^7.1.0
+        version: 7.1.0(rollup@4.52.5)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.3
+        version: 16.0.3(rollup@4.52.5)
+      '@rollup/plugin-replace':
+        specifier: ^6.0.3
+        version: 6.0.3(rollup@4.52.5)
+      '@rollup/plugin-typescript':
+        specifier: ^12.3.0
+        version: 12.3.0(rollup@4.52.5)(tslib@2.8.1)(typescript@5.9.2)
       '@stylistic/eslint-plugin':
         specifier: ^5.5.0
         version: 5.5.0(eslint@9.38.0)
@@ -50,21 +71,39 @@ importers:
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
+      del:
+        specifier: ^8.0.1
+        version: 8.0.1
       eslint:
         specifier: ^9.38.0
         version: 9.38.0
       eslint-plugin-workspaces:
         specifier: ^0.11.0
         version: 0.11.0
+      find-up:
+        specifier: ^8.0.0
+        version: 8.0.0
       globals:
         specifier: ^16.4.0
         version: 16.4.0
       lint-staged:
         specifier: ^16.2.6
         version: 16.2.6
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
       rollup:
         specifier: ^4.52.5
         version: 4.52.5
+      rollup-plugin-copy:
+        specifier: ^3.5.0
+        version: 3.5.0
+      rollup-plugin-dts:
+        specifier: ^6.2.3
+        version: 6.2.3(rollup@4.52.5)(typescript@5.9.2)
+      rollup-plugin-typescript2:
+        specifier: ^0.36.0
+        version: 0.36.0(rollup@4.52.5)(typescript@5.9.2)
       simple-git-hooks:
         specifier: ^2.13.1
         version: 2.13.1
@@ -269,6 +308,8 @@ importers:
 
   packages/mirta-globals: {}
 
+  packages/mirta-package: {}
+
   packages/mirta-polyfills: {}
 
   packages/mirta-rollup:
@@ -282,9 +323,15 @@ importers:
       '@dotenvx/dotenvx':
         specifier: ^1.51.0
         version: 1.51.0
-      '@mirta/polyfills':
+      '@mirta/basics':
         specifier: workspace:*
-        version: link:../mirta-polyfills
+        version: link:../mirta-basics
+      '@mirta/package':
+        specifier: workspace:*
+        version: link:../mirta-package
+      '@mirta/workspace':
+        specifier: workspace:*
+        version: link:../mirta-workspace
       '@rollup/plugin-babel':
         specifier: ^6.1.0
         version: 6.1.0(@babel/core@7.28.5)(rollup@4.52.5)
@@ -340,6 +387,9 @@ importers:
 
   packages/mirta-testing:
     dependencies:
+      '@mirta/workspace':
+        specifier: workspace:*
+        version: link:../mirta-workspace
       mirta:
         specifier: workspace:*
         version: link:../mirta
@@ -352,6 +402,15 @@ importers:
         version: link:../mirta-rollup
 
   packages/mirta-tsconfig: {}
+
+  packages/mirta-workspace:
+    dependencies:
+      '@mirta/package':
+        specifier: workspace:*
+        version: link:../mirta-package
+      find-up:
+        specifier: ^8.0.0
+        version: 8.0.0
 
 packages:
 
@@ -868,6 +927,10 @@ packages:
     resolution: {integrity: sha512-CbMGzyOYSyFF7d4uaeYwO9gpSBzLTnMmSmTVpCZjvpJFV69qYbjYPpzNnCz1mb2wIvEhjWjRwQWuBzTO0jITww==}
     hasBin: true
 
+  '@dotenvx/dotenvx@1.51.1':
+    resolution: {integrity: sha512-fqcQxcxC4LOaUlW8IkyWw8x0yirlLUkbxohz9OnWvVWjf73J5yyw7jxWnkOJaUKXZotcGEScDox9MU6rSkcDgg==}
+    hasBin: true
+
   '@ecies/ciphers@0.2.4':
     resolution: {integrity: sha512-t+iX+Wf5nRKyNzk8dviW3Ikb/280+aEJAnw9YXvCp2tYGPSkMki+NRY+8aNLmVFv3eNtMdvViPNOPxS8SZNP+w==}
     engines: {bun: '>=1', deno: '>=2', node: '>=16'}
@@ -1177,8 +1240,26 @@ packages:
       rollup:
         optional: true
 
+  '@rollup/plugin-commonjs@29.0.0':
+    resolution: {integrity: sha512-U2YHaxR2cU/yAiwKJtJRhnyLk7cifnQw0zUpISsocBDoHDJn+HTV74ABqnwr5bEgWUwFZC9oFL6wLe21lHu5eQ==}
+    engines: {node: '>=16.0.0 || 14 >= 14.17'}
+    peerDependencies:
+      rollup: ^2.68.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
   '@rollup/plugin-multi-entry@6.0.1':
     resolution: {integrity: sha512-AXm6toPyTSfbYZWghQGbom1Uh7dHXlrGa+HoiYNhQtDUE3Q7LqoUYdVQx9E1579QWS1uOiu+cZRSE4okO7ySgw==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
+  '@rollup/plugin-multi-entry@7.1.0':
+    resolution: {integrity: sha512-dLp8gf+Kb/JvGQOreC6pg2gCFWPNmKaZFUzBRN1KgiOjHMN7ZfVM11dJS0BjmcIpeA6KPbWq2tFB9OwTb2N5Cw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -3548,6 +3629,18 @@ snapshots:
       picomatch: 4.0.3
       which: 4.0.0
 
+  '@dotenvx/dotenvx@1.51.1':
+    dependencies:
+      commander: 11.1.0
+      dotenv: 17.2.3
+      eciesjs: 0.4.16
+      execa: 5.1.1
+      fdir: 6.5.0(picomatch@4.0.3)
+      ignore: 5.3.2
+      object-treeify: 1.1.33
+      picomatch: 4.0.3
+      which: 4.0.0
+
   '@ecies/ciphers@0.2.4(@noble/ciphers@1.3.0)':
     dependencies:
       '@noble/ciphers': 1.3.0
@@ -3776,10 +3869,29 @@ snapshots:
     optionalDependencies:
       rollup: 4.52.5
 
+  '@rollup/plugin-commonjs@29.0.0(rollup@4.52.5)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
+      commondir: 1.0.1
+      estree-walker: 2.0.2
+      fdir: 6.5.0(picomatch@4.0.3)
+      is-reference: 1.2.1
+      magic-string: 0.30.21
+      picomatch: 4.0.3
+    optionalDependencies:
+      rollup: 4.52.5
+
   '@rollup/plugin-multi-entry@6.0.1(rollup@4.52.5)':
     dependencies:
       '@rollup/plugin-virtual': 3.0.2(rollup@4.52.5)
       matched: 5.0.1
+    optionalDependencies:
+      rollup: 4.52.5
+
+  '@rollup/plugin-multi-entry@7.1.0(rollup@4.52.5)':
+    dependencies:
+      '@rollup/plugin-virtual': 3.0.2(rollup@4.52.5)
+      tinyglobby: 0.2.15
     optionalDependencies:
       rollup: 4.52.5
 

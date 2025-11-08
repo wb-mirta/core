@@ -1,114 +1,41 @@
-import nodePath from 'node:path'
-
 /**
- * Класс ошибки для обработки проблем с монорепозиторием,
- * расширяющий стандартный Error.
+ * Класс ошибки сборки, расширяющий стандартный Error.
  *
  * @since 0.3.5
  *
  **/
-export class WorkspaceError extends Error {
+export class BuildError extends Error {
+
+  /** Код ошибки для программной идентификации. */
+  readonly code: string
 
   /**
    * Приватный конструктор для создания экземпляра ошибки.
    *
-   * @param message - Сообщение об ошибке.
-   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
+   * @param message - Сообщение об ошибке
+   * @param code - Код ошибки
+   * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup')
    *
    **/
-  private constructor(message: string, scope = '@mirta/rollup') {
+  private constructor(message: string, code: string, scope = '@mirta/rollup') {
 
     super(`[${scope}] ${message}`)
 
-    this.name = 'WorkspaceError'
-
-    if ('captureStackTrace' in Error)
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, WorkspaceError.get)
-
-  }
-
-  private static readonly codeMappings = {
-
-    /**
-     * Ошибка, возникающая, когда не найден ни один из lock-файлов пакетных менеджеров
-     * (pnpm-lock.yaml, yarn.lock, package-lock.json, bun.lockb) в текущей или родительских директориях.
-     *
-     **/
-    noLockfile: () =>
-      'No lockfile (pnpm/yarn/bun/npm) found. Required to detect workspace root',
-
-    noPackageName: (packagePath: string) =>
-      `Package with path "${packagePath}" missing required 'name' field in package.json`,
-
-    noWorkspaces: () =>
-      'No workspaces configured in root package.json',
-
-    badWorkspacesFormat: (pkgPath: string) =>
-      `Bad workspaces format in "${pkgPath}": it must be array of strings`,
-
-  } as const
-
-  static get<T extends keyof typeof WorkspaceError['codeMappings']>(
-    code: T,
-    ...args: Parameters<typeof WorkspaceError['codeMappings'][T]>
-  ): WorkspaceError {
-
-    const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
-
-    const message = messageFn(...args)
-
-    return new WorkspaceError(message)
-
-  }
-}
-
-/**
- * Класс ошибки для обработки проблем с файлами, расширяющий стандартный Error.
- *
- * @since 0.3.5
- *
- **/
-export class FileError extends Error {
-
-  /**
-   * Приватный конструктор для создания экземпляра ошибки.
-   *
-   * @param message - Сообщение об ошибке.
-   * @param scope - Область, к которой относится ошибка (по умолчанию '@mirta/rollup').
-   *
-   **/
-  private constructor(message: string, scope = '@mirta/rollup') {
-
-    super(`[${scope}] ${message}`)
-
-    this.name = 'FileError'
+    this.name = 'BuildError'
+    this.code = code
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, FileError.get)
+      Error.captureStackTrace(this, BuildError.get)
 
   }
 
   /** Карта кодов ошибок с соответствующими сообщениями. */
   private static readonly codeMappings = {
 
-    /** Ошибка, возникающая при отсутствии файла в указанном расположении. */
-    notFound: (filePath: string) =>
-      `File not found: "${filePath}"`,
-
-    /** Ошибка, возникающая при отсутствии доступа к указанному файлу. */
-    noAccess: (filePath: string) =>
-      `No access to file "${filePath}"`,
-
-    /** Ошибка, возникающая при невалидном JSON в файле. */
-    invalidJson: (filePath: string, message: string) =>
-      `Invalid JSON in file "${filePath}": ${message}`,
-
-    /** Ошибка парсинга, возникающая по неуточненным причинам. */
-    failedToParse: (filePath: string, message: string) =>
-      `Failed to parse "${nodePath.basename(filePath)}": ${message}`,
+    /** Ошибка, возникающая когда чанк выходит за пределы собираемого пакета. */
+    chunkOutsidePackage: (chunkName: string, packageName: string, workspacePath: string) =>
+      `Chunk "${chunkName}" is not within package "${packageName}" workspace path "${workspacePath}"`,
 
   } as const
 
@@ -118,20 +45,20 @@ export class FileError extends Error {
    * @template T - Тип ключа из codeMappings
    * @param code - Код ошибки
    * @param args - Аргументы для формирования сообщения
-   * @returns Экземпляр {@link FileError}
+   * @returns Экземпляр {@link BuildError}
    *
    **/
-  static get<T extends keyof typeof FileError['codeMappings']>(
+  static get<T extends keyof typeof BuildError['codeMappings']>(
     code: T,
-    ...args: Parameters<typeof FileError['codeMappings'][T]>
-  ): FileError {
+    ...args: Parameters<typeof BuildError['codeMappings'][T]>
+  ): BuildError {
 
     const messageFn
       = this.codeMappings[code] as ((...args: unknown[]) => string)
 
     const message = messageFn(...args)
 
-    return new FileError(message)
+    return new BuildError(message, code)
 
   }
 }
@@ -144,18 +71,23 @@ export class FileError extends Error {
  **/
 export class NpmBuildError extends Error {
 
+  /** Код ошибки для программной идентификации. */
+  readonly code: string
+
   /**
    * Приватный конструктор для создания экземпляра ошибки.
    *
    * @param message - Сообщение об ошибке
+   * @param code - Код ошибки
    * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup NPM')
    *
    **/
-  private constructor(message: string, scope = '@mirta/rollup NPM') {
+  private constructor(message: string, code: string, scope = '@mirta/rollup NPM') {
 
     super(`[${scope}] ${message}`)
 
     this.name = 'NpmBuildError'
+    this.code = code
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -227,7 +159,7 @@ export class NpmBuildError extends Error {
 
     const message = messageFn(...args)
 
-    return new NpmBuildError(message)
+    return new NpmBuildError(message, code)
 
   }
 }
@@ -240,17 +172,22 @@ export class NpmBuildError extends Error {
  **/
 export class AstTransformError extends Error {
 
+  /** Код ошибки для программной идентификации. */
+  readonly code: string
+
   /**
    * Приватный конструктор для создания экземпляра ошибки.
    *
    * @param message - Сообщение об ошибке
+   * @param code - Код ошибки
    * @param scope - Область действия ошибки (по умолчанию '@mirta/rollup AST')
    *
    **/
-  private constructor(message: string, scope = '@mirta/rollup AST') {
+  private constructor(message: string, code: string, scope = '@mirta/rollup AST') {
 
     super(`[${scope}] ${message}`)
     this.name = 'AstTransformError'
+    this.code = code
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -262,7 +199,7 @@ export class AstTransformError extends Error {
   private static readonly codeMappings = {
 
     /** Ошибка, возникающая при отсутствии root-файлов в проекте. */
-    noRootFilesInProject: () =>
+    noRootFiles: () =>
       'No root files found in the project. Check your TypeScript configuration (tsconfig.json)',
 
     /** Ошибка, возникающая при отсутствии модуля для указанного спецификатора. */
@@ -270,8 +207,8 @@ export class AstTransformError extends Error {
       `Module "${modulePath}" not found in "${sourceFileName}"`,
 
     /** Ошибка, возникающая когда modulePath содержит недопустимые символы. */
-    invalidPathFormat: (modulePath: string) =>
-      `Invalid format of module path: "${modulePath}"`,
+    invalidChars: (path: string) =>
+      `Invalid chars in path: "${path}"`,
 
   } as const
 
@@ -294,7 +231,7 @@ export class AstTransformError extends Error {
 
     const message = messageFn(...args)
 
-    return new AstTransformError(message)
+    return new AstTransformError(message, code)
 
   }
 }

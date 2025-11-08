@@ -12,7 +12,15 @@ import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
 
-import { resolveMonorepoContextAsync, findMonorepoPackageByChunkName, mapChunkToPackage } from '#utils/context/monorepo'
+import { resolveMonorepoContextAsync } from '@mirta/workspace'
+
+import {
+
+  findPackageByChunkName,
+  toVirtualModulePath
+
+} from '#utils/monorepo'
+
 import { getEntryPath } from '#utils/entry-path'
 
 const mode = process.env.NODE_ENV ?? 'development'
@@ -132,16 +140,21 @@ export async function defineRuntimeConfig(
       dir: outDir,
       preserveModules: true,
 
-      entryFileNames(chunkInfo) {
+      entryFileNames(chunk) {
 
-        let chunkName = chunkInfo.name
+        // Относительный путь от корня репозитория.
+        let chunkName = chunk.name
 
         // Адаптация путей при сборке в монорепозитории.
         if (monorepoContext.packages.length !== 0) {
 
           const { rootDir } = monorepoContext
 
-          const absolutePath = nodePath.resolve(rootDir, chunkInfo.name)
+          // Преобразуем chunkName (относительный путь от корня монорепозитория)
+          // в абсолютный путь для корректного сравнения с cwd (абсолютным путём
+          // к текущему пакету).
+          //
+          const absolutePath = nodePath.resolve(rootDir, chunkName)
 
           if (absolutePath.startsWith(cwd)) {
 
@@ -154,10 +167,10 @@ export async function defineRuntimeConfig(
           else {
 
             // Ищем пакет монорепозитория, в котором находится указанный путь.
-            const pkgDefinition = findMonorepoPackageByChunkName(monorepoContext, chunkName)
+            const pkgDefinition = findPackageByChunkName(monorepoContext, chunkName)
 
             if (pkgDefinition)
-              chunkName = mapChunkToPackage(chunkName, pkgDefinition)
+              chunkName = toVirtualModulePath(chunkName, pkgDefinition)
 
           }
 

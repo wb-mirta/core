@@ -1,6 +1,6 @@
 import nodePath from 'node:path'
 import { defineConfig, configDefaults, type TestProjectConfiguration } from 'vitest/config'
-import { resolveMonorepoContextAsync } from '@mirta/rollup/context'
+import { resolveMonorepoContextAsync } from '@mirta/workspace'
 import { loadEnv } from '@mirta/rollup/env-loader'
 
 const cwd = process.cwd()
