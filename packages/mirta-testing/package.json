@@ -41,6 +41,7 @@
     "build:mono": "rollup -c"
   },
   "dependencies": {
+    "@mirta/workspace": "workspace:*",
     "mirta": "workspace:*",
     "vitest-mock-extended": "^3.1.0"
   },

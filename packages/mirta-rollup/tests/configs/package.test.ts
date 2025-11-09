@@ -1,1299 +1,687 @@
-import { type OutputOptions, type PreRenderedChunk, type Plugin } from 'rollup'
+import { ensureArray } from '@mirta/basics/array'
+import nodePath from 'node:path'
 
-const fs = await import('fs')
-const readFileSync = vi.mocked(fs.readFileSync)
-const nodePath = vi.mocked((await import('node:path')).default, true)
+vi.mock('@mirta/package', async () => {
 
-import { NpmBuildError } from '#utils/errors'
-
-// Mock fs module
-vi.mock('fs', () => ({
-
-  readFileSync: vi.fn(),
-
-}))
-
-// Mock node:path to ensure consistent behavior
-vi.mock('node:path', async () => {
-
-  const actual = await vi.importActual<typeof nodePath>('node:path')
+  const actual = await vi.importActual<typeof import('@mirta/package')>('@mirta/package')
 
   return {
-
     ...actual,
-
-    default: {
-      ...actual,
-      resolve: vi.fn((...args: string[]) => actual.resolve(...args)),
-      relative: vi.fn((from: string, to: string) => actual.relative(from, to)),
-      sep: actual.sep,
-      posix: actual.posix,
-    },
+    readPackage: vi.fn(),
   }
 
 })
 
-// Import after mocking
+vi.mock('@rollup/plugin-typescript', () => ({
+  default: vi.fn(() => ({ name: 'typescript' })),
+}))
+
+vi.mock('@rollup/plugin-node-resolve', () => ({
+  default: vi.fn(() => ({ name: 'node-resolve' })),
+}))
+
+vi.mock('@rollup/plugin-commonjs', () => ({
+  default: vi.fn(() => ({ name: 'commonjs' })),
+}))
+
+vi.mock('@rollup/plugin-replace', () => ({
+  default: vi.fn(() => ({ name: 'replace' })),
+}))
+
+vi.mock('rollup-plugin-copy', () => ({
+  default: vi.fn(() => ({ name: 'copy' })),
+}))
+
+vi.mock('rollup-plugin-dts', () => ({
+  default: vi.fn(() => ({ name: 'dts' })),
+}))
+
+vi.mock('#plugins/del', () => ({
+  default: vi.fn(() => ({ name: 'del' })),
+}))
+
+vi.mock('#ast', () => ({
+  dtsAlias: vi.fn(() => () => ({})),
+}))
+
+const { readPackage, toPosix } = await import('@mirta/package')
+const mockReadPackage = vi.mocked(readPackage)
+
 const { definePackageConfig } = await import('#configs/package')
 
-describe('package.ts - normalizeInput', () => {
+describe('definePackageConfig', () => {
+
+  const originalCwd = process.cwd()
+  const originalEnv = process.env.NODE_ENV
 
   beforeEach(() => {
 
     vi.clearAllMocks()
-
-  })
-
-  it('should handle string input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(config).toHaveLength(2) // mjs build + dts build
-    expect(config[0].input).toBe('src/index.ts')
-
-  })
-
-  it('should handle array input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            types: './dist/utils.d.mts',
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/utils.ts'],
-    })
-
-    expect(config).toHaveLength(2)
-    expect(config[0].input).toEqual(['src/index.ts', 'src/utils.ts'])
-
-  })
-
-  it('should handle object input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            types: './dist/utils.d.mts',
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: {
-        index: 'src/index.ts',
-        utils: 'src/utils.ts',
-      },
-    })
-
-    expect(config).toHaveLength(2)
-    expect(config[0].input).toEqual({
-      index: 'src/index.ts',
-      utils: 'src/utils.ts',
-    })
-
-  })
-
-  it('should throw BuildError for empty input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        cwd: '/test/project',
-        input: [],
-      })
-
-    }).toThrow(NpmBuildError.get('inputEmpty'))
-
-  })
-
-  it('should throw BuildError for empty object input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: {},
-      })
-
-    }).toThrow(NpmBuildError.get('inputEmpty'))
-
-  })
-
-})
-
-describe('package.ts - getInputBindings', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should map single entry point correctly', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(config).toBeDefined()
-    expect((config[0]?.output as OutputOptions).dir).toBe('dist')
-
-  })
-
-  it('should handle src/setup.ts', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './setup': {
-          import: {
-            default: './dist/setup.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    // Should work with explicit file
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/setup.ts'],
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should handle nested index file structure (src/setup/index.ts)', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './setup': {
-          import: {
-            types: './dist/setup/index.d.mts',
-            default: './dist/setup/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/setup/index.ts'],
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should not use export path ./dist/utils.mjs as output point for src/utils/index.ts', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    // Should ignore export pattern ./dist/utils.mjs
-    expect(() => {
-
-      definePackageConfig({
-        input: ['src/index.ts', 'src/utils/index.ts'],
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/utils/index.ts', './dist/utils/index.mjs'))
-
-  })
-
-  it('should throw error for input not matching any export pattern', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: ['src/index.ts', 'src/nonexistent.ts'],
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/nonexistent.ts', './dist/nonexistent.mjs'))
-
-  })
-
-  it('should handle .js input files correctly', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.js', 'src/utils.js'],
-    })
-
-    expect(config).toBeDefined()
-    expect(config[0].input).toEqual(['src/index.js', 'src/utils.js'])
-
-  })
-
-  it('should handle nested export paths', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './components/button': {
-          import: {
-            default: './dist/components/button.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/components/button.ts'],
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should throw BuildError when input file is not associated with export', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: ['src/index.ts', 'src/unknown.ts'],
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/unknown.ts', './dist/unknown.mjs'))
-
-  })
-
-  it('should throw BuildError when export has no corresponding input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('exportHasNoInput', './dist/utils.mjs'))
-
-  })
-
-  it('should handle exports without import.default', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          require: './dist/index.cjs',
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
-
-  })
-
-  it('should handle exports not starting with dot', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        'package.json': './package.json',
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('exportMustStartWithDot', 'package.json'))
-
-  })
-
-  it('should handle .js input files', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.js',
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should strip ./dist/ prefix from output file paths', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    // The output should be relative to dist/ directory
-    expect((config[0].output as OutputOptions).dir).toBe('dist')
-
-  })
-
-})
-
-describe('package.ts - getDtsMappings', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should create DTS mappings when types are defined', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    // Should have 2 configs: mjs build + dts build
-    expect(config).toHaveLength(2)
-    expect(config[1].plugins).toBeDefined()
-
-  })
-
-  it('should skip DTS build when no types are defined', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    // Should only have 1 config: mjs build (no dts)
-    expect(config).toHaveLength(1)
-
-  })
-
-  it('should handle multiple DTS entry points', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            types: './dist/utils.d.mts',
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/utils.ts'],
-    })
-
-    expect(config).toHaveLength(2)
-    // DTS config should have multiple inputs
-    expect(Array.isArray(config[1].input)).toBe(true)
-
-  })
-
-  it('should throw BuildError when type definition has no corresponding input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-        './missing': {
-          import: {
-            types: './dist/missing.d.mts',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/missing.d.mts'))
-
-  })
-
-  it('should strip ./dist/ prefix from DTS output paths', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/types/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[1].output as OutputOptions).dir).toBe('dist')
-
-  })
-
-})
-
-describe('package.ts - definePackageConfig', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should use default cwd when not provided', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(config).toBeDefined()
-
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(vi.mocked(nodePath.resolve)).toHaveBeenCalled()
-
-  })
-
-  it('should use default input when not provided', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({ })
-
-    expect(config).toBeDefined()
-    expect(config[0].input).toBe('src/index.ts')
-
-  })
-
-  it('should correctly configure external using createExternalFilter', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-      external: ['lodash', /^react/],
-    })
-
-    // external теперь функция, а не массив
-    expect(typeof config[0].external).toBe('function')
-
-    // Проверяем, что функция работает правильно
-    const externalFn = config[0].external as (id: string) => boolean
-
-    expect(externalFn('lodash')).toBe(true)
-    expect(externalFn('react-dom')).toBe(true)
-    expect(externalFn('vue')).toBe(false)
-
-  })
-
-  it('should include custom plugins in configuration', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const customPlugin = { name: 'custom-plugin' }
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-      plugins: [
-        customPlugin,
-      ],
-    })
-
-    expect(config[0].plugins).toContainEqual(customPlugin)
-
-  })
-
-  it('should handle package without exports', () => {
-
-    const mockPackage = {}
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow()
-
-  })
-
-  it('should configure ES module output format', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).format).toBe('es')
-    expect((config[0].output as OutputOptions).importAttributesKey).toBe('with')
-
-  })
-
-  it('should set output directory correctly', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).dir).toBe('dist')
-
-  })
-
-  it('should configure chunk file names correctly', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).chunkFileNames).toBe('[name].mjs')
-
-  })
-
-  it('should configure DTS deletion after build', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    // DTS config should have del plugin
-    const dtsConfig = config[1]
-
-    const delPlugin = (dtsConfig.plugins as Plugin[]).find(p => p.name === 'del')
-
-    expect(delPlugin).toBeDefined()
-
-  })
-
-})
-
-describe('package.ts - entryFileNames function', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should handle unmapped input', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/custom-name.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
-
-  })
-
-  it('should fall back to default name when no mapping exists', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    const entryFileNames = (config[0].output as OutputOptions).entryFileNames as (chunk: Partial<PreRenderedChunk>) => string
-    expect(entryFileNames).toBeDefined()
-
-    // Test with chunk that has no facadeModuleId
-    const result = entryFileNames({ name: 'test-chunk' })
-    expect(result).toBe('test-chunk.mjs')
-
-  })
-
-})
-
-describe('package.ts - environment variables', () => {
-
-  let originalEnv: NodeJS.ProcessEnv
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-    originalEnv = { ...process.env }
+    process.env.NODE_ENV = 'development'
 
   })
 
   afterEach(() => {
 
-    process.env = originalEnv
+    vi.spyOn(process, 'cwd').mockReturnValue(originalCwd)
+    process.env.NODE_ENV = originalEnv
 
   })
 
-  it('should enable sourcemaps when SOURCE_MAP is set', () => {
+  describe('ESM bundle generation', () => {
 
-    process.env.SOURCE_MAP = 'true'
+    it('should generate single ESM config when no types defined', () => {
 
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
         },
-      },
-    }
+      })
 
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).sourcemap).toBe(true)
-
-  })
-
-  it('should not enable sourcemaps by default', () => {
-
-    delete process.env.SOURCE_MAP
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).sourcemap).toBe(false)
-
-  })
-
-  it('should disable external live bindings', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect((config[0].output as OutputOptions).externalLiveBindings).toBe(false)
-
-  })
-
-})
-
-describe('package.ts - complex scenarios', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should handle mixed .ts and .js extensions', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            default: './dist/utils.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/utils.js'],
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should handle exports with nested paths', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-        './utils/helpers': {
-          import: {
-            types: './dist/utils/helpers.d.mts',
-            default: './dist/utils/helpers.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: ['src/index.ts', 'src/utils/helpers.ts'],
-    })
-
-    expect(config).toBeDefined()
-
-  })
-
-  it('should handle package with only index export', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(config).toHaveLength(2)
-    expect(config[0].input).toBe('src/index.ts')
-
-  })
-
-  it('should correctly handle external dependencies', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(typeof config[0].external).toBe('function')
-
-  })
-
-  it('should include package.json path in external', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
-    })
-
-    expect(config[0].external).toBeDefined()
-
-  })
-
-})
-
-describe('package.ts - edge cases', () => {
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
-
-  it('should handle empty exports object', () => {
-
-    const mockPackage = {
-      exports: {},
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
+      const configs = definePackageConfig({
         input: 'src/index.ts',
       })
 
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
-
-  })
-
-  it('should handle exports with only types (no default)', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-        './utils': {
-          import: {
-            types: './dist/utils.d.mts',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
+      expect(configs).toHaveLength(1)
+      expect(configs[0].output).toMatchObject({
+        dir: expect.stringContaining('dist') as unknown,
+        format: 'es',
       })
 
-    }).toThrow(NpmBuildError.get('exportTypesOnly', './dist/utils.d.mts'))
-
-  })
-
-  it('should handle malformed package.json', () => {
-
-    vi.mocked(readFileSync).mockReturnValue('invalid json')
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow()
-
-  })
-
-  it('should handle exports with different path prefixes', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            default: 'dist/index.mjs', // without ./
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    expect(() => {
-
-      definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-    }).toThrow(NpmBuildError.get('inputHasNoExport', 'src/index.ts', './dist/index.mjs'))
-
-  })
-
-  it('should handle root key only (.) export', () => {
-
-    const mockPackage = {
-      exports: {
-        '.': {
-          import: {
-            types: './dist/index.d.mts',
-            default: './dist/index.mjs',
-          },
-        },
-      },
-    }
-
-    vi.mocked(readFileSync).mockReturnValue(JSON.stringify(mockPackage))
-
-    const config = definePackageConfig({
-      input: 'src/index.ts',
     })
 
-    expect(config).toHaveLength(2)
+    it('should handle string input', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(configs).toHaveLength(1)
+      expect(Array.isArray(configs[0].input)).toBe(true)
+
+    })
+
+    it('should handle array input', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
+          './utils': './dist/utils.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: ['src/index.ts', 'src/utils.ts'],
+      })
+
+      expect(configs).toHaveLength(1)
+      expect(configs[0].input).toEqual(['src/index.ts', 'src/utils.ts'])
+
+    })
+
+    it('should handle object input', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
+          './lib': './dist/lib.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: {
+          index: 'src/index.ts',
+          lib: 'src/lib.ts',
+        },
+      })
+
+      expect(configs).toHaveLength(1)
+      expect(configs[0].input).toEqual(['src/index.ts', 'src/lib.ts'])
+
+    })
+
+    it('should configure TypeScript plugin correctly', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      const tsPlugin = ensureArray(configs[0].plugins)
+        .find(p => p && 'name' in p && p.name === 'typescript')
+
+      expect(tsPlugin).toBeDefined()
+
+    })
+
+    it('should set importAttributesKey to "with"', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(configs[0].output).toMatchObject({
+        importAttributesKey: 'with',
+      })
+
+    })
+
+    it('should configure external filter', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+        external: ['some-lib'],
+      })
+
+      expect(configs[0].external).toBeDefined()
+      expect(typeof configs[0].external).toBe('function')
+
+    })
+
+    it('should include custom plugins', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const customPlugin = { name: 'custom-plugin' }
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+        plugins: [customPlugin],
+      })
+
+      expect(configs[0].plugins).toContainEqual(customPlugin)
+
+    })
+
+  })
+
+  describe('DTS bundle generation', () => {
+
+    it('should generate DTS config when types are defined', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': {
+            import: {
+              types: './dist/index.d.mts',
+              default: './dist/index.mjs',
+            },
+          },
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(configs).toHaveLength(2)
+      expect(configs[1].input).toEqual(['dist/dts/index.d.ts'])
+      expect(configs[1].output).toMatchObject({
+        dir: expect.stringContaining('dist') as unknown,
+        format: 'es',
+      })
+
+    })
+
+    it('should configure DTS plugins', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': {
+            import: {
+              types: './dist/index.d.mts',
+              default: './dist/index.mjs',
+            },
+          },
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      const dtsConfig = configs[1]
+
+      const pluginNames = ensureArray(dtsConfig.plugins)
+        .map(p => p && 'name' in p ? p.name : null)
+
+      expect(pluginNames).toContain('node-resolve')
+      expect(pluginNames).toContain('commonjs')
+      expect(pluginNames).toContain('dts')
+      expect(pluginNames).toContain('del')
+
+    })
+
+    it('should handle multiple entries with types', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': {
+            import: {
+              types: './dist/index.d.mts',
+              default: './dist/index.mjs',
+            },
+          },
+          './utils': {
+            import: {
+              types: './dist/utils.d.mts',
+              default: './dist/utils.mjs',
+            },
+          },
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: ['src/index.ts', 'src/utils.ts'],
+      })
+
+      expect(configs).toHaveLength(2)
+      expect(configs[1].input).toEqual([
+        'dist/dts/index.d.ts',
+        'dist/dts/utils.d.ts',
+      ])
+
+    })
+
+    it('should not generate DTS config when types are absent', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
+          './utils': './dist/utils.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: ['src/index.ts', 'src/utils.ts'],
+      })
+
+      expect(configs).toHaveLength(1)
+
+    })
+
+    it('should handle mixed: some with types, some without', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': {
+            import: {
+              types: './dist/index.d.mts',
+              default: './dist/index.mjs',
+            },
+          },
+          './utils': './dist/utils.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: ['src/index.ts', 'src/utils.ts'],
+      })
+
+      expect(configs).toHaveLength(2)
+      expect(configs[1].input).toEqual(['dist/dts/index.d.ts'])
+
+    })
+
+  })
+
+  describe('bootstrap mode (monorepo context)', () => {
+
+    it('should add package prefix when cwd differs from process.cwd()', () => {
+
+      const rootDir = '/home/user/monorepo'
+      const packageDir = '/home/user/monorepo/packages/core'
+
+      vi.spyOn(process, 'cwd').mockReturnValue(rootDir)
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        cwd: packageDir,
+        input: 'src/index.ts',
+      })
+
+      const expectedPrefix = toPosix(nodePath.relative(rootDir, packageDir))
+      expect(configs[0].input).toEqual([`${expectedPrefix}/src/index.ts`])
+
+    })
+
+    it('should add prefix to DTS inputs in bootstrap mode', () => {
+
+      const rootDir = '/repo'
+      const packageDir = '/repo/packages/app'
+
+      vi.spyOn(process, 'cwd').mockReturnValue(rootDir)
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': {
+            import: {
+              types: './dist/index.d.mts',
+              default: './dist/index.mjs',
+            },
+          },
+        },
+      })
+
+      const configs = definePackageConfig({
+        cwd: packageDir,
+        input: 'src/index.ts',
+      })
+
+      expect(configs).toHaveLength(2)
+      expect(configs[1].input).toEqual(['packages/app/dist/dts/index.d.ts'])
+
+    })
+
+    it('should not add prefix when cwd equals process.cwd()', () => {
+
+      const workingDir = '/home/user/package'
+
+      vi.spyOn(process, 'cwd').mockReturnValue(workingDir)
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        cwd: workingDir,
+        input: 'src/index.ts',
+      })
+
+      expect(configs[0].input).toEqual(['src/index.ts'])
+
+    })
+
+    it('should handle nested package structure', () => {
+
+      const rootDir = '/monorepo'
+      const packageDir = '/monorepo/packages/nested/deep/pkg'
+
+      vi.spyOn(process, 'cwd').mockReturnValue(rootDir)
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        cwd: packageDir,
+        input: 'src/index.ts',
+      })
+
+      expect(configs[0].input).toEqual(['packages/nested/deep/pkg/src/index.ts'])
+
+    })
+
+  })
+
+  describe('skipExports mode', () => {
+
+    it('should skip exports validation when skipExports is true', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: undefined,
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/cli.ts',
+        skipExports: true,
+      })
+
+      expect(configs).toHaveLength(1)
+
+    })
+
+    it('should not generate DTS config in skipExports mode', () => {
+
+      mockReadPackage.mockReturnValue({})
+
+      const configs = definePackageConfig({
+        input: ['src/bin.ts', 'src/server.ts'],
+        skipExports: true,
+      })
+
+      expect(configs).toHaveLength(1)
+
+    })
+
+    it('should work with multiple inputs in skipExports mode', () => {
+
+      mockReadPackage.mockReturnValue({})
+
+      const configs = definePackageConfig({
+        input: ['src/cli.ts', 'src/daemon.ts', 'src/worker.ts'],
+        skipExports: true,
+      })
+
+      expect(configs[0].input).toEqual([
+        'src/cli.ts',
+        'src/daemon.ts',
+        'src/worker.ts',
+      ])
+
+    })
+
+  })
+
+  describe('default behavior', () => {
+
+    it('should use default input "src/index.ts" when not specified', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig()
+
+      expect(configs[0].input).toEqual(['src/index.ts'])
+
+    })
+
+    it('should use process.cwd() as default cwd', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.dir).toContain('dist')
+
+    })
+
+    it('should have empty external array by default', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(configs[0].external).toBeDefined()
+
+    })
+
+    it('should not skip exports validation by default', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
+          './orphan': './dist/orphan.mjs',
+        },
+      })
+
+      expect(() =>
+        definePackageConfig({
+          input: 'src/index.ts',
+        })
+      ).toThrow()
+
+    })
+
+  })
+
+  describe('entryFileNames resolution', () => {
+
+    it('should use binding outputFile when facadeModuleId matches', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          '.': './dist/index.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      const entryFileNamesFn = ensureArray(configs[0].output)[0]?.entryFileNames
+
+      expect(typeof entryFileNamesFn).toBe('function')
+
+    })
+
+    it('should fallback to chunk.name.mjs when no binding found', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      const entryFileNamesFn = ensureArray(configs[0].output)[0]?.entryFileNames
+
+      expect(typeof entryFileNamesFn).toBe('function')
+
+    })
+
+  })
+
+  describe('environment configuration', () => {
+
+    it('should set sourcemap based on SOURCE_MAP env', () => {
+
+      process.env.SOURCE_MAP = '1'
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.sourcemap).toBe(true)
+
+      delete process.env.SOURCE_MAP
+
+    })
+
+    it('should disable sourcemap when SOURCE_MAP is not set', () => {
+
+      delete process.env.SOURCE_MAP
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.sourcemap).toBe(false)
+
+    })
+
+    it('should set externalLiveBindings to false', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.externalLiveBindings).toBe(false)
+
+    })
+
+  })
+
+  describe('edge cases', () => {
+
+    it('should handle package.json at custom path', () => {
+
+      const customCwd = '/custom/path/to/package'
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        cwd: customCwd,
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.dir).toBe(nodePath.join(customCwd, 'dist'))
+
+    })
+
+    it('should handle deeply nested input paths', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: {
+          './lib/utils/helper': './dist/lib/utils/helper.mjs',
+        },
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/lib/utils/helper.ts',
+      })
+
+      expect(configs[0].input).toEqual(['src/lib/utils/helper.ts'])
+
+    })
+
+    it('should preserve chunkFileNames as static string', () => {
+
+      mockReadPackage.mockReturnValue({
+        exports: './dist/index.mjs',
+      })
+
+      const configs = definePackageConfig({
+        input: 'src/index.ts',
+      })
+
+      expect(ensureArray(configs[0].output)[0]?.chunkFileNames).toBe('[name].mjs')
+
+    })
 
   })
 

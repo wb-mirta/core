@@ -11,6 +11,9 @@
       "@mirta/*": [
         "packages/mirta-*/src"
       ],
+      "@mirta/basics/array": [
+        "packages/mirta-basics/src/array"
+      ],
       "mirta": [
         "packages/mirta/src"
       ]

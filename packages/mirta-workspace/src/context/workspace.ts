@@ -1,8 +1,7 @@
 import nodePath from 'node:path'
 import { findUp } from 'find-up'
-import { parsePackageJson } from '#utils/package'
-import { WorkspaceError } from '#utils/errors'
-import { toPosix } from '#utils/path'
+import { readPackageAsync, toPosix } from '@mirta/package'
+import { WorkspaceError } from '../errors'
 
 /**
  * Тип пакетного менеджера.
@@ -79,7 +78,7 @@ function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asse
   if (Array.isArray(workspaces) && workspaces.every(item => typeof item === 'string'))
     return
 
-  throw WorkspaceError.get('badWorkspacesFormat', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
+  throw WorkspaceError.get('invalidWorkspaces', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
 
 }
 
@@ -92,7 +91,7 @@ function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asse
  * @param cwd - Рабочая директория, с которой начинается поиск.
  * @returns Объект {@link WorkspaceContext} с корнем, менеджером и полем `workspaces` (если есть).
  * @throws {WorkspaceError} Если lock-файл не найден или `workspaces` имеет недопустимый формат.
- * @throws {FileError} Если `package.json` отсутствует, недоступен или содержит невалидный JSON.
+ * @throws {PackageError} Если `package.json` отсутствует, недоступен или содержит невалидный JSON.
  *
  * @remarks
  * - Поле `workspaces` может отсутствовать — это не ошибка.
@@ -115,7 +114,7 @@ export async function resolveWorkspaceContextAsync(cwd: string): Promise<Workspa
   const rootDir = nodePath.dirname(lockFilePath)
 
   const pkgPath = `${rootDir}/package.json`
-  const pkg = parsePackageJson(pkgPath)
+  const pkg = await readPackageAsync(pkgPath)
 
   assertWorkspacesFieldFormat(pkg.workspaces, pkgPath)
 

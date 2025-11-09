@@ -1,3 +1,17 @@
+/**
+ * @file Генерирует конфигурации Rollup на основе `package.json`.
+ *
+ * Главная функция — `definePackageConfig`. Она:
+ * - Читает `exports` и сопоставляет с `input`
+ * - Генерирует ESM-бандл и, при необходимости, `.d.ts`
+ * - Поддерживает запуск из корня монорепозитория (через `cwd`)
+ *
+ * Используется для сборки пакетов в монорепозитории.
+ *
+ * @since 0.3.0
+ *
+ **/
+
 import ts from '@rollup/plugin-typescript'
 
 import nodeResolve from '@rollup/plugin-node-resolve'
@@ -8,7 +22,7 @@ import copy from 'rollup-plugin-copy'
 import dts from 'rollup-plugin-dts'
 import del from '#plugins/del'
 
-import { dtsAlias } from '#ast/index'
+import { dtsAlias } from '#ast'
 
 import nodePath from 'node:path'
 
@@ -21,9 +35,19 @@ import type {
   PreRenderedChunk
 } from 'rollup'
 
-import { NpmBuildError } from '#utils/errors'
-import { parsePackageJson } from '#utils/package'
-import { createExternalFilter } from '#utils/external-filter'
+import {
+
+  readPackage,
+  toPosix,
+  type ExportsConditional,
+  type ExportsEntry,
+  type ExportsPath,
+  type PackageExports
+
+} from '@mirta/package'
+
+import { NpmBuildError } from '../utils/errors'
+import { createExternalFilter } from '../utils/external-filter'
 
 /**
  * Опции конфигурации Rollup.
@@ -69,6 +93,8 @@ interface BuildOptions {
   emitDeclarations: boolean
   external?: ExternalOption
   plugins?: Plugin[]
+  outPath: string
+  outPathDts: string
   output: {
     dir: string
     format: ModuleFormat
@@ -97,13 +123,13 @@ interface ExportDescriptor {
  *
  **/
 interface InputBinding {
-  outputFile: string
-  dtsSourceFile: string
-  dtsOutputFile?: string
+  readonly outputFile: string
+  readonly dtsSourceFile: string
+  readonly dtsOutputFile?: string
 }
 
 const outDir = 'dist'
-const dtsOutDir = `${outDir}/dts`
+const outDirDts = `${outDir}/dts`
 
 /**
  * Удаляет префикс каталога вывода (`./${outDir}/`) из пути.
@@ -137,9 +163,6 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
 
   const inputs: string[] = []
 
-  // Нормализация входных данных.
-  // Строка, массив или объект преобразуются в единый массив строк inputs.
-
   if (typeof input === 'string') {
 
     inputs.push(input)
@@ -172,7 +195,7 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
  * @since 0.3.5
  *
  **/
-function isConditionalEntry(source: object): source is PackageExports.ConditionalEntry {
+function isConditionalEntry(source: object): source is ExportsConditional {
 
   return 'import' in source
 
@@ -187,12 +210,12 @@ function isConditionalEntry(source: object): source is PackageExports.Conditiona
  * @since 0.3.5
  *
  **/
-function processConditionalEntry(source: PackageExports.ConditionalEntry) {
+function processConditionalEntry(source: ExportsConditional) {
 
   const result: {
 
-    entry?: PackageExports.Path
-    types?: PackageExports.Path
+    entry?: ExportsPath
+    types?: ExportsPath
 
   } = {}
 
@@ -227,7 +250,7 @@ function processConditionalEntry(source: PackageExports.ConditionalEntry) {
  * @since 0.3.5
  *
  **/
-function assertTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.Path) {
+function assertTypesHaveEntry(entry: ExportsPath, types: ExportsPath) {
 
   if (types && !entry)
     throw NpmBuildError.get('exportTypesOnly', types)
@@ -244,7 +267,7 @@ function assertTypesHaveEntry(entry: PackageExports.Path, types: PackageExports.
  * @since 0.3.5
  *
  **/
-function normalizeExports(exportsField: PackageExports) {
+export function normalizeExports(exportsField: PackageExports) {
 
   if (!exportsField)
     throw NpmBuildError.get('exportEmpty')
@@ -277,7 +300,7 @@ function normalizeExports(exportsField: PackageExports) {
 
   }
 
-  for (const [key, value] of Object.entries<PackageExports.Entry>(exportsField)) {
+  for (const [key, value] of Object.entries<ExportsEntry>(exportsField)) {
 
     if (!value)
       continue
@@ -286,8 +309,8 @@ function normalizeExports(exportsField: PackageExports) {
       throw NpmBuildError.get('exportMustStartWithDot', key)
 
     let
-      entry: PackageExports.Path,
-      types: PackageExports.Path
+      entry: ExportsPath,
+      types: ExportsPath
 
     if (typeof value === 'string') {
 
@@ -321,24 +344,31 @@ function normalizeExports(exportsField: PackageExports) {
 }
 
 /**
- * Создаёт отображение между входными файлами и выходными путями.
+ * Сопоставляет входные файлы (`src/*.ts`) с выходными (`./dist/*.mjs`)
+ * на основе поля `exports` из `package.json`.
  *
- * @param inputs Массив исходных файлов.
- * @param normalizedExports Нормализованные дескрипторы экспорта.
- * @param skipExports Позволяет пропустить проверку экспорта.
- * @returns Словарь связей вход-выход.
- * @throws {NpmBuildError} Если входной файл не связан с экспортом.
+ * @param inputs Локальные пути (`src/index.ts`)
+ * @param normalizedExports Словарь `exportPath → { dtsOutputFile }`
+ * @param skipExports Пропустить проверку (для `bin`-пакетов)
+ * @returns Словарь `input → { outputFile, dtsSourceFile, dtsOutputFile }`
+ *
+ * @throws NpmBuildError если:
+ *   - `input` не начинается с `src/`
+ *   - `input` не имеет соответствия в `exports`
+ *   - `exports` не имеет соответствия в `input`
+ *   - `types` указан без `import`/`default`
  *
  * @since 0.3.4
  *
  **/
-function getInputBindings(
+export function createInputBindings(
   inputs: string[],
   normalizedExports: Record<string, ExportDescriptor | undefined>,
   skipExports: boolean
 ) {
 
-  const bodyPattern = /^src\/(.*)\.[jt]s$/
+  // Извлекает относительный путь после префикса `src/` (без расширения).
+  const filePattern = /^(?:.*\/)?src\/(.*)\.[jt]s$/
 
   const result: Record<string, InputBinding | undefined> = {}
 
@@ -350,7 +380,7 @@ function getInputBindings(
     if (!input.startsWith('src/'))
       throw NpmBuildError.get('inputPathRequiresPrefix', input, 'src/')
 
-    const match = bodyPattern.exec(input)
+    const match = filePattern.exec(input)
 
     if (!match)
       throw NpmBuildError.get('inputFileExtensionNotSupported', input)
@@ -368,13 +398,13 @@ function getInputBindings(
 
     const descriptor = normalizedExports[exportEntry]
 
-    // Проверяем наличие ключа в словаре экспорта (при необходимости).
+    // Проверяет наличие ключа в словаре экспорта (при необходимости).
     if (!descriptor && !skipExports)
       throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
 
     result[input] = {
       outputFile,
-      dtsSourceFile: `${dtsOutDir}/${match[1]}.d.ts`,
+      dtsSourceFile: `${outDirDts}/${match[1]}.d.ts`,
       dtsOutputFile: descriptor?.dtsOutputFile,
     }
 
@@ -382,7 +412,7 @@ function getInputBindings(
 
   for (const key of Object.keys(normalizedExports)) {
 
-    // Выявляем незадействованные ключи в словаре экспорта (обратная проверка).
+    // Выявляет незадействованные ключи в словаре экспорта (обратная проверка).
     if (!usedExports.has(key))
       throw NpmBuildError.get('exportHasNoInput', key)
 
@@ -392,27 +422,117 @@ function getInputBindings(
 
 }
 
+/**
+ * Создаёт отображение между промежуточными файлами типов `.d.ts` и их финальными выходными путями.
+ * Используется для настройки `entryFileNames` в конфигурации Rollup для `.d.ts`-бандла.
+ *
+ * @param inputBindings Словарь связей входных файлов с выходными путями.
+ * @returns Словарь отображений: ключ — промежуточный путь `.d.ts` (например, `dist/dts/index.d.ts`),
+ *          значение — финальное имя файла (например, `index.d.mts`).
+ * @example
+ * ```ts
+ * const mappings = createDtsMappings({
+ *   'src/index.ts': {
+ *     outputFile: 'index.mjs',
+ *     dtsSourceFile: 'dist/dts/index.d.ts',
+ *     dtsOutputFile: './dist/index.d.mts'
+ *   }
+ * })
+ * // Возвращает: { 'dist/dts/index.d.ts': 'index.d.mts' }
+ * ```
+ * @since 0.4.0
+ *
+ **/
+export function createDtsMappings(inputBindings: Record<string, InputBinding | undefined>) {
+
+  const mappings: Record<string, string> = {}
+
+  for (const binding of Object.values(inputBindings)) {
+
+    if (binding?.dtsOutputFile)
+      mappings[binding.dtsSourceFile] = sliceDistPrefix(binding.dtsOutputFile)
+
+  }
+
+  return mappings
+
+}
+
+/**
+ * Возвращает относительный путь от корня монорепозитория до пакета с завершающим слешем.
+ *
+ * Используется для:
+ * - Преобразования локальных путей (`src/index.ts`) → глобальные (`packages/name/src/index.ts`)
+ * - Формирования входов для `dts`-сборки (`packages/name/dist/dts/index.d.ts`)
+ *
+ * @param cwdRoot Корень монорепозитория (где запущен Rollup)
+ * @param cwdPackage Директория пакета
+ * @returns Относительный путь вида `'packages/mirta-rollup/'`, или `''`, если это корень
+ *
+ * @example
+ *
+ * ```ts
+ * getPackagePrefix('/repo', '/repo/packages/core') → 'packages/core/'
+ *
+ * ```
+ *
+ * @since 0.4.0
+ *
+ **/
+function getPackagePrefix(cwdRoot: string, cwdPackage: string) {
+
+  const packagePrefix = toPosix(nodePath.relative(cwdRoot, cwdPackage))
+
+  return packagePrefix
+    ? `${packagePrefix}/`
+    : ''
+
+}
+
 // Проверка TypeScript выполняется только для первой конфигурации.
 let hasTsChecked = false
 
 /**
- * Определяет конфигурацию сборки на основе package.json.
+ * Создаёт конфигурации Rollup для пакета на основе его `package.json`.
  *
- * @param options Опции конфигурации Rollup.
- * @returns Массив конфигураций Rollup.
+ * Поддерживает:
+ * - ESM-бандл (обязательно)
+ * - `.d.ts`-бандл (если в `exports` указаны `types`)
+ * - Режим запуска из корня монорепозитория (через `packagePrefix`)
+ * - Проверки соответствия `input` ↔ `exports`
  *
+ * @param options Настройки сборки
+ * @returns Массив конфигураций Rollup
+ *
+ * @example
+ *
+ * ```ts
+ * definePackageConfig({
+ *   cwd: '/repo/packages/my-package',
+ *   input: 'src/index.ts',
+ * })
+ *
+ * ```
  * @since 0.3.0
  *
  **/
 export function definePackageConfig(options: RollupConfigOptions = {}) {
 
+  // Реальная директория запуска может отличаться от директории пакета `cwd`.
+  const cwdRoot = process.cwd()
+
   const {
-    cwd = process.cwd(),
+    cwd = cwdRoot,
     input = 'src/index.ts',
     external = [],
     plugins,
     skipExports = false,
   } = options
+
+  const packagePrefix = getPackagePrefix(cwdRoot, cwd)
+
+  const outDirPath = nodePath.join(cwd, outDir)
+  const outDirDtsPath = nodePath.join(cwd, outDirDts)
 
   const pkgPath = nodePath.resolve(cwd, 'package.json')
 
@@ -420,45 +540,41 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
     cwd,
     [
       /node_modules/,
-      pkgPath,
+      pkgPath, // Для предотвращения встраивания `package.json` в бандл
     ],
     external
   )
 
-  const { exports = {} } = parsePackageJson(pkgPath)
+  const normalizedInput = normalizeInput(input)
+
+  const { exports = {} } = readPackage(pkgPath)
 
   const normalizedExports = !skipExports
     ? normalizeExports(exports)
     : {}
 
-  const inputBindings = getInputBindings(
-    normalizeInput(input),
+  const inputBindings = createInputBindings(
+    normalizedInput,
     normalizedExports,
     skipExports
   )
 
-  // Создаёт отображение между файлами типов `.d.ts` и их выходными путями
-  const dtsMappings = Object.values(inputBindings)
-    .reduce<Record<string, string>>((mappings, nextValue) => {
-
-      if (nextValue?.dtsOutputFile)
-        mappings[nextValue.dtsSourceFile] = sliceDistPrefix(nextValue.dtsOutputFile)
-
-      return mappings
-
-    }, {})
+  const dtsMappings = createDtsMappings(inputBindings)
 
   const dtsInputs = Object.keys(dtsMappings)
+    .map(item => `${packagePrefix}${item}`)
 
   const rollupConfigs = [
     createBuildConfig('mjs', {
       cwd,
-      input,
+      input: normalizedInput.map(input => `${packagePrefix}${input}`),
       external: externalFilter,
       emitDeclarations: dtsInputs.length > 0,
       plugins,
+      outPath: outDirPath,
+      outPathDts: outDirDtsPath,
       output: {
-        dir: outDir,
+        dir: outDirPath,
         format: 'es',
         importAttributesKey: 'with',
         entryFileNames(chunk) {
@@ -494,12 +610,12 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
         commonjs(),
         dts(),
         del({
-          targets: dtsOutDir,
+          targets: outDirDtsPath,
           hook: 'closeBundle',
         }),
       ],
       output: {
-        dir: outDir,
+        dir: outDirPath,
         format: 'es',
         entryFileNames(chunk) {
 
@@ -541,7 +657,7 @@ function createBuildConfig(
   options: BuildOptions
 ): RollupOptions {
 
-  const { cwd, external, input, emitDeclarations, plugins = [], output } = options
+  const { cwd, external, input, emitDeclarations, plugins = [], outPath, outPathDts, output } = options
 
   output.sourcemap = !!process.env.SOURCE_MAP
   output.externalLiveBindings = false
@@ -556,9 +672,9 @@ function createBuildConfig(
     tsconfig: nodePath.resolve(cwd, './tsconfig.build.json'),
     compilerOptions: {
       noCheck: hasTsChecked,
-      outDir: outDir,
+      outDir: outPath,
       declaration: emitDeclarations,
-      declarationDir: emitDeclarations ? dtsOutDir : void 0,
+      declarationDir: emitDeclarations ? outPathDts : void 0,
     },
     exclude: [
       'packages/*/tests',
@@ -574,13 +690,15 @@ function createBuildConfig(
   // выполняются единожды - для первой конфигурации.
   hasTsChecked = true
 
+  const assetsSrc = toPosix(nodePath.join(cwd, 'public/*'))
+
   return {
     input,
     external,
     plugins: [
       // Очистка директории dist перед сборкой
       del({
-        targets: outDir,
+        targets: outPath,
       }),
       tsPlugin,
       createReplacePlugin(
@@ -593,7 +711,7 @@ function createBuildConfig(
       ...plugins,
       copy({
         targets: [
-          { src: 'public/*', dest: outDir },
+          { src: assetsSrc, dest: outPath },
         ],
       }),
     ],

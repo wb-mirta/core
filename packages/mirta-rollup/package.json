@@ -1,20 +1,29 @@
 {
   "name": "@mirta/rollup",
-  "description": "Predefined Rollup configuration for wb-rules project builds.",
   "version": "0.3.5",
   "sideEffects": false,
-  "license": "Unlicense",
+  "description": "Predefined Rollup configuration for wb-rules project builds.",
   "keywords": [
     "mirta",
     "wb-rules"
   ],
+  "license": "Unlicense",
+  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-rollup"
+  },
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
   "type": "module",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist",
     "LICENSE",
     "README.md"
   ],
-  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": {
@@ -30,10 +39,6 @@
       "types": "./dist/config-package.d.mts",
       "default": "./dist/config-package.mjs"
     },
-    "./context": {
-      "types": "./dist/utils/context/index.d.mts",
-      "default": "./dist/utils/context/index.mjs"
-    },
     "./env-loader": {
       "types": "./dist/utils/env-loader.d.mts",
       "default": "./dist/utils/env-loader.mjs"
@@ -41,19 +46,11 @@
   },
   "imports": {
     "#src/*": "./src/*.js",
-    "#ast/*": "./src/ast-transformers/*.js",
+    "#ast": "./src/ast-transformers/index.js",
     "#utils/*": "./src/utils/*.js",
+    "#utils/monorepo": "./src/utils/monorepo/index.js",
     "#plugins/*": "./src/plugins/*.js",
     "#configs/*": "./src/configs/*.js"
-  },
-  "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wb-mirta/core.git",
-    "directory": "packages/mirta-rollup"
-  },
-  "bugs": {
-    "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
     "build:mono": "rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
@@ -62,7 +59,9 @@
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
     "@dotenvx/dotenvx": "^1.51.0",
-    "@mirta/polyfills": "workspace:*",
+    "@mirta/basics": "workspace:*",
+    "@mirta/package": "workspace:*",
+    "@mirta/workspace": "workspace:*",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-multi-entry": "^6.0.1",
