@@ -5,14 +5,13 @@ import resolve from '@rollup/plugin-node-resolve'
 import ts from 'rollup-plugin-typescript2'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
-import { loadEnvReplacements, type EnvLoaderOptions } from '#utils/env-loader'
+import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader'
+import { resolveMonorepoContextAsync } from '@mirta/workspace'
 
 import del from '#plugins/del'
 import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
-
-import { resolveMonorepoContextAsync } from '@mirta/workspace'
 
 import {
 
@@ -95,13 +94,19 @@ export async function defineRuntimeConfig(
     replace({
       preventAssignment: true,
       values: {
+
         // Загрузка переменных окружения
-        ...loadEnvReplacements({ mode, ...envLoaderOptions }),
+        ...loadEnvReplacements({
+          mode,
+          rootDir: monorepoContext.rootDir,
+          ...envLoaderOptions,
+        }),
 
         // Признак сборки в режиме разработки
         __DEV__: JSON.stringify(!isProduction),
         // Автоматически меняется в процессе тестирования
         __TEST__: 'false',
+
       },
     }),
 

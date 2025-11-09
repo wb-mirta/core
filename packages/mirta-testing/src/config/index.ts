@@ -1,10 +1,10 @@
 import nodePath from 'node:path'
 import { defineConfig, configDefaults, type TestProjectConfiguration } from 'vitest/config'
 import { resolveMonorepoContextAsync } from '@mirta/workspace'
-import { loadEnv } from '@mirta/rollup/env-loader'
+import { loadEnv } from '@mirta/env-loader'
 
 const cwd = process.cwd()
-const { packages } = await resolveMonorepoContextAsync(cwd)
+const { rootDir, packages } = await resolveMonorepoContextAsync(cwd)
 
 const projects = packages.length > 0
   ? packages.map<TestProjectConfiguration>(pkg => ({
@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => ({
       '**/public/templates/**',
       '**/dist/**',
     ],
-    env: loadEnv({ mode }),
+    env: loadEnv({ mode, rootDir }),
     setupFiles: [
       '@mirta/testing/setup-global',
     ],

@@ -20,7 +20,6 @@
 
 import { toPosix } from '@mirta/package'
 import { definePackageConfig } from '@mirta/rollup'
-import { compactArray } from '@mirta/basics/array'
 
 /**
  * Корневая директория проекта, нормализованная к Unix-стилю (с `/`).
@@ -48,8 +47,6 @@ const cwd = toPosix(process.cwd())
  **/
 function buildPackage(workspace: string, input: string | string[] = 'src/index.ts') {
 
-  input = compactArray(input)
-
   return definePackageConfig({
     cwd: `${cwd}/packages/${workspace}`,
     input,
@@ -64,6 +61,7 @@ const configs = [
       'src/index.ts',
       'src/array/index.ts',
     ]),
+  ...buildPackage('mirta-env-loader'),
   ...buildPackage('mirta-package'),
   ...buildPackage('mirta-workspace'),
   ...buildPackage('mirta-rollup',
@@ -71,7 +69,6 @@ const configs = [
       'src/index.ts',
       'src/config.ts',
       'src/config-package.ts',
-      'src/utils/env-loader.ts',
     ]),
 
   // TODO: Разобраться с зависимостями mirta-testing

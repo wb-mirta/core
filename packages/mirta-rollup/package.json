@@ -38,10 +38,6 @@
     "./config-package": {
       "types": "./dist/config-package.d.mts",
       "default": "./dist/config-package.mjs"
-    },
-    "./env-loader": {
-      "types": "./dist/utils/env-loader.d.mts",
-      "default": "./dist/utils/env-loader.mjs"
     }
   },
   "imports": {
@@ -60,6 +56,7 @@
     "@babel/preset-env": "^7.28.5",
     "@dotenvx/dotenvx": "^1.51.0",
     "@mirta/basics": "workspace:*",
+    "@mirta/env-loader": "workspace:*",
     "@mirta/package": "workspace:*",
     "@mirta/workspace": "workspace:*",
     "@rollup/plugin-babel": "^6.1.0",
