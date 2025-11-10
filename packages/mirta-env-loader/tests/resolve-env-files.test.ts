@@ -1,20 +1,11 @@
-import { existsSync } from 'node:fs'
-
-vi.mock('node:fs', () => ({
-  existsSync: vi.fn(),
-}))
-
-const mockExistsSync = vi.mocked(existsSync)
+import { resetTestEnv, restoreTestEnv, mockExistsSync } from './tests-setup'
 
 const { resolveEnvFiles } = await import('#src/load-env')
 
 describe('resolveEnvFiles', () => {
 
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-  })
+  beforeEach(resetTestEnv)
+  afterEach(restoreTestEnv)
 
   describe('basic file resolution', () => {
 

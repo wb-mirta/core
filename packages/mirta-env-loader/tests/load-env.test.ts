@@ -1,84 +1,12 @@
-import type { DotenvConfigOptions } from '@dotenvx/dotenvx'
 import { ensureArray } from '@mirta/basics/array'
-import { existsSync } from 'node:fs'
-
-vi.mock('node:fs', () => ({
-  existsSync: vi.fn(),
-}))
-
-vi.mock('@dotenvx/dotenvx', () => ({
-  default: {
-    config: vi.fn(),
-  },
-}))
-
-const mockExistsSync = vi.mocked(existsSync)
-const dotenvx = await import('@dotenvx/dotenvx')
-const mockDotenvxConfig = vi.mocked(dotenvx.default.config)
-
-function mockDotenvxConfigWithEnv(env: Record<string, string> = {}) {
-
-  mockDotenvxConfig.mockImplementation((config) => {
-
-    if (config?.processEnv) {
-
-      Object.assign(config.processEnv, env)
-
-    }
-    return {}
-
-  })
-
-}
-
-function withConfigPath(
-  callback: (config: DotenvConfigOptions) => void
-) {
-
-  const [config] = mockDotenvxConfig.mock.lastCall ?? []
-
-  expect(config).toBeDefined()
-
-  if (!config)
-    return
-
-  expect(config.path).toBeDefined()
-
-  if (!config.path)
-    return
-
-  callback(config)
-
-}
+import { resetTestEnv, restoreTestEnv, mockDotenvxConfig, mockExistsSync, mockConfigWithEnv, expectConfigCalledWith } from './tests-setup'
 
 const { loadEnv } = await import('#src/load-env')
 
 describe('loadEnv', () => {
 
-  const originalEnv = process.env
-  const originalCwd = process.cwd()
-
-  beforeEach(() => {
-
-    vi.clearAllMocks()
-
-    // ⚠️ БЕЗОПАСНОСТЬ: Полностью заменяем process.env на контролируемый набор
-    // Это предотвращает утечку системных переменных в логи при падении тестов
-    //
-    process.env = {
-      NODE_ENV: 'development', // только необходимый минимум.
-    }
-
-    vi.spyOn(process, 'cwd').mockReturnValue('/test/project')
-
-  })
-
-  afterEach(() => {
-
-    process.env = originalEnv
-    vi.spyOn(process, 'cwd').mockReturnValue(originalCwd)
-
-  })
+  beforeEach(resetTestEnv)
+  afterEach(restoreTestEnv)
 
   describe('basic functionality', () => {
 
@@ -86,7 +14,7 @@ describe('loadEnv', () => {
 
       mockExistsSync.mockReturnValue(true)
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_TEST: 'value1',
         APP_PORT: '3000',
       })
@@ -104,19 +32,21 @@ describe('loadEnv', () => {
 
       mockExistsSync.mockReturnValue(true)
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_VALUE: 'test',
       })
 
       loadEnv()
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: expect.arrayContaining([
-            expect.stringContaining('/test/project/.env'),
-          ]) as unknown,
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        const paths = ensureArray(config.path).map(String)
+
+        console.log(paths)
+
+        expect(paths).toContain('/test/project/.env')
+
+      })
 
     })
 
@@ -126,19 +56,21 @@ describe('loadEnv', () => {
 
       mockExistsSync.mockReturnValue(true)
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_TEST: 'production',
       })
 
       loadEnv()
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: expect.arrayContaining([
+      expectConfigCalledWith((config) => {
+
+        expect(config.path).toEqual(
+          expect.arrayContaining([
             expect.stringContaining('.env.production'),
-          ]) as unknown,
-        })
-      )
+          ])
+        )
+
+      })
 
     })
 
@@ -165,7 +97,7 @@ describe('loadEnv', () => {
 
     it('should include only environment variables matching default prefixes (MIRTA_, APP_)', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_TEST: 'value',
         APP_PORT: '3000',
         OTHER_VAR: 'ignored',
@@ -186,7 +118,7 @@ describe('loadEnv', () => {
 
     it('should respect custom prefix when filtering environment variables', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         CUSTOM_VAR: 'included',
         MIRTA_TEST: 'excluded',
         APP_PORT: 'excluded',
@@ -202,7 +134,7 @@ describe('loadEnv', () => {
 
     it('should support multiple prefixes in array form', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         PREFIX1_VAR: 'included1',
         PREFIX2_VAR: 'included2',
         OTHER_VAR: 'excluded',
@@ -219,7 +151,7 @@ describe('loadEnv', () => {
 
     it('should exclude variables with undefined values', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_DEFINED: 'value',
         MIRTA_UNDEFINED: undefined as unknown as string,
       })
@@ -248,16 +180,16 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: 'development', cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: [
-            '/app/.env.development.local',
-            '/app/.env.development',
-            '/app/.env.local',
-            '/app/.env',
-          ],
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.path).toEqual([
+          '/app/.env.development.local',
+          '/app/.env.development',
+          '/app/.env.local',
+          '/app/.env',
+        ])
+
+      })
 
     })
 
@@ -265,19 +197,13 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: 'test', cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: expect.arrayContaining([
-            '/app/.env.test',
-            '/app/.env',
-          ]) as unknown,
-        })
-      )
+      expectConfigCalledWith((config) => {
 
-      const [config] = mockDotenvxConfig.mock.lastCall ?? []
+        expect(config.path).toEqual(['/app/.env.test', '/app/.env'])
+        expect(config.path).not.toContain('/app/.env.test.local')
+        expect(config.path).not.toContain('/app/.env.local')
 
-      expect(config?.path).not.toContain('/app/.env.test.local')
-      expect(config?.path).not.toContain('/app/.env.local')
+      })
 
     })
 
@@ -287,11 +213,11 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: undefined, cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: ['/app/.env'],
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.path).toEqual(['/app/.env'])
+
+      })
 
     })
 
@@ -299,16 +225,16 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: 'staging', cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: [
-            '/app/.env.staging.local',
-            '/app/.env.staging',
-            '/app/.env.local',
-            '/app/.env',
-          ],
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.path).toEqual([
+          '/app/.env.staging.local',
+          '/app/.env.staging',
+          '/app/.env.local',
+          '/app/.env',
+        ])
+
+      })
 
     })
 
@@ -326,19 +252,17 @@ describe('loadEnv', () => {
         rootDir: '/monorepo',
       })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
-        const pathList = ensureArray(config.path).map(String)
-
-        // Все файлы из cwd должны быть раньше файлов из rootDir
-        const cwdPaths = pathList.filter(p => p.startsWith('/monorepo/packages/app'))
-        const rootPaths = pathList.filter(p => p.startsWith('/monorepo/') && !p.startsWith('/monorepo/packages/app'))
+        const paths = ensureArray(config.path).map(String)
+        const cwdPaths = paths.filter(p => p.startsWith('/monorepo/packages/app'))
+        const rootPaths = paths.filter(p => p.startsWith('/monorepo/') && !p.startsWith('/monorepo/packages/app'))
 
         expect(cwdPaths.length).toBeGreaterThan(0)
         expect(rootPaths.length).toBeGreaterThan(0)
 
-        const lastCwdIndex = pathList.lastIndexOf(cwdPaths[cwdPaths.length - 1])
-        const firstRootIndex = pathList.indexOf(rootPaths[0])
+        const lastCwdIndex = paths.lastIndexOf(cwdPaths[cwdPaths.length - 1])
+        const firstRootIndex = paths.indexOf(rootPaths[0])
 
         expect(lastCwdIndex).toBeLessThan(firstRootIndex)
 
@@ -352,10 +276,9 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: 'development', cwd: '/app' })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         const paths = ensureArray(config.path).map(String)
-
         expect(paths.every(p => p.startsWith('/app'))).toBe(true)
 
       })
@@ -372,11 +295,9 @@ describe('loadEnv', () => {
         rootDir: '/app',
       })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         const paths = ensureArray(config.path).map(String)
-
-        // Должно быть ровно 4 файла для development (без дубликатов)
         expect(paths).toHaveLength(4)
 
       })
@@ -393,7 +314,7 @@ describe('loadEnv', () => {
 
       loadEnv({ mode: 'development', cwd: '/app' })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         const paths = ensureArray(config.path).map(String)
 
@@ -419,7 +340,7 @@ describe('loadEnv', () => {
 
     it('should include NODE_ENV by default', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_TEST: 'value',
       })
 
@@ -431,7 +352,7 @@ describe('loadEnv', () => {
 
     it('should exclude NODE_ENV when keepNodeEnv is false', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_TEST: 'value',
       })
 
@@ -444,7 +365,7 @@ describe('loadEnv', () => {
 
     it('should preserve NODE_ENV even when not matching prefix, if keepNodeEnv: true', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         CUSTOM_VAR: 'value',
       })
 
@@ -471,11 +392,11 @@ describe('loadEnv', () => {
 
       loadEnv({ envFile: '.env.custom', cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: ['/app/.env.custom'],
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.path).toEqual(['/app/.env.custom'])
+
+      })
 
     })
 
@@ -483,10 +404,9 @@ describe('loadEnv', () => {
 
       loadEnv({ envFile: ['.env', '.env.custom'], cwd: '/app' })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         const paths = ensureArray(config.path).map(String)
-
         expect(paths).toContain('/app/.env')
         expect(paths).toContain('/app/.env.custom')
 
@@ -498,12 +418,11 @@ describe('loadEnv', () => {
 
       loadEnv({ envFile: ['.env', '.env', '.env'], cwd: '/app' })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
-        const envPaths = ensureArray(config.path)
-          .filter(p => p === '/app/.env')
-
-        expect(envPaths).toHaveLength(1)
+        const paths = ensureArray(config.path).map(String)
+        const filtered = paths.filter(p => p === '/app/.env')
+        expect(filtered).toHaveLength(1)
 
       })
 
@@ -548,11 +467,9 @@ describe('loadEnv', () => {
         envFile: ['.env.custom', '.env'],
       })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         const paths = ensureArray(config.path).map(String)
-
-        // Находим точные пути
         const devLocal = paths.find(p => p === '/app/.env.development.local')
         const dev = paths.find(p => p === '/app/.env.development')
 
@@ -590,13 +507,13 @@ describe('loadEnv', () => {
         },
       })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          encoding: 'utf16',
-          debug: true,
-          strict: true,
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.encoding).toBe('utf16')
+        expect(config.debug).toBe(true)
+        expect(config.strict).toBe(true)
+
+      })
 
     })
 
@@ -604,11 +521,11 @@ describe('loadEnv', () => {
 
       loadEnv({ cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          logLevel: 'warn',
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.logLevel).toBe('warn')
+
+      })
 
     })
 
@@ -616,11 +533,11 @@ describe('loadEnv', () => {
 
       loadEnv({ cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ignore: ['MISSING_ENV_FILE'],
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.ignore).toEqual(['MISSING_ENV_FILE'])
+
+      })
 
     })
 
@@ -628,7 +545,7 @@ describe('loadEnv', () => {
 
       loadEnv({ cwd: '/app' })
 
-      withConfigPath((config) => {
+      expectConfigCalledWith((config) => {
 
         expect(config.processEnv).toBeDefined()
         expect(config.processEnv).not.toBe(process.env)
@@ -641,11 +558,11 @@ describe('loadEnv', () => {
 
       loadEnv({ cwd: '/app' })
 
-      expect(mockDotenvxConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          convention: undefined,
-        })
-      )
+      expectConfigCalledWith((config) => {
+
+        expect(config.convention).toBeUndefined()
+
+      })
 
     })
 
@@ -661,7 +578,7 @@ describe('loadEnv', () => {
 
     it('should sort filtered env keys in lexicographical order', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_Z: 'z',
         APP_A: 'a',
         MIRTA_A: 'a',
@@ -682,7 +599,7 @@ describe('loadEnv', () => {
 
     it('should sort numeric string keys naturally (e.g. VAR1, VAR2, VAR10)', () => {
 
-      mockDotenvxConfigWithEnv({
+      mockConfigWithEnv({
         MIRTA_VAR10: '10',
         MIRTA_VAR2: '2',
         MIRTA_VAR1: '1',

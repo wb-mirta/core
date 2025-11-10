@@ -1,13 +1,15 @@
 // packages/mirta-env-loader/tests/filter-env-keys.test.ts
 const { filterEnvKeys } = await import('#src/load-env')
 
+type Env = Record<string, string | undefined>
+
 describe('filterEnvKeys', () => {
 
   describe('prefix-based filtering', () => {
 
     it('should include only environment variables matching allowed prefixes', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_TEST: 'value1',
         APP_PORT: '3000',
         OTHER_VAR: 'ignored',
@@ -25,7 +27,7 @@ describe('filterEnvKeys', () => {
 
     it('should respect single prefix when filtering variables', () => {
 
-      const env = {
+      const env: Env = {
         CUSTOM_VAR1: 'value1',
         CUSTOM_VAR2: 'value2',
         OTHER_VAR: 'ignored',
@@ -42,7 +44,7 @@ describe('filterEnvKeys', () => {
 
     it('should return empty object when no variables match any prefix', () => {
 
-      const env = {
+      const env: Env = {
         OTHER_VAR: 'value',
         RANDOM: 'value',
       }
@@ -59,7 +61,7 @@ describe('filterEnvKeys', () => {
 
     it('should include NODE_ENV if keepNodeEnv is true, regardless of prefixes', () => {
 
-      const env = {
+      const env: Env = {
         NODE_ENV: 'production',
         MIRTA_TEST: 'value',
       }
@@ -72,7 +74,7 @@ describe('filterEnvKeys', () => {
 
     it('should exclude NODE_ENV when keepNodeEnv is false', () => {
 
-      const env = {
+      const env: Env = {
         NODE_ENV: 'production',
         MIRTA_TEST: 'value',
       }
@@ -86,7 +88,7 @@ describe('filterEnvKeys', () => {
 
     it('should preserve NODE_ENV even if it does not match any prefix, if keepNodeEnv: true', () => {
 
-      const env = {
+      const env: Env = {
         NODE_ENV: 'development',
         OTHER_VAR: 'ignored',
       }
@@ -105,7 +107,7 @@ describe('filterEnvKeys', () => {
 
     it('should omit variables with undefined values from result', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_DEFINED: 'value',
         MIRTA_UNDEFINED: undefined,
         APP_DEFINED: 'value',
@@ -125,7 +127,7 @@ describe('filterEnvKeys', () => {
 
     it('should exclude NODE_ENV when its value is undefined, even if keepNodeEnv: true', () => {
 
-      const env = {
+      const env: Env = {
         NODE_ENV: undefined,
         MIRTA_TEST: 'value',
       }
@@ -142,7 +144,7 @@ describe('filterEnvKeys', () => {
 
     it('should sort keys in lexicographical order using localeCompare', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_Z: 'z',
         APP_A: 'a',
         MIRTA_A: 'a',
@@ -159,7 +161,7 @@ describe('filterEnvKeys', () => {
 
     it('should sort numeric substrings naturally (e.g. VAR1, VAR2, VAR10)', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_VAR10: '10',
         MIRTA_VAR2: '2',
         MIRTA_VAR1: '1',
@@ -175,7 +177,7 @@ describe('filterEnvKeys', () => {
 
     it('should produce consistent key order across multiple calls', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_C: 'c',
         MIRTA_A: 'a',
         MIRTA_B: 'b',
@@ -202,7 +204,7 @@ describe('filterEnvKeys', () => {
 
     it('should return empty object when no prefixes are allowed', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_TEST: 'value',
         APP_PORT: '3000',
       }
@@ -215,7 +217,7 @@ describe('filterEnvKeys', () => {
 
     it('should treat prefix as plain string start, even if not ending with underscore', () => {
 
-      const env = {
+      const env: Env = {
         CUSTOM: 'exact',
         CUSTOMVAR: 'prefix',
         OTHER: 'ignored',
@@ -232,7 +234,7 @@ describe('filterEnvKeys', () => {
 
     it('should perform case-sensitive prefix matching (e.g. MIRTA_ ≠ mirta_)', () => {
 
-      const env = {
+      const env: Env = {
         MIRTA_TEST: 'uppercase',
         mirta_test: 'lowercase',
         Mirta_Test: 'mixed',
