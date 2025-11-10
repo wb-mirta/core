@@ -40,16 +40,14 @@ describe('loadEnvReplacements', () => {
 
     vi.resetAllMocks()
 
+    mockExistsSync.mockReturnValue(true)
+
     // ⚠️ БЕЗОПАСНОСТЬ: Полностью заменяем process.env на контролируемый набор
     // Это предотвращает утечку системных переменных в логи при падении тестов
     //
     process.env = {
       NODE_ENV: 'development', // только необходимый минимум
     }
-
-    mockDotenvxConfig.mockReset()
-    mockDotenvxConfig.mockImplementation(() => ({}))
-    mockExistsSync.mockReturnValue(true)
 
   })
 
