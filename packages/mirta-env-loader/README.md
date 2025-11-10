@@ -60,6 +60,21 @@ Synchronously loads and filters environment variables.
  | `keepNodeEnv` | `boolean` | Whether to include `NODE_ENV`. Default: `true`.<br/>If `false`, it is removed from the returned object.<br/>⚠️ Note: does not affect the global `process.env.NODE_ENV` value |
  | `dotenv` | `DotenvOptions` | Additional `@dotenvx/dotenvx` settings, see below |
 
+#### ⚠️ **Security: `prefix` cannot be fully disabled**
+
+The `prefix` option **cannot be disabled** (e.g., via `prefix: false`, `prefix: ''`, `prefix: []`, or `prefix: ['']`) to prevent **automatic secret leakage**.
+
+Even when loading variables, filtering remains active, and default prefixes (`MIRTA_`, `APP_`) are applied.
+
+If you need to load variables with other prefixes, explicitly specify them:
+
+```ts
+loadEnv({
+  prefix: ['MIRTA_', 'APP_', 'CUSTOM_', 'SECRET_'] // ← explicit allowance
+})
+```
+This ensures that **only expected variables** are included in the result and — when using `loadEnvReplacements` — in the client-side code.
+
 #### ⚙️ Dotenv Options
 
 Type: `DotenvOptions` — passed directly to `@dotenvx/dotenvx`, but with limitations.
@@ -168,6 +183,85 @@ Suitable for integration with `@rollup/plugin-replace`.
 
 Default list of prefixes for variable filtering.
 Can be overridden via `options.prefix`.
+
+## 🛡️ Security and Configuration Best Practices
+
+### ❌ Do not use system environment variables directly
+
+Directly loading system environment variables — such as `PATH`, `HOME`, `USER`, `NODE_VERSION` — is **not recommended**, even if they are available in the environment.
+
+👉 Why:
+- **Breaks portability**: behavior will differ across machines.
+- **Security risk**: sensitive data may accidentally leak into the build.
+- **Non-deterministic behavior**: application behavior depends on the environment, not configuration.
+
+---
+
+### ✅ Option 1: Explicit override in `.env`
+
+If you truly need a system environment variable, **explicitly declare it in your `.env` file**:
+
+```env
+# .env
+MIRTA_PATH=${PATH}
+MIRTA_HOME=${HOME}
+APP_NODE_VERSION=${NODE_VERSION}
+```
+👉 This way:
+- You **control** which variables enter the application,
+- You **document** the intent explicitly,
+- You can **override** the value per environment.
+
+⚠️ Important: `@mirta/env-loader` does not expose variables outside allowed prefixes — even if `${PATH}` is used in `.env`, the `PATH` variable itself will not be included unless it starts with `MIRTA_` or `APP_`.
+
+---
+
+### ✅ Option 2: Explicit configuration (recommended)
+
+Better yet — **avoid relying on system variables altogether**, and define paths and settings explicitly:
+
+```env
+# .env
+MIRTA_BINARY_PATH=/usr/local/bin/custom-tool
+APP_CONFIG_DIR=/etc/myapp
+APP_CACHE_DIR=./temp/cache
+```
+👉 Benefits:
+
+**Portability**: the app behaves consistently across environments,
+**Readability**: all settings are visible in `.env`,
+**Security**: no surprises from the environment,
+**Testability**: easy to emulate different setups.
+
+---
+
+🧩 Example of a secure .env
+
+```env
+# Environment mode
+NODE_ENV=development
+
+# Binaries and paths
+MIRTA_BINARY_PATH=/opt/tools/cli
+MIRTA_CONFIG_ROOT=./config
+
+# Application settings
+APP_PORT=3000
+APP_API_KEY=dev-key-7x29qn
+APP_FEATURE_TOGGLES=auth,logging,metrics
+
+# Logging
+MIRTA_LOG_LEVEL=debug
+```
+
+---
+
+📌 Summary
+- ❌ **Do not rely** on system environment variables directly.
+- ✅ **Explicitly** declare everything you need in .env.
+- ✅ **Use clear, fixed values**.
+
+This way, you build a **predictable, secure, and portable** application.
 
 ## 🔐 Working with encrypted variables
 
