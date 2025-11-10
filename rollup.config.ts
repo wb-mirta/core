@@ -29,22 +29,12 @@ import { definePackageConfig } from '@mirta/rollup'
 const cwd = toPosix(process.cwd())
 
 /**
- * Формирует конфигурации для сборки пакета в монорепозитории.
+ * Генерирует Rollup-конфигурации для указанного пакета монорепозитория.
  *
- * @remarks
- * Работает в бутстрап-режиме: запускается из корня, но настраивает сборку пакета.
- *
- * Особенности:
- * - `cwd`: указывает на директорию пакета → Rollup знает, где искать `tsconfig`, `package.json`
- * - `input`: передаётся как локальные пути (`src/index.ts`) → `definePackageConfig` сам добавит префикс
- *
- * @param workspace Имя папки в `packages/`
- * @param input Входные файлы (по умолчанию: `'src/index.ts'`)
+ * @param workspace Имя папки в каталоге `packages`
+ * @param input Входные файлы пакета (по умолчанию: `'src/index.ts'`)
  * @returns Массив конфигураций Rollup
- *
- * @since 0.4.0
- *
- **/
+ */
 function buildPackage(workspace: string, input: string | string[] = 'src/index.ts') {
 
   return definePackageConfig({

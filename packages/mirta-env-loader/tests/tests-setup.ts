@@ -17,7 +17,11 @@ const dotenvx = await import('@dotenvx/dotenvx')
 export const mockDotenvxConfig = vi.mocked(dotenvx.default.config)
 
 /**
- * Устанавливает мок для `dotenvx.config`, который наполняет `processEnv`
+ * Устанавливает мок для `dotenvx.config`, который при вызове объединяет указанные пары ключ‑значение в переданный объект `processEnv`.
+ *
+ * @param env - Объект с переменными окружения (ключ → значение), которые будут скопированы в `config.processEnv`.
+ * @throws Если `dotenvx.config` был вызван без аргумента или без свойства `processEnv`.
+ * @throws Если `config.processEnv` равен `null` или `undefined`.
  */
 export function mockConfigWithEnv(env: Record<string, string> = {}) {
 
@@ -49,7 +53,11 @@ export function mockConfigWithEnv(env: Record<string, string> = {}) {
 }
 
 /**
- * Утилита для проверки последнего вызова `dotenvx.config`
+ * Вызывает переданный матчер с конфигурацией из последнего вызова `dotenvx.config`, если такой вызов существует.
+ *
+ * Если вызов не зафиксирован или аргумент конфигурации отсутствует, функция ничего не делает.
+ *
+ * @param matcher - Функция, которой будет передан объект конфигурации (`DotenvConfigOptions`) последнего вызова `dotenvx.config`
  */
 export function expectConfigCalledWith(
   matcher: (config: DotenvConfigOptions) => void
@@ -78,6 +86,12 @@ export function expectConfigCalledWith(
 const originalEnv = process.env
 const originalCwd = process.cwd()
 
+/**
+ * Инициализирует контролируемое тестовое окружение и сбрасывает все мок-объекты.
+ *
+ * Сбрасывает все vi-моки, заменяет process.env на минимальный набор (NODE_ENV = 'development'),
+ * подменяет process.cwd() на '/test/project' и настраивает mockExistsSync так, чтобы возвращать `true`.
+ */
 export function resetTestEnv() {
 
   vi.resetAllMocks()
@@ -94,6 +108,11 @@ export function resetTestEnv() {
 
 }
 
+/**
+ * Восстанавливает сохранённое окружение тестов.
+ *
+ * Восстанавливает `process.env` и поведение `process.cwd()` к значениям, сохранённым при загрузке модуля.
+ */
 export function restoreTestEnv() {
 
   process.env = originalEnv

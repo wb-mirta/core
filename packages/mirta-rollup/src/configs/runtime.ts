@@ -45,15 +45,12 @@ export interface RuntimeConfigOptions {
 }
 
 /**
- * Основная функция, возвращающая конфигурацию Rollup.
- * Обрабатывает входные файлы, плагины и настройку выходных путей.
+ * Собирает Rollup-конфигурацию для сборки runtime-кода проекта с учётом монорепозитория и подстановки переменных окружения.
  *
- * @param options - опции конфигурации
- * @returns Объект RollupOptions
- *
+ * @param options - Параметры: `cwd` — рабочая директория проекта; `external` — список внешних зависимостей; `envLoader` — опции загрузчика окружения; `plugins` — дополнительные Rollup-плагины
+ * @returns Сконфигурированный объект RollupOptions, готовый для сборки в каталог `dist/es5`
  * @since 0.3.0
- *
- **/
+ */
 export async function defineRuntimeConfig(
   options: RuntimeConfigOptions = {}
 ): Promise<RollupOptions> {
