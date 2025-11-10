@@ -440,7 +440,7 @@ describe('loadEnv', () => {
     it('should warn when envFile entries produce duplicate resolved files', () => {
 
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {
-        //
+        // Suppress console output during test
       })
 
       loadEnv({
