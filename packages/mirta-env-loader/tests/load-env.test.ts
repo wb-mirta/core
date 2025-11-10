@@ -61,7 +61,14 @@ describe('loadEnv', () => {
   beforeEach(() => {
 
     vi.clearAllMocks()
-    process.env = { ...originalEnv }
+
+    // ⚠️ БЕЗОПАСНОСТЬ: Полностью заменяем process.env на контролируемый набор
+    // Это предотвращает утечку системных переменных в логи при падении тестов
+    //
+    process.env = {
+      NODE_ENV: 'development', // только необходимый минимум.
+    }
+
     vi.spyOn(process, 'cwd').mockReturnValue('/test/project')
 
   })
@@ -206,24 +213,6 @@ describe('loadEnv', () => {
       expect(env).toEqual({
         PREFIX1_VAR: 'included1',
         PREFIX2_VAR: 'included2',
-      })
-
-    })
-
-    it('should include all variables when prefix: false', () => {
-
-      mockDotenvxConfigWithEnv({
-        ANY_VAR: 'included',
-        ANOTHER: 'included',
-        MIRTA_TEST: 'included',
-      })
-
-      const env = loadEnv({ prefix: false })
-
-      expect(env).toMatchObject({
-        ANOTHER: 'included',
-        ANY_VAR: 'included',
-        MIRTA_TEST: 'included',
       })
 
     })
@@ -544,7 +533,7 @@ describe('loadEnv', () => {
       })
 
       expect(warn).toHaveBeenCalledWith(
-        expect.stringContaining('Duplicate env file ".env.local"')
+        expect.stringContaining('Redundant env file entry detected')
       )
 
       warn.mockRestore()

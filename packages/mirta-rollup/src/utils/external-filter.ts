@@ -1,6 +1,6 @@
 import nodePath from 'node:path'
 import type { ExternalOption } from 'rollup'
-import { compactArray } from '@mirta/basics/array'
+import { ensureCompactArray } from '@mirta/basics/array'
 
 /**
  * Создаёт фильтр для определения внешних модулей на основе указанных правил.
@@ -40,7 +40,7 @@ export function createExternalFilter(cwd: string, ...externals: ExternalOption[]
       else {
 
         // Шаг 2: Массив паттернов
-        const isExternal = compactArray(external).some((item) => {
+        const isExternal = ensureCompactArray(external).some((item) => {
 
           if (item instanceof RegExp)
             return item.test(target)
