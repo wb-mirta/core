@@ -336,7 +336,7 @@ export function filterEnvKeys(
 
 /**
  * Загружает и фильтрует переменные окружения из dotenv-файлов.
- * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvOptions}).
+ * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvLoaderOptions}).
  * @returns Набор переменных окружения.
  *
  * @since 0.4.0
@@ -363,30 +363,41 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
 
   const files = resolveEnvFiles({ cwd, rootDir, mode, envFile })
 
-  if (files.length === 0)
-    return processEnv
+  if (files.length > 0)
+    dotenvx.config({
+      // Переопределяемые параметры конфигурации:
+      logLevel: 'warn',
+      ignore: [
+        'MISSING_ENV_FILE',
+      ],
 
-  dotenvx.config({
+      // Пользовательская конфигурация.
+      ...dotenv,
 
-    // Переопределяемые параметры конфигурации:
-    logLevel: 'warn',
-    ignore: [
-      'MISSING_ENV_FILE',
-    ],
+      // Параметры, которые переопределить нельзя:
+      path: resolveEnvFiles({ cwd, rootDir, mode, envFile }),
+      processEnv,
+      convention: undefined,
+    })
 
-    // Пользовательская конфигурация.
-    ...dotenv,
+  for (const [key, value] of Object.entries(process.env)) {
 
-    // Параметры, которые переопределить нельзя:
-    path: resolveEnvFiles({ cwd, rootDir, mode, envFile }),
-    processEnv,
-    convention: undefined,
+    if (typeof value === 'string')
+      processEnv[key] = value
 
-  })
+  }
 
-  // Фильтрация переменных, если задан префикс.
-  if (prefix)
+  if (prefix) {
+
+    // Фильтрация переменных, если задан префикс.
     processEnv = filterEnvKeys(processEnv, ensureArray(prefix), keepNodeEnv)
+
+  }
+  else if (!keepNodeEnv) {
+
+    delete processEnv.NODE_ENV
+
+  }
 
   return processEnv
 
