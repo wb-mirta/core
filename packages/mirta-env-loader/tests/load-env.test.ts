@@ -42,8 +42,6 @@ describe('loadEnv', () => {
 
         const paths = ensureArray(config.path).map(String)
 
-        console.log(paths)
-
         expect(paths).toContain('/test/project/.env')
 
       })
