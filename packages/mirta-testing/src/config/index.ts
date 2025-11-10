@@ -6,6 +6,12 @@ import { loadEnv } from '@mirta/env-loader'
 const cwd = process.cwd()
 const { rootDir, packages } = await resolveMonorepoContextAsync(cwd)
 
+/**
+ * Формирует конфигурации проектов Vitest для каждого пакета монорепозитория в соответствии с указанным режимом.
+ *
+ * @param mode - Режим окружения, передаваемый в загрузчик переменных окружения (`loadEnv`) для каждой конфигурации
+ * @returns Массив конфигураций `TestProjectConfiguration` для каждого пакета, или `undefined`, если пакетов нет
+ */
 function getProjects(mode: string) {
 
   if (packages.length === 0)
