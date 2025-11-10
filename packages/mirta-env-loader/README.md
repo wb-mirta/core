@@ -57,8 +57,56 @@ Synchronously loads and filters environment variables.
 | `cwd` | `string` | Current working directory. Defaults to `process.cwd()` |
 | `rootDir` | `string` | Root directory of the project (e.g., in a monorepo).<br/>If specified and differs from `cwd`, files are also searched in the root |
 | `envFile` | `string \| string[]` | Base `.env` file name. Default: `.env` |
-| `keepNodeEnv` | `boolean` | Whether to include NODE_ENV. Default: `true` |
-| `dotenv` | `DotenvOptions` | Additional `@dotenvx/dotenvx` options |
+ | `keepNodeEnv` | `boolean` | Whether to include `NODE_ENV`. Default: `true`.<br/>If `false`, it is removed from the returned object.<br/>⚠️ Note: does not affect the global `process.env.NODE_ENV` value |
+ | `dotenv` | `DotenvOptions` | Additional `@dotenvx/dotenvx` settings, see below |
+
+#### ⚙️ Dotenv Options
+
+Type: `DotenvOptions` — passed directly to `@dotenvx/dotenvx`, but with limitations.
+
+`@mirta/env-loader` controls key aspects of loading, so some options are overridden or ignored to ensure predictable behavior.
+
+✅ **Supported and safe options**
+
+| Option | Description |
+|--------|-------------|
+| `overload` | If `true`, later files overwrite variables from earlier ones. Default: `false` (earlier files have higher priority) |
+| `encoding` | Encoding of `.env` files. Default: `'utf8'` |
+| `strict` | If `true`, throws an error on parsing failures. Default: `false` |
+| `debug` | Enables debug output. Useful for diagnostics. Default: `false` |
+| `verbose` | Increases log verbosity |
+| `quiet` | Suppresses console output (including errors) |
+| `envKeysFile` | Path to `.env.keys` — useful in monorepos |
+| `logLevel` | Log level: `'error'`, `'warn'`, `'info'`, etc. Partially overridden — see below |
+
+❌ **Ignored or overridden options**
+
+| Option | What happens | Reason |
+|--------|--------------|--------|
+| `path` | Ignored | File order and list are determined by `@mirta/env-loader` |
+| `processEnv` | Overridden | To avoid polluting `process.env` and to apply filtering |
+| `convention` | Ignored | To prevent conflicts with built-in priority logic |
+| `logLevel` | Default is `'warn'`, but can be overridden | To avoid suppressing important warnings (e.g., missing `.env.keys`) |
+| `ignore` | `'MISSING_ENV_FILE'` is enforced | `.env` files are optional — missing files are not an error |
+
+📌 **Recommendations**
+- Use `overload`, `debug`, `encoding` — they work as expected.
+- Do not rely on `convention` or `path` — they are disabled.
+- To change load order, configure `envFile`, `mode`, and `.env` file structure.
+
+Example
+
+```ts
+const env = loadEnv({
+  mode: 'production',
+  dotenv: {
+    overload: true,     // ✅ allowed: reverses file processing priority
+    debug: true,        // ✅ allowed: console output
+    encoding: 'utf16',  // ✅ rare, but possible
+    // convention: 'nextjs'  // ❌ ignored
+  }
+})
+```
 
 ### File Loading Order
 

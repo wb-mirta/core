@@ -1,6 +1,7 @@
 import nodePath from 'node:path'
 import dotenvx from '@dotenvx/dotenvx'
 import { ensureArray } from '@mirta/basics/array'
+import { existsSync } from 'node:fs'
 
 /**
  * Регулярное выражение, определяющее допустимые префиксы для переменных окружения,
@@ -70,12 +71,6 @@ export interface DotenvOptions {
    *
    **/
   envKeysFile?: string
-
-  /**
-   * Соглашение `.env`, определяет очерёдность загрузки файлов.
-   *
-   **/
-  convention?: 'nextjs' | 'flow'
 
   /**
    * Включает логирование для диагностики причин, почему определённые ключи или значения не устанавливаются.
@@ -265,12 +260,12 @@ export function resolveEnvFiles(options: EnvResolutionOptions) {
   // Преобразует envFile в массив уникальных значений:
   // удаляет дубликаты с помощью `Set`.
   //
-  const envFiles = [
+  let envFiles = [
     ...new Set(ensureArray(envFile)),
   ]
 
   // Перечисляем все базовые файлы (обычно это один `.env`)
-  return envFiles.flatMap(file =>
+  envFiles = envFiles.flatMap(file =>
     // Перемножаем на количество директорий, в которых нужно выполнить поиск.
     lookupDirs.flatMap(dir =>
       // Перемножаем на количество вариаций (в зависимости от режима)
@@ -278,6 +273,11 @@ export function resolveEnvFiles(options: EnvResolutionOptions) {
         .map(variant => nodePath.join(dir, variant))
     )
   )
+
+  // Самостоятельно отсеиваем несуществующие файлы,
+  // чтобы предотвратить падение производительности.
+  //
+  return envFiles.filter(envFile => existsSync(envFile))
 
 }
 
@@ -361,10 +361,14 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
   // Хранилище для загруженных переменных окружения.
   let processEnv: Record<string, string> = {}
 
+  const files = resolveEnvFiles({ cwd, rootDir, mode, envFile })
+
+  if (files.length === 0)
+    return processEnv
+
   dotenvx.config({
 
     // Переопределяемые параметры конфигурации:
-
     logLevel: 'warn',
     ignore: [
       'MISSING_ENV_FILE',
@@ -374,9 +378,9 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
     ...dotenv,
 
     // Параметры, которые переопределить нельзя:
-
     path: resolveEnvFiles({ cwd, rootDir, mode, envFile }),
     processEnv,
+    convention: undefined,
 
   })
 

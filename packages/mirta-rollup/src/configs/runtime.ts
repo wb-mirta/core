@@ -98,6 +98,7 @@ export async function defineRuntimeConfig(
         // Загрузка переменных окружения
         ...loadEnvReplacements({
           mode,
+          cwd,
           rootDir: monorepoContext.rootDir,
           ...envLoaderOptions,
         }),

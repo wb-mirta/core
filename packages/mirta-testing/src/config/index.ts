@@ -6,18 +6,28 @@ import { loadEnv } from '@mirta/env-loader'
 const cwd = process.cwd()
 const { rootDir, packages } = await resolveMonorepoContextAsync(cwd)
 
-const projects = packages.length > 0
-  ? packages.map<TestProjectConfiguration>(pkg => ({
-      extends: true,
-      root: pkg.workspacePath,
-      test: {
-        name: pkg.name,
-        typecheck: {
-          enabled: true,
-        },
+function getProjects(mode: string) {
+
+  if (packages.length === 0)
+    return
+
+  return packages.map<TestProjectConfiguration>(pkg => ({
+    extends: true,
+    root: pkg.workspacePath,
+    test: {
+      env: loadEnv({
+        mode,
+        // Поиск только в пакете, чтобы не дублировать.
+        cwd: nodePath.join(rootDir, pkg.workspacePath),
+      }),
+      name: pkg.name,
+      typecheck: {
+        enabled: true,
       },
-    }))
-  : undefined
+    },
+  }))
+
+}
 
 export default defineConfig(({ mode }) => ({
   define: {
@@ -48,10 +58,14 @@ export default defineConfig(({ mode }) => ({
       '**/public/templates/**',
       '**/dist/**',
     ],
-    env: loadEnv({ mode, rootDir }),
+    env: loadEnv({
+      mode,
+      cwd,
+      rootDir,
+    }),
     setupFiles: [
       '@mirta/testing/setup-global',
     ],
-    projects,
+    projects: getProjects(mode),
   },
 }))

@@ -4,7 +4,7 @@ import { loadEnv, type EnvLoaderOptions } from './load-env'
  * Загружает и фильтрует переменные окружения из dotenv-файлов.
  * Используется совместно с `@rollup/plugin-replace` для замены значений в коде.
  *
- * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvOptions}).
+ * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvLoaderOptions}).
  * @returns Объект с ключами вида `process.env.KEY` и `import.meta.env.KEY`, где `KEY` — имя переменной окружения.
  *
  *
