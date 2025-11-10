@@ -398,7 +398,7 @@ describe('loadEnv', () => {
 
     })
 
-    it('should resolve mixed envFile entries (e.g. .env and .env.custom', () => {
+    it('should resolve mixed envFile entries (e.g. .env and .env.custom)', () => {
 
       loadEnv({ envFile: ['.env', '.env.custom'], cwd: '/app' })
 
@@ -457,7 +457,7 @@ describe('loadEnv', () => {
 
     })
 
-    it('should sort envFile entries by length to prevent premature duplicate detection', () => {
+    it('should prioritize longer envFile entries to ensure correct variant loading order', () => {
 
       loadEnv({
         mode: 'development',
