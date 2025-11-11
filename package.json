@@ -63,7 +63,7 @@
     "globals": "^16.5.0",
     "magic-string": "^0.30.21",
     "lint-staged": "^16.2.6",
-    "rollup": "^4.52.5",
+    "rollup": "^4.53.2",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-typescript2": "^0.36.0",
