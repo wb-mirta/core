@@ -100,45 +100,6 @@ export default definePackageConfig({
 - Позволяют расширять поведение по умолчанию;
 - Идеальны для сложных проектов.
 
-## 🧰 Публичные инфраструктурные API
-
-### `@mirta/rollup/env-loader` - API загрузчика .env-файлов
-
-Загружает и фильтрует переменные окружения из .env-файлов. Реализован на базе `dotenvx` и поддерживает шифрование.
-
-[👉 Исходный код `env-loader`](https://github.com/wb-mirta/core/tree/latest/packages/mirta-rollup/src/utils/env-loader.ts)
-
-#### Пример использования
-
-```ts
-import { loadEnv, loadEnvReplacements } from '@mirta/rollup/env-loader'
-
-const mode = process.env.NODE_ENV
-
-// Для использования в Vitest
-const env = loadEnv({ mode, ...envLoaderOptions })
-
-// Для использования в Rollup
-const envReplacements = loadEnvReplacements({ mode, ...envLoaderOptions })
-
-```
-
-Загрузка переменных осуществляется согласно приоритетам:
-- `.env.{mode}.local`
-- `.env.{mode}`
-- `.env.local`
-- `.env`
-
-Ищет файлы сначала в текущей директории проекта, затем — в корне монорепозитория (если обнаружен).
-
-- Значения из `cwd` переопределяют значения из корня — это позволяет задавать локальные настройки;
-- Фильтрует переменные по префиксам — по умолчанию: `MIRTA_` и `APP_`;
-- Только `MIRTA_*` и `APP_*` попадают в `process.env`;
-- Защищает от случайной утечки `SECRET_*`, `DATABASE_URL` и т.п.;
-- Позволяет переопределить префиксы через `options.prefix`.
-
-✅ Используется совместно с `@rollup/plugin-replace` через `loadEnvReplacements`, а также Vitest через `loadEnv`.
-
 ## 🔄 Архитектурная роль
 
 Пакет обеспечивает **консистентность** и **предсказуемость** на всех уровнях экосистемы:

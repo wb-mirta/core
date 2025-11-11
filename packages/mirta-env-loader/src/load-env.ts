@@ -1,6 +1,7 @@
 import nodePath from 'node:path'
 import dotenvx from '@dotenvx/dotenvx'
-import { compactArray } from '@mirta/basics/array'
+import { ensureArray, ensureCompactArray } from '@mirta/basics/array'
+import { existsSync } from 'node:fs'
 
 /**
  * Регулярное выражение, определяющее допустимые префиксы для переменных окружения,
@@ -72,12 +73,6 @@ export interface DotenvOptions {
   envKeysFile?: string
 
   /**
-   * Соглашение `.env`, определяет очерёдность загрузки файлов.
-   *
-   **/
-  convention?: 'nextjs' | 'flow'
-
-  /**
    * Включает логирование для диагностики причин, почему определённые ключи или значения не устанавливаются.
    *
    * @default false
@@ -134,28 +129,43 @@ export interface EnvLoaderOptions {
   mode?: string
 
   /**
-   * Префикс для фильтрации переменных окружения.
+   * Префиксы для фильтрации переменных окружения.
+   *
+   * Если не указано, используется значение по умолчанию из {@link DEFAULT_ENV_PREFIXES}..
+   *
+   * @remarks
+   * Полностью отключить фильтрацию нельзя — это мера защиты от утечки секретов
+   * (например, `DB_PASSWORD`, `API_KEY`) в клиентский код.
+   *
+   * Чтобы использовать другие префиксы, перечислите их явно.
    *
    * @example
+   * // Фильтрация по одному префиксу
+   * prefix: 'APP_'
+   * // → включаются только переменные, начинающиеся с `APP_`
    *
-   * ```txt
-   * 'APP_' — выбираются только переменные, начинающиеся с этого префикса.
+   * @example
+   * // Фильтрация по нескольким префиксам
+   * prefix: ['MIRTA_', 'CUSTOM_']
+   * // → включаются переменные с `MIRTA_` или `CUSTOM_`
    *
-   * ```
    **/
   prefix?: string | string[]
 
   /**
-   * Текущая рабочая директория для поиска файлов `.env`.
+   * Текущая рабочая директория для обнаружения и загрузки файлов `.env`.
    *
    **/
   cwd?: string
 
   /**
-   * Корневая директория монорепозитория (если проект использует такую структуру).
+   * Корневая директория проекта.
+   *
+   * Используется для обнаружения и загрузки общих `.env`-файлов.
+   * Если не указана или совпадает с `cwd`, поиск в корне не выполняется.
    *
    **/
-  monorepoDir?: string
+  rootDir?: string
 
   /**
    * Префикс файла с переменными окружения, по умолчанию `'.env'`.
@@ -166,7 +176,12 @@ export interface EnvLoaderOptions {
   /**
    * Определяет, нужно ли включать переменную `NODE_ENV` в результат.
    *
-   * По умолчанию - `true`.
+   * @default true
+   *
+   * @remarks
+   *
+   * Используется для изоляции тестовой среды или предотвращения
+   * утечки режима выполнения в клиентский код.
    *
    **/
   keepNodeEnv?: boolean
@@ -191,9 +206,11 @@ interface EnvResolutionOptions {
 
   cwd: string
 
-  monorepoDir?: string
+  rootDir?: string
 
   envFile?: string | string[]
+
+  quiet?: boolean
 
 }
 
@@ -203,7 +220,7 @@ interface EnvResolutionOptions {
  * @param mode - Название текущего режима (например, `'development'`, `'production'`, `'test'`).
  *               Если значение не определено, возвращается только базовый файл.
  * @param envFile - Базовое имя файла, которое будет дополнено (по умолчанию `.env`).
- * @returns Массив строк с путями к файлам окружения, отсортированный по приоритету загрузки.
+ * @returns Массив строк с путями к файлам окружения, отсортированный в порядке убывания приоритета загрузки.
  *
  * @since 0.4.0
  *
@@ -217,6 +234,9 @@ function getEnvFileVariantsByMode(
 
   if (!mode)
     return [envFile]
+
+  if (mode === 'test' && envFile.endsWith('.local'))
+    return []
 
   const envFiles: string[] = []
 
@@ -240,71 +260,87 @@ function getEnvFileVariantsByMode(
 }
 
 /**
- * Разрешает пути к файлам окружения в зависимости от режима работы, текущей директории и структуры монорепозитория
+ * Формирует список существующих файлов окружения для загрузки на основе режима, текущей и корневой директорий.
  *
- * @param options - Параметры разрешения путей.
- * @returns Массив абсолютных путей к файлам окружения.
+ * @param options - Опции разрешения путей: `mode` (env mode), `cwd` (текущая рабочая директория), `rootDir` (опциональная корневая директория для общих .env), `envFile` (имя или список базовых файлов, по умолчанию `.env`), `quiet` (подавлять предупреждения о дубликатах)
+ * @returns Массив абсолютных путей к существующим файлам окружения, в порядке поиска (сначала по `cwd`, затем по `rootDir` при наличии)
  *
  * @since 0.4.0
- *
- **/
-function resolveEnvFiles(options: EnvResolutionOptions) {
+ */
+export function resolveEnvFiles(options: EnvResolutionOptions) {
 
-  const { mode, cwd, envFile = '.env' } = options
+  const { mode, cwd, rootDir, envFile = '.env', quiet } = options
 
-  // Определяет директорию монорепозитория, если она указана и отличается от `cwd`.
-  // Используется для поиска `.env`-файлов в родительской структуре проекта.
-  //
-  const monorepoDir = (options.monorepoDir !== cwd) && options.monorepoDir
+  // Сначала — все файлы из cwd
+  const lookupDirs = [cwd]
+
+  // Потом — все файлы из rootDir, если директория указана
+  if (rootDir && rootDir !== cwd)
+    lookupDirs.push(rootDir)
 
   // Преобразует envFile в массив уникальных значений:
   // удаляет дубликаты с помощью `Set`.
   //
   const envFiles = [
-    ...new Set(Array.isArray(envFile) ? envFile : [envFile]),
+    ...new Set(ensureArray(envFile)),
   ]
 
-  const resultFiles: string[] = []
+  const envFilesVariants = new Set<string>()
 
-  // Для каждого файла из `envFiles`
-  // 1. Получает варианты названий файлов на основе `mode` через `getEnvFileVariantsByMode`.
-  // 2. Строит полные пути к файлам:
-  //    - В текущей директории (`cwd`);
-  //    - В монорепозитории (`monorepoDir`), если он указан.
-  //
   for (const file of envFiles) {
 
-    const fileVariants = getEnvFileVariantsByMode(mode, file)
+    for (const variant of getEnvFileVariantsByMode(mode, file)) {
 
-    for (const variant of fileVariants) {
+      if (envFilesVariants.has(variant) && !quiet) {
 
-      resultFiles.push(nodePath.join(cwd, variant))
+        console.warn(`[@mirta/env-loader] Redundant env file entry detected: "${file}" may be unnecessary, as it generates a file already covered by another entry.`)
+        continue
 
-      if (monorepoDir)
-        resultFiles.push(nodePath.join(monorepoDir, variant))
+      }
+
+      envFilesVariants.add(variant)
 
     }
 
   }
 
-  return resultFiles
+  const result: string[] = []
+
+  // Перечисляем директории, в которых нужно выполнить поиск.
+  for (const dir of lookupDirs) {
+
+    // Перемножаем на варианты .env-файлов (обычно это все вариации `.env`)
+    for (const file of envFilesVariants) {
+
+      const path = nodePath.join(dir, file).replaceAll('\\', '/')
+
+      // Самостоятельно отсеиваем несуществующие файлы,
+      // чтобы предотвратить падение производительности.
+      //
+      if (existsSync(path))
+        result.push(path)
+
+    }
+
+  }
+
+  return result
 
 }
 
 /**
- * Фильтрует и сортирует переменные окружения по заданным префиксам и правилам.
+ * Отбирает из заданного набора только допустимые переменные окружения и возвращает их в детерминированном порядке.
  *
- * @param env Объект переменных окружения в формате `{ ключ: значение | undefined }`.
- * @param prefixes Массив строковых префиксов (например, `['MIRTA_', 'APP_']`).
- *                 Ключ будет включен, если начинается с любого из этих префиксов.
- * @param keepNodeEnv Определяет, включать ли переменную `NODE_ENV` в результат,
- *                    независимо от наличия префикса.
- * @returns Объект с отфильтрованными и отсортированными ключами в лексикографическом порядке.
+ * Фильтрация пропускает только пары, у которых есть определённое строковое значение; ключы, совпадающие с любым из указанных префиксов, и (опционально) `NODE_ENV` включаются в результат.
+ *
+ * @param env - Объект переменных окружения, значения могут быть `undefined`; только пары с определёнными строковыми значениями рассматриваются.
+ * @param prefixes - Список префиксов; ключ включается, если начинается с любого из этих префиксов.
+ * @param keepNodeEnv - Если `true`, ключ `NODE_ENV` будет включён в результат независимо от префиксов.
+ * @returns Объект с отфильтрованными парами ключ/значение; ключи отсортированы лексикографически с учётом числовых частей.
  *
  * @since 0.4.0
- *
- **/
-function filterEnvKeys(
+ */
+export function filterEnvKeys(
 
   env: Record<string, string | undefined>,
   prefixes: string[],
@@ -346,7 +382,7 @@ function filterEnvKeys(
 
 /**
  * Загружает и фильтрует переменные окружения из dotenv-файлов.
- * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvOptions}).
+ * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvLoaderOptions}).
  * @returns Набор переменных окружения.
  *
  * @since 0.4.0
@@ -360,7 +396,7 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
     prefix = [...DEFAULT_ENV_PREFIXES],
 
     cwd = process.cwd(),
-    monorepoDir,
+    rootDir,
     envFile = '.env',
 
     keepNodeEnv = true,
@@ -369,60 +405,30 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
   } = options
 
   // Хранилище для загруженных переменных окружения.
-  let processEnv: Record<string, string> = {}
+  let processEnv = { ...process.env } as Record<string, string>
 
-  dotenvx.config({
+  const files = resolveEnvFiles({ cwd, rootDir, mode, envFile, quiet: dotenv?.quiet })
 
-    // Переопределяемые параметры конфигурации:
+  if (files.length > 0)
+    dotenvx.config({
+      // Переопределяемые параметры конфигурации:
+      logLevel: 'warn',
+      ignore: [
+        'MISSING_ENV_FILE',
+      ],
 
-    logLevel: 'warn',
-    ignore: [
-      'MISSING_ENV_FILE',
-    ],
+      // Пользовательская конфигурация.
+      ...dotenv,
 
-    // Внешнаяя конфигурация.
-    ...dotenv,
+      // Параметры, которые переопределить нельзя:
+      path: files,
+      processEnv,
+      convention: undefined,
+    })
 
-    // Параметры, которые переопределить нельзя:
-
-    path: resolveEnvFiles({ cwd, monorepoDir, mode, envFile }),
-    processEnv,
-  })
-
-  // Фильтрация переменных, если задан префикс.
-  if (prefix)
-    processEnv = filterEnvKeys(processEnv, compactArray(prefix), keepNodeEnv)
+  // Фильтрация переменных по заданным префиксам.
+  processEnv = filterEnvKeys(processEnv, ensureCompactArray(prefix), keepNodeEnv)
 
   return processEnv
-
-}
-
-/**
- * Загружает и фильтрует переменные окружения из dotenv-файлов.
- * Используется совместно с `@rollup/plugin-replace` для замены значений в коде.
- *
- * @param options Опции загрузки и фильтрации переменных окружения (см. {@link EnvOptions}).
- * @returns Объект с ключами вида `process.env.KEY` и `import.meta.env.KEY`, где `KEY` — имя переменной окружения.
- *
- *
- * @since 0.4.0
- *
- **/
-export function loadEnvReplacements(options: EnvLoaderOptions = {}) {
-
-  const env = loadEnv(options)
-
-  const result: Record<string, string> = {}
-
-  for (const [key, rawValue] of Object.entries(env)) {
-
-    const value = JSON.stringify(rawValue)
-
-    result[`process.env.${key}`] = value
-    result[`import.meta.env.${key}`] = value
-
-  }
-
-  return result
 
 }

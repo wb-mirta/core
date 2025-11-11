@@ -1,2 +1,2 @@
 export { ensureArray } from './ensure-array'
-export { compactArray } from './compact-array'
+export { ensureCompactArray } from './ensure-compact-array'

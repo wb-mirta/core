@@ -10,26 +10,26 @@
  * @example
  *
  * ```ts
- * compactArray([1, null, 2, '']) // → [1, 2]
+ * ensureCompactArray([1, null, 2, '']) // → [1, 2]
  *
  * ```
  * @example
  *
  * ```ts
- * compactArray('hello') // → ['hello']
+ * ensureCompactArray('hello') // → ['hello']
  *
  * ```
  * @example
  *
  * ```ts
- * compactArray(undefined) // → []
+ * ensureCompactArray(undefined) // → []
  *
  * ```
  *
  * @since 0.4.0
  *
  **/
-export function compactArray<TItem>(
+export function ensureCompactArray<TItem>(
   input: TItem | false | null | undefined | (TItem | false | null | undefined)[]
 ): TItem[] {
 

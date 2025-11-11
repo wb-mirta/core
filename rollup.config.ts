@@ -20,7 +20,6 @@
 
 import { toPosix } from '@mirta/package'
 import { definePackageConfig } from '@mirta/rollup'
-import { compactArray } from '@mirta/basics/array'
 
 /**
  * Корневая директория проекта, нормализованная к Unix-стилю (с `/`).
@@ -30,25 +29,13 @@ import { compactArray } from '@mirta/basics/array'
 const cwd = toPosix(process.cwd())
 
 /**
- * Формирует конфигурации для сборки пакета в монорепозитории.
+ * Генерирует Rollup-конфигурации для указанного пакета монорепозитория.
  *
- * @remarks
- * Работает в бутстрап-режиме: запускается из корня, но настраивает сборку пакета.
- *
- * Особенности:
- * - `cwd`: указывает на директорию пакета → Rollup знает, где искать `tsconfig`, `package.json`
- * - `input`: передаётся как локальные пути (`src/index.ts`) → `definePackageConfig` сам добавит префикс
- *
- * @param workspace Имя папки в `packages/`
- * @param input Входные файлы (по умолчанию: `'src/index.ts'`)
+ * @param workspace Имя папки в каталоге `packages`
+ * @param input Входные файлы пакета (по умолчанию: `'src/index.ts'`)
  * @returns Массив конфигураций Rollup
- *
- * @since 0.4.0
- *
- **/
+ */
 function buildPackage(workspace: string, input: string | string[] = 'src/index.ts') {
-
-  input = compactArray(input)
 
   return definePackageConfig({
     cwd: `${cwd}/packages/${workspace}`,
@@ -64,6 +51,7 @@ const configs = [
       'src/index.ts',
       'src/array/index.ts',
     ]),
+  ...buildPackage('mirta-env-loader'),
   ...buildPackage('mirta-package'),
   ...buildPackage('mirta-workspace'),
   ...buildPackage('mirta-rollup',
@@ -71,7 +59,6 @@ const configs = [
       'src/index.ts',
       'src/config.ts',
       'src/config-package.ts',
-      'src/utils/env-loader.ts',
     ]),
 
   // TODO: Разобраться с зависимостями mirta-testing

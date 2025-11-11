@@ -1,21 +1,14 @@
 import nodePath from 'node:path'
 import type { ExternalOption } from 'rollup'
-import { compactArray } from '@mirta/basics/array'
+import { ensureCompactArray } from '@mirta/basics/array'
 
 /**
- * Создаёт фильтр для определения внешних модулей на основе указанных правил.
+ * Создаёт предикат для проверки, следует ли считать модуль внешним по набору правил.
  *
- * @param cwd Рабочая директория проекта (используется для проверки относительных путей)
- * @param externals Набор паттернов или функций для определения внешних модулей
- * @returns Функция-предикат, которая принимает параметры модуля и возвращает true,
- *          если модуль должен быть считаться внешним
- *
- * @returns Функция-предикат `(target: string, importer: string | undefined, isResolved: boolean): boolean`,
- *          которая возвращает `true`, если модуль считается внешним.
- *
- * @since 0.3.5
- *
- **/
+ * @param cwd - рабочая директория. Пути за её пределами считаются внешними.
+ * @param externals - список функций или паттернов (строки, RegExp или массивы таких значений), определяющих внешние модули
+ * @returns `true` если модуль считается внешним, `false` в противном случае
+ */
 export function createExternalFilter(cwd: string, ...externals: ExternalOption[]) {
 
   /**
@@ -40,7 +33,7 @@ export function createExternalFilter(cwd: string, ...externals: ExternalOption[]
       else {
 
         // Шаг 2: Массив паттернов
-        const isExternal = compactArray(external).some((item) => {
+        const isExternal = ensureCompactArray(external).some((item) => {
 
           if (item instanceof RegExp)
             return item.test(target)

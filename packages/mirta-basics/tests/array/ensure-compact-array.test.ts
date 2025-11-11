@@ -1,6 +1,6 @@
-import { compactArray } from '#array/compact-array'
+import { ensureCompactArray } from '#array/ensure-compact-array'
 
-describe('compactArray', () => {
+describe('ensureCompactArray', () => {
 
   describe('array inputs', () => {
 
@@ -8,7 +8,7 @@ describe('compactArray', () => {
 
       const input = ['a', false, 'b', null, 'c', undefined, '', 0]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual(['a', 'b', 'c'])
 
@@ -18,7 +18,7 @@ describe('compactArray', () => {
 
       const input = ['a', 'b', 'c', 1, 2, 3, true, {}]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual(['a', 'b', 'c', 1, 2, 3, true, {}])
 
@@ -28,7 +28,7 @@ describe('compactArray', () => {
 
       const input = [false, null, undefined, '', 0, NaN]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual([])
 
@@ -36,7 +36,7 @@ describe('compactArray', () => {
 
     it('should handle empty array input', () => {
 
-      const result = compactArray([])
+      const result = ensureCompactArray([])
 
       expect(result).toEqual([])
 
@@ -48,7 +48,7 @@ describe('compactArray', () => {
       const arr = [1, 2, 3]
       const input = [obj, false, arr, null, 'test']
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual([obj, arr, 'test'])
       expect(result[0]).toBe(obj)
@@ -72,7 +72,7 @@ describe('compactArray', () => {
         undefined,
       ]
 
-      const result = compactArray<TestItem>(input)
+      const result = ensureCompactArray<TestItem>(input)
 
       expect(result).toHaveLength(3)
       expect(result[0]).toEqual({ id: 1, name: 'first' })
@@ -85,7 +85,7 @@ describe('compactArray', () => {
 
       const input = [1, NaN, 2, NaN, 3]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual([1, 2, 3])
       expect(result).not.toContain(NaN)
@@ -98,7 +98,7 @@ describe('compactArray', () => {
 
     it('should wrap truthy string in array', () => {
 
-      const result = compactArray('test')
+      const result = ensureCompactArray('test')
 
       expect(result).toEqual(['test'])
 
@@ -106,7 +106,7 @@ describe('compactArray', () => {
 
     it('should wrap truthy number in array', () => {
 
-      const result = compactArray(42)
+      const result = ensureCompactArray(42)
 
       expect(result).toEqual([42])
 
@@ -114,7 +114,7 @@ describe('compactArray', () => {
 
     it('should wrap negative number in array', () => {
 
-      const result = compactArray(-5)
+      const result = ensureCompactArray(-5)
 
       expect(result).toEqual([-5])
 
@@ -124,7 +124,7 @@ describe('compactArray', () => {
 
       const obj = { key: 'value' }
 
-      const result = compactArray(obj)
+      const result = ensureCompactArray(obj)
 
       expect(result).toEqual([obj])
       expect(result[0]).toBe(obj)
@@ -133,7 +133,7 @@ describe('compactArray', () => {
 
     it('should wrap true boolean in array', () => {
 
-      const result = compactArray(true)
+      const result = ensureCompactArray(true)
 
       expect(result).toEqual([true])
 
@@ -141,7 +141,7 @@ describe('compactArray', () => {
 
     it('should return empty array for false', () => {
 
-      const result = compactArray(false)
+      const result = ensureCompactArray(false)
 
       expect(result).toEqual([])
 
@@ -149,7 +149,7 @@ describe('compactArray', () => {
 
     it('should return empty array for null', () => {
 
-      const result = compactArray(null)
+      const result = ensureCompactArray(null)
 
       expect(result).toEqual([])
 
@@ -157,7 +157,7 @@ describe('compactArray', () => {
 
     it('should return empty array for undefined', () => {
 
-      const result = compactArray(undefined)
+      const result = ensureCompactArray(undefined)
 
       expect(result).toEqual([])
 
@@ -165,7 +165,7 @@ describe('compactArray', () => {
 
     it('should return empty array for empty string', () => {
 
-      const result = compactArray('')
+      const result = ensureCompactArray('')
 
       expect(result).toEqual([])
 
@@ -173,7 +173,7 @@ describe('compactArray', () => {
 
     it('should return empty array for zero', () => {
 
-      const result = compactArray(0)
+      const result = ensureCompactArray(0)
 
       expect(result).toEqual([])
 
@@ -181,7 +181,7 @@ describe('compactArray', () => {
 
     it('should return empty array for NaN', () => {
 
-      const result = compactArray(NaN)
+      const result = ensureCompactArray(NaN)
 
       expect(result).toEqual([])
 
@@ -205,7 +205,7 @@ describe('compactArray', () => {
         null,
       ]
 
-      const result = compactArray<User>(input)
+      const result = ensureCompactArray<User>(input)
 
       expect(result).toHaveLength(2)
       expect(result[0].id).toBe(1)
@@ -221,7 +221,7 @@ describe('compactArray', () => {
 
       const input: (Item | false | undefined)[] = ['a', 1, false, 'b', 2, undefined]
 
-      const result = compactArray<Item>(input)
+      const result = ensureCompactArray<Item>(input)
 
       expect(result).toEqual(['a', 1, 'b', 2])
 
@@ -241,7 +241,7 @@ describe('compactArray', () => {
         undefined,
       ]
 
-      const result = compactArray<Config>(input)
+      const result = ensureCompactArray<Config>(input)
 
       expect(result).toHaveLength(2)
       expect(result[0].key).toBe('a')
@@ -256,7 +256,7 @@ describe('compactArray', () => {
     it('should not mutate the original array', () => {
 
       const original = [1, null, 2]
-      const result = compactArray(original)
+      const result = ensureCompactArray(original)
 
       expect(result).toEqual([1, 2])
       expect(original).toEqual([1, null, 2]) // Does not change
@@ -267,7 +267,7 @@ describe('compactArray', () => {
 
       const input = [undefined, undefined, undefined]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual([])
 
@@ -277,7 +277,7 @@ describe('compactArray', () => {
 
       const input = [[1, 2], false, [3, 4], null, []]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toHaveLength(3)
       expect(result[0]).toEqual([1, 2])
@@ -290,7 +290,7 @@ describe('compactArray', () => {
 
       const input = [-1, false, -2, null, -3]
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual([-1, -2, -3])
 
@@ -300,7 +300,7 @@ describe('compactArray', () => {
 
       const input = ['a', ' ', 'b', '', 'c']
 
-      const result = compactArray(input)
+      const result = ensureCompactArray(input)
 
       expect(result).toEqual(['a', ' ', 'b', 'c'])
       expect(result).not.toContain('')
@@ -309,7 +309,7 @@ describe('compactArray', () => {
 
     it('should handle single truthy value in array', () => {
 
-      const result = compactArray(['only'])
+      const result = ensureCompactArray(['only'])
 
       expect(result).toEqual(['only'])
 
@@ -317,7 +317,7 @@ describe('compactArray', () => {
 
     it('should handle single falsy value in array', () => {
 
-      const result = compactArray([null])
+      const result = ensureCompactArray([null])
 
       expect(result).toEqual([])
 

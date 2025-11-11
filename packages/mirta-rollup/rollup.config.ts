@@ -5,6 +5,5 @@ export default definePackageConfig({
     'src/index.ts',
     'src/config.ts',
     'src/config-package.ts',
-    'src/utils/env-loader.ts',
   ],
 })

@@ -1,0 +1,53 @@
+{
+  "name": "@mirta/env-loader",
+  "version": "0.4.0",
+  "sideEffects": false,
+  "description": "Internal dotenvx-based environment loader, used by Mirta Framework.",
+  "keywords": [
+    "mirta",
+    "env",
+    "environment",
+    "loader",
+    "dotenv",
+    "dotenvx",
+    "nodejs",
+    "utility",
+    "tooling"
+  ],
+  "license": "Unlicense",
+  "homepage": "https://github.com/wb-mirta/core#readme",
+  "bugs": {
+    "url": "https://github.com/wb-mirta/core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wb-mirta/core.git",
+    "directory": "packages/mirta-env-loader"
+  },
+  "type": "module",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "imports": {
+    "#src": "./src/index.js",
+    "#src/*": "./src/*.js"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.51.1",
+    "@mirta/basics": "workspace:*"
+  }
+}

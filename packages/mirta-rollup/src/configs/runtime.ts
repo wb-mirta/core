@@ -5,14 +5,13 @@ import resolve from '@rollup/plugin-node-resolve'
 import ts from 'rollup-plugin-typescript2'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
-import { loadEnvReplacements, type EnvLoaderOptions } from '#utils/env-loader'
+import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader'
+import { resolveMonorepoContextAsync } from '@mirta/workspace'
 
 import del from '#plugins/del'
 import wbRulesImports from '#plugins/wb-rules-imports'
 
 import nodePath from 'node:path'
-
-import { resolveMonorepoContextAsync } from '@mirta/workspace'
 
 import {
 
@@ -39,22 +38,19 @@ export interface RuntimeConfigOptions {
   external?: ExternalOption
 
   /** Конфигурация загрузчика `.env`-файлов `dotenvx`, {@link EnvLoaderOptions}. */
-  envLoader?: EnvLoaderOptions
+  envLoader?: Omit<EnvLoaderOptions, 'mode' | 'cwd' | 'rootDir'>
 
   /** Дополнительные плагины. */
   plugins?: Plugin[]
 }
 
 /**
- * Основная функция, возвращающая конфигурацию Rollup.
- * Обрабатывает входные файлы, плагины и настройку выходных путей.
+ * Собирает Rollup-конфигурацию для сборки runtime-кода проекта с учётом монорепозитория и подстановки переменных окружения.
  *
- * @param options - опции конфигурации
- * @returns Объект RollupOptions
- *
+ * @param options - Параметры: `cwd` — рабочая директория проекта; `external` — список внешних зависимостей; `envLoader` — опции загрузчика окружения; `plugins` — дополнительные Rollup-плагины
+ * @returns Сконфигурированный объект RollupOptions, готовый для сборки в каталог `dist/es5`
  * @since 0.3.0
- *
- **/
+ */
 export async function defineRuntimeConfig(
   options: RuntimeConfigOptions = {}
 ): Promise<RollupOptions> {
@@ -95,13 +91,20 @@ export async function defineRuntimeConfig(
     replace({
       preventAssignment: true,
       values: {
+
         // Загрузка переменных окружения
-        ...loadEnvReplacements({ mode, ...envLoaderOptions }),
+        ...loadEnvReplacements({
+          ...envLoaderOptions,
+          mode,
+          cwd,
+          rootDir: monorepoContext.rootDir,
+        }),
 
         // Признак сборки в режиме разработки
         __DEV__: JSON.stringify(!isProduction),
         // Автоматически меняется в процессе тестирования
         __TEST__: 'false',
+
       },
     }),
 
