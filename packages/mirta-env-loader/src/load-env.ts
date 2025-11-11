@@ -281,12 +281,9 @@ export function resolveEnvFiles(options: EnvResolutionOptions) {
   // Преобразует envFile в массив уникальных значений:
   // удаляет дубликаты с помощью `Set`.
   //
-  let envFiles = [
+  const envFiles = [
     ...new Set(ensureArray(envFile)),
   ]
-
-  if (envFiles.length > 1)
-    envFiles = envFiles.sort((a, b) => a.length - b.length)
 
   const envFilesVariants = new Set<string>()
 

@@ -38,7 +38,7 @@ export interface RuntimeConfigOptions {
   external?: ExternalOption
 
   /** Конфигурация загрузчика `.env`-файлов `dotenvx`, {@link EnvLoaderOptions}. */
-  envLoader?: EnvLoaderOptions
+  envLoader?: Omit<EnvLoaderOptions, 'mode' | 'cwd' | 'rootDir'>
 
   /** Дополнительные плагины. */
   plugins?: Plugin[]
@@ -94,10 +94,10 @@ export async function defineRuntimeConfig(
 
         // Загрузка переменных окружения
         ...loadEnvReplacements({
+          ...envLoaderOptions,
           mode,
           cwd,
           rootDir: monorepoContext.rootDir,
-          ...envLoaderOptions,
         }),
 
         // Признак сборки в режиме разработки

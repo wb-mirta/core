@@ -33,7 +33,7 @@ pnpm add -D @mirta/env-loader
 ## 🚀 Quick Start
 
 ```ts
-import { loadEnv } from '@mirta/env-loader'
+import { loadEnv, loadEnvReplacements } from '@mirta/env-loader'
 
 // Load environment variables
 const env = loadEnv({ mode: 'development' })
@@ -263,20 +263,34 @@ MIRTA_LOG_LEVEL=debug
 
 This way, you build a **predictable, secure, and portable** application.
 
-## 🔐 Working with encrypted variables
+## 🔐 Working with Encrypted Variables
 
 `@mirta/env-loader` uses `@dotenvx/dotenvx` to load and decrypt `.env` files.
 
-If the `DOTENV_KEY` environment variable is set and the `.env` file is encrypted,
-it will be automatically decrypted before loading.
+> ⚠️ **Deprecated: `DOTENV_KEY` and `.env.vault`**
+>
+> The legacy encryption flow using `DOTENV_KEY` and `.env.vault` is **deprecated**.  
+> While still supported for backward compatibility, it is no longer recommended.
 
-🔍 This means:
-- `@dotenvx/dotenvx` handles cryptographic operations,
-- `@mirta/env-loader` receives already decrypted values.
 
-We do not process encryption directly.
+✅ **Current mechanism: Key-pair encryption**
 
-👉 For setup details, see [dotenvx](https://github.com/dotenvx/dotenvx#readme)
+`dotenvx` now uses public-key cryptography:
+- **`DOTENV_PUBLIC_KEY`** — used to **encrypt** `.env` files.
+- **`DOTENV_PRIVATE_KEY`** — used to **decrypt** them at runtime.
+
+When enabled:
+- Your `.env` files are **fully encrypted on disk**.
+- Only the public key is needed for encryption (safe to commit).
+- The private key is required for decryption (kept secret in CI/CD or local env).
+
+🔍 How it works:
+- `@dotenvx/dotenvx` performs all cryptographic operations using the key pair.
+- `@mirta/env-loader` receives **already decrypted values** — it does not handle keys or crypto directly.
+
+👉 We recommend migrating to the new key-pair system.
+ 
+For setup, see: [dotenvx — Encryption Guide](https://github.com/dotenvx/dotenvx#encryption)
 
 ## ✅ Testing
 

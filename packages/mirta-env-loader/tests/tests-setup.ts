@@ -1,4 +1,5 @@
 import type { DotenvConfigOptions } from '@dotenvx/dotenvx'
+import type { Mock } from 'vitest'
 
 vi.mock('node:fs', () => ({
   existsSync: vi.fn(),
@@ -84,7 +85,8 @@ export function expectConfigCalledWith(
 // --- Глобальные утилиты для тестов ---
 
 const originalEnv = process.env
-const originalCwd = process.cwd()
+
+let cwdSpy: Mock<() => string> | undefined
 
 /**
  * Инициализирует контролируемое тестовое окружение и сбрасывает все мок-объекты.
@@ -103,7 +105,7 @@ export function resetTestEnv() {
     NODE_ENV: 'development', // только необходимый минимум.
   }
 
-  vi.spyOn(process, 'cwd').mockReturnValue('/test/project')
+  cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/test/project')
   mockExistsSync.mockReturnValue(true)
 
 }
@@ -117,6 +119,7 @@ export function restoreTestEnv() {
 
   process.env = originalEnv
 
-  vi.spyOn(process, 'cwd').mockReturnValue(originalCwd)
+  cwdSpy?.mockRestore()
+  cwdSpy = undefined
 
 }
