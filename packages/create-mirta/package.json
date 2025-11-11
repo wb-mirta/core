@@ -41,7 +41,7 @@
     "lodash.merge": "^4.6.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^9.39.1",
     "@stylistic/eslint-plugin": "^5.5.0",
     "@types/cross-spawn": "^6.0.6",
     "@types/ejs": "^3.1.5",
@@ -49,7 +49,7 @@
     "@types/lodash.merge": "^4.6.9",
     "eslint": "^9.38.0",
     "@vitest/eslint-plugin": "^1.4.2",
-    "globals": "^16.4.0",
+    "globals": "^16.5.0",
     "typescript-eslint": "^8.46.2"
   }
 }

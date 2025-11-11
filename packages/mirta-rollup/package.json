@@ -54,7 +54,7 @@
   "dependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
-    "@dotenvx/dotenvx": "^1.51.0",
+    "@dotenvx/dotenvx": "^1.51.1",
     "@mirta/basics": "workspace:*",
     "@mirta/env-loader": "workspace:*",
     "@mirta/package": "workspace:*",
