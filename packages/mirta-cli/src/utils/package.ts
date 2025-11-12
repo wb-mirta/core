@@ -323,8 +323,12 @@ export async function publishPackagesAsync(
   for (const [pkgName, pkg] of Object.entries(packages)) {
 
     // Приватные пакеты не публикуются.
-    if (pkg.isPrivate)
+    if (pkg.isPrivate) {
+
+      logger.step(`Skipping private ${pkgName}`)
       continue
+
+    }
 
     await publishSinglePackageAsync(
       pkgName,

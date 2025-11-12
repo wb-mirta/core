@@ -24,7 +24,7 @@ To automatically detect project structure, `@mirta/cli` uses the packages `@mirt
 ## 📦 Installation
 
 ```sh
-pnpm add -D @mirta/cli
+pnpm add -wD @mirta/cli
 ```
 
 ✅ This package was developed for the Mirta framework but works in any `pnpm`-based monorepository with synchronized versioning.

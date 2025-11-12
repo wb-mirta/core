@@ -1,5 +1,3 @@
-import nodePath from 'node:path'
-
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
 /**
@@ -49,9 +47,9 @@ export class PackageError extends Error {
 
       Error.captureStackTrace(this, scope
         // eslint-disable-next-line @typescript-eslint/unbound-method
-        ? PackageError.get
+        ? PackageError.getScoped
         // eslint-disable-next-line @typescript-eslint/unbound-method
-        : PackageError.getScoped
+        : PackageError.get
       )
 
   }
@@ -112,7 +110,7 @@ export class PackageError extends Error {
      *
      **/
     failedToRead: (filePath: string, message: string | null | undefined) =>
-      `Failed to read "${nodePath.basename(filePath)}": ${message ?? 'unknown reason'}`,
+      `Failed to read "${filePath}": ${message ?? 'unknown reason'}`,
 
     /**
      * Ошибка, возникающая, если в `package.json` отсутствует поле `version`.
