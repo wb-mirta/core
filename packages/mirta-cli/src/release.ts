@@ -35,10 +35,6 @@ const allOptions = ({
     type: 'boolean',
     default: false,
   },
-  skipBuild: {
-    type: 'boolean',
-    default: false,
-  },
   help: {
     type: 'boolean',
     short: 'h',

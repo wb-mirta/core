@@ -13,6 +13,9 @@
     "resolver"
   ],
   "license": "Unlicense",
+  "scripts": {
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
+  },
   "homepage": "https://github.com/wb-mirta/core#readme",
   "bugs": {
     "url": "https://github.com/wb-mirta/core/issues"

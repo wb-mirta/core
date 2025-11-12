@@ -9,5 +9,6 @@ export type {
 
 export { readPackage, readPackageAsync } from './read-package'
 export { parsePackageJson } from './parse-package-json'
-export { PackageError } from './errors/package-error'
+export { resolvePackagePath } from './resolve-package-path'
 export { toPosix } from './path'
+export { PackageError } from './errors/package-error'
