@@ -14,7 +14,7 @@
 
 Works in any monorepo using `pnpm` and following the principle of synchronized semantic versioning.
 
-To automatically detect project structure, `@mirta/cli` uses `@mirta/workspace` and `@mirta/package`, reading the `workspaces` field from the root `package.json`.
+To recognize the monorepo structure, `@mirta/cli` relies on the packages `@mirta/workspace` and `@mirta/package`, which read the configuration from the workspaces field in the root `package.json`.
 
 **Not intended for execution in Duktape environment on Wiren Board controllers.**
 
@@ -232,14 +232,15 @@ The tool has been tested manually and in CI:
 **Runs only in Node.js** (not in Duktape).<br/>
 Automatic commit and tag creation — only when connected to GitHub via `ssh`.
 
-## Mirta Framework Special Options
+## 🛠 Mirta Internal Configuration
 
-Additional functionality is available by placing a `mirta.config.json` file in the repo root:
+The `mirta.config.json` file allows you to configure the behavior of `@mirta/cli` specifically within the Mirta framework.
 
-- `templates` — a list of paths to project template directories.<br/>
-  Performs recursive scanning for `package.json` files in specified locations.
+Currently supported:
 
-Example Mirta configuration:
+`templates` — a list of paths to project templates (e.g. in `create-mirta`).
+
+Example:
 
 ```json
 {
