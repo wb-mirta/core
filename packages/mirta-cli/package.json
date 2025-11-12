@@ -9,7 +9,7 @@
     "wb-rules"
   ],
   "engines": {
-    "node": ">=20.6.0"
+    "node": ">=20.10.0"
   },
   "type": "module",
   "files": [
