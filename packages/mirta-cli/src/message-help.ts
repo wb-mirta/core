@@ -11,30 +11,36 @@ Performs operations over monorepo projects powered by the Mirta Framework.
 ${yellow('Usage:')}
   mirta [command] [options...]
 
+${yellow('Global flags:')}
+  --help, -h
+    ${dim('Displays help information about available commands and options.')}
+  --version, -v
+    ${dim('Prints the version of this CLI utility.')}
+
 ${yellow('Commands:')}
-- release:
+  release
   ${dim('Increase package versions following semantic versioning rules.')}
-- publish:
+  publish
   ${dim('Builds and publishes packages to npm registry.')}
 
 ${yellow(`Options for 'release':`)}
   --dry
-    ${dim('Runs the command in dry run mode, showing what would be done but not performing any actual changes. Useful for previewing changes before applying them.')}
-  --preid <custom-pre-release-id>
-    ${dim('Sets a custom pre-release identifier that will be appended to the version string (for example, beta.1). This option allows creating pre-release versions like alpha, beta, rc etc., prior to official stable releases.')}
+    ${dim('Runs the command in simulation mode. Shows what would change but does not apply modifications.')}
+  --preid <id>
+    ${dim('Sets a custom pre-release identifier (e.g., `alpha`, `beta.1`, `rc`).')}
   --skipPrompts
-    ${dim('Skips user interaction prompts entirely. The command runs non-interactively, automatically proceeding with defaults or configured values where applicable.')}
+    ${dim('Skips interactive prompts, using default values.')}
   --skipGit
-    ${dim('Omits Git-related actions such as committing changes, tagging commits, or pushing updates to remote repositories. This can be useful if you want to manually manage Git operations later.')}
+    ${dim('Disables creating a commit and tag. Git changes remain uncommitted.')}
 
 ${yellow(`Options for 'publish':`)}
   --dry
-    ${dim('Runs the command in dry run mode, showing what would be done but not performing any actual changes. Useful for previewing changes before applying them.')}
+    ${dim('Runs in simulation mode. Shows what would happen, but does not publish')}
   --skipBuild
-    ${dim('Excludes running the build process after version bumps. Bypasses execution of tasks defined in the build pipeline, allowing users to control whether they need a rebuild after updating package versions.')}
+    ${dim('Skips running `pnpm run build` before publishing.')}
   --skipGit
-    ${dim('Omits Git-related actions such as committing changes, tagging commits, or pushing updates to remote repositories. This can be useful if you want to manually manage Git operations later.')}
-    
+    ${dim('Disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).')}
+
 `
 
 const helpMessageRu = `\
@@ -44,28 +50,34 @@ ${yellow('Использование:')}
   mirta [command] [options...]
 
 ${yellow('Команды:')}
-- release:
+  release
   ${dim('Повышение версий пакетов согласно правилам семантического версионирования.')}
-- publish:
+  publish
   ${dim('Сборка и публикация пакетов в реестр npm.')}
+
+${yellow('Общие флаги:')}
+  --help, -h
+    ${dim('Отображает справку по доступным командам и параметрам.')}
+  --version, -v
+    ${dim('Выводит версию данной утилиты.')}
 
 ${yellow(`Опции для 'release':`)}
   --dry
-    ${dim('Запускает команду в режиме симуляции ("dry run"), показывая изменения, которые будут произведены, но фактически ничего не меняя. Полезно для предварительного просмотра изменений перед применением.')}
-  --preid <custom-pre-release-id>
-    ${dim('Устанавливает кастомный префикс для предварительной версии, который добавляется к номеру версии пакета (например, beta.1). Эта опция позволяет создавать предварительные версии типа альфа, бета, RC и др. перед официальным стабильным выпуском.')}
+    ${dim('Запускает команду в режиме симуляции. Показывает изменения, но не применяет их.')}
+  --preid <id>
+    ${dim('Задаёт кастомный префикс для преверсии (например, `alpha`, `beta.1`, `rc`).')}
   --skipPrompts
-    ${dim('Пропускает интерактивные запросы пользователя. Команда выполняется автоматически, используя значения по умолчанию или заданные настройки.')}
+    ${dim('Пропускает интерактивные запросы. Используются значения по умолчанию.')}
   --skipGit
-    ${dim('Игнорирует действия, связанные с системой контроля версий Git, такие как фиксация изменений, создание меток коммитов или отправка изменений на удалённый репозиторий. Может пригодиться, если вы хотите самостоятельно управлять операциями с Git позже.')}
+    ${dim('Не создаёт коммит и тег. Git-изменения остаются в рабочей директории.')}
 
 ${yellow(`Опции для 'publish':`)}
   --dry
-    ${dim('Запускает команду в режиме симуляции ("dry run"), показывая изменения, которые будут произведены, но фактически ничего не меняя. Полезно для предварительного просмотра изменений перед применением.')}
+    ${dim('Запускает команду в режиме симуляции. Показывает изменения, но не применяет их.')}
   --skipBuild
-    ${dim('Исключает запуск процесса сборки после обновления версий пакетов. Пропускает выполнение заданий, указанных в конвейере сборки, позволяя вам самим решать, необходима ли повторная компиляция после изменения номеров версий.')}
+    ${dim('Пропускает выполнение `pnpm run build` перед публикацией')}
   --skipGit
-    ${dim('Игнорирует действия, связанные с системой контроля версий Git, такие как фиксация изменений, создание меток коммитов или отправка изменений на удалённый репозиторий. Может пригодиться, если вы хотите самостоятельно управлять операциями с Git позже.')}
+    ${dim('Отключает проверки git-состояния (аналог `--no-git-checks` в `pnpm publish`)')}
 `
 
 export const helpMessage = locale === 'ru-RU'

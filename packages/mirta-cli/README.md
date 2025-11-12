@@ -44,6 +44,12 @@ All public packages will be published to NPM.
 
 ## 🧰 Commands
 
+### `mirta [options]`
+
+These global options are available for all commands:
+- `--help` (`-h`) — displays help information about available commands and options.
+- `--version` (`-v`) — prints the version of `@mirta/cli`.
+
 ### `pnpm mirta release`
 
 Prepares a release: detects the current version, prompts you to choose an update type (`patch`, `minor`, `major`, `pre*`), and applies it to all packages containing the `version` field.
