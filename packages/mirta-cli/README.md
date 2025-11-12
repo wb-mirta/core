@@ -51,22 +51,22 @@ Prepares a release: detects the current version, prompts you to choose an update
 <details>
   <summary>Technical Details</summary>
 
-  The process is divided into several steps.
+The process is divided into several steps.
 
-  Step 1: If the project is git-connected, it first checks:
-  - Sync status with `origin`.
-  - CI pipeline success (via the `build` workflow).
+Step 1: If the project is git-connected, it first checks:
+- Sync status with `origin`.
+- CI pipeline success (via the `build` workflow).
 
-  Step 2: For paths listed in `mirta.config.json#templates`, performs recursive discovery of `package.json` files and updates monorepo dependencies (`dependencies`, `devDependencies`) accordingly.
+Step 2: For paths listed in `mirta.config.json#templates`, performs recursive discovery of `package.json` files and updates monorepo dependencies (`dependencies`, `devDependencies`) accordingly.
 
-  Step 3: Runs `pnpm run changelog` if the script exists.
+Step 3: Runs `pnpm run changelog` if the script exists.
 
-  Step 4: If GitHub connection is via `ssh`, creates a commit and a tag:
-  ```sh
-  git commit -m "release: vX.X.X"
-  git tag vX.X.X
-  ```
-  If connected via `https`, changes remain in the working directory. You can commit them manually or use a GUI client (e.g., GitHub Desktop).
+Step 4: If GitHub connection is via `ssh`, creates a commit and a tag:
+```sh
+git commit -m "release: vX.X.X"
+git tag vX.X.X
+```
+If connected via `https`, changes remain in the working directory. You can commit them manually or use a GUI client (e.g., GitHub Desktop).
 
 </details>
 
@@ -85,53 +85,53 @@ Prepares a release: detects the current version, prompts you to choose an update
 <details>
   <summary>Why synchronized versioning?</summary>
 
-  All packages in the monorepo receive the same version upon release.
+All packages in the monorepo receive the same version upon release.
 
-  This is useful when:
-  - Packages are tightly coupled (e.g., parts of the same framework),
-  - Compatibility matters: `@mirta/cli@0.4.0` is guaranteed to work with `@mirta/package@0.4.0`,
-  - Dependency management needs to be simplified.
+This is useful when:
+- Packages are tightly coupled (e.g., parts of the same framework),
+- Compatibility matters: `@mirta/cli@0.4.0` is guaranteed to work with `@mirta/package@0.4.0`,
+- Dependency management needs to be simplified.
 
-  Compared to independent versioning, synchronized versioning:
-  - Simplifies publishing,
-  - Reduces version conflicts,
-  - Makes releases atomic: all packages update together.
+Compared to independent versioning, synchronized versioning:
+- Simplifies publishing,
+- Reduces version conflicts,
+- Makes releases atomic: all packages update together.
 
-  💡 If you use `workspace:*`, during release all such references are replaced with the exact version — this is synchronized versioning in action.
+💡 If you use `workspace:*`, during release all such references are replaced with the exact version — this is synchronized versioning in action.
 </details>
 
 <details>
   <summary>What is "semantic" versioning?</summary>
 
-  Semantic version follows the format `major.minor.patch`, where each segment indicates different levels of change:
-  - `major` — breaking changes or major updates,
-  - `minor` — new features without breaking compatibility,
-  - `patch` — bug fixes.
+Semantic version follows the format `major.minor.patch`, where each segment indicates different levels of change:
+- `major` — breaking changes or major updates,
+- `minor` — new features without breaking compatibility,
+- `patch` — bug fixes.
 
-  Versions before `1.0.0` (e.g., `0.4.0`) are considered experimental:<br/>
-  any update may include breaking changes.
+Versions before `1.0.0` (e.g., `0.4.0`) are considered experimental:<br/>
+any update may include breaking changes.
 
-  Learn more at [semver.org](https://semver.org/)
+Learn more at [semver.org](https://semver.org/)
 </details>
 
 <details>
   <summary>How to set up CHANGELOG.md generation?</summary>
 
-  To generate a changelog file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package to devDependencies in the root `package.json`, and include the `changelog` script:
+To generate a changelog file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package to devDependencies in the root `package.json`, and include the `changelog` script:
 
-  ```json
-  {
-    "scripts": {
-      "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
-    }
+```json
+{
+  "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   }
-  ```
+}
+```
 
-  The automatically generated changelog is based on commits within the version range. Commit messages must follow these rules:
-  1. Total line length must not exceed 50 characters;
-  2. Use prefixes like `fix:`, `feat:`, `docs:`, `chore:`, etc.
+The automatically generated changelog is based on commits within the version range. Commit messages must follow these rules:
+1. Total line length must not exceed 50 characters;
+2. Use prefixes like `fix:`, `feat:`, `docs:`, `chore:`, etc.
 
-  See full requirements in the [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) document.
+See full requirements in the [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) document.
 </details>
 
 #### Advanced Usage
@@ -139,57 +139,57 @@ Prepares a release: detects the current version, prompts you to choose an update
 <details>
   <summary>Explicit version specification</summary>
 
-  Sets exactly the version passed as an argument:
+Sets exactly the version passed as an argument:
 
-  ```sh
-  pnpm mirta release 1.2.3
-  ```
-  ⚠️ **Warning!** Do not attempt to overwrite already published versions — NPM registry will reject them.
+```sh
+pnpm mirta release 1.2.3
+```
+⚠️ **Warning!** Do not attempt to overwrite already published versions — NPM registry will reject them.
 </details>
 
 <details>
   <summary>Increment: patch, minor, major</summary>
 
-  ```sh
-  pnpm mirta release patch
-  # 0.0.1
-  ```
+```sh
+pnpm mirta release patch
+# 0.0.1
+```
 
-  ```sh
-  pnpm mirta release minor
-  # 0.1.0
-  ```
+```sh
+pnpm mirta release minor
+# 0.1.0
+```
 
-  ```sh
-  pnpm mirta release major
-  # 1.0.0
-  ```
+```sh
+pnpm mirta release major
+# 1.0.0
+```
 </details>
 
 <details>
   <summary>Pre-releases: alpha, beta, rc</summary>
 
-  ```sh
-  pnpm mirta release prepatch --preid alpha
-  # 0.0.1-alpha.0
-  ```
+```sh
+pnpm mirta release prepatch --preid alpha
+# 0.0.1-alpha.0
+```
 
-  ```sh
-  pnpm mirta release preminor --preid alpha
-  # 0.1.0-alpha.0
-  ```
+```sh
+pnpm mirta release preminor --preid alpha
+# 0.1.0-alpha.0
+```
 
-  ```sh
-  pnpm mirta release premajor --preid alpha
-  # 1.0.0-alpha.0
-  ```
+```sh
+pnpm mirta release premajor --preid alpha
+# 1.0.0-alpha.0
+```
 
-  **Incrementing pre-release version:**
+#### Incrementing pre-release version
 
-  ```sh
-  pnpm mirta release prerelease --preid alpha
-  # 0.0.1-alpha.1
-  ```
+```sh
+pnpm mirta release prerelease --preid alpha
+# 0.0.1-alpha.1
+```
 </details>
 
 ---
@@ -201,14 +201,14 @@ Publishes packages to NPM, skipping those marked as `private: true`.
 <details>
   <summary>Technical Details</summary>
 
-  ⚠️ Typically executed in CI/CD after pushing the `vX.X.X` git tag.
+⚠️ Typically executed in CI/CD after pushing the `vX.X.X` git tag.
 
-  The NPM dist tag is determined automatically:
-  - `alpha` → `--tag` `alpha`
-  - `beta` → `--tag` `beta`
-  - `rc` → `--tag` `rc`
+The NPM dist tag is determined automatically:
+- `alpha` → `--tag` `alpha`
+- `beta` → `--tag` `beta`
+- `rc` → `--tag` `rc`
 
-  In CI environments (when `process.env.CI` is set), adds `--provenance`.
+In CI environments (when `process.env.CI` is set), adds `--provenance`.
 </details>
 
 #### Supported Options

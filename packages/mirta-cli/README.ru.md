@@ -51,22 +51,22 @@ pnpm mirta publish
 <details>
   <summary>Технические подробности</summary>
 
-  Производимые манипуляции разделены на этапы.
+Производимые манипуляции разделены на этапы.
 
-  Этап 1: если проект связан с `git`, при запуске первым делом проверяет:
-  - Синхронизацию с `origin`.
-  - Успешность CI (по workflow `build`).
+Этап 1: если проект связан с `git`, при запуске первым делом проверяет:
+- Синхронизацию с `origin`.
+- Успешность CI (по workflow `build`).
 
-  Этап 2: для путей, указанных в `mirta.config.json#templates`, выполняет рекурсивное обнаружение `package.json` с последующим обновлением зависимостей монорепозитория (`dependencies`, `devDependencies`).
+Этап 2: для путей, указанных в `mirta.config.json#templates`, выполняет рекурсивное обнаружение `package.json` с последующим обновлением зависимостей монорепозитория (`dependencies`, `devDependencies`).
 
-  Этап 3: запускает `pnpm run changelog`, если скрипт существует.
+Этап 3: запускает `pnpm run changelog`, если скрипт существует.
 
-  Этап 4: если подключение к GitHub — по `ssh`, создаёт коммит и тег:
-  ```sh
-  git commit -m "release: vX.X.X"
-  git tag vX.X.X
-  ```
-  При подключении к GitHub по `https` изменения остаются в рабочей директории. Вы можете зафиксировать изменения вручную или через GUI-клиент (например, GitHub Desktop).
+Этап 4: если подключение к GitHub — по `ssh`, создаёт коммит и тег:
+```sh
+git commit -m "release: vX.X.X"
+git tag vX.X.X
+```
+При подключении к GitHub по `https` изменения остаются в рабочей директории. Вы можете зафиксировать изменения вручную или через GUI-клиент (например, GitHub Desktop).
 
 </details>
 
@@ -85,56 +85,56 @@ pnpm mirta publish
 <details>
   <summary>Почему версионирование синхронное?</summary>
 
-  Все пакеты монорепозитория получают одинаковую версию при релизе.
+Все пакеты монорепозитория получают одинаковую версию при релизе.
 
-  Это полезно, когда:
-  - Пакеты тесно связаны (например, часть одного фреймворка),
-  - Важна совместимость: `@mirta/cli@0.4.0` гарантированно работает с `@mirta/package@0.4.0`.
-  - Нужно упростить управление зависимостями.
+Это полезно, когда:
+- Пакеты тесно связаны (например, часть одного фреймворка),
+- Важна совместимость: `@mirta/cli@0.4.0` гарантированно работает с `@mirta/package@0.4.0`.
+- Нужно упростить управление зависимостями.
 
-  В отличие от независимого версионирования пакетов, синхронное:
-  - Упрощает публикацию.
-  - Уменьшает количество версионных конфликтов.
-  - Делает релиз атомарным: все пакеты обновляются вместе.
+В отличие от независимого версионирования пакетов, синхронное:
+- Упрощает публикацию.
+- Уменьшает количество версионных конфликтов.
+- Делает релиз атомарным: все пакеты обновляются вместе.
 
-  💡 Если вы используете `workspace:*`, то при релизе все ссылки заменяются на конкретную версию — это и есть синхронное версионирование в действии.
+💡 Если вы используете `workspace:*`, то при релизе все ссылки заменяются на конкретную версию — это и есть синхронное версионирование в действии.
 
 </details>
 
 <details>
   <summary>Что такое «семантическая» версия?</summary>
 
-  Семантическая версия имеет формат `major.minor.patch`, где каждый сегмент обозначает разные уровни изменений:
-  - `major` — крупные изменения, возможны breaking changes,
-  - `minor` — добавление новых возможностей без нарушения совместимости,
-  - `patch` — исправление ошибок.
+Семантическая версия имеет формат `major.minor.patch`, где каждый сегмент обозначает разные уровни изменений:
+- `major` — крупные изменения, возможны breaking changes,
+- `minor` — добавление новых возможностей без нарушения совместимости,
+- `patch` — исправление ошибок.
 
-  Версии до `1.0.0` (например, `0.4.0`) считаются экспериментальными:<br/>
-  любое обновление может включать breaking changes.
+Версии до `1.0.0` (например, `0.4.0`) считаются экспериментальными:<br/>
+любое обновление может включать breaking changes.
 
-  Подробнее на сайте [semver.org](https://semver.org/lang/ru/)
+Подробнее на сайте [semver.org](https://semver.org/lang/ru/)
 
 </details>
 
 <details>
   <summary>Как настроить генерацию файла CHANGELOG.md?</summary>
 
-  Для генерации файла со списком изменений в dev-зависимости корневого `package.json` нужно добавить пакет [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli), а в секции `scripts` должна присутствовать команда `changelog`:
+Для генерации файла со списком изменений в dev-зависимости корневого `package.json` нужно добавить пакет [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli), а в секции `scripts` должна присутствовать команда `changelog`:
 
-  ```json
-  {
-    "scripts": {
-      "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
-    }
+```json
+{
+  "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   }
-  ```
+}
+```
 
-  Список изменений в автоматически генерируемом Changelog основывается на выполненных в пределах версии коммитах. При этом есть требования к заголовкам:
+Список изменений в автоматически генерируемом Changelog основывается на выполненных в пределах версии коммитах. При этом есть требования к заголовкам:
 
-  1. Общая длина строки не должна превышать 50 символов;
-  2. Использовать префиксы вида `fix:`, `feat:`, `docs:`, `chore:` и т.п.
+1. Общая длина строки не должна превышать 50 символов;
+2. Использовать префиксы вида `fix:`, `feat:`, `docs:`, `chore:` и т.п.
 
-  Полный список требований смотреть в соглашении [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) фреймворка.
+Полный список требований смотреть в соглашении [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) фреймворка.
 
 </details>
 
@@ -143,12 +143,12 @@ pnpm mirta publish
 <details>
   <summary>Явное указание версии</summary>
 
-  Установит ровно ту версию, которая передана в качестве аргумента:
+Установит ровно ту версию, которая передана в качестве аргумента:
 
-  ```sh
-  pnpm mirta release 1.2.3
-  ```
-  ⚠️ **Внимание!** Не пытайтесь перезаписать уже опубликованные версии - реестр NPM такое не пропустит.
+```sh
+pnpm mirta release 1.2.3
+```
+⚠️ **Внимание!** Не пытайтесь перезаписать уже опубликованные версии - реестр NPM такое не пропустит.
 
 </details>
 
@@ -156,45 +156,45 @@ pnpm mirta publish
 <details>
   <summary>Инкремент: patch, minor, major</summary>
 
-  ```sh
-  pnpm mirta release patch
-  # 0.0.1
-  ```
-  ```sh
-  pnpm mirta release minor
-  # 0.1.0
-  ```
-  ```sh
-  pnpm mirta release major
-  # 1.0.0
-  ```
+```sh
+pnpm mirta release patch
+# 0.0.1
+```
+```sh
+pnpm mirta release minor
+# 0.1.0
+```
+```sh
+pnpm mirta release major
+# 1.0.0
+```
 
 </details>
 
 <details>
   <summary>Преверсии: alpha, beta, rc</summary>
 
-  ```sh
-  pnpm mirta release prepatch --preid alpha
-  # 0.0.1-alpha.0
-  ```
+```sh
+pnpm mirta release prepatch --preid alpha
+# 0.0.1-alpha.0
+```
 
-  ```sh
-  pnpm mirta release preminor --preid alpha
-  # 0.1.0-alpha.0
-  ```
+```sh
+pnpm mirta release preminor --preid alpha
+# 0.1.0-alpha.0
+```
 
-  ```sh
-  pnpm mirta release premajor --preid alpha
-  # 1.0.0-alpha.0
-  ```
+```sh
+pnpm mirta release premajor --preid alpha
+# 1.0.0-alpha.0
+```
 
-  **Инкремент предварительной версии**
+#### Инкремент предварительной версии**
 
-  ```sh
-  pnpm mirta release prerelease --preid alpha
-  # 0.0.1-alpha.1
-  ```
+```sh
+pnpm mirta release prerelease --preid alpha
+# 0.0.1-alpha.1
+```
 
 </details>
 
@@ -207,14 +207,14 @@ pnpm mirta publish
 <details>
   <summary>Технические подробности</summary>
 
-  ⚠️ Обычно вызывается в CI/CD после `git push` тега `vX.X.X`.
+⚠️ Обычно вызывается в CI/CD после `git push` тега `vX.X.X`.
 
-  Тег определяется автоматически:
-  - `alpha` → `--tag` `alpha`
-  - `beta` → `--tag` `beta`
-  - `rc` → `--tag` `rc`
+Тег определяется автоматически:
+- `alpha` → `--tag` `alpha`
+- `beta` → `--tag` `beta`
+- `rc` → `--tag` `rc`
 
-  В CI (если `process.env.CI`) добавляет `--provenance`.
+В CI (если `process.env.CI`) добавляет `--provenance`.
 
 </details>
 
