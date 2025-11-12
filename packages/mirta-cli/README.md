@@ -49,7 +49,7 @@ All public packages will be published to NPM.
 Prepares a release: detects the current version, prompts you to choose an update type (`patch`, `minor`, `major`, `pre*`), and applies it to all packages containing the `version` field.
 
 <details>
-  <summary>Technical Details</summary>
+<summary>Technical Details</summary>
 
 The process is divided into several steps.
 
@@ -83,7 +83,7 @@ If connected via `https`, changes remain in the working directory. You can commi
 #### Frequently Asked Questions
 
 <details>
-  <summary>Why synchronized versioning?</summary>
+<summary>Why synchronized versioning?</summary>
 
 All packages in the monorepo receive the same version upon release.
 
@@ -101,7 +101,7 @@ Compared to independent versioning, synchronized versioning:
 </details>
 
 <details>
-  <summary>What is "semantic" versioning?</summary>
+<summary>What is "semantic" versioning?</summary>
 
 Semantic version follows the format `major.minor.patch`, where each segment indicates different levels of change:
 - `major` — breaking changes or major updates,
@@ -115,7 +115,7 @@ Learn more at [semver.org](https://semver.org/)
 </details>
 
 <details>
-  <summary>How to set up CHANGELOG.md generation?</summary>
+<summary>How to set up CHANGELOG.md generation?</summary>
 
 To generate a changelog file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package to devDependencies in the root `package.json`, and include the `changelog` script:
 
@@ -137,7 +137,7 @@ See full requirements in the [Commit Convention](https://github.com/wb-mirta/cor
 #### Advanced Usage
 
 <details>
-  <summary>Explicit version specification</summary>
+<summary>Explicit version specification</summary>
 
 Sets exactly the version passed as an argument:
 
@@ -148,7 +148,7 @@ pnpm mirta release 1.2.3
 </details>
 
 <details>
-  <summary>Increment: patch, minor, major</summary>
+<summary>Increment: patch, minor, major</summary>
 
 ```sh
 pnpm mirta release patch
@@ -167,7 +167,7 @@ pnpm mirta release major
 </details>
 
 <details>
-  <summary>Pre-releases: alpha, beta, rc</summary>
+<summary>Pre-releases: alpha, beta, rc</summary>
 
 ```sh
 pnpm mirta release prepatch --preid alpha
@@ -199,7 +199,7 @@ pnpm mirta release prerelease --preid alpha
 Publishes packages to NPM, skipping those marked as `private: true`.
 
 <details>
-  <summary>Technical Details</summary>
+<summary>Technical Details</summary>
 
 ⚠️ Typically executed in CI/CD after pushing the `vX.X.X` git tag.
 

@@ -49,7 +49,7 @@ pnpm mirta publish
 Подготавливает релиз: определяет текущую версию, предлагает выбрать тип обновления (`patch`, `minor`, `major`, `pre*`) и применяет его ко всем пакетам, где указано поле `version`.
 
 <details>
-  <summary>Технические подробности</summary>
+<summary>Технические подробности</summary>
 
 Производимые манипуляции разделены на этапы.
 
@@ -83,7 +83,7 @@ git tag vX.X.X
 #### Частые вопросы
 
 <details>
-  <summary>Почему версионирование синхронное?</summary>
+<summary>Почему версионирование синхронное?</summary>
 
 Все пакеты монорепозитория получают одинаковую версию при релизе.
 
@@ -102,7 +102,7 @@ git tag vX.X.X
 </details>
 
 <details>
-  <summary>Что такое «семантическая» версия?</summary>
+<summary>Что такое «семантическая» версия?</summary>
 
 Семантическая версия имеет формат `major.minor.patch`, где каждый сегмент обозначает разные уровни изменений:
 - `major` — крупные изменения, возможны breaking changes,
@@ -117,7 +117,7 @@ git tag vX.X.X
 </details>
 
 <details>
-  <summary>Как настроить генерацию файла CHANGELOG.md?</summary>
+<summary>Как настроить генерацию файла CHANGELOG.md?</summary>
 
 Для генерации файла со списком изменений в dev-зависимости корневого `package.json` нужно добавить пакет [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli), а в секции `scripts` должна присутствовать команда `changelog`:
 
@@ -141,7 +141,7 @@ git tag vX.X.X
 #### Расширенное управление
 
 <details>
-  <summary>Явное указание версии</summary>
+<summary>Явное указание версии</summary>
 
 Установит ровно ту версию, которая передана в качестве аргумента:
 
@@ -154,7 +154,7 @@ pnpm mirta release 1.2.3
 
 
 <details>
-  <summary>Инкремент: patch, minor, major</summary>
+<summary>Инкремент: patch, minor, major</summary>
 
 ```sh
 pnpm mirta release patch
@@ -172,7 +172,7 @@ pnpm mirta release major
 </details>
 
 <details>
-  <summary>Преверсии: alpha, beta, rc</summary>
+<summary>Преверсии: alpha, beta, rc</summary>
 
 ```sh
 pnpm mirta release prepatch --preid alpha
@@ -189,7 +189,7 @@ pnpm mirta release premajor --preid alpha
 # 1.0.0-alpha.0
 ```
 
-#### Инкремент предварительной версии**
+#### Инкремент предварительной версии
 
 ```sh
 pnpm mirta release prerelease --preid alpha
@@ -205,7 +205,7 @@ pnpm mirta release prerelease --preid alpha
 Осуществляет публикацию в NPM, пропуская пакеты с `private: true`.
 
 <details>
-  <summary>Технические подробности</summary>
+<summary>Технические подробности</summary>
 
 ⚠️ Обычно вызывается в CI/CD после `git push` тега `vX.X.X`.
 
