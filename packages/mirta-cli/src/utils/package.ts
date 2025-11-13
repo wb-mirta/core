@@ -295,7 +295,7 @@ async function publishSinglePackageAsync(
       }
     )
 
-    logger.success(`Published ${pkgName} ${version}`)
+    logger.success(`Published ${pkgName}@${version}`)
 
   }
   catch (e: unknown) {
