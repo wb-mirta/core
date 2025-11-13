@@ -4,29 +4,49 @@ import { helpMessage } from './message-help'
 
 import cliPackage from '../package.json' with { type: 'json' }
 
+import { getLocalized } from './utils/localization'
+import { useLogger } from './utils/logger'
+
+const messages = await getLocalized()
+const logger = useLogger(messages)
+
 const currentVersion = getCurrentVersion()
 
 const allOptions = ({
-  dry: {
+  'dry-run': {
     type: 'boolean',
     default: false,
   },
-  skipGit: {
+  'dry': {
     type: 'boolean',
     default: false,
   },
-  skipBuild: {
+  'skip-build': {
     type: 'boolean',
     default: false,
   },
-  help: {
+  'skip-git': {
+    type: 'boolean',
+    default: false,
+  },
+  'help': {
     type: 'boolean',
     short: 'h',
     default: false,
   },
-  version: {
+  'version': {
     type: 'boolean',
     short: 'v',
+    default: false,
+  },
+  // Deprecated. Use 'skip-git' instead
+  'skipGit': {
+    type: 'boolean',
+    default: false,
+  },
+  // Deprecated. Use 'skip-build' instead
+  'skipBuild': {
+    type: 'boolean',
     default: false,
   },
 }) as const
@@ -53,8 +73,17 @@ if (argv.version) {
 
 }
 
-const skipGit = argv.skipGit
-const isDryRun = argv.dry
+const isDryRun = argv['dry-run'] || argv.dry
 
-await buildPackagesAsync(argv.skipBuild)
+const skipBuild = argv['skip-build'] || argv.skipBuild
+
+if (argv.skipBuild)
+  logger.warn('Deprecated flag "--skipBuild" used. Please use "--skip-build" instead.')
+
+const skipGit = argv['skip-git'] || argv.skipGit
+
+if (argv.skipGit)
+  logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead.')
+
+await buildPackagesAsync(skipBuild)
 await publishPackagesAsync(currentVersion, skipGit, isDryRun)

@@ -78,13 +78,13 @@ If connected via `https`, changes remain in the working directory. You can commi
 
 #### Supported Options
 
-`--dry` — runs the command in simulation mode. Shows what would change but does not apply modifications.
+`--dry-run` (`--dry`) — runs the command in simulation mode. Shows what would change but does not apply modifications.
 
 `--preid` `<id>` — sets a custom pre-release identifier (e.g., `alpha`, `beta.1`, `rc`).
 
-`--skipPrompts` — skips interactive prompts, using default values.
+`--skip-prompts` — skips interactive prompts, using default values.
 
-`--skipGit` — disables creating a commit and tag. Git changes remain uncommitted.
+`--skip-git` — disables creating a commit and tag. Git changes remain uncommitted.
 
 #### Frequently Asked Questions
 
@@ -219,11 +219,11 @@ In CI environments (when `process.env.CI` is set), adds `--provenance`.
 
 #### Supported Options
 
-`--dry` — runs in simulation mode. Shows what would happen, but does not publish.
+`--dry-run` (`--dry`) — runs in simulation mode. Shows what would happen, but does not publish.
 
-`--skipBuild` — skips running `pnpm run build` before publishing.
+`--skip-build` — skips running `pnpm run build` before publishing.
 
-`--skipGit` — disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).
+`--skip-git` — disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).
 
 ## ✅ Testing
 

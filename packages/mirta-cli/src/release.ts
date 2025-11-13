@@ -20,29 +20,43 @@ import cliPackage from '../package.json' with { type: 'json' }
 const { yellow } = chalk
 
 const allOptions = ({
-  dry: {
+  'dry-run': {
     type: 'boolean',
     default: false,
   },
-  preid: {
+  'dry': {
+    type: 'boolean',
+    default: false,
+  },
+  'preid': {
     type: 'string',
   },
-  skipPrompts: {
+  'skip-prompts': {
     type: 'boolean',
     default: false,
   },
-  skipGit: {
+  'skip-git': {
     type: 'boolean',
     default: false,
   },
-  help: {
+  'help': {
     type: 'boolean',
     short: 'h',
     default: false,
   },
-  version: {
+  'version': {
     type: 'boolean',
     short: 'v',
+    default: false,
+  },
+  // Deprecated. Use 'skip-git' instead
+  'skipGit': {
+    type: 'boolean',
+    default: false,
+  },
+  // Deprecated. Use 'skip-prompts' instead
+  'skipPrompts': {
+    type: 'boolean',
     default: false,
   },
 }) as const
@@ -86,9 +100,17 @@ const releaseTypes: readonly ReleaseType[] = [
   ),
 ] as const
 
-const isDryRun = argv.dry
-const skipGit = argv.skipGit
-const skipPrompts = argv.skipPrompts
+const isDryRun = argv['dry-run'] || argv.dry
+
+const skipPrompts = argv['skip-prompts'] || argv.skipPrompts
+
+if (argv.skipPrompts)
+  logger.warn('Deprecated flag "--skipPrompts" used. Please use "--skip-prompts" instead.')
+
+const skipGit = argv['skip-git'] || argv.skipGit
+
+if (argv.skipGit)
+  logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead.')
 
 // Параметр командной строки:
 // конкретный номер версии, либо тип релиза (см. releaseTypes).

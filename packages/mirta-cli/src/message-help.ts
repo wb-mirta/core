@@ -24,23 +24,22 @@ ${yellow('Commands:')}
   ${dim('Builds and publishes packages to npm registry.')}
 
 ${yellow(`Options for 'release':`)}
-  --dry
+  --dry-run, --dry
     ${dim('Runs the command in simulation mode. Shows what would change but does not apply modifications.')}
   --preid <id>
     ${dim('Sets a custom pre-release identifier (e.g., `alpha`, `beta.1`, `rc`).')}
-  --skipPrompts
+  --skip-prompts
     ${dim('Skips interactive prompts, using default values.')}
-  --skipGit
+  --skip-git
     ${dim('Disables creating a commit and tag. Git changes remain uncommitted.')}
 
 ${yellow(`Options for 'publish':`)}
-  --dry
+  --dry-run, --dry
     ${dim('Runs in simulation mode. Shows what would happen, but does not publish')}
-  --skipBuild
-    ${dim('Skips running `pnpm run build` before publishing.')}
-  --skipGit
+  --skip-build
+  ${dim('Skips running `pnpm run build` before publishing.')}
+  --skip-git
     ${dim('Disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).')}
-
 `
 
 const helpMessageRu = `\
@@ -62,21 +61,21 @@ ${yellow('Общие флаги:')}
     ${dim('Выводит версию данной утилиты.')}
 
 ${yellow(`Опции для 'release':`)}
-  --dry
+  --dry-run, --dry
     ${dim('Запускает команду в режиме симуляции. Показывает изменения, но не применяет их.')}
   --preid <id>
     ${dim('Задаёт кастомный префикс для преверсии (например, `alpha`, `beta.1`, `rc`).')}
-  --skipPrompts
+  --skip-prompts
     ${dim('Пропускает интерактивные запросы. Используются значения по умолчанию.')}
-  --skipGit
+  --skip-git
     ${dim('Не создаёт коммит и тег. Git-изменения остаются в рабочей директории.')}
 
 ${yellow(`Опции для 'publish':`)}
-  --dry
+  --dry-run, --dry
     ${dim('Запускает команду в режиме симуляции. Показывает изменения, но не применяет их.')}
-  --skipBuild
+  --skip-build
     ${dim('Пропускает выполнение `pnpm run build` перед публикацией')}
-  --skipGit
+  --skip-git
     ${dim('Отключает проверки git-состояния (аналог `--no-git-checks` в `pnpm publish`)')}
 `
 
