@@ -298,6 +298,9 @@ importers:
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
+      p-map:
+        specifier: ^7.0.4
+        version: 7.0.4
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -2468,6 +2471,10 @@ packages:
 
   p-map@7.0.3:
     resolution: {integrity: sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==}
+    engines: {node: '>=18'}
+
+  p-map@7.0.4:
+    resolution: {integrity: sha512-tkAQEw8ysMzmkhgw8k+1U/iPhWNhykKnSk4Rd5zLoPJCuJaGRPo6YposrZgaxHKzDHdDWWZvE/Sk7hsL2X/CpQ==}
     engines: {node: '>=18'}
 
   p-try@2.2.0:
@@ -5157,6 +5164,8 @@ snapshots:
       p-limit: 4.0.0
 
   p-map@7.0.3: {}
+
+  p-map@7.0.4: {}
 
   p-try@2.2.0: {}
 

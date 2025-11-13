@@ -1,11 +1,12 @@
 import nodePath, { posix } from 'node:path'
 
-import { readFileSync, existsSync, writeFileSync } from 'node:fs'
+import pMap from 'p-map'
 
-import { glob } from 'node:fs/promises'
+import { readFileSync, existsSync } from 'node:fs'
+import { glob, writeFile } from 'node:fs/promises'
 
 import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace'
-import { PackageError, readPackage, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
+import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
 
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
@@ -18,6 +19,8 @@ const { yellow } = chalk
 
 const messages = await getLocalized()
 const logger = useLogger(messages)
+
+const MAX_CONCURRENT_WRITES = 5
 
 type DepType = 'dependencies' | 'devDependencies'
 
@@ -134,6 +137,9 @@ export async function resolveTemplatePaths(): Promise<string[]> {
 
 async function getTemplatePaths() {
 
+  if (__TEST__)
+    return await resolveTemplatePaths()
+
   return _templatePathsCache ??= await resolveTemplatePaths()
 
 }
@@ -168,23 +174,23 @@ function updateDependencies(
 
 }
 
-function updateTemplateDependencies(pkgPath: string, version: string) {
+async function updateTemplateDependencies(pkgPath: string, version: string) {
 
   logger.step(pkgPath)
 
-  const pkg = readPackage(pkgPath)
+  const pkg = await readPackageAsync(pkgPath)
 
   updateDependencies(pkg, 'dependencies', version)
   updateDependencies(pkg, 'devDependencies', version)
 
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 
 }
 
-function updatePackageVersion(pkgRoot: string, version: string) {
+async function updatePackageVersion(pkgRoot: string, version: string) {
 
   const pkgPath = resolvePackagePath(pkgRoot)
-  const pkg = readPackage(pkgPath)
+  const pkg = await readPackageAsync(pkgPath)
 
   logger.step(
     pkgRoot === rootDir
@@ -194,7 +200,7 @@ function updatePackageVersion(pkgRoot: string, version: string) {
 
   pkg.version = version
 
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 
 }
 
@@ -203,7 +209,7 @@ export async function updateVersion(version: string) {
   logger.log(`Patching all packages to version ${version}`)
 
   // Обновляет корневой пакет.
-  updatePackageVersion(
+  await updatePackageVersion(
     rootDir,
     version
   )
@@ -211,14 +217,14 @@ export async function updateVersion(version: string) {
   rootPackage.version = version
 
   // Обновляет все остальные пакеты репозитория.
-  for (const pkg of Object.values(packages)) {
-
-    updatePackageVersion(
-      nodePath.join(rootDir, pkg.workspacePath),
+  await pMap(
+    Object.values(packages),
+    ({ workspacePath }) => updatePackageVersion(
+      nodePath.join(rootDir, workspacePath),
       version
-    )
-
-  }
+    ),
+    { concurrency: MAX_CONCURRENT_WRITES }
+  )
 
   const templatePaths = await getTemplatePaths()
 
@@ -227,8 +233,11 @@ export async function updateVersion(version: string) {
 
     logger.log(`Patching template packages`)
 
-    for (const path of templatePaths)
-      updateTemplateDependencies(path, version)
+    await pMap(
+      templatePaths,
+      path => updateTemplateDependencies(path, version),
+      { concurrency: MAX_CONCURRENT_WRITES }
+    )
 
   }
 

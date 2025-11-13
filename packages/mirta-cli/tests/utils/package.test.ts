@@ -29,11 +29,11 @@ vi.mock('@mirta/package', async (importOriginal) => {
 vi.mock('node:fs', () => ({
   existsSync: vi.fn(),
   readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
 }))
 
 vi.mock('node:fs/promises', () => ({
   glob: vi.fn(),
+  writeFile: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('#utils/logger', () => ({
@@ -60,7 +60,6 @@ const mockResolveMonorepoContextAsync = vi.mocked(workspace).resolveMonorepoCont
 // @mirta/package
 const pkg = await import('@mirta/package')
 const mockReadPackageAsync = vi.mocked(pkg).readPackageAsync
-const mockReadPackage = vi.mocked(pkg).readPackage
 const mockResolvePackagePath = vi.mocked(pkg).resolvePackagePath
 const parsePackageJson = pkg.parsePackageJson
 const PackageError = pkg.PackageError
@@ -69,11 +68,11 @@ const PackageError = pkg.PackageError
 const fs = await import('node:fs')
 const mockExistsSync = vi.mocked(fs).existsSync
 const mockReadFileSync = vi.mocked(fs).readFileSync
-const mockWriteFileSync = vi.mocked(fs).writeFileSync
 
 // node:fs/promises
 const fsPromises = await import('node:fs/promises')
 const mockGlob = vi.mocked(fsPromises).glob
+const mockWriteFile = vi.mocked(fsPromises).writeFile
 
 function mockGlobReturns(...paths: string[]) {
 
@@ -149,8 +148,11 @@ describe('package utils', () => {
   const setupMocks = (overrides: { rootPackage?: Partial<typeof mockRootPackage> } = {}) => {
 
     cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(mockRootDir)
+
     mockResolveMonorepoContextAsync.mockResolvedValue(mockContext)
+
     mockReadPackageAsync.mockResolvedValue({ ...mockRootPackage, ...overrides.rootPackage })
+
     mockResolvePackagePath.mockImplementation((dir: string) => resolve(dir, 'package.json'))
 
     mockGlob.mockImplementation(
@@ -304,11 +306,22 @@ describe('package utils', () => {
 
     beforeEach(() => {
 
-      mockReadPackage.mockImplementation((path: string) => ({
-        name: path.includes('package-a') ? '@test/package-a' : '@test/root',
-        version: '1.0.0',
-        dependencies: { '@test/package-a': '1.0.0' },
-      }))
+      mockReadPackageAsync
+        // eslint-disable-next-line @typescript-eslint/require-await
+        .mockImplementation(async (dir: string) => {
+
+          if (dir === '/mock/root')
+            return { ...mockRootPackage }
+
+          if (dir.includes('package-a'))
+            return { name: '@test/package-a', version: '1.0.0' }
+
+          if (dir.includes('package-b'))
+            return { name: '@test/package-b', version: '1.0.0' }
+
+          return { name: 'unknown', version: '1.0.0' }
+
+        })
 
     })
 
@@ -322,7 +335,7 @@ describe('package utils', () => {
 
       await updateVersion('2.0.0')
 
-      expect(mockWriteFileSync).toHaveBeenCalledTimes(4) // root + 2 пакета + 1 шаблон
+      expect(mockWriteFile).toHaveBeenCalledTimes(4) // root + 2 пакета + 1 шаблон
 
     })
 
@@ -332,7 +345,7 @@ describe('package utils', () => {
       mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['templates'] }))
       mockGlobReturns('/mock/root/templates/a/package.json')
 
-      mockReadPackage.mockReturnValue({
+      mockReadPackageAsync.mockResolvedValue({
         name: 'template-package',
         dependencies: { '@test/package-a': '1.0.0' },
         devDependencies: { '@test/package-a': '1.0.0' },
@@ -342,8 +355,8 @@ describe('package utils', () => {
 
       await updateVersion('2.0.0')
 
-      const call = mockWriteFileSync.mock.calls
-        .find(([p]) => String(p).includes('templates'))
+      const call = mockWriteFile.mock.calls
+        .find(([p]) => typeof p === 'string' && p.includes('templates'))
 
       expect(call).toBeDefined()
 
