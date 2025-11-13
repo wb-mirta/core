@@ -259,13 +259,13 @@ describe('package utils', () => {
       const { resolveTemplatePaths } = await importModule()
       const result = await resolveTemplatePaths()
 
-      // expect(mockGlob).toHaveBeenCalledWith(
-      //   ['templates/**/package.json'],
-      //   expect.objectContaining({
-      //     cwd: '/mock/root',
-      //     exclude: ['node_modules/**'],
-      //   })
-      // )
+      expect(mockGlob).toHaveBeenCalledWith(
+        ['templates/**/package.json'],
+        expect.objectContaining({
+          cwd: '/mock/root',
+          exclude: ['node_modules/**'],
+        })
+      )
 
       expect(result).toEqual([
         'templates/a/package.json',

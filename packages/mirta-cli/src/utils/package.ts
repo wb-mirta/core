@@ -4,7 +4,7 @@ import { readFileSync, existsSync, writeFileSync } from 'node:fs'
 
 import { glob } from 'node:fs/promises'
 
-import { resolveMonorepoContextAsync } from '@mirta/workspace'
+import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace'
 import { PackageError, readPackage, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
 
 import { THIS_PACKAGE_NAME } from '#src/constants'
@@ -21,11 +21,6 @@ const logger = useLogger(messages)
 
 type DepType = 'dependencies' | 'devDependencies'
 
-interface PackageDefinition {
-  workspacePath: string
-  isPrivate: boolean
-}
-
 interface MirtaConfig {
   templates?: string[]
 }
@@ -37,7 +32,7 @@ const rootDir = toPosix(
 const context = await resolveMonorepoContextAsync(rootDir)
 
 // Список всех пакетов репозитория.
-const packages: Record<string, PackageDefinition> = {}
+const packages: Record<string, Pick<PackageDefinition, 'workspacePath' | 'isPrivate'>> = {}
 
 for (const pkg of context.packages) {
 
