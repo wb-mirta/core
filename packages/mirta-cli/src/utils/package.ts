@@ -1,8 +1,11 @@
-import nodePath from 'node:path'
-import { readdirSync, readFileSync, statSync, existsSync, writeFileSync } from 'node:fs'
+import nodePath, { posix } from 'node:path'
+
+import { readFileSync, existsSync, writeFileSync } from 'node:fs'
+
+import { glob } from 'node:fs/promises'
 
 import { resolveMonorepoContextAsync } from '@mirta/workspace'
-import { PackageError, readPackage, readPackageAsync, resolvePackagePath, type Package } from '@mirta/package'
+import { PackageError, readPackage, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
 
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
@@ -24,12 +27,12 @@ interface PackageDefinition {
 }
 
 interface MirtaConfig {
-  scope?: string
-  scopeAsPackagePrefix?: boolean
   templates?: string[]
 }
 
-const rootDir = process.cwd()
+const rootDir = toPosix(
+  process.cwd()
+)
 
 const context = await resolveMonorepoContextAsync(rootDir)
 
@@ -51,8 +54,6 @@ for (const pkg of context.packages) {
 
 }
 
-const templatePackages: Record<string, string[]> = {}
-
 const rootPackage = await readPackageAsync(rootDir)
 
 /** Возвращает текущую версию корневого проекта. */
@@ -71,47 +72,74 @@ export function hasScript(name: string) {
 
 }
 
-const mirtaConfigFilePath = nodePath.join(rootDir, 'mirta.config.json')
+let _templatePathsCache: string[] | undefined
 
-if (existsSync(mirtaConfigFilePath)) {
+export async function resolveTemplatePaths(): Promise<string[]> {
 
-  const config = JSON.parse(
-    readFileSync(mirtaConfigFilePath, 'utf-8')
-  ) as MirtaConfig
+  const configPath = posix.join(rootDir, 'mirta.config.json')
 
-  if (config.templates && Array.isArray(config.templates)) {
+  const pathPatterns: string[] = []
 
-    config.templates.forEach((template) => {
+  if (!existsSync(configPath))
+    return pathPatterns
 
-      const templatesDir = nodePath.resolve(rootDir, template)
+  let config: MirtaConfig
 
-      // Предохранитель от выхода за пределы рабочей директории.
-      if (!templatesDir.startsWith(rootDir))
-        return
+  try {
 
-      // Обрабатываем только существующие директории.
-      if (!statSync(templatesDir).isDirectory())
-        return
-
-      const localTemplatePackages = readdirSync(templatesDir,
-        {
-          withFileTypes: true,
-          recursive: true,
-        })
-        .reduce<string[]>((items, nextEntry) => {
-
-          if (nextEntry.name === 'package.json')
-            items.push(nextEntry.parentPath)
-
-          return items
-
-        }, [])
-
-      templatePackages[templatesDir] = localTemplatePackages
-
-    })
+    config = JSON.parse(readFileSync(configPath, 'utf-8')) as MirtaConfig
 
   }
+  catch (e: unknown) {
+
+    logger.warn(`Failed to parse mirta.config.json: ${String(e)}`)
+    return pathPatterns
+
+  }
+
+  if (!Array.isArray(config.templates))
+    return pathPatterns
+
+  for (const templatePath of config.templates) {
+
+    const resolvedDir = posix.resolve(rootDir, templatePath)
+
+    if (!resolvedDir.startsWith(rootDir)) {
+
+      logger.warn(`Templates path '${templatePath}' is outside root directory. Skipping`)
+      continue
+
+    }
+
+    pathPatterns.push(
+      posix.join(templatePath, '**', 'package.json')
+    )
+
+  }
+
+  const templatePkgPaths = new Set<string>()
+
+  if (pathPatterns.length === 0)
+    return pathPatterns
+
+  for await (const pkgPath of glob(pathPatterns, {
+    cwd: rootDir,
+    exclude: ['node_modules/**'],
+  })) {
+
+    templatePkgPaths.add(
+      toPosix(pkgPath)
+    )
+
+  }
+
+  return [...templatePkgPaths]
+
+}
+
+async function getTemplatePaths() {
+
+  return _templatePathsCache ??= await resolveTemplatePaths()
 
 }
 
@@ -145,13 +173,10 @@ function updateDependencies(
 
 }
 
-function updateTemplateDependencies(templateRoot: string, version: string) {
+function updateTemplateDependencies(pkgPath: string, version: string) {
 
-  logger.step(
-    `Template: ${nodePath.relative(rootDir, templateRoot)}`
-  )
+  logger.step(pkgPath)
 
-  const pkgPath = resolvePackagePath(templateRoot)
   const pkg = readPackage(pkgPath)
 
   updateDependencies(pkg, 'dependencies', version)
@@ -168,8 +193,8 @@ function updatePackageVersion(pkgRoot: string, version: string) {
 
   logger.step(
     pkgRoot === rootDir
-      ? 'Root package'
-      : `Package: ${pkg.name ?? nodePath.basename(pkgRoot)}`
+      ? '- <root>'
+      : `- ${pkg.name ?? nodePath.basename(pkgRoot)}`
   )
 
   pkg.version = version
@@ -178,7 +203,7 @@ function updatePackageVersion(pkgRoot: string, version: string) {
 
 }
 
-export function updateVersion(version: string) {
+export async function updateVersion(version: string) {
 
   logger.log(`Patching all packages to version ${version}`)
 
@@ -198,22 +223,15 @@ export function updateVersion(version: string) {
 
   }
 
-  const templateKeys = Object.keys(templatePackages)
+  const templatePaths = await getTemplatePaths()
 
   // Обновляет пакеты, используемые в шаблонах.
-  if (templateKeys.length > 0) {
+  if (templatePaths.length > 0) {
 
     logger.log(`Patching template packages`)
 
-    Object.keys(templatePackages).forEach((templatesDir) => {
-
-      templatePackages[templatesDir].forEach((templateRoot) => {
-
-        updateTemplateDependencies(templateRoot, version)
-
-      })
-
-    })
+    for (const path of templatePaths)
+      updateTemplateDependencies(path, version)
 
   }
 
@@ -332,7 +350,7 @@ export async function publishPackagesAsync(
 
     await publishSinglePackageAsync(
       pkgName,
-      nodePath.join(rootDir, pkg.workspacePath),
+      posix.join(rootDir, pkg.workspacePath),
       version,
       flags
     )
