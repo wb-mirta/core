@@ -2,6 +2,7 @@ import { THIS_PACKAGE_NAME } from '#src/constants'
 import type { MonorepoContext } from '@mirta/workspace'
 import type { GlobOptions } from 'node:fs'
 import { resolve } from 'node:path'
+import type { Mock } from 'vitest'
 
 vi.mock('#utils/shell', () => ({
   runCommandAsync: vi.fn(),
@@ -108,6 +109,7 @@ function mockGlobReturns(...paths: string[]) {
 describe('package utils', () => {
 
   const mockRootDir = '/mock/root'
+
   const mockContext: MonorepoContext = {
     manager: 'pnpm',
     rootDir: mockRootDir,
@@ -142,9 +144,11 @@ describe('package utils', () => {
     },
   }
 
+  let cwdSpy: Mock<() => string> | undefined
+
   const setupMocks = (overrides: { rootPackage?: Partial<typeof mockRootPackage> } = {}) => {
 
-    vi.spyOn(process, 'cwd').mockReturnValue(mockRootDir)
+    cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(mockRootDir)
     mockResolveMonorepoContextAsync.mockResolvedValue(mockContext)
     mockReadPackageAsync.mockResolvedValue({ ...mockRootPackage, ...overrides.rootPackage })
     mockResolvePackagePath.mockImplementation((dir: string) => resolve(dir, 'package.json'))
@@ -184,6 +188,13 @@ describe('package utils', () => {
 
     vi.clearAllMocks()
     setupMocks()
+
+  })
+
+  afterEach(() => {
+
+    cwdSpy?.mockRestore()
+    cwdSpy = undefined
 
   })
 

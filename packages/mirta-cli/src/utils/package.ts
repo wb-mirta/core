@@ -208,6 +208,8 @@ export async function updateVersion(version: string) {
     version
   )
 
+  rootPackage.version = version
+
   // Обновляет все остальные пакеты репозитория.
   for (const pkg of Object.values(packages)) {
 
