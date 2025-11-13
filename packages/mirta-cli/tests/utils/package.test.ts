@@ -288,7 +288,7 @@ describe('package utils', () => {
     it('should skip templates outside root directory', async () => {
 
       mockExistsSync.mockReturnValue(true)
-      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['../outside'] }))
+      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['../root-evil'] }))
       // mockGlob не должен вызываться
 
       const { resolveTemplatePaths } = await importModule()

@@ -99,9 +99,9 @@ export async function resolveTemplatePaths(): Promise<string[]> {
 
     const resolvedDir = posix.resolve(rootDir, templatePath)
 
-    if (!resolvedDir.startsWith(rootDir)) {
+    if (!resolvedDir.startsWith(rootDir + posix.sep)) {
 
-      logger.warn(`Templates path '${templatePath}' is outside root directory. Skipping`)
+      logger.warn(`Template path '${templatePath}' is not located inside the workspace root. Skipping`)
       continue
 
     }
@@ -119,7 +119,7 @@ export async function resolveTemplatePaths(): Promise<string[]> {
 
   for await (const pkgPath of glob(pathPatterns, {
     cwd: rootDir,
-    exclude: ['node_modules/**'],
+    exclude: ['node_modules/**', 'dist/**'],
   })) {
 
     templatePkgPaths.add(
