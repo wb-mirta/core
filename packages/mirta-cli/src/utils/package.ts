@@ -1,5 +1,14 @@
-import nodePath from 'node:path'
-import { readdirSync, readFileSync, statSync, existsSync, writeFileSync } from 'node:fs'
+import nodePath, { posix } from 'node:path'
+
+import pMap from 'p-map'
+
+import { readFileSync, existsSync } from 'node:fs'
+import { glob, writeFile } from 'node:fs/promises'
+
+import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace'
+import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
+
+import { THIS_PACKAGE_NAME } from '#src/constants'
 
 import { runCommandAsync } from '#utils/shell'
 import { getLocalized } from '#utils/localization'
@@ -11,76 +20,43 @@ const { yellow } = chalk
 const messages = await getLocalized()
 const logger = useLogger(messages)
 
+const MAX_CONCURRENT_WRITES = 5
+
 type DepType = 'dependencies' | 'devDependencies'
 
 interface MirtaConfig {
-  scope?: string
-  scopeAsPackagePrefix?: boolean
   templates?: string[]
 }
 
-interface Package {
-  name?: string
-  version: string
-  private: boolean
-  scripts?: Record<string, string>
-  dependencies?: Record<string, string>
-  devDependencies?: Record<string, string>
-}
+const cwd = process.cwd()
+const context = await resolveMonorepoContextAsync(cwd)
+const rootDir = context.rootDir
 
-const rootDir = process.cwd()
-const packagesDir = nodePath.join(rootDir, 'packages')
+// Список всех пакетов репозитория.
+const packages: Record<string, Pick<PackageDefinition, 'workspacePath' | 'isPrivate'>> = {}
 
-const getPackageRoot
-  = (packageName: string) => nodePath.join(packagesDir, packageName)
+for (const pkg of context.packages) {
 
-// Перечисляем пакеты, которые должны выйти в релиз.
-const packages = readdirSync(packagesDir)
-  .filter((pkgName) => {
-
-    const pkgRoot = getPackageRoot(pkgName)
-
-    if (!statSync(pkgRoot).isDirectory())
-      return
-
-    const pkg = JSON.parse(
-      readFileSync(nodePath.join(pkgRoot, 'package.json'), 'utf-8')
-    ) as Package
-
-    return !pkg.private
-
-  })
-
-const templatePackages: Record<string, string[]> = {}
-
-/** Имя пользователя или организации, владеющей пакетом. */
-let scope: string | undefined
-/** Форматированный scope пакета. */
-let scoped: string | undefined
-/** Использовать scope в качестве префикса в названиях пакетов. */
-let scopeAsPackagePrefix = false
-
-const mirtaConfigFilePath = nodePath.join(rootDir, 'mirta.config.json')
-
-const rootPackage = JSON.parse(
-  readFileSync(nodePath.join(rootDir, 'package.json'), 'utf-8')
-) as Package
-
-if (rootPackage.name) {
-
-  const match = /^@([^/]+)\//i.exec(rootPackage.name)
-
-  if (match?.[1]) {
-
-    scope = match[1]
-    scoped = `@${match[1]}/`
-
-  }
+  // Необходимость обновления версии определяется
+  // наличием атрибута версии.
+  //
+  // Не зависит от статуса private пакета.
+  //
+  if (pkg.version)
+    packages[pkg.name] = {
+      workspacePath: pkg.workspacePath,
+      isPrivate: pkg.isPrivate,
+    }
 
 }
+
+const rootPackage = await readPackageAsync(rootDir)
 
 /** Возвращает текущую версию корневого проекта. */
 export function getCurrentVersion() {
+
+  if (!rootPackage.version)
+    throw PackageError.getScoped(THIS_PACKAGE_NAME, 'noVersionField')
 
   return rootPackage.version
 
@@ -92,79 +68,83 @@ export function hasScript(name: string) {
 
 }
 
-if (existsSync(mirtaConfigFilePath)) {
+let _templatePathsCache: string[] | undefined
 
-  const config = JSON.parse(
-    readFileSync(mirtaConfigFilePath, 'utf-8')
-  ) as MirtaConfig
+export async function resolveTemplatePaths(): Promise<string[]> {
 
-  if (config.scope) {
+  const configPath = posix.join(rootDir, 'mirta.config.json')
 
-    scope = config.scope
+  const pathPatterns: string[] = []
 
-    if (scope.startsWith('@'))
-      scope = scope.slice(1)
+  if (!existsSync(configPath))
+    return pathPatterns
 
-    if (scope)
-      scoped = `@${scope}/`
+  let config: MirtaConfig
+
+  try {
+
+    config = JSON.parse(readFileSync(configPath, 'utf-8')) as MirtaConfig
+
+  }
+  catch (e: unknown) {
+
+    logger.warn(`Failed to parse mirta.config.json: ${String(e)}`)
+    return pathPatterns
 
   }
 
-  scopeAsPackagePrefix = config.scopeAsPackagePrefix === true
+  if (!Array.isArray(config.templates))
+    return pathPatterns
 
-  if (config.templates && Array.isArray(config.templates)) {
+  for (const templatePath of config.templates) {
 
-    config.templates.forEach((template) => {
+    const resolvedDir = posix.resolve(rootDir, templatePath)
 
-      const templatesDir = nodePath.resolve(rootDir, template)
+    if (!resolvedDir.startsWith(rootDir + posix.sep)) {
 
-      // Предохранитель от выхода за пределы рабочей директории.
-      if (!templatesDir.startsWith(rootDir))
-        return
+      logger.warn(`Template path '${templatePath}' is not located inside the workspace root. Skipping`)
+      continue
 
-      // Обрабатываем только существующие директории.
-      if (!statSync(templatesDir).isDirectory())
-        return
+    }
 
-      const localTemplatePackages = readdirSync(templatesDir,
-        {
-          withFileTypes: true,
-          recursive: true,
-        })
-        .reduce<string[]>((items, nextEntry) => {
-
-          if (nextEntry.name === 'package.json')
-            items.push(nextEntry.parentPath)
-
-          return items
-
-        }, [])
-
-      templatePackages[templatesDir] = localTemplatePackages
-
-    })
+    pathPatterns.push(
+      posix.join(templatePath, '**', 'package.json')
+    )
 
   }
+
+  const templatePkgPaths = new Set<string>()
+
+  if (pathPatterns.length === 0)
+    return pathPatterns
+
+  for await (const pkgPath of glob(pathPatterns, {
+    cwd: rootDir,
+    exclude: ['node_modules/**', 'dist/**'],
+  })) {
+
+    templatePkgPaths.add(
+      toPosix(pkgPath)
+    )
+
+  }
+
+  return [...templatePkgPaths]
+
+}
+
+async function getTemplatePaths() {
+
+  if (__TEST__)
+    return await resolveTemplatePaths()
+
+  return _templatePathsCache ??= await resolveTemplatePaths()
 
 }
 
 const isWorkspacePackage = (pkgName: string) => {
 
-  if (!pkgName)
-    return false
-
-  if (packages.includes(pkgName))
-    return true
-
-  if (!scoped || !pkgName.startsWith(scoped))
-    return false
-
-  pkgName = pkgName.slice(scoped.length)
-
-  if (scopeAsPackagePrefix)
-    pkgName = `${scope}-${pkgName}`
-
-  return packages.includes(pkgName)
+  return Boolean(pkgName && packages[pkgName])
 
 }
 
@@ -192,73 +172,70 @@ function updateDependencies(
 
 }
 
-function updateTemplateDependencies(templateRoot: string, version: string) {
+async function updateTemplateDependencies(pkgPath: string, version: string) {
 
-  logger.step(
-    `Template: ${nodePath.relative(rootDir, templateRoot)}`
-  )
+  logger.step(pkgPath)
 
-  const pkgPath = nodePath.join(templateRoot, 'package.json')
-
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as Package
+  const pkg = await readPackageAsync(pkgPath)
 
   updateDependencies(pkg, 'dependencies', version)
   updateDependencies(pkg, 'devDependencies', version)
 
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 
 }
 
-function updatePackageVersion(pkgRoot: string, version: string) {
+async function updatePackageVersion(pkgRoot: string, version: string) {
 
-  const pkgPath = nodePath.join(pkgRoot, 'package.json')
-
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as Package
+  const pkgPath = resolvePackagePath(pkgRoot)
+  const pkg = await readPackageAsync(pkgPath)
 
   logger.step(
     pkgRoot === rootDir
-      ? 'Root package'
-      : `Package: ${pkg.name ?? nodePath.basename(pkgRoot)}`
+      ? '- <root>'
+      : `- ${pkg.name ?? nodePath.basename(pkgRoot)}`
   )
 
   pkg.version = version
 
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 
 }
 
-export function updateVersion(version: string) {
+export async function updateVersion(version: string) {
 
   logger.log(`Patching all packages to version ${version}`)
 
-  // Update root package.json
-  updatePackageVersion(rootDir, version)
+  // Обновляет корневой пакет.
+  await updatePackageVersion(
+    rootDir,
+    version
+  )
 
-  // Update all packages
-  packages.forEach((pkgDirName) => {
+  rootPackage.version = version
 
-    updatePackageVersion(
-      nodePath.join(packagesDir, pkgDirName),
+  // Обновляет все остальные пакеты репозитория.
+  await pMap(
+    Object.values(packages),
+    ({ workspacePath }) => updatePackageVersion(
+      nodePath.join(rootDir, workspacePath),
       version
-    )
+    ),
+    { concurrency: MAX_CONCURRENT_WRITES }
+  )
 
-  })
+  const templatePaths = await getTemplatePaths()
 
-  const templateKeys = Object.keys(templatePackages)
-
-  if (templateKeys.length > 0) {
+  // Обновляет пакеты, используемые в шаблонах.
+  if (templatePaths.length > 0) {
 
     logger.log(`Patching template packages`)
 
-    Object.keys(templatePackages).forEach((templatesDir) => {
-
-      templatePackages[templatesDir].forEach((templateRoot) => {
-
-        updateTemplateDependencies(templateRoot, version)
-
-      })
-
-    })
+    await pMap(
+      templatePaths,
+      path => updateTemplateDependencies(path, version),
+      { concurrency: MAX_CONCURRENT_WRITES }
+    )
 
   }
 
@@ -283,6 +260,7 @@ export async function buildPackagesAsync(skipBuild: boolean) {
 
 async function publishSinglePackageAsync(
   pkgName: string,
+  pkgPath: string,
   version: string,
   flags: string[]
 ) {
@@ -319,7 +297,7 @@ async function publishSinglePackageAsync(
         ...(flags),
       ],
       {
-        cwd: getPackageRoot(pkgName),
+        cwd: pkgPath,
         stdio: 'pipe',
       }
     )
@@ -364,7 +342,23 @@ export async function publishPackagesAsync(
   if (process.env.CI)
     flags.push('--provenance')
 
-  for (const pkgName of packages)
-    await publishSinglePackageAsync(pkgName, version, flags)
+  for (const [pkgName, pkg] of Object.entries(packages)) {
+
+    // Приватные пакеты не публикуются.
+    if (pkg.isPrivate) {
+
+      logger.step(`Skipping private ${pkgName}`)
+      continue
+
+    }
+
+    await publishSinglePackageAsync(
+      pkgName,
+      posix.join(rootDir, pkg.workspacePath),
+      version,
+      flags
+    )
+
+  }
 
 }

@@ -23,7 +23,8 @@ export type PackageManager = 'pnpm' | 'yarn' | 'bun' | 'npm'
 export interface WorkspaceContext {
 
   /**
-   * Корневая директория workspace — место расположения lock-файла.
+   * Абсолютный путь к корневой директории репозитория в формате POSIX.
+   *
    **/
   readonly rootDir: string
 

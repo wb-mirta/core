@@ -29,14 +29,6 @@ interface ExecutionResult {
   stdout: string
 }
 
-/**
- * @typedef ExecutionResult
- * @property {boolean} isDone
- * @property {number} code
- * @property {string} stderr
- * @property {string} stdout
- */
-
 async function execAsync(
   command: string,
   args?: readonly string[],

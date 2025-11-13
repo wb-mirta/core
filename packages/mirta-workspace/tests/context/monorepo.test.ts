@@ -69,7 +69,12 @@ describe('monorepo utilities', () => {
       expect(result).toEqual({
         rootDir,
         manager: 'pnpm',
-        packages: [{ name: '@scope/app', workspacePath: 'packages/app' }],
+        packages: [
+          expect.objectContaining({
+            name: '@scope/app',
+            workspacePath: 'packages/app',
+          }),
+        ],
       })
 
     })
@@ -106,8 +111,16 @@ describe('monorepo utilities', () => {
       const result = await resolveMonorepoPackagesAsync(context)
 
       expect(result).toHaveLength(2)
-      expect(result).toContainEqual({ name: '@scope/ui', workspacePath: 'packages/ui' })
-      expect(result).toContainEqual({ name: '@scope/web', workspacePath: 'apps/web' })
+      expect(result).toEqual([
+        expect.objectContaining({
+          name: '@scope/ui',
+          workspacePath: 'packages/ui',
+        }),
+        expect.objectContaining({
+          name: '@scope/web',
+          workspacePath: 'apps/web',
+        }),
+      ])
 
     })
 

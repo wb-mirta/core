@@ -35,10 +35,6 @@ const allOptions = ({
     type: 'boolean',
     default: false,
   },
-  skipBuild: {
-    type: 'boolean',
-    default: false,
-  },
   help: {
     type: 'boolean',
     short: 'h',
@@ -221,7 +217,7 @@ async function runAsync() {
 
   }
 
-  updateVersion(targetVersion)
+  await updateVersion(targetVersion)
   isVersionUpdated = true
 
   if (inWorkTree && hasScript('changelog')) {
@@ -280,12 +276,12 @@ async function runAsync() {
 
 }
 
-await runAsync().catch((e: unknown) => {
+await runAsync().catch(async (e: unknown) => {
 
   if (isVersionUpdated) {
 
     // Revert version changes on failed release
-    updateVersion(currentVersion)
+    await updateVersion(currentVersion)
 
   }
 

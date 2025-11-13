@@ -3,6 +3,9 @@ import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'
 import { ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
+import { helpMessage } from './message-help'
+
+import cliPackage from '../package.json' with { type: 'json' }
 
 const messages = await getLocalized()
 const logger = useLogger(messages)
@@ -14,11 +17,27 @@ async function run() {
   if (command === 'release') {
 
     await import('./release')
+    return
 
   }
   else if (command === 'publish') {
 
     await import('./publish')
+    return
+
+  }
+
+  if (command === '--help' || command === '-h') {
+
+    console.log(helpMessage)
+    process.exit(0)
+
+  }
+
+  if (command === '--version' || command === '-v') {
+
+    console.log(`${cliPackage.name} v${cliPackage.version}`)
+    process.exit(0)
 
   }
 

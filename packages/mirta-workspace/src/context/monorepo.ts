@@ -10,13 +10,12 @@ import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManage
  *
  * Является результатом анализа структуры монорепы.
  *
- * @since 0.3.5
+ * @since 0.4.0
  *
  **/
 export interface MonorepoContext {
   /**
-   * Абсолютный путь к корневой директории монорепозитория.
-   * Место, где находится `package.json` с полем `workspaces`.
+   * Абсолютный путь к корневой директории монорепозитория в формате POSIX.
    *
    **/
   readonly rootDir: string
@@ -40,7 +39,7 @@ export interface MonorepoContext {
  *
  * Содержит имя пакета и его путь относительно корня монорепы.
  *
- * @since 0.3.5
+ * @since 0.4.0
  *
  **/
 export interface PackageDefinition {
@@ -49,6 +48,17 @@ export interface PackageDefinition {
    *
    **/
   readonly name: string
+
+  readonly version?: string
+
+  /**
+   * Признак того, что пакет не предназначен для публикации.
+   *
+   * Если значение `true`, пакет нельзя опубликовать в реестре (например, npm).
+   * Используется для защиты от случайной публикации внутренних или служебных пакетов.
+   *
+   **/
+  readonly isPrivate: boolean
 
   /**
    * Путь к пакету относительно корня монорепозитория.
@@ -170,6 +180,8 @@ export async function resolveMonorepoPackagesAsync(
 
     packages.push({
       name: pkg.name,
+      version: pkg.version,
+      isPrivate: pkg.private === true,
       workspacePath: nodePath.dirname(pkgPath),
     })
 

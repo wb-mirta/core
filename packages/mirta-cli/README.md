@@ -2,82 +2,128 @@
 
 [![en](https://img.shields.io/badge/lang-en-olivedrab.svg?style=flat-square)](https://github.com/wb-mirta/core/blob/latest/packages/mirta-cli/README.md)
 [![ru](https://img.shields.io/badge/lang-ru-dimgray.svg?style=flat-square)](https://github.com/wb-mirta/core/blob/latest/packages/mirta-cli/README.ru.md)
-[![NPM Version](https://img.shields.io/npm/v/@mirta/globals?style=flat-square)](https://npmjs.com/package/@mirta/cli)
+[![NPM Version](https://img.shields.io/npm/v/@mirta/cli?style=flat-square)](https://npmjs.com/package/@mirta/cli)
 [![NPM Downloads](https://img.shields.io/npm/dm/@mirta/cli?style=flat-square&logo=npm)](https://npmjs.com/package/@mirta/cli)
 
-Utility for efficient release management and automated package publishing in NPM, supports work in monorepositories.
+> A universal command-line tool for releasing and publishing versions in monorepos with synchronized semantic versioning.
 
-### Key Features
+`@mirta/cli` is a release orchestrator that:
+- Synchronously updates versions across all packages in a monorepo,
+- Generates `CHANGELOG` (if configured),
+- Publishes packages to NPM with `--provenance` support in CI.
 
-- Convenient system for updating project versions;
-- Easy integration with existing CI/CD processes;
-- Access to all necessary operations through intuitive commands;
-- Support for customizing workflows specific to your infrastructure.
+Works in any monorepo using `pnpm` and following the principle of synchronized semantic versioning.
 
-## Installation and Initial Setup
+To recognize the monorepo structure, `@mirta/cli` relies on the packages `@mirta/workspace` and `@mirta/package`, which read the configuration from the workspaces field in the root `package.json`.
 
-Add `@mirta/cli` as a development dependency to your project using the following command:
+**Not intended for execution in Duktape environment on Wiren Board controllers.**
+
+## 📦 Installation
 
 ```sh
 pnpm add -wD @mirta/cli
 ```
-You can configure additional parameters by adding a configuration file named `mirta.config.json` at the root of your main project. For example:
 
-```json
-{
-  "scope": "myscope",
-  "scopeAsPackagePrefix": false
-}
-```
-### Main Configuration Options
+✅ This package was designed for the Mirta framework but works in any `pnpm` monorepo with synchronized versioning.
 
-- `scope` sets the correspondence to an account or organization name in the NPM registry.
-- `scopeAsPackagePrefix` enables transformation of module paths by prefixing the specified `scope` before the package name. Default is `false`.
+## 🚀 Quick Start
 
-Example of `scopeAsPackagePrefix` for the package `@myscope/globals`:
-
-- `false` - location `packages/globals`
-- `true` - location `packages/myscope-globals`
-
-Activating this option helps prevent collisions with third-party NPM packages without a `scope`.
-
-If you are satisfied with the default behavior of the tool, creating a separate configuration file is not required. Simply specify the scope in the main `package.json` file like so:
-
-```json
-{
-  "name": "@myscope/myproject"
-}
-```
-
-### Special Mirta Framework Options
-
-- `templates` contains a set of paths to templates used by the project generation wizard. Performs recursive search for `package.json` files within the listed locations.
-
-Example Mirta configuration:
-
-```json
-{
-  "scopeAsPackagePrefix": true,
-  "templates": [
-    "packages/create-mirta/public/templates"
-  ]
-}
-```
-## Release Management
-
-Performing the release procedure interactively:
+**Trigger a release**:
 
 ```sh
 pnpm mirta release
 ```
-The command will prompt you to select an appropriate version. If the project is managed by Git, it will prepare a list of changes in the `CHANGELOG.md` file, check the CI status, and create a commit.
+Select the update type → all versions will be updated.
 
-During operation with Git, the needed repository is automatically recognized, but two checks are performed:
+**Publish (in CI or locally)**:
 
-1. Local changes have been synchronized with the remote storage beforehand;
-2. The CI process named `Build` for the last commit has completed successfully.
+```sh
+pnpm mirta publish
+```
+All public packages will be published to NPM.
 
-To generate a change log file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package as a dev dependency in the root `package.json`. Additionally, include a `changelog` script in the `scripts` section:
+## 🧰 Commands
+
+### `mirta [options]`
+
+These global options are available for all commands:
+- `--help` (`-h`) — displays help information about available commands and options.
+- `--version` (`-v`) — prints the version of `@mirta/cli`.
+
+### `pnpm mirta release`
+
+Prepares a release: detects the current version, prompts you to choose an update type (`patch`, `minor`, `major`, `pre*`), and applies it to all packages containing the `version` field.
+
+<details>
+<summary>Technical Details</summary>
+
+The process is divided into several steps.
+
+Step 1: If the project is git-connected, it first checks:
+- Sync status with `origin`.
+- CI pipeline success (via the `build` workflow).
+
+Step 2: For paths listed in `mirta.config.json#templates`, performs recursive discovery of `package.json` files and updates monorepo dependencies (`dependencies`, `devDependencies`) accordingly.
+
+Step 3: Runs `pnpm run changelog` if the script exists.
+
+Step 4: If GitHub connection is via `ssh`, creates a commit and a tag:
+```sh
+git commit -m "release: vX.X.X"
+git tag vX.X.X
+```
+If connected via `https`, changes remain in the working directory. You can commit them manually or use a GUI client (e.g., GitHub Desktop).
+
+</details>
+
+#### Supported Options
+
+`--dry` — runs the command in simulation mode. Shows what would change but does not apply modifications.
+
+`--preid` `<id>` — sets a custom pre-release identifier (e.g., `alpha`, `beta.1`, `rc`).
+
+`--skipPrompts` — skips interactive prompts, using default values.
+
+`--skipGit` — disables creating a commit and tag. Git changes remain uncommitted.
+
+#### Frequently Asked Questions
+
+<details>
+<summary>Why synchronized versioning?</summary>
+
+All packages in the monorepo receive the same version upon release.
+
+This is useful when:
+- Packages are tightly coupled (e.g., parts of the same framework),
+- Compatibility matters: `@mirta/cli@0.4.0` is guaranteed to work with `@mirta/package@0.4.0`,
+- Dependency management needs to be simplified.
+
+Compared to independent versioning, synchronized versioning:
+- Simplifies publishing,
+- Reduces version conflicts,
+- Makes releases atomic: all packages update together.
+
+💡 If you use `workspace:*`, during release all such references are replaced with the exact version — this is synchronized versioning in action.
+</details>
+
+<details>
+<summary>What is "semantic" versioning?</summary>
+
+Semantic version follows the format `major.minor.patch`, where each segment indicates different levels of change:
+- `major` — breaking changes or major updates,
+- `minor` — new features without breaking compatibility,
+- `patch` — bug fixes.
+
+Versions before `1.0.0` (e.g., `0.4.0`) are considered experimental:<br/>
+any update may include breaking changes.
+
+Learn more at [semver.org](https://semver.org/)
+</details>
+
+<details>
+<summary>How to set up CHANGELOG.md generation?</summary>
+
+To generate a changelog file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package to devDependencies in the root `package.json`, and include the `changelog` script:
 
 ```json
 {
@@ -86,90 +132,126 @@ To generate a change log file, add the [conventional-changelog-cli](https://www.
   }
 }
 ```
-The changelog entries are based on commits made within the version range. There are requirements for commit headers:
 
-1. Line length should not exceed 50 characters;
-2. Use prefixes such as `fix:`, `feat:`, `docs:`, `chore:`, etc.
+The automatically generated changelog is based on commits within the version range. Commit messages must follow these rules:
+1. Total line length must not exceed 50 characters;
+2. Use prefixes like `fix:`, `feat:`, `docs:`, `chore:`, etc.
 
-For the full list of requirements, refer to the framework's [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md).
+See full requirements in the [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) document.
+</details>
 
-### Semantic Versioning
+#### Advanced Usage
 
-A semantic version follows the format `major.minor.patch` (for example, `1.2.3`), where each segment represents different levels of changes:
+<details>
+<summary>Explicit version specification</summary>
 
-- `major` increases when incompatible changes are introduced;
-- `minor` increases when new functionality is added while maintaining backward compatibility;
-- `patch` increases when bug fixes are applied, preserving backward compatibility.
-
-Releasing with a specific version:
+Sets exactly the version passed as an argument:
 
 ```sh
 pnpm mirta release 1.2.3
 ```
-Release specifying the incremented part:
+⚠️ **Warning!** Do not attempt to overwrite already published versions — NPM registry will reject them.
+</details>
+
+<details>
+<summary>Increment: patch, minor, major</summary>
 
 ```sh
 pnpm mirta release patch
 # 0.0.1
 ```
+
 ```sh
 pnpm mirta release minor
 # 0.1.0
 ```
+
 ```sh
 pnpm mirta release major
 # 1.0.0
 ```
-Pre-release version specifying the type:
+</details>
+
+<details>
+<summary>Pre-releases: alpha, beta, rc</summary>
 
 ```sh
 pnpm mirta release prepatch --preid alpha
 # 0.0.1-alpha.0
 ```
+
 ```sh
 pnpm mirta release preminor --preid alpha
 # 0.1.0-alpha.0
 ```
+
 ```sh
 pnpm mirta release premajor --preid alpha
 # 1.0.0-alpha.0
 ```
-Incrementing an already existing pre-release version is done via
+
+#### Incrementing pre-release version
 
 ```sh
 pnpm mirta release prerelease --preid alpha
 # 0.0.1-alpha.1
 ```
-## Automatic Publishing
+</details>
 
-Publish ready-made packages to the NPM repository:
+---
 
-```sh
-pnpm mirta publish
+### `pnpm mirta publish`
+
+Publishes packages to NPM, skipping those marked as `private: true`.
+
+<details>
+<summary>Technical Details</summary>
+
+⚠️ Typically executed in CI/CD after pushing the `vX.X.X` git tag.
+
+The NPM dist tag is determined automatically:
+- `alpha` → `--tag` `alpha`
+- `beta` → `--tag` `beta`
+- `rc` → `--tag` `rc`
+
+In CI environments (when `process.env.CI` is set), adds `--provenance`.
+</details>
+
+#### Supported Options
+
+`--dry` — runs in simulation mode. Shows what would happen, but does not publish.
+
+`--skipBuild` — skips running `pnpm run build` before publishing.
+
+`--skipGit` — disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).
+
+## ✅ Testing
+
+The tool has been tested manually and in CI:
+- Interactive and automated releases,
+- Error handling (version rollback on failure),
+- Git state and CI checks,
+- Support for `--dry-run`.
+
+## ⚠️ Limitations
+
+**Runs only in Node.js** (not in Duktape).<br/>
+Automatic commit and tag creation — only when connected to GitHub via `ssh`.
+
+## 🛠 Mirta Internal Configuration
+
+The `mirta.config.json` file allows you to configure the behavior of `@mirta/cli` specifically within the Mirta framework.
+
+Currently supported:
+
+`templates` — a list of paths to project templates (e.g. in `create-mirta`).
+
+Example:
+
+```json
+{
+  "templates": [
+    "packages/create-mirta/public/templates"
+  ]
+}
 ```
-
-This operation will initiate the build and publication process for the prepared packages.
-
-If the process is triggered from a CI environment on GitHub, then every file inside the published package will be automatically enriched with [provenance information](https://docs.npmjs.com/generating-provenance-statements) - hash values and metadata that confirm its integrity and authenticity.
-
-The primary goal of this feature is to enhance trust and security for published packages. When a package is published using this option, users can verify whether the content of the downloaded package matches the original source provided by the author.
-
-## Auxiliary options
-
-### `release` options
-
-`--dry` runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
-
-`--preid <custom-pre-release-id>` sets a custom prefix for the pre-release version, which is appended to the package version number (e.g., beta.1). This option allows creating pre-release versions such as alpha, beta, RC, etc., before the official stable release.
-
-`--skipPrompts` skips interactive user queries. The command runs automatically using default values or predefined settings.
-
-`--skipGit` ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
-
-### `publish` options
-
-`--dry` runs the command in simulation mode ("dry run"), showing changes that would be made without actually applying them. Useful for previewing changes before application.
-
-`--skipBuild` excludes running the build process after updating package versions. Skips executing tasks defined in the build pipeline, allowing you to decide whether recompilation is necessary after changing version numbers.
-
-`--skipGit` ignores actions related to the Git version control system, such as committing changes, creating commit tags, or pushing updates to a remote repository. Might be useful if you wish to manage Git operations manually later.
