@@ -15,8 +15,7 @@ import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManage
  **/
 export interface MonorepoContext {
   /**
-   * Абсолютный путь к корневой директории монорепозитория.
-   * Место, где находится `package.json` с полем `workspaces`.
+   * Абсолютный путь к корневой директории монорепозитория в формате POSIX.
    *
    **/
   readonly rootDir: string

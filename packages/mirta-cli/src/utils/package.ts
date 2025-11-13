@@ -28,11 +28,9 @@ interface MirtaConfig {
   templates?: string[]
 }
 
-const rootDir = toPosix(
-  process.cwd()
-)
-
-const context = await resolveMonorepoContextAsync(rootDir)
+const cwd = process.cwd()
+const context = await resolveMonorepoContextAsync(cwd)
+const rootDir = context.rootDir
 
 // Список всех пакетов репозитория.
 const packages: Record<string, Pick<PackageDefinition, 'workspacePath' | 'isPrivate'>> = {}
