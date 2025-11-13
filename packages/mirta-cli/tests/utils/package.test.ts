@@ -274,7 +274,6 @@ describe('package utils', () => {
         ['templates/**/package.json'],
         expect.objectContaining({
           cwd: '/mock/root',
-          exclude: ['node_modules/**'],
         })
       )
 
