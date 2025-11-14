@@ -26,6 +26,12 @@
         "types": "./dist/array/index.d.mts",
         "default": "./dist/array/index.mjs"
       }
+    },
+    "./object": {
+      "import": {
+        "types": "./dist/object/index.d.mts",
+        "default": "./dist/object/index.mjs"
+      }
     }
   },
   "imports": {
