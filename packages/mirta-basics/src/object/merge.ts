@@ -1,76 +1,99 @@
-import { isObject, isPlainObject } from '../guards'
-import { hasOwn } from './helpers'
+/**
+ * Проверяет, является ли тип настоящим объектом (не `null`, не примитив).
+ * Фильтрует `null`, так как `null extends object` в TS.
+ *
+ * @template T - Входной тип.
+ *
+ * @since 0.4.0
+ *
+ **/
+type IsObject<TValue> = TValue extends object
+  ? (TValue extends null ? never : TValue)
+  : never
 
 /**
- * Рекурсивно объединяет свойства источника (`source`) с целевым объектом (`target`).
+ * Полностью заменяет свойства из `TFirst` на свойства из `TSecond`.
+ * Эквивалент `Omit<TFirst, keyof TSecond> & TSecond`, но с `Expand`.
  *
- * - Объекты объединяются рекурсивно.
- * - Массивы и другие значения (включая функции) заменяются целиком — не сливаются.
- * - Не изменяет исходные объекты — возвращает новый объект.
+ * @template TFirst - Базовый тип.
+ * @template TSecond - Тип с переопределяющими полями.
  *
- * @param target - Целевой объект, в который происходит слияние. Должен быть объектом.
- * @param source - Источник данных для слияния. Если не является объектом, возвращается `target` без изменений.
- * @returns Новый объект, полученный путём глубокого слияния `target` и `source`.
+ * @since 0.4.0
  *
- * @throws {TypeError} Если `target` не является объектом.
+ **/
+type Overwrite<TFirst, TSecond> = Expand<Omit<TFirst, keyof TSecond> & TSecond>
+
+type MergeAll<TList>
+  = TList extends readonly [infer Head, ...infer Tail]
+    ? Head extends IsObject<Head>
+      ? Expand<Overwrite<MergeAll<Tail>, Head>>
+      : MergeAll<Tail>
+    : {}
+
+/**
+ * Тип результата `merge`: объединение списка объектов с приоритетом правых полей.
+ * Используется для вывода типа при вызове `merge(a, b, c)`.
+ *
+ * @template TList - Кортеж аргументов типа `(object | null | undefined)[]`.
+ * @returns Итоговый тип после поверхностного слияния.
  *
  * @example
- * Объекты объединяются рекурсивно:
+ * type Result = Merged<[{ a: 1 }, { a: 2; b: 2 }]>
+ * // → { a: 2; b: 2 }
+ *
+ * @since 0.4.0
+ *
+ **/
+export type Merged<TList> = Expand<MergeAll<TList>>
+
+/**
+ * Поверхностно объединяет объекты слева направо:
+ * если у нескольких объектов есть свойство с одинаковым ключом, побеждает значение из самого правого.
+ *
+ * - `null` и `undefined` игнорируются.
+ * - Не изменяет исходные объекты.
+ * - Возвращает новый объект.
+ *
+ * @param objects - Список объектов для объединения. Может включать `null`/`undefined`.
+ * @returns Новый объект, в котором поля из правых аргументов побеждают.
+ *
+ * @example
+ *
  * ```ts
- * deepMerge({ a: { b: 1 } }, { a: { c: 2 } })
- * // → { a: { b: 1, c: 2 } }
+ * const a = { x: 1, y: 2 }
+ * const b = { y: 3, z: 4 }
+ * const c = null
+ *
+ * const result = merge(a, b, c)
+ * // → { x: 1, y: 3, z: 4 }
  * ```
  * @example
- * Массивы заменяются целиком:
+ *
  * ```ts
- * deepMerge({ arr: [1, 2] }, { arr: [3, 4] })
- * // → { arr: [3, 4] }
+ * merge({ a: 1 }, { a: 2 }, { a: 3 })
+ * // → { a: 3 }
  * ```
  * @example
- * Примитивы и функции заменяются:
+ *
  * ```ts
- * const fn1 = () => {}
- * const fn2 = () => {}
- * deepMerge({ fn: fn1 }, { fn: fn2 })
- * // → { fn: fn2 }
+ * merge()
+ * // → {}
  * ```
  * @since 0.4.0
  *
  **/
-export function deepMerge<TTarget extends object = object>(
-  target: TTarget,
-  source: unknown
-): TTarget {
+export function merge<TList extends readonly (object | null | undefined)[]>(
+  ...objects: TList
+): Merged<TList>
 
-  if (!isObject(target))
-    throw new TypeError('[deepMerge] target must be an object')
+export function merge(...objects: (object | null | undefined)[]): object {
 
-  if (source == null || typeof source !== 'object')
-    return target
+  if (objects.length === 0)
+    return {}
 
-  const output = { ...target }
-
-  for (const key in source) {
-
-    if (!hasOwn(source, key))
-      continue
-
-    const sourceVal = source[key] as unknown
-    const targetVal = output[key] as unknown
-
-    if (isPlainObject(targetVal) && isPlainObject(sourceVal)) {
-
-      output[key] = deepMerge(targetVal, sourceVal)
-
-    }
-    else {
-
-      output[key] = sourceVal
-
-    }
-
-  }
-
-  return output
+  return objects.reduce<Record<string, unknown>>(
+    (acc, nextItem) => (nextItem ? { ...acc, ...nextItem } : acc),
+    {}
+  )
 
 }

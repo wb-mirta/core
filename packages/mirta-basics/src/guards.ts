@@ -94,7 +94,7 @@ export const isFunction = (value: unknown): value is ((...args: unknown[]) => un
  * ```ts
  * isObject({})       // true
  * isObject([])       // true
- * isObject(() => {}) // true
+ * isObject(() => {}) // false
  * isObject(null)     // false
  * isObject('hello')  // false
  * isObject(42)       // false
