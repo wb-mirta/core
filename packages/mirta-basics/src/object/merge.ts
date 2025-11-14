@@ -12,46 +12,61 @@ type IsObject<TValue> = TValue extends object
   : never
 
 /**
- * Полностью заменяет свойства из `TFirst` на свойства из `TSecond`.
- * Эквивалент `Omit<TFirst, keyof TSecond> & TSecond`, но с `Expand`.
+ * Заменяет свойства из `TBase` на свойства из `TPatch` по ключам.
+ * Оставляет несовпадающие свойства из `TBase`, добавляет новые из `TPatch`.
  *
- * @template TFirst - Базовый тип.
- * @template TSecond - Тип с переопределяющими полями.
+ * Эквивалент `Omit<TBase, keyof TPatch> & TPatch`, но с `Expand`.
+ *
+ * @template TBase - Базовый тип.
+ * @template TPatch - Тип с переопределяющими полями.
  *
  * @since 0.4.0
  *
  **/
-type Overwrite<TFirst, TSecond> = Expand<Omit<TFirst, keyof TSecond> & TSecond>
+type Overwrite<TBase, TPatch> = Expand<Omit<TBase, keyof TPatch> & TPatch>
 
-type MergeAll<TList>
+/**
+ * Рекурсивно вычисляет тип результата слияния кортежа объектов слева направо.
+ * Игнорирует `null` и `undefined`, объединяя только объекты.
+ * Поля из правых объектов переопределяют поля из левых.
+ *
+ * @template TList - readonly кортеж из объектов, `null` или `undefined`.
+ *
+ * @since 0.4.0
+ *
+ **/
+type MergeList<TList>
   = TList extends readonly [infer Head, ...infer Tail]
     ? Head extends IsObject<Head>
-      ? Expand<Overwrite<MergeAll<Tail>, Head>>
-      : MergeAll<Tail>
+      ? Expand<Overwrite<MergeList<Tail>, Head>>
+      : MergeList<Tail>
     : {}
 
 /**
  * Тип результата `merge`: объединение списка объектов с приоритетом правых полей.
- * Используется для вывода типа при вызове `merge(a, b, c)`.
+ * Поля из последующих объектов переопределяют уже существующие.
  *
  * @template TList - Кортеж аргументов типа `(object | null | undefined)[]`.
  * @returns Итоговый тип после поверхностного слияния.
  *
  * @example
+ *
+ * ```ts
  * type Result = Merged<[{ a: 1 }, { a: 2; b: 2 }]>
  * // → { a: 2; b: 2 }
- *
+ * ```
  * @since 0.4.0
  *
  **/
-export type Merged<TList> = Expand<MergeAll<TList>>
+export type Merged<TList> = Expand<MergeList<TList>>
 
 /**
- * Поверхностно объединяет объекты слева направо:
- * если у нескольких объектов есть свойство с одинаковым ключом, побеждает значение из самого правого.
+ * Поверхностно объединяет объекты слева направо. Если у нескольких
+ * объектов есть свойство с одинаковым ключом, побеждает значение из самого правого.
  *
- * - `null` и `undefined` игнорируются.
- * - Не изменяет исходные объекты.
+ * При этом:
+ * - Игнорируются значения `null` и `undefined`,
+ * - Не изменяет исходные объекты,
  * - Возвращает новый объект.
  *
  * @param objects - Список объектов для объединения. Может включать `null`/`undefined`.
@@ -86,13 +101,13 @@ export function merge<TList extends readonly (object | null | undefined)[]>(
   ...objects: TList
 ): Merged<TList>
 
-export function merge(...objects: (object | null | undefined)[]): object {
+export function merge(...objects: readonly (object | null | undefined)[]): object {
 
   if (objects.length === 0)
     return {}
 
   return objects.reduce<Record<string, unknown>>(
-    (acc, nextItem) => (nextItem ? { ...acc, ...nextItem } : acc),
+    (base, patch) => (patch ? { ...base, ...patch } : base),
     {}
   )
 

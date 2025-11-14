@@ -2,40 +2,43 @@ import { isObject, isPlainObject } from '../guards'
 import { hasOwn } from './helpers'
 
 /**
- * Рекурсивно объединяет типы. Поля из `TSecond` побеждают.
+ * Рекурсивно объединяет типы. Поля из `TPatch` побеждают.
  * Вложенные объекты сливаются, прочие значения — заменяются.
  *
- * @template TFirst - Тип первого объекта.
- * @template TSecond - Тип второго объекта (или `null`/`undefined`).
- */
-export type DeepMerged<TFirst, TSecond> = [TFirst, TSecond] extends [object, object]
+ * @template TBase - Тип объекта, с которого начинается слияние.
+ * @template TPatch - Тип объекта с изменениями (может быть `null` или `undefined`).
+ *
+ * @since 0.4.0
+ *
+ **/
+export type DeepMerged<TBase, TPatch> = [TBase, TPatch] extends [object, object]
   ? {
-      [K in keyof TFirst | keyof TSecond]: K extends keyof TSecond
-        ? TSecond[K] extends object
-          ? K extends keyof TFirst
-            ? TFirst[K] extends object
-              ? DeepMerged<TFirst[K], TSecond[K]>
-              : TSecond[K]
-            : TSecond[K]
-          : TSecond[K]
-        : K extends keyof TFirst
-          ? TFirst[K]
+      [K in keyof TBase | keyof TPatch]: K extends keyof TPatch
+        ? TPatch[K] extends object
+          ? K extends keyof TBase
+            ? TBase[K] extends object
+              ? DeepMerged<TBase[K], TPatch[K]>
+              : TPatch[K]
+            : TPatch[K]
+          : TPatch[K]
+        : K extends keyof TBase
+          ? TBase[K]
           : never
     }
-  : TSecond
+  : TPatch
 
 /**
- * Рекурсивно объединяет два объекта. Не изменяет исходные.
+ * Рекурсивно объединяет базовый объект с патчем. Не изменяет исходные.
  *
  * - Вложенные объекты — сливаются.
  * - Массивы, примитивы — заменяются целиком.
- * - Если `second` — `null`/`undefined`, возвращается копия `first`.
+ * - Если `patch` — `null`/`undefined`, возвращается копия `base`.
  *
- * @param first - Базовый объект. Должен быть объектом.
- * @param second - Объект с переопределениями. Может быть `null`/`undefined`.
+ * @param base - Объект, с которого начинается слияние.
+ * @param patch - Объект с изменениями (может быть `null` или `undefined`).
  * @returns Новый объект — результат слияния.
  *
- * @throws {TypeError} Если `first` не объект.
+ * @throws {TypeError} Если `base` не является объектом.
  *
  * @example
  * deepMerge({ a: { b: 1 } }, { a: { c: 2 } })
@@ -48,44 +51,40 @@ export type DeepMerged<TFirst, TSecond> = [TFirst, TSecond] extends [object, obj
  * @since 0.4.0
  *
  **/
-export function deepMerge<TFirst extends object, TSecond extends object | null | undefined>(
-  first: TFirst,
-  second: TSecond
-): TSecond extends object ? DeepMerged<TFirst, TSecond> : TFirst
+export function deepMerge<TBase extends object, TPatch extends object | null | undefined>(
+  base: TBase,
+  patch: TPatch
+): TPatch extends object ? DeepMerged<TBase, TPatch> : TBase
 
-// Реализация
 export function deepMerge(
-  first: object,
-  second: unknown
+  base: object,
+  patch: unknown
 ): object {
 
-  if (!isObject(first)) {
+  if (!isObject(base))
+    throw new TypeError('[deepMerge] first argument must be an object')
 
-    throw new TypeError('[deepMerge] first must be an object')
+  const output = { ...base }
 
-  }
+  if (patch == null || typeof patch !== 'object')
+    return output
 
-  if (second == null || typeof second !== 'object')
-    return first
+  for (const key in patch) {
 
-  const output = { ...first }
-
-  for (const key in second) {
-
-    if (!hasOwn(second, key))
+    if (!hasOwn(patch, key))
       continue
 
-    const secondVal = second[key] as unknown
-    const firstVal = output[key] as unknown
+    const fromBase = output[key] as unknown
+    const fromPatch = patch[key] as unknown
 
-    if (isPlainObject(firstVal) && isPlainObject(secondVal)) {
+    if (isPlainObject(fromBase) && isPlainObject(fromPatch)) {
 
-      output[key] = deepMerge(firstVal, secondVal)
+      output[key] = deepMerge(fromBase, fromPatch)
 
     }
     else {
 
-      output[key] = secondVal
+      output[key] = fromPatch
 
     }
 
