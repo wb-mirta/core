@@ -35,6 +35,8 @@
     }
   },
   "imports": {
+    "#src/*": "./src/*.js",
+    "#src/object/*": "./src/object/*.js",
     "#array/*": "./src/array/*.js"
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-basics#readme",

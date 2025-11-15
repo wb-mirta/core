@@ -82,18 +82,21 @@ export const isFunction = (value: unknown): value is ((...args: unknown[]) => un
   typeof value === 'function'
 
 /**
- * Проверяет, является ли переданное значение объектом.
+ * Проверяет, является ли значение объектом —
+ * имеет тип `object` и не равно `null`.
  *
- * Возвращает `true` только для значений, которые являются объектами и не являются `null`.
- * Массивы и функции также считаются объектами, так как `typeof [] === 'object'`, `typeof fn === 'function'`.
+ * @remarks
+ * Проходят массивы и все объектные типы, включая
+ * встроенные (`Date`, `Map`, `Set`, `RegExp` и прочие).
  *
- * @param value - Значение, которое необходимо проверить.
- * @returns `true`, если значение является объектом и не является `null`, иначе `false`.
+ * @param value - Проверяемое значение.
+ * @returns `true`, если это объект.
  *
  * @example
  * ```ts
  * isObject({})       // true
  * isObject([])       // true
+ *
  * isObject(() => {}) // false
  * isObject(null)     // false
  * isObject('hello')  // false
@@ -105,24 +108,28 @@ export const isObject = (value: unknown): value is object =>
   value !== null && typeof value === 'object'
 
 /**
- * Проверяет, является ли переданное значение "обычным объектом" (plain object).
+ * Проверяет, является ли значение "обычным объектом" —
+ * имеет прототип `Object.prototype` или `null`.
  *
- * "Обычный объект" — это объект, созданный с помощью литерала `{}`, `Object.create({})` или `Object.create(null)`,
- * и не являющийся экземпляром встроенного класса (например, `Array`, `Date`, `RegExp`, `Error` и т.д.).
+ * @remarks
+ * Не проходят массивы и встроенные типы (`Date`, `Map`, `Set`, `RegExp` и прочие).
  *
- * @param value - Значение, которое необходимо проверить.
- * @returns `true`, если значение является обычным объектом, иначе `false`.
+ * Не пройдёт и `Object.create({})`, т.к. экземпляр _унаследован_ от обычного объекта `{}`.
+ *
+ * @param value - Проверяемое значение.
+ *
+ * @returns `true`, если это обычный объект.
  *
  * @example
  * ```ts
  * isPlainObject({})                  // true
- * isPlainObject(Object.create(null)) // true
  * isPlainObject({ a: 1, b: 2 })      // true
- * isPlainObject([])                  // false
+ * isPlainObject(Object.create(null)) // true
+ *
+ * isPlainObject(Object.create({}))   // false
  * isPlainObject(new Date())          // false
- * isPlainObject(new RegExp(''))      // false
  * isPlainObject(() => {})            // false
- * isPlainObject(null)                // false
+ * isPlainObject([])                  // false
  * ```
  * @since 0.4.0
  *

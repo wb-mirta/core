@@ -19,7 +19,7 @@
  * @since 0.4.0
  *
  **/
-export function hasOwn(target: object, key: string) {
+export function hasOwn(target: object, key: PropertyKey) {
 
   return Object.prototype.hasOwnProperty
     .call(target, key) as boolean
