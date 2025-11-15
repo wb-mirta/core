@@ -2,11 +2,12 @@ import { isObject, isPlainObject } from '../guards'
 import { hasOwn } from './helpers'
 
 /**
- * Рекурсивно объединяет типы. Поля из `TPatch` побеждают.
- * Вложенные объекты сливаются, прочие значения — заменяются.
+ * Результат рекурсивного объединения `TBase` и `TPatch`.
+ * Поля из `TPatch` переопределяют поля из `TBase`.
+ * Вложенные объекты объединяются, остальные значения — заменяются.
  *
- * @template TBase - Тип объекта, с которого начинается слияние.
- * @template TPatch - Тип объекта с изменениями (может быть `null` или `undefined`).
+ * @template TBase - Тип базового объекта.
+ * @template TPatch - Тип объекта с изменениями.
  *
  * @since 0.4.0
  *
@@ -25,18 +26,21 @@ export type DeepMerged<TBase, TPatch> = [TBase, TPatch] extends [object, object]
           ? TBase[K]
           : never
     }
-  : TPatch
+  : TBase
 
 /**
- * Рекурсивно объединяет базовый объект с патчем. Не изменяет исходные.
+ * Рекурсивно объединяет базовый объект с патчем.
  *
- * - Вложенные объекты — сливаются.
- * - Массивы, примитивы — заменяются целиком.
- * - Если `patch` — `null`/`undefined`, возвращается копия `base`.
+ * - Вложенные объекты — объединяются,
+ * - Массивы, примитивы — заменяются целиком,
+ * - Не мутирует аргументы `base` и `patch`,
+ * - Если `patch` равен `null` или `undefined`, возвращает копию `base`.
  *
- * @param base - Объект, с которого начинается слияние.
- * @param patch - Объект с изменениями (может быть `null` или `undefined`).
- * @returns Новый объект — результат слияния.
+ * Для поверхностного объединения используйте {@link merge}.
+ *
+ * @param base - Объект, с которого начинается объединение.
+ * @param patch - Набор изменений (допускает `null` или `undefined`).
+ * @returns Новый объект — результат объединения.
  *
  * @throws {TypeError} Если `base` не является объектом.
  *
@@ -54,7 +58,7 @@ export type DeepMerged<TBase, TPatch> = [TBase, TPatch] extends [object, object]
 export function deepMerge<TBase extends object, TPatch extends object | null | undefined>(
   base: TBase,
   patch: TPatch
-): TPatch extends object ? DeepMerged<TBase, TPatch> : TBase
+): DeepMerged<TBase, TPatch>
 
 export function deepMerge(
   base: object,
