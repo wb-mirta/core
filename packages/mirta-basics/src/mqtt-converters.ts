@@ -1,4 +1,4 @@
-import { isNumber, isString } from './type-guards'
+import { isNumber, isString } from './guards'
 
 export const mqttToBoolean = (value: WbRules.MqttValue): boolean => {
 

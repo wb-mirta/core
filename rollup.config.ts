@@ -50,6 +50,7 @@ const configs = [
     [
       'src/index.ts',
       'src/array/index.ts',
+      'src/object/index.ts',
     ]),
   ...buildPackage('mirta-env-loader'),
   ...buildPackage('mirta-package'),
