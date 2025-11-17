@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=22.17.1"
   },
-  "packageManager": "pnpm@10.21.0",
+  "packageManager": "pnpm@10.22.0",
   "workspaces": [
     "packages/*",
     "examples/*/*"
@@ -50,7 +50,7 @@
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-babel": "^6.1.0",
     "@stylistic/eslint-plugin": "^5.5.0",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "@types/prompts": "^2.4.9",
     "chalk": "^5.6.2",
     "conventional-changelog-cli": "^5.0.0",
