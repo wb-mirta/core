@@ -27,7 +27,7 @@
     "@mirta/rollup": "workspace:*",
     "@mirta/tsconfig": "workspace:*",
     "@stylistic/eslint-plugin": "^5.5.0",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
