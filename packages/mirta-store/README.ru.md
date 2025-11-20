@@ -221,6 +221,26 @@ const bathroom = useSensor('bathroom')
 
 </details>
 
+### 💾 Сериализация состояния
+Для сохранения или передачи состояния используйте **`$state`**.
+
+<details>
+<summary>Подробнее</summary>
+
+```ts
+const store = useCounter()
+
+// ✅ Правильно — сериализует только состояние
+const json = JSON.stringify(store.$state)
+
+// ❌ Неправильно — содержит функции и служебные поля
+const json = JSON.stringify(store)
+```
+
+Свойство `$state` содержит чистый объект состояния без методов и прокси-данных.
+
+</details>
+
 ## 🔄 Когда что использовать
 
 ### 1. Временное состояние: `@mirta/store` vs `global.__proto__`

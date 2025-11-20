@@ -231,6 +231,25 @@ If `useStore()` is not exported:
 > ❗ Not meaningful in local modules where `defineStore()` and `useStore()` are in the same file.
 </details>
 
+### 💾 State Serialization
+To save or transfer state, use $state.
+
+<details>
+<summary>Details</summary>
+
+```ts
+const store = useCounter()
+
+// ✅ Correct — serializes only the state
+const json = JSON.stringify(store.$state)
+
+// ❌ Incorrect — includes functions and internal properties
+const json = JSON.stringify(store)
+```
+The `$state` property contains a plain state object without methods or proxy-related data.
+
+</details>
+
 ## 🔄 When to use
 
 ### 1. Temporary state: `@mirta/store` vs `global.__proto__`
