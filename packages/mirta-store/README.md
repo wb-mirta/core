@@ -141,6 +141,7 @@ actions: {
 ---
 
 ### 📦 Deep updates with `$patch`
+
 Safely update nested objects — `@mirta/store` performs **deep merging**.
 
 <details>
@@ -161,6 +162,7 @@ store.$patch((state) => {
 ---
 
 ### 🔁 Reset state with `$reset`
+
 Restore the store to its initial state — as when first created.
 
 <details>
@@ -172,12 +174,13 @@ store.$reset()
 
 - Calls `state()`
 - Preserves reactivity
-- Useful for tests, restarting logic, or resetting settings
+- Resets state values for testing, logic restart, or configuration reset
 </details>
 
 ---
 
 ### 🛑 Protection against duplication
+
 A store cannot be defined twice with the same `typeId` — prevents conflicts.
 
 <details>
@@ -195,6 +198,7 @@ defineStore('sensor', { ... }) // ❌ StoreError: alreadyDefined
 ---
 
 ### 🧩 Scoped States — isolated instances
+
 Create separate store instances for different contexts: rooms, devices, sessions.
 
 <details>
@@ -232,6 +236,7 @@ If `useStore()` is not exported:
 </details>
 
 ### 💾 State Serialization
+
 To save or transfer state, use $state.
 
 <details>
