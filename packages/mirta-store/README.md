@@ -7,7 +7,7 @@
 
 > Type-safe storage solution for automation scenarios, inspired by the Pinia architecture.
 
-Each script in the `wb-rules` folder runs in an isolated context — with a separate namespace. This means that functions and variables from one script are not accessible to others.
+Each script in the `wb-rules` folder runs in an isolated context — with a separate namespace. This means that functions and variables from one script are inaccessible to others.
 
 `@mirta/store` enables moving data into **centralized states**, available across any scripts and modules. Provides a convenient API for:
 - defining state structure,
@@ -273,4 +273,4 @@ Tests verify:
 ## ⚠️ Limitations
 
 - State is **lost** upon restarting the `wb-rules.service` or the controller.
-- Store instances are cached globally and **not automatically cleared**. Dynamically creating a large number of instances with unique `scope` values may lead to memory leaks. Use predictable, bounded `scope` values.
+- Store instances are cached globally and **not automatically cleared**. Dynamically creating many instances with unique `scope` values may lead to memory leaks. Use predictable, bounded `scope` values.

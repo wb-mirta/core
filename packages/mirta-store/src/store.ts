@@ -122,11 +122,10 @@ function createStore<
     }
     else {
 
-      // Сначала формируем новый снимок состояния через
-      // иммутабельный deepMerge, затем применяем его
-      // к текущему состоянию с помощью assign.
-      //
-      assign(staticState, deepMerge(staticState, mutator))
+      const merged = deepMerge(staticState, mutator)
+
+      for (const key in merged)
+        staticState[key] = merged[key]
 
     }
 
@@ -247,14 +246,6 @@ function createStore<
   }) as Store<TState, TGetters, TActions>
 
   return proxy
-
-}
-
-export function fromState<TState extends Record<string, unknown>, R>(
-  fn: (state: TState) => R
-): (state: TState) => R {
-
-  return fn
 
 }
 
