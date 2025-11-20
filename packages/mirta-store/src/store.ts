@@ -153,9 +153,15 @@ function createStore<
     {
       get(target, key: string) {
 
+        // Состояние
         if (key in staticState)
           return staticState[key]
 
+        // Геттеры
+        if (key in getters)
+          return getters[key]()
+
+        // Служебные свойства
         if (key in target)
           return target[key as keyof typeof target]
 
@@ -165,7 +171,7 @@ function createStore<
       set(target, key: string, value: unknown) {
 
         if (key in target)
-          throw StoreError.get('readonlyAssignment', key)
+          throw StoreError.get('readonlyProperty', key)
 
         staticState[key] = value
 
@@ -225,7 +231,7 @@ function createStore<
     set(target, key: string, value: unknown): boolean {
 
       if (key in internals || key in getters || key in actions)
-        throw StoreError.get('readonlyAssignment', key)
+        throw StoreError.get('readonlyProperty', key)
 
       target[key] = value
       return true
