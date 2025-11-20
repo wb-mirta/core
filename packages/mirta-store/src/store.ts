@@ -161,6 +161,9 @@ function createStore<
         if (key in getters)
           return getters[key]()
 
+        if (key in actions)
+          return actions[key]
+
         // Служебные свойства
         if (key in target)
           return target[key as keyof typeof target]

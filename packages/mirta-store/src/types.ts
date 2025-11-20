@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 
 /**
+ * Рекурсивная версия утилитарного типа `Partial<T>`.
+ *
+ * @since 0.4.0
+ *
+ **/
+export type DeepPartial<TTarget> = TTarget extends object
+  ? {
+      [K in keyof TTarget]?: DeepPartial<TTarget[K]>
+    }
+  : TTarget
+
+/**
  * Тип, представляющий дерево состояния хранилища.
  *
  * Является объектом, где ключи — строки, числа или символы (`PropertyKey`),
@@ -88,13 +100,13 @@ export interface _StoreWithState<TState extends StateTree> {
    * Формируется как `typeId` или `typeId/id` для именованных экземпляров.
    *
    **/
-  $id: string
+  readonly $id: string
 
   /**
    * Ссылка на полное состояние хранилища.
    *
    **/
-  $state: TState
+  readonly $state: TState
 
   /**
    * Обновляет состояние путём слияния с переданным объектом.
@@ -108,7 +120,7 @@ export interface _StoreWithState<TState extends StateTree> {
    * ```
    *
    **/
-  $patch(state: Partial<TState>): void
+  $patch(state: DeepPartial<TState>): void
 
   /**
    * Обновляет состояние с помощью функции-мутатора.
@@ -167,7 +179,7 @@ export type _PatchFunc<TState extends StateTree>
  *
  **/
 export type _PatchArgs<TState extends StateTree>
-  = | Partial<TState>
+  = | DeepPartial<TState>
     | ((state: TState) => void)
 
 /**
@@ -190,7 +202,7 @@ export type _PatchArgs<TState extends StateTree>
  *
  **/
 export type _StoreWithGetters<TGetters> = {
-  [K in keyof TGetters]: TGetters[K] extends (...args: unknown[]) => infer R ? R : never
+  readonly [K in keyof TGetters]: TGetters[K] extends (...args: unknown[]) => infer R ? R : never
 }
 
 /**
@@ -203,7 +215,9 @@ export type _StoreWithGetters<TGetters> = {
  * @internal
  *
  **/
-export type _StoreWithActions<TActions> = TActions
+export type _StoreWithActions<TActions> = {
+  readonly [K in keyof TActions]: TActions[K]
+}
 
 /**
  * Полный тип хранилища - итоговый тип, возвращаемый `defineStore`.
@@ -316,7 +330,7 @@ export interface DefineStoreOptions<
    * @since 0.4.0
    *
    **/
-  actions?: TActions & ThisType<TState & _StoreWithGetters<TGetters> & _StoreWithState<TState>>
+  actions?: TActions & ThisType<TState & _StoreWithGetters<TGetters> & _StoreWithActions<TActions> & _StoreWithState<TState>>
 
 }
 
