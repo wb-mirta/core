@@ -23,6 +23,10 @@
       }
     }
   },
+  "imports": {
+    "#src": "./src/index.js",
+    "#src/*": "./src/*.js"
+  },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-store#readme",
   "repository": {
     "type": "git",
@@ -40,6 +44,11 @@
     "build:mono": "rollup -c node:@mirta/rollup/config-package"
   },
   "dependencies": {
+    "@mirta/basics": "workspace:*",
+    "@mirta/polyfills": "workspace:*"
+  },
+  "peerDependencies": {
+    "@mirta/basics": "workspace:*",
     "@mirta/polyfills": "workspace:*"
   }
 }
