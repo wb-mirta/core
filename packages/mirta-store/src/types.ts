@@ -6,11 +6,13 @@
  * @since 0.4.0
  *
  **/
-export type DeepPartial<TTarget> = TTarget extends object
-  ? {
-      [K in keyof TTarget]?: DeepPartial<TTarget[K]>
-    }
-  : TTarget
+export type DeepPartial<TTarget> = TTarget extends (infer TItem)[]
+  ? TItem[]
+  : TTarget extends object
+    ? {
+        [K in keyof TTarget]?: DeepPartial<TTarget[K]>
+      }
+    : TTarget
 
 /**
  * Тип, представляющий дерево состояния хранилища.
