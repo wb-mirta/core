@@ -165,13 +165,16 @@ function createStore<
         if (key in target)
           return target[key as keyof typeof target]
 
-        return undefined
+        throw StoreError.get('unknownProperty', key)
 
       },
       set(target, key: string, value: unknown) {
 
         if (key in target)
           throw StoreError.get('readonlyProperty', key)
+
+        if (!(key in staticState))
+          throw StoreError.get('unknownProperty', key)
 
         staticState[key] = value
 
@@ -211,9 +214,9 @@ function createStore<
 
     get(target, key: string) {
 
-      // Служебные свойства
-      if (key in internals)
-        return internals[key as keyof typeof internals]()
+      // Состояние
+      if (key in target)
+        return target[key]
 
       // Геттеры
       if (key in getters)
@@ -223,8 +226,11 @@ function createStore<
       if (key in actions)
         return actions[key]
 
-      // Состояние
-      return target[key]
+      // Служебные свойства
+      if (key in internals)
+        return internals[key as keyof typeof internals]()
+
+      throw StoreError.get('unknownProperty', key)
 
     },
 
@@ -232,6 +238,9 @@ function createStore<
 
       if (key in internals || key in getters || key in actions)
         throw StoreError.get('readonlyProperty', key)
+
+      if (!(key in target))
+        throw StoreError.get('unknownProperty', key)
 
       target[key] = value
       return true

@@ -108,7 +108,8 @@ store.increment()
 
 - `'alreadyDefined'` — повторное определение,
 - `'alreadyDefinedOutside'` — повторное определение в другом файле,
-- `'readonlyProperty'` — изменение служебного поля.
+- `'readonlyProperty'` — изменение служебного поля,
+- `'unknownProperty'` - обращение к неизвестному полю.
 
 ## 🔧 Особенности
 

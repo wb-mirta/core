@@ -109,7 +109,8 @@ A specialized error class with the following codes:
 
 - `'alreadyDefined'` — repeated definition,
 - `'alreadyDefinedOutside'` — repeated definition in another file,
-- `'readonlyProperty'` — attempting to modify a readonly property.
+- `'readonlyProperty'` — modify a readonly property,
+- `'unknownProperty'` - access to unknown property.
 
 ## 🔧 Features
 

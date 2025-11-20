@@ -82,8 +82,16 @@ export class StoreError extends Error {
      * @param propertyName - Название свойства, которому нельзя присваивать значение.
      *
      */
-    readonlyAssignment: (propertyName: string) =>
+    readonlyProperty: (propertyName: string) =>
       `Cannot assign to readonly property "${propertyName}"`,
+
+    /**
+     * Ошибка, возникающая при попытке обращения к несуществующему свойству хранилища.
+     * @param propertyName Имя отсутствующего свойства, вызвавшего ошибку.
+     *
+     **/
+    unknownProperty: (propertyName: string) =>
+      `Unknown property "${propertyName}"`,
 
   } as const
 
