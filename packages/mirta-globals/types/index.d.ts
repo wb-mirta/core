@@ -1,3 +1,4 @@
+/// <reference path="./utils.d.ts" />
 /// <reference path="./wb-rules.d.ts" />
 
 /** Признак сборки в режиме разработки. */
