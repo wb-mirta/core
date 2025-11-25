@@ -1,49 +1,5 @@
+/// <reference path="./utils.d.ts" />
 /// <reference path="./wb-rules/alarms.d.ts" />
-
-/**
- * Используется для нормализации составных типов.
- *
- * @example
- * ```ts
- * interface A { value: number }
- * interface B { isReadonly: boolean }
- *
- * type C = A & B
- * // A & B
- *
- * type D = Expand<A & B>
- * // {
- * //   value: number;
- * //   isReadonly: boolean;
- * // }
- * ```
- * @since 0.0.4
- *
- **/
-declare type Expand<T> = { [K in keyof T]: T[K] } & {}
-
-/**
- * Разрешает частичное заполнение полей объекта, но требует наличия хотя бы одного поля.
- *
- * @example
- * ```ts
- * interface SafeRange {
- *   minValue: number
- *   maxValue: number
- * }
- *
- * // Корректное объявление
- * const a: AtLeastOne<SafeRange> = {
- *   minValue: 0
- * }
- *
- * // Ошибка - требуется хотя бы одно из обязательных полей
- * const b: AtLeastOne<SafeRange> = { }
- * ```
- * @since 0.3.3
- *
- **/
-declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U]
 
 /** Типы и интерфейсы правил wb-rules */
 declare namespace WbRules {
