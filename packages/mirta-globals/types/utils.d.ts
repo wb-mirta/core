@@ -65,4 +65,5 @@ declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[
  * @since 0.4.0
  *
  **/
-declare type Branded<TValue, TBrand> = TValue & { readonly __brand: TBrand }
+declare type Branded<TValue, TBrand extends string | symbol>
+  = TValue & { readonly __brand: TBrand }
