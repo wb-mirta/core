@@ -64,6 +64,15 @@ global.trackMqtt = vi.fn()
 // Мок определения правил.
 global.defineRule = vi.fn()
 
+// Мок отключения правила.
+global.disableRule = vi.fn()
+
+// Мок включения правила.
+global.enableRule = vi.fn()
+
+// Мок запуска правила.
+global.runRule = vi.fn()
+
 // Мок сервиса уведомлений.
 global.Notify = mock<WbRules.Notify>()
 
