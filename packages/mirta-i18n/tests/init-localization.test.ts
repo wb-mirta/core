@@ -29,7 +29,7 @@ describe('initLocalizationAsync', () => {
 
     vi.mocked(getSystemLocale).mockReturnValue('ru-RU')
 
-    vi.mocked(loadMessagesAsync).mockResolvedValueOnce({ title: 'Заголовок' })
+    vi.mocked(loadMessagesAsync).mockResolvedValueOnce({ title: 'Title' })
     vi.mocked(loadMessagesAsync).mockResolvedValueOnce({ subtitle: 'Подзаголовок' })
 
     const { getLocale, t } = await initLocalizationAsync()
@@ -40,12 +40,14 @@ describe('initLocalizationAsync', () => {
 
     expect(getLocale()).toBe('ru-RU')
 
-    expect(t('title')).toBe('Заголовок')
+    expect(t('title')).toBe('Title')
     expect(t('subtitle')).toBe('Подзаголовок')
 
   })
 
   it('should use fallback if system locale is missing', async () => {
+
+    vi.mocked(getSystemLocale).mockReturnValue('fr-FR')
 
     vi.mocked(loadMessagesAsync)
       // First call to load fallback messages
@@ -62,6 +64,8 @@ describe('initLocalizationAsync', () => {
   })
 
   it('should throw if fallback locale cannot be loaded', async () => {
+
+    vi.mocked(getSystemLocale).mockReturnValue('de-DE')
 
     vi.mocked(loadMessagesAsync).mockResolvedValueOnce(null)
 

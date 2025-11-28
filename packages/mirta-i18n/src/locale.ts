@@ -142,7 +142,7 @@ export function resolveLocale(input: string | undefined, defaultLocale?: Locale)
   try {
 
     // Защитная попытка нормализовать через Intl.
-    return Intl.getCanonicalLocales(normalizedInput)[0] as Locale
+    return Intl.getCanonicalLocales(input.trim())[0] as Locale
 
   }
   catch {
