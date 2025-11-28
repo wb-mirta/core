@@ -173,6 +173,31 @@ declare namespace WbRules {
   }
 
   /**
+   * Дескриптор, возвращаемый функцией {@link defineRule}.
+   *
+   * Используется для управления правилом: отключение,
+   * включение, принудительный запуск.
+   *
+   * @example
+   * ```ts
+   * const cabinetLightRule = defineRule('cabinet_light', {
+   *   whenChanged: 'motion/sensor',
+   *   then: (newValue) => dev['light/power'] = newValue
+   * })
+   *
+   * // Отключить правило
+   * disableRule(cabinetLightRule)
+   *
+   * // Включить снова
+   * enableRule(cabinetLightRule)
+   * ```
+   *
+   * @since 0.4.0
+   *
+   **/
+  type RuleHandle = Branded<number, 'WbRules.RuleHandle'>
+
+  /**
    * Соответствие типа контрола его типу значения.
    * @since 0.0.4
    *
@@ -672,14 +697,63 @@ declare function cron(spec: string): WbRules.CronEntry
  * @param options Конфигурация правила.
  *
  **/
-declare function defineRule(name: string, options: WbRules.RuleOptions): void
+declare function defineRule(name: string, options: WbRules.RuleOptions): WbRules.RuleHandle
 
 /**
  * Создаёт анонимное правило обработки.
  * @param options Конфигурация правила.
  *
  **/
-declare function defineRule(options: WbRules.RuleOptions): void
+declare function defineRule(options: WbRules.RuleOptions): WbRules.RuleHandle
+
+/**
+ * Отключает правило. Оно перестаёт реагировать на события.
+ * Сохраняется в памяти — можно включить снова.
+ *
+ * @param rule - Дескриптор правила, возвращённый {@link defineRule}.
+ *
+ * @example
+ * ```ts
+ * const cabinetLightRule = defineRule({ ... })
+ * disableRule(cabinetLightRule)
+ * ```
+ * @since 0.4.0
+ *
+ **/
+declare function disableRule(rule: WbRules.RuleHandle): void
+
+/**
+ * Включает ранее отключённое правило.
+ *
+ * @param rule - Дескриптор правила, возвращённый {@link defineRule}.
+ *
+ * @example
+ * ```ts
+ * enableRule(cabinetLightRule)
+ * ```
+ * @since 0.4.0
+ *
+ **/
+declare function enableRule(rule: WbRules.RuleHandle): void
+
+/**
+ * Запускает правило по его дескриптору.
+ *
+ * @warning
+ * Контекст вызова будет пустым:
+ * - `newValue = undefined`
+ * - `deviceId = undefined`
+ * - `controlId = undefined`
+ *
+ * Не используйте `runRule` для правил, зависящих от этих значений.
+ * Вместо этого выносите общую логику в отдельную функцию и вызывайте её напрямую.
+ *
+ * @param rule - Дескриптор правила, возвращённый {@link defineRule}.
+ *
+ * @since 0.4.0
+ *
+ **/
+declare function runRule(rule: WbRules.RuleHandle): void
 
 /**
  * Создаёт виртуальное устройство.

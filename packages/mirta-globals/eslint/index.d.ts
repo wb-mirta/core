@@ -7,6 +7,9 @@ declare interface GlobalsMirta {
   readonly 'cron': false
   readonly 'timers': false
   readonly 'defineRule': false
+  readonly 'disableRule': false
+  readonly 'enableRule': false
+  readonly 'runRule': false
   readonly 'defineAlias': false
   readonly 'defineVirtualDevice': false
   readonly 'getDevice': false
