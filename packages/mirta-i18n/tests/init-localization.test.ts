@@ -19,6 +19,12 @@ vi.mock('#src/messages')
 
 describe('initLocalizationAsync', () => {
 
+  beforeEach(() => {
+
+    vi.clearAllMocks()
+
+  })
+
   it('should initialize with system locale', async () => {
 
     vi.mocked(getSystemLocale).mockReturnValue('ru-RU')

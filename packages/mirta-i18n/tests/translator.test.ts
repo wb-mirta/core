@@ -86,16 +86,6 @@ describe('createTranslator', () => {
 
   })
 
-  it('should handle variable with spaces in key', () => {
-
-    const context = mockCreateContext({
-      'greeting': 'Hello, {first name}!',
-    })
-    const t = createTranslator(context)
-    expect(t('greeting', { 'first name': 'Bob' })).toBe('Hello, Bob!')
-
-  })
-
   it('should handle missing variable as placeholder', () => {
 
     const context = mockCreateContext({ 'greeting': 'Hello, {name}!' })
@@ -136,13 +126,13 @@ describe('createTranslator', () => {
 
   })
 
-  it('should not replace variable with spaces in key', () => {
+  it('should handle variable with spaces in key', () => {
 
     const context = mockCreateContext({
-      'msg': 'Hello {first name}!',
+      'greeting': 'Hello, {first name}!',
     })
     const t = createTranslator(context)
-    expect(t('msg', { 'first name': 'Bob' })).toBe('Hello Bob!')
+    expect(t('greeting', { 'first name': 'Bob' })).toBe('Hello, Bob!')
 
   })
 

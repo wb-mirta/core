@@ -205,6 +205,6 @@ export function getSystemLocale(): string {
 
   /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
-  return rawLocale.split('.')[0].replace('_', '-')
+  return rawLocale.split('.')[0].replaceAll('_', '-')
 
 }
