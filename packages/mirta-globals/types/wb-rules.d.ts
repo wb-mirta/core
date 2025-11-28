@@ -743,7 +743,7 @@ declare function enableRule(rule: WbRules.RuleHandle): void
  * Контекст вызова будет пустым:
  * - `newValue = undefined`
  * - `deviceId = undefined`
- * - `controId = undefined`
+ * - `controlId = undefined`
  *
  * Не используйте `runRule` для правил, зависящих от этих значений.
  * Вместо этого выносите общую логику в отдельную функцию и вызывайте её напрямую.

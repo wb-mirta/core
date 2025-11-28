@@ -9,7 +9,7 @@ declare interface GlobalsMirta {
   readonly 'defineRule': false
   readonly 'disableRule': false
   readonly 'enableRule': false
-  readonly 'ruleRule': false
+  readonly 'runRule': false
   readonly 'defineAlias': false
   readonly 'defineVirtualDevice': false
   readonly 'getDevice': false

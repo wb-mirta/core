@@ -9,7 +9,7 @@ export default {
   'defineRule': 'readonly',
   'disableRule': 'readonly',
   'enableRule': 'readonly',
-  'ruleRule': 'readonly',
+  'runRule': 'readonly',
   'defineAlias': 'readonly',
   'defineVirtualDevice': 'readonly',
   'getDevice': 'readonly',
