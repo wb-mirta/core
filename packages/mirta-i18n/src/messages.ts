@@ -151,3 +151,22 @@ export async function loadMessagesAsync<TShape extends GenericShape>(
   }
 
 }
+
+/**
+ * Сбрасывает внутреннее состояние.
+ *
+ * Используется исключительно в тестах для обеспечения изоляции.
+ *
+ * @internal
+ *
+ * @since 0.4.0
+ *
+ **/
+export function __resetInternalState() {
+
+  if (!__TEST__)
+    return
+
+  loadedMessages.clear()
+
+}
