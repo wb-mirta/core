@@ -28,6 +28,10 @@ describe('initLocalizationAsync', () => {
 
     const { getLocale, t } = await initLocalizationAsync()
 
+    // Проверяем порядок вызова: сначала fallback, затем системная локаль
+    expect(loadMessagesAsync).toHaveBeenNthCalledWith(1, 'en-US', expect.any(String))
+    expect(loadMessagesAsync).toHaveBeenNthCalledWith(2, 'ru-RU', expect.any(String))
+
     expect(getLocale()).toBe('ru-RU')
 
     expect(t('title')).toBe('Заголовок')

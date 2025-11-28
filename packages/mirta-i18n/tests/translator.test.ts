@@ -18,7 +18,7 @@ const mockCreateContext = <TShape extends GenericShape>(
       lang: getLang(fallbackLocale),
       messages: fallbackMessages,
     },
-    supportedLocales: new Set([locale]),
+    supportedLocales: new Set([locale, fallbackLocale]),
     locale,
     lang: getLang(locale),
     messages,
@@ -50,6 +50,49 @@ describe('createTranslator', () => {
     const t = createTranslator(context)
     expect(t('title')).toBe('Default')
     expect(t('unknown')).toBe('{{unknown}}')
+
+  })
+
+  it('should handle adjacent variables without spaces', () => {
+
+    const context = mockCreateContext({
+      'greeting': 'Hello {firstName}{lastName}!',
+    })
+    const t = createTranslator(context)
+    expect(t('greeting', { firstName: 'John', lastName: 'Doe' }))
+      .toBe('Hello JohnDoe!')
+
+  })
+
+  it('should handle adjacent variables with spaces in between', () => {
+
+    const context = mockCreateContext({
+      'status': 'User: {name} Role: {role} Status: {status}',
+    })
+    const t = createTranslator(context)
+    expect(t('status', { name: 'admin', role: 'moderator', status: 'active' }))
+      .toBe('User: admin Role: moderator Status: active')
+
+  })
+
+  it('should interpolate variables inside plural forms', () => {
+
+    const context = mockCreateContext({
+      'files': '{count, plural, one{One file for {owner}} other{# files for {owner}}}',
+    })
+    const t = createTranslator(context)
+    expect(t('files', { count: 1, owner: 'Alice' })).toBe('One file for Alice')
+    expect(t('files', { count: 5, owner: 'Bob' })).toBe('5 files for Bob')
+
+  })
+
+  it('should handle variable with spaces in key', () => {
+
+    const context = mockCreateContext({
+      'greeting': 'Hello, {first name}!',
+    })
+    const t = createTranslator(context)
+    expect(t('greeting', { 'first name': 'Bob' })).toBe('Hello, Bob!')
 
   })
 
@@ -99,7 +142,7 @@ describe('createTranslator', () => {
       'msg': 'Hello {first name}!',
     })
     const t = createTranslator(context)
-    expect(t('msg', { 'first name': 'Bob' })).toBe('Hello {first name}!')
+    expect(t('msg', { 'first name': 'Bob' })).toBe('Hello Bob!')
 
   })
 
@@ -109,6 +152,7 @@ describe('createTranslator', () => {
       'files': '{count, plural, one{One file} other{# files}}',
     })
     const t = createTranslator(context)
+
     expect(t('files', { count: 1 })).toBe('One file')
     expect(t('files', { count: 5 })).toBe('5 files')
 
@@ -160,8 +204,6 @@ describe('createTranslator', () => {
 
   })
 
-  // --- Новые тесты ---
-
   it('should handle NaN in plural as "NaN"', () => {
 
     const context = mockCreateContext({
@@ -172,6 +214,14 @@ describe('createTranslator', () => {
     expect(t('files', { count: undefined })).toBe('NaN')
     expect(t('files', { count: 'abc' as unknown as number })).toBe('NaN')
 
+  })
+
+  it('should coerce null and arrays to numbers in plural', () => {
+
+    const context = mockCreateContext({
+      'files': '{count, plural, one{# file} other{# files}}',
+    })
+    const t = createTranslator(context)
     expect(t('files', { count: null })).toBe('0 files')
     expect(t('files', { count: [] as unknown as number })).toBe('0 files')
     expect(t('files', { count: ['2'] as unknown as number })).toBe('2 files')
@@ -262,6 +312,48 @@ describe('createTranslator', () => {
     expect(t('files', { count: 5.5 })).toBe('5.5 градуса')
     expect(t('files', { count: 21.3 })).toBe('21.3 градуса')
     expect(t('files', { count: -1.5 })).toBe('-1.5 градуса')
+
+  })
+
+  it('should return empty string if no forms match and no other', () => {
+
+    const context = mockCreateContext({
+      'empty': '{count, plural}',
+    })
+    const t = createTranslator(context)
+    expect(t('empty', { count: 1 })).toBe('')
+
+  })
+
+  it('should use fallback asset when key is missing', () => {
+
+    const context = mockCreateContext(
+      {},
+      { 'fallbackKey': 'Fallback Value' }
+    )
+
+    const t = createTranslator(context)
+    expect(t('fallbackKey')).toBe('Fallback Value')
+
+  })
+
+  it('should return {{key}} when neither messages nor fallbackAsset have the key', () => {
+
+    const context = mockCreateContext({}, {})
+
+    const t = createTranslator(context)
+    expect(t('unknown')).toBe('{{unknown}}')
+
+  })
+
+  it('should return empty string if plural has no forms', () => {
+
+    const context = mockCreateContext({
+      'empty': '{count, plural}',
+    })
+    const t = createTranslator(context)
+    expect(t('empty', { count: 1 })).toBe('')
+    expect(t('empty', { count: 5 })).toBe('')
 
   })
 

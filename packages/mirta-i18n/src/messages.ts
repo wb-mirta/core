@@ -47,7 +47,7 @@ export function parseLocaleJson(
  *
  * @param filePath - Путь к файлу `.json`.
  * @returns Объект сообщений.
- * @throws {LocalizationError} С кодами `file.notFound`, `file.accessDenied`, `parse.invalidJson` и др.
+ * @throws {SourceError} С кодами `file.notFound`, `file.accessDenied`, `parse.invalidJson` и др.
  *
  **/
 export async function readLocaleFileAsync<TMessages extends object>(

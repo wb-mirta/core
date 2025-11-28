@@ -67,10 +67,10 @@ interface LocaleShape {
 }
 ```
 
-> 💡 The `LocaleShape` type must be defined in the project.  
-> Mirta Framework uses an internal script to generate it from `locales/en-US.json`.
+💡 The `LocaleShape` type must be defined in the project.  
+Mirta Framework uses an internal script to generate it from `locales/en-US.json`.
 
-> ⚠️ If no locale shape is provided, `GenericShape` is used — keys and variables are not type-checked.
+⚠️ If no locale shape is provided, `GenericShape` is used — keys and variables are not type-checked.
 
 ### 3. Initialize localization
 
@@ -163,12 +163,12 @@ Supports a **limited subset of ICU MessageFormat**, sufficient for CLI:
 - Plural: `{count, plural, one{...} few{...} other{...}}`
 - Offset: `offset:1`, `=0`, `#`
 
-> ⚠️ Not supported:
-> - `select`, `selectordinal`, number/date formatting
-> - Variables with spaces: `{first name}` → not replaced
-> - Nested `plural` or `#` inside `=n`
+⚠️ Not supported:
+- `select`, `selectordinal`, number/date formatting
+- Variables with spaces: `{first name}` → not replaced
+- Nested `plural` or `#` inside `=n`
 
-> Implemented without external dependencies — only essentials.
+Implemented without external dependencies — only essentials.
 
 #### Example with `offset`
 

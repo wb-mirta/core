@@ -132,13 +132,13 @@ export interface Localization<TShape extends GenericShape> {
 }
 
 /**
- * Контекст выполнения локализации.
- * Содержит все необходимые данные для работы переводчика.
+ * Базовый интерфейс контекста локализации.
+ * Содержит общие настройки и состояние, используемое в процессе перевода.
  *
  * @since 0.4.0
  *
  **/
-export interface LocalizationContext<TShape extends GenericShape> {
+export interface ContextBase {
 
   /**
    * Определяет реакцию на ошибки при локализации.
@@ -158,17 +158,6 @@ export interface LocalizationContext<TShape extends GenericShape> {
   readonly cwd: string
 
   /**
-   * Набор данных fallback-локали.
-   *
-   **/
-  readonly fallbackAsset: LocaleAsset<TShape>
-
-  /**
-   * Набор поддерживаемых локалей.
-   */
-  readonly supportedLocales: Set<Locale>
-
-  /**
    * Текущая активная локаль.
    *
    **/
@@ -180,6 +169,29 @@ export interface LocalizationContext<TShape extends GenericShape> {
    *
    **/
   lang: Lang
+
+}
+
+/**
+ * Контекст выполнения локализации.
+ * Содержит все необходимые данные для работы переводчика.
+ *
+ * @since 0.4.0
+ *
+ **/
+export interface LocalizationContext<TShape extends GenericShape> extends ContextBase {
+
+  /**
+   * Набор данных fallback-локали.
+   *
+   **/
+  readonly fallbackAsset: LocaleAsset<TShape>
+
+  /**
+   * Набор поддерживаемых локалей.
+   *
+   **/
+  readonly supportedLocales: Set<Locale>
 
   /**
    * Текущие сообщения, соответствующие активной локали.

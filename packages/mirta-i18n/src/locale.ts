@@ -195,11 +195,15 @@ export async function setLocaleAsync<TShape extends GenericShape>(
  **/
 export function getSystemLocale(): string {
 
+  /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
   const rawLocale
     = process.env.LC_ALL
-      ?? process.env.LC_MESSAGES
-      ?? process.env.LANG
-      ?? Intl.DateTimeFormat().resolvedOptions().locale
+      || process.env.LC_MESSAGES
+      || process.env.LANG
+      || Intl.DateTimeFormat().resolvedOptions().locale
+
+  /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
   return rawLocale.split('.')[0].replace('_', '-')
 
