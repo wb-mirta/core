@@ -23,6 +23,9 @@ importers:
       '@mirta/globals':
         specifier: workspace:*
         version: link:packages/mirta-globals
+      '@mirta/package':
+        specifier: workspace:*
+        version: link:packages/mirta-package
       '@mirta/rollup':
         specifier: workspace:*
         version: link:packages/mirta-rollup
@@ -286,6 +289,12 @@ importers:
       '@clack/prompts':
         specifier: ^0.11.0
         version: 0.11.0
+      '@mirta/basics':
+        specifier: workspace:*
+        version: link:../mirta-basics
+      '@mirta/i18n':
+        specifier: workspace:*
+        version: link:../mirta-i18n
       '@mirta/package':
         specifier: workspace:*
         version: link:../mirta-package
@@ -295,9 +304,6 @@ importers:
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
-      lodash.merge:
-        specifier: ^4.6.2
-        version: 4.6.2
       p-map:
         specifier: ^7.0.4
         version: 7.0.4
@@ -308,9 +314,6 @@ importers:
         specifier: ^7.7.3
         version: 7.7.3
     devDependencies:
-      '@types/lodash.merge':
-        specifier: ^4.6.9
-        version: 4.6.9
       '@types/semver':
         specifier: ^7.7.1
         version: 7.7.1
@@ -325,6 +328,8 @@ importers:
         version: link:../mirta-basics
 
   packages/mirta-globals: {}
+
+  packages/mirta-i18n: {}
 
   packages/mirta-package: {}
 

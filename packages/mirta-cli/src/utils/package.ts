@@ -11,14 +11,12 @@ import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Packa
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
 import { runCommandAsync } from '#utils/shell'
-import { getLocalized } from '#utils/localization'
 import { useLogger } from '#utils/logger'
 
 import chalk from 'chalk'
 const { yellow } = chalk
 
-const messages = await getLocalized()
-const logger = useLogger(messages)
+const logger = useLogger()
 
 const MAX_CONCURRENT_WRITES = 5
 

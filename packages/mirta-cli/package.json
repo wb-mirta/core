@@ -15,6 +15,7 @@
   "files": [
     "bin",
     "dist",
+    "locales",
     "LICENSE",
     "README.md"
   ],
@@ -23,6 +24,7 @@
   },
   "imports": {
     "#src/*": "./src/*.js",
+    "#src/i18n": "./src/i18n/index.js",
     "#utils/*": "./src/utils/*.js"
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-cli#readme",
@@ -35,7 +37,8 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports",
+    "i18n:shape-gen": "node ../../scripts/i18n/shape-gen.mjs"
   },
   "funding": {
     "type": "individual",
@@ -43,16 +46,16 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",
+    "@mirta/basics": "workspace:*",
+    "@mirta/i18n": "workspace:*",
     "@mirta/package": "workspace:*",
     "@mirta/workspace": "workspace:*",
     "p-map": "^7.0.4",
     "chalk": "^5.6.2",
     "prompts": "^2.4.2",
-    "semver": "^7.7.3",
-    "lodash.merge": "^4.6.2"
+    "semver": "^7.7.3"
   },
   "devDependencies": {
-    "@types/semver": "^7.7.1",
-    "@types/lodash.merge": "^4.6.9"
+    "@types/semver": "^7.7.1"
   }
 }

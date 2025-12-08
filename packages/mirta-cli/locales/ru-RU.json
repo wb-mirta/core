@@ -1,0 +1,13 @@
+{
+  "command.suggest": "{input} → возможно, {suggestion}?",
+  "command.notFound": "Неизвестная команда: {input}",
+  "args.suggest": "{input} → {suggestion}",
+  "args.notFound": "{count, plural, one{Неизвестная опция} other{Неизвестные опции}}",
+  "caption.note": "Примечание",
+  "caption.info": "Инфо",
+  "caption.canceled": "Отмена",
+  "caption.success": "Успешно",
+  "caption.error": "Ошибка",
+  "caption.warning": "Предупреждение",
+  "step.canceled": "Операция отменена"
+}

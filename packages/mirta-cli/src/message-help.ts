@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { getLocale } from '#utils/localization'
+import { getLocale } from '#src/i18n'
 
 const { dim, yellow } = chalk
 

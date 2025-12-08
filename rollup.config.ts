@@ -49,12 +49,14 @@ const configs = [
   ...buildPackage('mirta-basics',
     [
       'src/index.ts',
+      'src/fuzzy/index.ts',
       'src/array/index.ts',
       'src/object/index.ts',
     ]),
   ...buildPackage('mirta-env-loader'),
   ...buildPackage('mirta-package'),
   ...buildPackage('mirta-workspace'),
+  ...buildPackage('mirta-i18n'),
   ...buildPackage('mirta-rollup',
     [
       'src/index.ts',
