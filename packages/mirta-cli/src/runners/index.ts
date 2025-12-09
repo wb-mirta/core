@@ -20,7 +20,7 @@ export async function resolveRunnerAsync(nameInput: string) {
     const knownNames = Object.keys(runners)
 
     const suggestion = nameInput.length > 1
-      ? suggestClosest(nameInput, knownNames)
+      ? suggestClosest(nameInput, knownNames, { ignoreCase: true })
       : undefined
 
     const errorInput = suggestion

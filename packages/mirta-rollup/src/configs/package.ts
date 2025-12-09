@@ -597,6 +597,9 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
         },
         chunkFileNames(chunk) {
 
+          // Для чанков с названием `index` использует имя родительской директории
+          // вместо порядкового номера (`index.mjs`, `index2.mjs`, `index3.mjs`)
+          //
           if (chunk.name === 'index' && chunk.facadeModuleId)
             return `${basename(dirname(chunk.facadeModuleId))}.mjs`
 

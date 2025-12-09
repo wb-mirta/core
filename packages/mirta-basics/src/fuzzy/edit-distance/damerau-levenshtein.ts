@@ -127,7 +127,7 @@ export function damerauLevenshtein(source: string, target: string, maxDistance?:
         && source[i - 2] === target[j - 1]
       ) {
 
-        const transposition = matrix[i - 2][j - 2] + cost
+        const transposition = matrix[i - 2][j - 2] + 1
         if (transposition < min) {
 
           min = transposition

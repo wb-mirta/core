@@ -63,18 +63,31 @@ export function suggestClosest(
 
   const { maxDistance = 2, ignoreCase = false } = options
 
-  if (ignoreCase) {
+  const normalizedInput = ignoreCase
+    ? input.toLowerCase()
+    : input
 
-    input = input.toLowerCase()
-    knownValues = knownValues.map(value => value.toLowerCase())
+  const normalizedValues = ignoreCase
+    ? knownValues.map(value => value.toLowerCase())
+    : knownValues
+
+  let bestIndex = -1
+  let bestDistance = Number.POSITIVE_INFINITY
+
+  for (let i = 0; i < normalizedValues.length; i++) {
+
+    const candidate = normalizedValues[i]
+    const { steps } = damerauLevenshtein(normalizedInput, candidate, maxDistance)
+
+    if (steps <= maxDistance && steps < bestDistance) {
+
+      bestDistance = steps
+      bestIndex = i
+
+    }
 
   }
 
-  const closest = knownValues
-    .map(value => ({ value, distance: damerauLevenshtein(input, value).steps }))
-    .filter(item => item.distance <= maxDistance)
-    .sort((a, b) => a.distance - b.distance)
-
-  return closest[0]?.value
+  return bestIndex >= 0 ? knownValues[bestIndex] : undefined
 
 }

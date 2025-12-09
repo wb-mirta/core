@@ -90,11 +90,19 @@ function extractVariables(message) {
 
 }
 
+function escapeRegExp(value) {
+
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+}
+
 // Определяем тип переменной: если в plural/select → number, иначе string | number
 function getVarType(message, varName) {
 
-  const pluralRegex = new RegExp(`\\{\\s*${varName}\\s*,\\s*plural`, 'g')
-  const selectRegex = new RegExp(`\\{\\s*${varName}\\s*,\\s*select`, 'g')
+  const escapedName = escapeRegExp(varName)
+
+  const pluralRegex = new RegExp(`\\{\\s*${escapedName}\\s*,\\s*plural`, 'g')
+  const selectRegex = new RegExp(`\\{\\s*${escapedName}\\s*,\\s*select`, 'g')
 
   if (pluralRegex.test(message) || selectRegex.test(message))
     return 'number'

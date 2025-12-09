@@ -54,10 +54,17 @@ export async function determineTargetVersion(
 
         const version = inc(currentVersion, releaseType, undefined, preid)
 
-        return { title: `${releaseType} (${version})`, value: version }
+        return {
+          title: `${releaseType} (${version})`,
+          value: version,
+        }
 
       })
-      .concat({ title: 'custom', value: 'custom' })
+      .filter(choice => choice.value !== null)
+      .concat({
+        title: 'custom',
+        value: 'custom',
+      })
 
     const { release } = await prompts({
       type: 'select',

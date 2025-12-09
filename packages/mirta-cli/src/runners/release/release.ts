@@ -36,7 +36,9 @@ export async function executeReleaseAsync(
 
         if (!isContinue) {
 
+          logger.step('Reverting version...')
           await updateVersion(context.currentVersion)
+
           return
 
         }

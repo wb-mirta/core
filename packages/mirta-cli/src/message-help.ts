@@ -3,8 +3,6 @@ import { getLocale } from '#src/i18n'
 
 const { dim, yellow } = chalk
 
-const locale = getLocale()
-
 const helpMessageEn = `\
 Performs operations over monorepo projects powered by the Mirta Framework.
 
@@ -79,6 +77,7 @@ ${yellow(`Опции для 'publish':`)}
     ${dim('Отключает проверки git-состояния (аналог `--no-git-checks` в `pnpm publish`)')}
 `
 
-export const helpMessage = locale === 'ru-RU'
-  ? helpMessageRu
-  : helpMessageEn
+export const getHelpMessage
+  = () => getLocale() === 'ru-RU'
+    ? helpMessageRu
+    : helpMessageEn

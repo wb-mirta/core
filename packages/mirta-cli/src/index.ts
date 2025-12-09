@@ -3,7 +3,7 @@ import { PromptCanceledError } from '#utils/prompts'
 import { createStagedArgs } from '#utils/staged-args'
 import { ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
-import { helpMessage } from './message-help'
+import { getHelpMessage } from './message-help'
 
 import cliPackage from '../package.json' with { type: 'json' }
 import { setLocaleAsync, t } from './i18n'
@@ -45,9 +45,9 @@ async function run() {
 
   }
 
-  if (argv.help) {
+  if (argv.help || !positionals.length) {
 
-    console.log(helpMessage)
+    console.log(getHelpMessage())
     process.exit(0)
 
   }
