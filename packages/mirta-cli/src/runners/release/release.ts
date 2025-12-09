@@ -4,6 +4,7 @@ import { prompts } from '#src/utils/prompts'
 import { runCommandAsync } from '#src/utils/shell'
 import chalk from 'chalk'
 import type { ReleaseContext } from './types'
+import { t } from '#src/i18n/index'
 
 const logger = useLogger()
 const { yellow } = chalk
@@ -19,11 +20,15 @@ export async function executeReleaseAsync(
   try {
 
     await updateVersion(context.targetVersion)
-    logger.log(`Version updated to ${yellow(`v${context.targetVersion}`)}`)
+
+    logger.log(t('release.versionUpdated', {
+      newVersion: yellow(`v${context.targetVersion}`),
+    }))
 
     if (context.inWorkTree && !context.skipGit && hasScript('changelog')) {
 
-      logger.step('Generating changelog...')
+      logger.step(t('release.changelogGenerating'))
+
       await runCommandAsync('pnpm', ['run', 'changelog'])
 
       if (!context.skipPrompts) {
@@ -36,8 +41,13 @@ export async function executeReleaseAsync(
 
         if (!isContinue) {
 
-          logger.step('Reverting version...')
+          logger.step(t('release.versionReverting'))
+
           await updateVersion(context.currentVersion)
+
+          logger.step(t('release.versionReverted', {
+            oldVersion: yellow(`v${context.currentVersion}`),
+          }))
 
           return
 
@@ -47,28 +57,32 @@ export async function executeReleaseAsync(
 
     }
 
-    logger.step('Updating lock-file...')
+    logger.step(t('release.lockfileUpdating'))
+
     await runIfNotDry('pnpm', ['install', '--prefer-offline'])
 
-    if (
-      context.inWorkTree
-      && !context.skipGit
-      && context.connectionType === 'ssh'
-      && context.repository
-    ) {
+    if (!context.inWorkTree || !context.repository) {
+
+      logger.note(t('release.final.noGit'))
+      return
+
+    }
+
+    if (!context.skipGit && context.connectionType === 'ssh') {
 
       const { stdout } = await runCommandAsync('git', ['diff'], { stdio: 'pipe' })
 
       if (stdout) {
 
-        logger.step('Committing version changes...')
+        logger.step(t('release.committing'))
+
         await runIfNotDry('git', ['add', '-A'])
         await runIfNotDry('git', ['commit', '-m', `release: v${context.targetVersion}`])
 
         if (!context.isDryRun)
           isCommitted = true
 
-        logger.step('Pushing tag and changes')
+        logger.step(t('release.pushing'))
 
         const tagName = `v${context.targetVersion}`
         const { stdout: existingTag } = await runCommandAsync('git', ['tag', '-l', tagName], { stdio: 'pipe' })
@@ -80,24 +94,33 @@ export async function executeReleaseAsync(
         }
         else {
 
-          logger.warn(`Tag ${yellow(tagName)} already exists, skipping tag creation`)
+          logger.warn(t('release.tagAlreadyExists', {
+            tag: yellow(tagName),
+          }))
 
         }
 
-        await runIfNotDry('git', ['push', 'origin', `refs/tags/v${context.targetVersion}`])
         await runIfNotDry('git', ['push'])
+        await runIfNotDry('git', ['push', 'origin', `refs/tags/v${context.targetVersion}`])
 
-        logger.note(
-          yellow('Release will be done via GitHub Actions.')
-          + `\nCheck status at https://github.com/${context.repository}/actions/workflows/release.yml`
-        )
+        logger.note(yellow(t('release.final.gitRemote')))
+        logger.note(t('release.final.gitRemoteStatus', {
+          workflowLink: `https://github.com/${context.repository}/actions/workflows/release.yml`,
+        }))
 
       }
       else {
 
-        logger.step('No changes to commit.')
+        logger.step(t('release.final.gitNoChanges'))
 
       }
+
+    }
+    else {
+
+      logger.note(t('release.final.gitManual', {
+        version: yellow(`v${context.targetVersion}`),
+      }))
 
     }
 
@@ -106,13 +129,31 @@ export async function executeReleaseAsync(
 
     if (!isCommitted) {
 
-      logger.step('Reverting version...')
-      await updateVersion(context.currentVersion)
+      logger.step(t('release.versionReverting'))
+
+      try {
+
+        await updateVersion(context.currentVersion)
+
+        logger.step(t('release.versionReverted', {
+          oldVersion: yellow(`v${context.currentVersion}`),
+        }))
+
+      }
+      catch (rollbackError: unknown) {
+
+        logger.error(
+          t('release.error.versionRevertingFailed')
+          + '\n'
+          + (rollbackError instanceof Error ? rollbackError.message : String(rollbackError))
+        )
+
+      }
 
     }
     else {
 
-      logger.warn('Version was already committed. Please manually resolve the issue.')
+      logger.warn(t('release.error.versionAlreadyCommitted'))
 
     }
 

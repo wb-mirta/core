@@ -142,7 +142,11 @@ export function damerauLevenshtein(source: string, target: string, maxDistance?:
 
   }
 
-  const steps = matrix[lenA][lenB]
+  // Ограничиваем steps сверху: не больше вычисленного расстояния,
+  // effectiveLimit и maxLength, чтобы relative/similarity всегда
+  // попадали в ожидаемый диапазон [0, 1], даже при узком maxDistance.
+  //
+  const steps = Math.min(matrix[lenA][lenB], effectiveLimit, maxLength)
 
   return normalizeDistance(steps, maxLength)
 

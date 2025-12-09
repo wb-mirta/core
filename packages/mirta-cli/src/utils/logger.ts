@@ -68,10 +68,10 @@ export function useLogger() {
 
   }
 
-  function note(message: string, caption = t('caption.note')) {
+  function note(message: string) {
 
     if (message)
-      console.log(`${yellowBanner} ${warnPill(caption)}${message}`)
+      console.log(`${yellowBanner} ${message}`)
 
   }
 

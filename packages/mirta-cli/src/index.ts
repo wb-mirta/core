@@ -41,14 +41,14 @@ async function run() {
   if (argv.version) {
 
     console.log(`${cliPackage.name} v${cliPackage.version}`)
-    process.exit(0)
+    return
 
   }
 
   if (argv.help || !positionals.length) {
 
     console.log(getHelpMessage())
-    process.exit(0)
+    return
 
   }
 
