@@ -36,10 +36,12 @@ export async function executeReleaseAsync(
         const { isContinue } = await prompts({
           type: 'confirm',
           name: 'isContinue',
-          message: 'Changelog generated. Does it look good?',
+          message: t('release.changelogConfirm'),
         })
 
         if (!isContinue) {
+
+          logger.cancel(t('release.canceled'))
 
           logger.step(t('release.versionReverting'))
 

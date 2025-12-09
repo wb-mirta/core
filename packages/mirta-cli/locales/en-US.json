@@ -16,6 +16,8 @@
   "release.error.versionRevertingFailed": "Failed to revert version to {oldVersion}. Please manually resolve the issue",
   "release.error.versionAlreadyCommitted": "Version was already committed. Please manually resolve the issue.",
   "release.changelogGenerating": "Generating changelog...",
+  "release.changelogConfirm": "Changelog generated. Does it look good?",
+  "release.canceled": "Release canceled",
   "release.lockfileUpdating": "Updating lockfile...",
   "release.committing": "Committing changes...",
   "release.pushing": "Pushing to remote...",

@@ -16,6 +16,8 @@
   "release.error.versionRevertingFailed": "Не удалось вернуть версию к {oldVersion}, устраните проблему вручную",
   "release.error.versionAlreadyCommitted": "Версия уже закоммичена. Устраните проблему вручную",
   "release.changelogGenerating": "Генерация changelog...",
+  "release.changelogConfirm": "Changelog сгенерирован. Всё выглядит хорошо?",
+  "release.canceled": "Релиз отменён",
   "release.lockfileUpdating": "Обновление lockfile...",
   "release.committing": "Коммит изменений...",
   "release.pushing": "Отправка в удалённый репозиторий...",
