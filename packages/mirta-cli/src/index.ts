@@ -1,6 +1,6 @@
 import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'
-import { createStagedArgs } from '#utils/staged-args'
+import { createStagedArgs } from '#src/staged-args'
 import { ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
 import { getHelpMessage } from './message-help'

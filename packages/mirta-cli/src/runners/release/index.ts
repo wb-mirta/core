@@ -1,6 +1,6 @@
 import { useLogger } from '#src/utils/logger'
 import { getCurrentVersion } from '#src/utils/package'
-import type { StagedArgs } from '#src/utils/staged-args'
+import type { StagedArgs } from '#src/staged-args'
 import { prerelease } from 'semver'
 import { parseArgs } from './args'
 import { determineTargetVersion } from './version'

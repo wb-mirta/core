@@ -1,4 +1,8 @@
-import { damerauLevenshtein } from './edit-distance/damerau-levenshtein'
+import { damerauLevenshtein } from './distance/damerau-levenshtein'
+import { daitchMokotoffLite } from './phonetics/daitch-mokotoff'
+import { trigramSimilarity } from './similarity'
+import { translit } from '#src/fuzzy/translit'
+import { buildTrigrams } from './similarity/trigrams/build'
 
 /**
  * Параметры для работы с функцией {@link suggestClosest} — нечёткого поиска
@@ -21,14 +25,31 @@ export interface SuggestOptions {
   maxDistance?: number
 
   /**
-   * Флаг, указывающий, следует ли игнорировать регистр символов
-   * при сравнении строк.
-   *
-   * Полезно в CLI-интерфейсах, где пользователь может вводить команды
-   * в любом регистре.
-   *
-   **/
-  ignoreCase?: boolean
+   * Веса для комбинированного ранжира.
+   * Сумма не обязана быть 1 — нормализуется внутри.
+   */
+  weights?: {
+    phonetic?: number
+    trigram?: number
+    levenshtein?: number
+  }
+
+}
+
+interface Candidate {
+
+  value: string
+  valueNorm: string
+  phonetic: string
+  triScore: number
+
+}
+
+const normalize = (input: string) => translit(input.toUpperCase())
+
+function sumWeights(weights: SuggestOptions['weights'] = {}) {
+
+  return (weights.phonetic ?? 0) + (weights.trigram ?? 0) + (weights.levenshtein ?? 0)
 
 }
 
@@ -40,54 +61,114 @@ export interface SuggestOptions {
  * "Вы имели в виду 'release'?", когда пользователь ввёл 'releas'.
  *
  * @param input Введённая пользователем строка, возможно, с опечаткой
- * @param knownValues Список корректных, допустимых значений (например, команды, флаги)
+ * @param targetValues Список корректных, допустимых значений (например, команды, флаги)
  * @param options Настройки нечёткого поиска
  * @returns Наиболее близкое значение из `knownValues` или `undefined`, если совпадений нет
  *
  * @example
  * ```ts
  * suggestClosest('releas', ['release', 'publish']) // → 'release'
- * suggestClosest('релиз', ['release', 'publish'])  // → undefined
- * ```
- * @example С игнорированием регистра
- * ```ts
- * suggestClosest('RELEASE', ['release'], { ignoreCase: true }) // → 'release'
+ * suggestClosest('релиз', ['release', 'publish'])  // → 'release'
  * ```
  * @since 0.4.0
- */
+ *
+ **/
 export function suggestClosest(
   input: string,
-  knownValues: readonly string[],
+  targetValues: readonly string[],
   options: SuggestOptions = {}
 ): string | undefined {
 
-  const { maxDistance = 2, ignoreCase = false } = options
+  const {
+    maxDistance = 2,
+    weights = { phonetic: 0.5, trigram: 0.3, levenshtein: 0.2 },
+  } = options
 
-  const normalizedInput = ignoreCase
-    ? input.toLowerCase()
-    : input
+  const inputNorm = normalize(input)
 
-  const normalizedValues = ignoreCase
-    ? knownValues.map(value => value.toLowerCase())
-    : knownValues
+  let candidates: Candidate[] = []
 
-  let bestIndex = -1
-  let bestDistance = Number.POSITIVE_INFINITY
+  if (!inputNorm)
+    return undefined
 
-  for (let i = 0; i < normalizedValues.length; i++) {
+  for (const value of targetValues) {
 
-    const candidate = normalizedValues[i]
-    const { steps } = damerauLevenshtein(normalizedInput, candidate, maxDistance)
+    // Ранний выход - прямое соответствие.
+    if (input === value)
+      return value
 
-    if (steps <= maxDistance && steps < bestDistance) {
+    const valueNorm = normalize(value)
 
-      bestDistance = steps
-      bestIndex = i
+    // Ранний выход - прямое соответствие.
+    if (inputNorm === valueNorm)
+      return value
+
+    candidates.push({
+      value: value,
+      valueNorm: valueNorm,
+      phonetic: daitchMokotoffLite(value),
+      triScore: 0,
+    })
+
+  }
+
+  // Предвычисляем фонетический код и триграммы для ввода
+  const inputPhonetic = daitchMokotoffLite(input)
+  const inputTrigrams = buildTrigrams(inputNorm)
+
+  const phoneticCandidates = candidates.filter(c => c.phonetic === inputPhonetic)
+
+  // Замена кандидатов на фонетические, если есть прямые совпадения
+  // Если нет фонетических совпадений — используем все
+  //
+  if (phoneticCandidates.length > 0)
+    candidates = phoneticCandidates
+
+  candidates = candidates.map((c) => {
+
+    c.triScore = trigramSimilarity(inputTrigrams, c.valueNorm)
+
+    return c
+
+  })
+
+  const top10 = candidates
+    .sort((a, b) => b.triScore - a.triScore)
+    .slice(0, 10)
+
+  const totalWeight = sumWeights(weights)
+  const normWeight = (weight: number | undefined) => (totalWeight === 0 ? 0 : (weight ?? 0) / totalWeight)
+
+  let bestScore = -1
+  let bestValue: string | undefined
+
+  for (const candidate of top10) {
+
+    const { similarity: levScore } = damerauLevenshtein(
+      inputNorm,
+      candidate.valueNorm,
+      maxDistance
+    )
+
+    if (levScore <= 0)
+      continue // Пропускаем, если расстояние слишком большое.
+
+    const phoneticScore = candidate.phonetic === inputPhonetic ? 1 : 0
+
+    const score
+      = phoneticScore * normWeight(weights.phonetic)
+        + candidate.triScore * normWeight(weights.trigram)
+        + levScore * normWeight(weights.levenshtein)
+
+    if (score > bestScore) {
+
+      bestScore = score
+      bestValue = candidate.value
 
     }
 
   }
 
-  return bestIndex >= 0 ? knownValues[bestIndex] : undefined
+  return bestValue
 
 }

@@ -1,20 +1,35 @@
 import { useLogger } from '#src/utils/logger'
-import type { OptionSchema, StagedArgs } from '#src/utils/staged-args'
+import type { OptionSchema, StagedArgs } from '#src/staged-args'
 
 const logger = useLogger()
 
 const options = ({
-  'dry-run': { type: 'boolean' },
-  'dry': { type: 'boolean' },
-  'preid': { type: 'string' },
-  'skip-prompts': { type: 'boolean' },
-  'skip-git': { type: 'boolean' },
-  'help': { type: 'boolean' },
-  'version': { type: 'boolean' },
+  'dry-run': {
+    type: 'boolean',
+    default: false,
+  },
+  'dry': {
+    type: 'boolean',
+  },
+  'preid': {
+    type: 'string',
+  },
+  'skip-git': {
+    type: 'boolean',
+    default: false,
+  },
+  'skip-prompts': {
+    type: 'boolean',
+    default: false,
+  },
   // Deprecated. Use 'skip-git' instead
-  'skipGit': { type: 'boolean' },
+  'skipGit': {
+    type: 'boolean',
+  },
   // Deprecated. Use 'skip-prompts' instead
-  'skipPrompts': { type: 'boolean' },
+  'skipPrompts': {
+    type: 'boolean',
+  },
 }) satisfies OptionSchema
 
 export function parseArgs(

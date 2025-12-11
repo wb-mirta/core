@@ -1,4 +1,4 @@
-import type { StagedArgs } from '#src/utils/staged-args'
+import type { StagedArgs } from '#src/staged-args'
 import { suggestClosest } from '@mirta/basics/fuzzy'
 import { t } from '../i18n'
 
@@ -20,7 +20,7 @@ export async function resolveRunnerAsync(nameInput: string) {
     const knownNames = Object.keys(runners)
 
     const suggestion = nameInput.length > 1
-      ? suggestClosest(nameInput, knownNames, { ignoreCase: true })
+      ? suggestClosest(nameInput, knownNames, { maxDistance: 2 })
       : undefined
 
     const errorInput = suggestion

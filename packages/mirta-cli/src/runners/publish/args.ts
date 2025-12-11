@@ -1,5 +1,5 @@
 import { useLogger } from '#src/utils/logger'
-import type { StagedArgs, OptionSchema } from '#src/utils/staged-args'
+import type { StagedArgs, OptionSchema } from '#src/staged-args'
 
 const logger = useLogger()
 
@@ -10,24 +10,13 @@ const options = ({
   },
   'dry': {
     type: 'boolean',
-    default: false,
-  },
-  'skip-build': {
-    type: 'boolean',
-    default: false,
   },
   'skip-git': {
     type: 'boolean',
     default: false,
   },
-  'help': {
+  'skip-build': {
     type: 'boolean',
-    short: 'h',
-    default: false,
-  },
-  'version': {
-    type: 'boolean',
-    short: 'v',
     default: false,
   },
   // Deprecated. Use 'skip-git' instead
