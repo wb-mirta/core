@@ -13,8 +13,6 @@ const runners: Record<string, () => Promise<AsyncRunner>> = {
 
 export async function resolveRunnerAsync(nameInput: string) {
 
-  const runner = runners[nameInput]
-
   if (!(nameInput in runners)) {
 
     const knownNames = Object.keys(runners)
@@ -30,6 +28,8 @@ export async function resolveRunnerAsync(nameInput: string) {
     throw new Error(t('command.notFound', { input: errorInput }))
 
   }
+
+  const runner = runners[nameInput]
 
   return {
     runAsync: await runner(),

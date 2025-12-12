@@ -100,89 +100,56 @@ describe('daitchMokotoffLite', () => {
 
   })
 
-  describe('should produce hash 783000 (B-L-D)', () => {
+  describe('should produce correct hashes', () => {
 
-    it('should encode build as 783000', () => {
+    it('should encode build as 783000 (B-L-D)', () => {
 
       expect(daitchMokotoffLite('build')).toBe('783000')
-
-    })
-
-    it('should encode биулд as 783000', () => {
-
       expect(daitchMokotoffLite('биулд')).toBe('783000')
 
     })
 
-  })
-
-  describe('should produce hash 593000 (K-R-T)', () => {
-
-    it('should encode create as 593000', () => {
+    it('should encode create as 593000 (K-R-T)', () => {
 
       expect(daitchMokotoffLite('create')).toBe('593000')
 
     })
 
-  })
-
-  describe('should produce hash 676960 (N-P-M R-N)', () => {
-
-    it('should encode npm run as 676960', () => {
+    it('should encode npm run as 676960 (N-P-M R-N)', () => {
 
       expect(daitchMokotoffLite('npm run')).toBe('676960')
 
     })
 
-  })
-
-  describe('should produce hash 056954 (I-N-G-K-S)', () => {
-
-    it('should encode ignoreCase as 056954', () => {
+    it('should encode ignoreCase as 056954 (I-N-G-K-S)', () => {
 
       expect(daitchMokotoffLite('IGNORECASE')).toBe('056954')
 
     })
 
-  })
-
-  describe('should produce hash 478300 (S-B-L-D)', () => {
-
-    it('should encode subbuild as 478300', () => {
+    it('should encode subbuild as 478300 (S-B-L-D)', () => {
 
       expect(daitchMokotoffLite('subbuild')).toBe('478300')
 
     })
 
-  })
-
-  describe('should produce hash 454000 (S-K-S)', () => {
-
-    it('should encode success as 454000', () => {
+    it('should encode success as 454000 (S-K-S)', () => {
 
       expect(daitchMokotoffLite('success')).toBe('454000')
 
     })
 
-  })
-
-  describe('should produce hash 550000 (K-V-K)', () => {
-
-    it('should encode quick as 550000', () => {
+    it('should encode quick as 550000 (K-V-K)', () => {
 
       expect(daitchMokotoffLite('quick')).toBe('550000')
 
     })
 
-    it('should encode kvik as 575000', () => {
+    it('should encode kvik as 575000 (K-V-K)', () => {
 
       expect(daitchMokotoffLite('kvik')).toBe('575000')
 
     })
-
-  })
-
-  describe('should produce hash 430000 (SH-T or CH-T)', () => {
 
     it('should encode щит as 430000', () => {
 
@@ -202,10 +169,6 @@ describe('daitchMokotoffLite', () => {
 
     })
 
-  })
-
-  describe('should produce hash 530000 (K-T or CH-T)', () => {
-
     it('should encode cat as 530000', () => {
 
       expect(daitchMokotoffLite('cat')).toBe('530000')
@@ -218,31 +181,19 @@ describe('daitchMokotoffLite', () => {
 
     })
 
-  })
-
-  describe('should produce hash 550000 (K-H-K)', () => {
-
-    it('should encode хак as 550000', () => {
+    it('should encode хак as 550000 (K-H-K)', () => {
 
       expect(daitchMokotoffLite('хак')).toBe('550000')
 
     })
 
-  })
-
-  describe('should produce hash 496800 (ZH-R-N-L)', () => {
-
-    it('should encode журнал as 496800', () => {
+    it('should encode журнал as 496800 (ZH-R-N-L)', () => {
 
       expect(daitchMokotoffLite('журнал')).toBe('496800')
 
     })
 
-  })
-
-  describe('should produce hash 445000 (CH-A-SH-K)', () => {
-
-    it('should encode чашка as 445000', () => {
+    it('should encode чашка as 445000 (CH-A-SH-K)', () => {
 
       expect(daitchMokotoffLite('чашка')).toBe('445000')
 
