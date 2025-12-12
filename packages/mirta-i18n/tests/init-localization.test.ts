@@ -1,7 +1,7 @@
 import { initLocalizationAsync } from '#src'
 import { LocalizationError } from '#src/errors/localization'
 import { getSystemLocale } from '#src/locale'
-import { loadMessagesAsync } from '#src/messages'
+import { loadMessagesAsync, __resetInternalState } from '#src/messages'
 
 // Мокаем getSystemLocale
 vi.mock('#src/locale', async () => {
@@ -22,6 +22,7 @@ describe('initLocalizationAsync', () => {
   beforeEach(() => {
 
     vi.clearAllMocks()
+    __resetInternalState()
 
   })
 

@@ -126,10 +126,7 @@ describe('locale utilities', () => {
 
     beforeEach(() => {
 
-      process.env = { ...originalEnv }
-      delete process.env.LC_ALL
-      delete process.env.LC_MESSAGES
-      delete process.env.LANG
+      process.env = {}
 
     })
 
