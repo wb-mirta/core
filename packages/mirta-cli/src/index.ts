@@ -1,45 +1,60 @@
-import { getLocalized } from '#utils/localization'
 import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'
+import { createStagedArgs } from '#src/staged-args'
 import { ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
-import { helpMessage } from './message-help'
+import { getHelpMessage } from './message-help'
 
 import cliPackage from '../package.json' with { type: 'json' }
+import { setLocaleAsync, t } from './i18n'
+import { resolveRunnerAsync } from './runners'
 
-const messages = await getLocalized()
-const logger = useLogger(messages)
+const logger = useLogger()
+
+const commonOptions = {
+
+  locale: {
+    type: 'string',
+  },
+  version: {
+    type: 'boolean',
+    short: 'v',
+  },
+  help: {
+    type: 'boolean',
+    short: 'h',
+  },
+
+} as const
 
 async function run() {
 
-  const command = process.argv[2]
+  const args = createStagedArgs(
+    process.argv.slice(2)
+  )
 
-  if (command === 'release') {
+  const { values: argv, positionals, stagedArgs: runnerArgs } = args.parse(commonOptions)
 
-    await import('./release')
-    return
+  if (argv.locale)
+    await setLocaleAsync(argv.locale)
 
-  }
-  else if (command === 'publish') {
-
-    await import('./publish')
-    return
-
-  }
-
-  if (command === '--help' || command === '-h') {
-
-    console.log(helpMessage)
-    process.exit(0)
-
-  }
-
-  if (command === '--version' || command === '-v') {
+  if (argv.version) {
 
     console.log(`${cliPackage.name} v${cliPackage.version}`)
-    process.exit(0)
+    return
 
   }
+
+  if (argv.help || !positionals.length) {
+
+    console.log(getHelpMessage())
+    return
+
+  }
+
+  const module = await resolveRunnerAsync(positionals[0])
+
+  await module.runAsync(runnerArgs)
 
 }
 
@@ -61,7 +76,7 @@ run().catch((e: unknown) => {
   }
   else if (e instanceof PromptCanceledError) {
 
-    logger.cancel(messages.errors.operationCanceled)
+    logger.cancel(t('step.canceled'))
 
   }
   else if (e instanceof Error && 'code' in e) {

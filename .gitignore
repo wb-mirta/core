@@ -13,6 +13,10 @@ dist
 coverage
 *.local
 
+# Generated files
+
+*.gen.ts
+
 # dotenv environment variable files
 .env
 .env.development.local

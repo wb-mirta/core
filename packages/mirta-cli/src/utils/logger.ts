@@ -1,4 +1,4 @@
-import { type Localized } from './localization'
+import { t } from '../i18n'
 import chalk from 'chalk'
 
 const {
@@ -37,13 +37,13 @@ const errorPill = (message?: string) => message
 export const formatMessage = (message: string) =>
   message ? `${greenBanner} ${message}` : ''
 
-export const formatSuccess = (message: string, title?: string) =>
-  message ? `${successPill(title)}${green(dot, message)}` : ''
+export const formatSuccess = (message: string, caption?: string) =>
+  message ? `${successPill(caption)}${green(dot, message)}` : ''
 
-export const formatError = (message: string, title?: string) =>
-  message ? `${errorPill(title)}${red(dot, message)}` : ''
+export const formatError = (message: string, caption?: string) =>
+  message ? `${errorPill(caption)}${red(dot, message)}` : ''
 
-export function useLogger(localized: Localized) {
+export function useLogger() {
 
   function log(message: string) {
 
@@ -61,45 +61,45 @@ export function useLogger(localized: Localized) {
 
   }
 
-  function info(message: string, title = localized.status.info) {
+  function info(message: string, caption = t('caption.info')) {
 
     if (message)
-      console.log(`${cyanBanner} ${infoPill(title)}${cyan(message)}`)
+      console.log(`${cyanBanner} ${infoPill(caption)}${cyan(message)}`)
 
   }
 
-  function note(message: string, title = localized.status.note) {
+  function note(message: string) {
 
     if (message)
-      console.log(`${yellowBanner} ${warnPill(title)}${message}`)
+      console.log(`${yellowBanner} ${message}`)
 
   }
 
-  function success(message: string, title = localized.status.success) {
+  function success(message: string, caption = t('caption.success')) {
 
     if (message)
-      console.log(`${greenBanner} ${successPill(title)}${green(dot, message)}`)
+      console.log(`${greenBanner} ${successPill(caption)}${green(dot, message)}`)
 
   }
 
-  function warn(message: string, title = localized.status.warn) {
+  function warn(message: string, caption = t('caption.warning')) {
 
     if (message)
-      console.log(`${yellowBanner} ${warnPill(title)}${yellow(message)}`)
+      console.log(`${yellowBanner} ${warnPill(caption)}${yellow(message)}`)
 
   }
 
-  function error(message: string, title = localized.status.error) {
+  function error(message: string, caption = t('caption.error')) {
 
     if (message)
-      console.log(`${redBanner} ${errorPill(title)}${red(dot, message)}`)
+      console.log(`${redBanner} ${errorPill(caption)}${red(dot, message)}`)
 
   }
 
-  function cancel(message: string, title = localized.status.canceled) {
+  function cancel(message: string, caption = t('caption.canceled')) {
 
     if (message)
-      console.log(`${redBanner} ${errorPill(title)}${red(dot, message)}`)
+      console.log(`${redBanner} ${errorPill(caption)}${red(dot, message)}`)
 
   }
 

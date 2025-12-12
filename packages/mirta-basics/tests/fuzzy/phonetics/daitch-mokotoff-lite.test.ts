@@ -1,0 +1,231 @@
+// packages/mirta-basics/tests/fuzzy/phonetics/daitch-mokotoff-lite.test.ts
+
+import { daitchMokotoffLite } from '#src/fuzzy/phonetics/daitch-mokotoff/index'
+
+describe('daitchMokotoffLite', () => {
+
+  describe('should return 000000 for empty or invalid input', () => {
+
+    it('should return 000000 for empty string', () => {
+
+      expect(daitchMokotoffLite('')).toBe('000000')
+
+    })
+
+    it('should return 000000 for null', () => {
+
+      expect(daitchMokotoffLite(null as unknown as string)).toBe('000000')
+
+    })
+
+    it('should return 000000 for undefined', () => {
+
+      expect(daitchMokotoffLite(undefined as unknown as string)).toBe('000000')
+
+    })
+
+  })
+
+  describe('should produce hash 778400 (P-B-L-SH)', () => {
+
+    it('should encode publish as 778400', () => {
+
+      expect(daitchMokotoffLite('publish')).toBe('778400')
+
+    })
+
+    it('should encode публиш as 778400', () => {
+
+      expect(daitchMokotoffLite('публиш')).toBe('778400')
+
+    })
+
+    it('should encode паблиш as 778400', () => {
+
+      expect(daitchMokotoffLite('паблиш')).toBe('778400')
+
+    })
+
+    it('should encode puplish (typo) as 778400', () => {
+
+      expect(daitchMokotoffLite('puplish')).toBe('778400')
+
+    })
+
+    it('should encode publsh (missing i) as 778400', () => {
+
+      expect(daitchMokotoffLite('publsh')).toBe('778400')
+
+    })
+
+    it('should encode pablis (phonetic spelling) as 778400', () => {
+
+      expect(daitchMokotoffLite('pablis')).toBe('778400')
+
+    })
+
+    it('should be case-insensitive for publish variants', () => {
+
+      expect(daitchMokotoffLite('PuBlIsH')).toBe('778400')
+
+    })
+
+  })
+
+  describe('should produce hash 984000 (R-L-S)', () => {
+
+    it('should encode release as 984000', () => {
+
+      expect(daitchMokotoffLite('release')).toBe('984000')
+
+    })
+
+    it('should encode релиз as 984000', () => {
+
+      expect(daitchMokotoffLite('релиз')).toBe('984000')
+
+    })
+
+    it('should encode ruleez (phonetic spelling) as 984000', () => {
+
+      expect(daitchMokotoffLite('ruleez')).toBe('984000')
+
+    })
+
+    it('should be case-insensitive for release variants', () => {
+
+      expect(daitchMokotoffLite('ReLeaSe')).toBe('984000')
+
+    })
+
+  })
+
+  describe('should produce correct hashes', () => {
+
+    it('should encode build as 783000 (B-L-D)', () => {
+
+      expect(daitchMokotoffLite('build')).toBe('783000')
+      expect(daitchMokotoffLite('биулд')).toBe('783000')
+
+    })
+
+    it('should encode create as 593000 (K-R-T)', () => {
+
+      expect(daitchMokotoffLite('create')).toBe('593000')
+
+    })
+
+    it('should encode npm run as 676960 (N-P-M R-N)', () => {
+
+      expect(daitchMokotoffLite('npm run')).toBe('676960')
+
+    })
+
+    it('should encode ignoreCase as 056954 (I-N-G-K-S)', () => {
+
+      expect(daitchMokotoffLite('IGNORECASE')).toBe('056954')
+
+    })
+
+    it('should encode subbuild as 478300 (S-B-L-D)', () => {
+
+      expect(daitchMokotoffLite('subbuild')).toBe('478300')
+
+    })
+
+    it('should encode success as 454000 (S-K-S)', () => {
+
+      expect(daitchMokotoffLite('success')).toBe('454000')
+
+    })
+
+    it('should encode quick as 550000 (K-V-K)', () => {
+
+      expect(daitchMokotoffLite('quick')).toBe('550000')
+
+    })
+
+    it('should encode kvik as 575000 (K-V-K)', () => {
+
+      expect(daitchMokotoffLite('kvik')).toBe('575000')
+
+    })
+
+    it('should encode щит as 430000', () => {
+
+      expect(daitchMokotoffLite('щит')).toBe('430000')
+
+    })
+
+    it('should encode chat as 530000', () => {
+
+      expect(daitchMokotoffLite('chat')).toBe('530000')
+
+    })
+
+    it('should encode thing as 365000', () => {
+
+      expect(daitchMokotoffLite('thing')).toBe('365000')
+
+    })
+
+    it('should encode cat as 530000', () => {
+
+      expect(daitchMokotoffLite('cat')).toBe('530000')
+
+    })
+
+    it('should encode код as 530000', () => {
+
+      expect(daitchMokotoffLite('код')).toBe('530000')
+
+    })
+
+    it('should encode хак as 550000 (K-H-K)', () => {
+
+      expect(daitchMokotoffLite('хак')).toBe('550000')
+
+    })
+
+    it('should encode журнал as 496800 (ZH-R-N-L)', () => {
+
+      expect(daitchMokotoffLite('журнал')).toBe('496800')
+
+    })
+
+    it('should encode чашка as 445000 (CH-A-SH-K)', () => {
+
+      expect(daitchMokotoffLite('чашка')).toBe('445000')
+
+    })
+
+  })
+
+  describe('should handle silent h and digraphs', () => {
+
+    it('should encode theme as 360000 (th → t, silent h)', () => {
+
+      expect(daitchMokotoffLite('theme')).toBe('360000')
+
+    })
+
+    it('should encode phoenix as 765400 (ph → f, silent h)', () => {
+
+      expect(daitchMokotoffLite('phoenix')).toBe('765400')
+
+    })
+
+  })
+
+  describe('should truncate long input to 6 digits', () => {
+
+    it('should encode long string as 075375', () => {
+
+      const long = 'abcdefghijklmnopqrstuvwxyz'
+      expect(daitchMokotoffLite(long)).toBe('075375')
+
+    })
+
+  })
+
+})

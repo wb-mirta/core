@@ -21,6 +21,12 @@
         "default": "./dist/index.mjs"
       }
     },
+    "./fuzzy": {
+      "import": {
+        "types": "./dist/fuzzy/index.d.mts",
+        "default": "./dist/fuzzy/index.mjs"
+      }
+    },
     "./array": {
       "import": {
         "types": "./dist/array/index.d.mts",

@@ -1,10 +1,7 @@
 import { spawn, type SpawnOptionsWithoutStdio } from 'node:child_process'
-
-import { getLocalized } from '#utils/localization'
 import { useLogger } from '#utils/logger'
 
-const messages = await getLocalized()
-const logger = useLogger(messages)
+const logger = useLogger()
 
 export class ShellError extends Error {
   constructor(message: string) {

@@ -24,7 +24,7 @@ import del from '#plugins/del'
 
 import { dtsAlias } from '#ast'
 
-import nodePath from 'node:path'
+import nodePath, { basename, dirname } from 'node:path'
 
 import type {
   RollupOptions,
@@ -100,7 +100,7 @@ interface BuildOptions {
     format: ModuleFormat
     importAttributesKey: ImportAttributesKey
     entryFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined
-    chunkFileNames: string
+    chunkFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined
     sourcemap?: boolean
     externalLiveBindings?: boolean
   }
@@ -595,7 +595,17 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
           return `${chunk.name}.mjs`
 
         },
-        chunkFileNames: '[name].mjs',
+        chunkFileNames(chunk) {
+
+          // Для чанков с названием `index` использует имя родительской директории
+          // вместо порядкового номера (`index.mjs`, `index2.mjs`, `index3.mjs`)
+          //
+          if (chunk.name === 'index' && chunk.facadeModuleId)
+            return `${basename(dirname(chunk.facadeModuleId))}.mjs`
+
+          return `${chunk.name}.mjs`
+
+        },
       },
     }),
   ]

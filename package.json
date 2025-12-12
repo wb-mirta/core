@@ -23,7 +23,8 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
-    "pack:dev": "pnpm pack --recursive --filter ./packages/* --pack-destination /packed"
+    "pack:dev": "pnpm pack --recursive --filter ./packages/* --pack-destination /packed",
+    "i18n:shape-gen": "pnpm --filter ./packages/* run i18n:shape-gen"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
@@ -40,6 +41,7 @@
     "@eslint/json": "^0.14.0",
     "@mirta/cli": "workspace:*",
     "@mirta/globals": "workspace:*",
+    "@mirta/package": "workspace:*",
     "@mirta/rollup": "workspace:*",
     "@mirta/testing": "workspace:*",
     "@mirta/tsconfig": "workspace:*",

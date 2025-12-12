@@ -11,14 +11,13 @@ import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Packa
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
 import { runCommandAsync } from '#utils/shell'
-import { getLocalized } from '#utils/localization'
 import { useLogger } from '#utils/logger'
 
 import chalk from 'chalk'
+import { t } from '../i18n'
 const { yellow } = chalk
 
-const messages = await getLocalized()
-const logger = useLogger(messages)
+const logger = useLogger()
 
 const MAX_CONCURRENT_WRITES = 5
 
@@ -102,7 +101,7 @@ export async function resolveTemplatePaths(): Promise<string[]> {
 
     if (!resolvedDir.startsWith(rootDir + posix.sep)) {
 
-      logger.warn(`Template path '${templatePath}' is not located inside the workspace root. Skipping`)
+      logger.warn(t('package.templateOutsideRoot', { template: templatePath }))
       continue
 
     }
@@ -283,7 +282,7 @@ async function publishSinglePackageAsync(
 
   }
 
-  logger.step(`Publishing ${pkgName}`)
+  logger.step(t('publish.packagePublishing', { name: pkgName }))
 
   try {
 
@@ -302,14 +301,14 @@ async function publishSinglePackageAsync(
       }
     )
 
-    logger.success(`Published ${pkgName}@${version}`)
+    logger.success(t('publish.packagePublished', { name: `${pkgName}@${version}` }))
 
   }
   catch (e: unknown) {
 
     if (e instanceof Error && /previously published/.exec(e.message)) {
 
-      logger.warn(`Skipping already published ${pkgName}`)
+      logger.warn(t('publish.skippingPublished', { name: pkgName }))
 
     }
     else {
@@ -329,7 +328,7 @@ export async function publishPackagesAsync(
   isDryRun: boolean
 ) {
 
-  logger.log('Publishing packages...')
+  logger.log(t('publish.begin'))
 
   const flags: string[] = []
 
@@ -347,7 +346,7 @@ export async function publishPackagesAsync(
     // Приватные пакеты не публикуются.
     if (pkg.isPrivate) {
 
-      logger.step(`Skipping private ${pkgName}`)
+      logger.step(t('publish.skippingPrivate', { name: pkgName }))
       continue
 
     }

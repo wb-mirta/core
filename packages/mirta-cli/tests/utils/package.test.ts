@@ -45,8 +45,10 @@ vi.mock('#utils/logger', () => ({
   }),
 }))
 
-vi.mock('#utils/localization', () => ({
-  getLocalized: vi.fn().mockResolvedValue({}),
+vi.mock('#src/i18n', () => ({
+  t: vi.fn((key: string) => key),
+  getLocale: vi.fn(() => 'en-US'),
+  setLocaleAsync: vi.fn(),
 }))
 
 // #utils/shell

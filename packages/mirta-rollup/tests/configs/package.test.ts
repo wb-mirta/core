@@ -669,20 +669,6 @@ describe('definePackageConfig', () => {
 
     })
 
-    it('should preserve chunkFileNames as static string', () => {
-
-      mockReadPackage.mockReturnValue({
-        exports: './dist/index.mjs',
-      })
-
-      const configs = definePackageConfig({
-        input: 'src/index.ts',
-      })
-
-      expect(ensureArray(configs[0].output)[0]?.chunkFileNames).toBe('[name].mjs')
-
-    })
-
   })
 
 })
