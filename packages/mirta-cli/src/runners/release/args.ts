@@ -4,11 +4,11 @@ import type { OptionSchema, StagedArgs } from '#src/staged-args'
 const logger = useLogger()
 
 const options = ({
-  'dry-run': {
-    type: 'boolean',
-    default: false,
+  'config': {
+    type: 'string',
+    short: 'c',
   },
-  'dry': {
+  'dry-run': {
     type: 'boolean',
   },
   'preid': {
@@ -16,11 +16,9 @@ const options = ({
   },
   'skip-git': {
     type: 'boolean',
-    default: false,
   },
   'skip-prompts': {
     type: 'boolean',
-    default: false,
   },
   // Deprecated. Use 'skip-git' instead
   'skipGit': {
@@ -28,6 +26,10 @@ const options = ({
   },
   // Deprecated. Use 'skip-prompts' instead
   'skipPrompts': {
+    type: 'boolean',
+  },
+  // Deprecated. Use 'dry-run' instead
+  'dry': {
     type: 'boolean',
   },
 }) satisfies OptionSchema
@@ -40,21 +42,22 @@ export function parseArgs(
 
   if (values.dry) {
 
-    values['dry-run'] = values['dry-run'] || values.dry
+    logger.warn('Deprecated flag "--dry" used. Please use "--dry-run" instead')
+    values['dry-run'] = values['dry-run'] !== false
 
   }
 
   if (values.skipGit) {
 
-    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead.')
-    values['skip-git'] = values['skip-git'] || values.skipGit
+    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead')
+    values['skip-git'] = values['skip-git'] !== false
 
   }
 
   if (values.skipPrompts) {
 
-    logger.warn('Deprecated flag "--skipPrompts" used. Please use "--skip-prompts" instead.')
-    values['skip-prompts'] = values['skip-prompts'] || values.skipPrompts
+    logger.warn('Deprecated flag "--skipPrompts" used. Please use "--skip-prompts" instead')
+    values['skip-prompts'] = values['skip-prompts'] !== false
 
   }
 

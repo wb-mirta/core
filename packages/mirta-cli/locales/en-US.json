@@ -31,5 +31,14 @@
   "publish.skippingPrivate": "Skipping private {name}",
   "publish.skippingPublished": "Skipping already published {name}",
   "publish.packagePublishing": "Publishing {name}",
-  "publish.packagePublished": "Published {name}"
+  "publish.packagePublished": "Published {name}",
+  "deploy.deploying": "Deploying to {target} in {mode} mode, {profile} profile",
+  "deploy.profileNotFound": "Deploy profile '{name}' not found",
+  "deploy.profileImplicit": "{name} (implicit)",
+  "deploy.mappingsNotFound": "Mappings not found: {key}",
+  "deploy.mappingDisabled": "Skipping disabled: {from} → {to}",
+  "deploy.sourceNotExists": "Skipping non-existent: {source}",
+  "deploy.transmitting": "Transmitting {from} → {to}",
+  "deploy.simulationComplete": "Simulation complete. No changes applied.",
+  "deploy.successful": "🎉 Deployment successful!"
 }

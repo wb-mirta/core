@@ -1,0 +1,50 @@
+import { runCommandAsync } from '#src/utils/shell'
+import type { MirtaConnection } from '#src/config/types'
+import type { AgentContext } from './ssh-agent/types'
+import { ensureAgentIsRunningAsync } from './ssh-agent/agent'
+import { hasTokenAsync, addTokenAsync } from './ssh-agent/token'
+import { hasKeyAsync, addKeyAsync } from './ssh-agent/key'
+
+export async function authenticateAsync(
+  connection: MirtaConnection
+): Promise<void> {
+
+  if (connection.type !== 'ssh')
+    return
+
+  const context: AgentContext = {
+
+    pkcs11: connection.pkcs11,
+    key: connection.key,
+    ttl: connection.ttl,
+
+    runAsync: runCommandAsync.inUnixShell(connection.wsl),
+
+  }
+
+  // Ленивая инициализация агента SSH - только если это имеет смысл.
+
+  if (context.pkcs11 || context.key) {
+
+    await ensureAgentIsRunningAsync(context)
+
+    if (context.pkcs11) {
+
+      const hasToken = await hasTokenAsync(context.pkcs11, context)
+
+      if (!hasToken)
+        await addTokenAsync(context.pkcs11, context)
+
+    }
+    else if (context.key) {
+
+      const hasKey = await hasKeyAsync(context.key, context)
+
+      if (!hasKey)
+        await addKeyAsync(context.key, context)
+
+    }
+
+  }
+
+}

@@ -8,9 +8,9 @@ export async function runAsync(args: StagedArgs): Promise<void> {
 
   const { values: argv } = parseArgs(args)
 
-  const isDryRun = argv['dry-run']
-  const skipGit = argv['skip-git']
-  const skipBuild = argv['skip-build']
+  const isDryRun = argv['dry-run'] ?? false
+  const skipGit = argv['skip-git'] ?? false
+  const skipBuild = argv['skip-build'] ?? false
 
   // === 2. Выполнение сборки и публикации ===
 

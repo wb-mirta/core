@@ -369,16 +369,15 @@ describe('createStagedArgs', () => {
 
       })
 
-      it('should use default if string option has no value', () => {
+      it('should throw if specified string option has no value', () => {
 
         const schema = {
           config: { type: 'string', default: 'main.json' },
         } as const
 
         const args = createStagedArgs(['--config'])
-        const { values } = args.parseFinal(schema)
 
-        expect(values.config).toBe('main.json')
+        expect(() => args.parseFinal(schema)).toThrow()
 
       })
 

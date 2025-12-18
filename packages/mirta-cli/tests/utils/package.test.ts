@@ -69,7 +69,6 @@ const PackageError = pkg.PackageError
 // node:fs
 const fs = await import('node:fs')
 const mockExistsSync = vi.mocked(fs).existsSync
-const mockReadFileSync = vi.mocked(fs).readFileSync
 
 // node:fs/promises
 const fsPromises = await import('node:fs/promises')
@@ -250,60 +249,6 @@ describe('package utils', () => {
 
   })
 
-  describe('resolveTemplatePaths', () => {
-
-    it('should return empty array if config does not exist', async () => {
-
-      mockExistsSync.mockReturnValue(false)
-      const { resolveTemplatePaths } = await importModule()
-      const result = await resolveTemplatePaths()
-      expect(result).toEqual([])
-
-    })
-
-    it('should return resolved template package.json paths', async () => {
-
-      mockExistsSync.mockReturnValue(true)
-      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['templates'] }))
-
-      mockGlobReturns(
-        'templates/a/package.json',
-        'templates/b/package.json'
-      )
-
-      const { resolveTemplatePaths } = await importModule()
-      const result = await resolveTemplatePaths()
-
-      expect(mockGlob).toHaveBeenCalledWith(
-        ['templates/**/package.json'],
-        expect.objectContaining({
-          cwd: '/mock/root',
-        })
-      )
-
-      expect(result).toEqual([
-        'templates/a/package.json',
-        'templates/b/package.json',
-      ])
-
-    })
-
-    it('should skip templates outside root directory', async () => {
-
-      mockExistsSync.mockReturnValue(true)
-      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['../root-evil'] }))
-      // mockGlob не должен вызываться
-
-      const { resolveTemplatePaths } = await importModule()
-      const result = await resolveTemplatePaths()
-
-      expect(result).toEqual([])
-      expect(mockGlob).not.toHaveBeenCalled()
-
-    })
-
-  })
-
   describe('updateVersion', () => {
 
     beforeEach(() => {
@@ -330,12 +275,15 @@ describe('package utils', () => {
     it('should update version in root and versioned packages', async () => {
 
       mockExistsSync.mockReturnValue(true)
-      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['templates'] }))
       mockGlobReturns('/mock/root/templates/a/package.json')
 
       const { updateVersion } = await importModule()
 
-      await updateVersion('2.0.0')
+      await updateVersion('2.0.0', {
+        project: {
+          templates: ['templates'],
+        },
+      })
 
       expect(mockWriteFile).toHaveBeenCalledTimes(4) // root + 2 пакета + 1 шаблон
 
@@ -344,7 +292,6 @@ describe('package utils', () => {
     it('should update dependencies in template packages', async () => {
 
       mockExistsSync.mockReturnValue(true)
-      mockReadFileSync.mockReturnValue(JSON.stringify({ templates: ['templates'] }))
       mockGlobReturns('/mock/root/templates/a/package.json')
 
       mockReadPackageAsync.mockResolvedValue({
@@ -355,7 +302,11 @@ describe('package utils', () => {
 
       const { updateVersion } = await importModule()
 
-      await updateVersion('2.0.0')
+      await updateVersion('2.0.0', {
+        project: {
+          templates: ['templates'],
+        },
+      })
 
       const call = mockWriteFile.mock.calls
         .find(([p]) => typeof p === 'string' && p.includes('templates'))

@@ -6,28 +6,24 @@ const logger = useLogger()
 const options = ({
   'dry-run': {
     type: 'boolean',
-    default: false,
-  },
-  'dry': {
-    type: 'boolean',
   },
   'skip-git': {
     type: 'boolean',
-    default: false,
   },
   'skip-build': {
     type: 'boolean',
-    default: false,
+  },
+  // Deprecated. Use 'dry-run' instead
+  'dry': {
+    type: 'boolean',
   },
   // Deprecated. Use 'skip-git' instead
   'skipGit': {
     type: 'boolean',
-    default: false,
   },
   // Deprecated. Use 'skip-build' instead
   'skipBuild': {
     type: 'boolean',
-    default: false,
   },
 }) satisfies OptionSchema
 
@@ -39,21 +35,22 @@ export function parseArgs(
 
   if (values.dry) {
 
-    values['dry-run'] = values['dry-run'] || values.dry
+    logger.warn('Deprecated flag "--dry" used. Please use "--dry-run" instead')
+    values['dry-run'] = values['dry-run'] !== false
 
   }
 
   if (values.skipGit) {
 
-    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead.')
-    values['skip-git'] = values['skip-git'] || values.skipGit
+    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead')
+    values['skip-git'] = values['skip-git'] !== false
 
   }
 
   if (values.skipBuild) {
 
-    logger.warn('Deprecated flag "--skipBuild" used. Please use "--skip-build" instead.')
-    values['skip-build'] = values['skip-build'] || values.skipBuild
+    logger.warn('Deprecated flag "--skipBuild" used. Please use "--skip-build" instead')
+    values['skip-build'] = values['skip-build'] !== false
 
   }
 

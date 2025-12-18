@@ -292,6 +292,9 @@ importers:
       '@mirta/basics':
         specifier: workspace:*
         version: link:../mirta-basics
+      '@mirta/env-loader':
+        specifier: workspace:*
+        version: link:../mirta-env-loader
       '@mirta/i18n':
         specifier: workspace:*
         version: link:../mirta-i18n
@@ -340,6 +343,9 @@ importers:
       '@babel/core':
         specifier: ^7.28.5
         version: 7.28.5
+      '@babel/plugin-transform-spread':
+        specifier: ^7.27.1
+        version: 7.27.1(@babel/core@7.28.5)
       '@babel/preset-env':
         specifier: ^7.28.5
         version: 7.28.5(@babel/core@7.28.5)

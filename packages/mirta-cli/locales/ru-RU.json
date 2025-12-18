@@ -31,5 +31,14 @@
   "publish.skippingPrivate": "Пропуск приватного пакета {name}",
   "publish.skippingPublished": "Пропуск уже опубликованного пакета {name}",
   "publish.packagePublishing": "Публикация пакета {name}",
-  "publish.packagePublished": "Пакет {name} опубликован"
+  "publish.packagePublished": "Пакет {name} опубликован",
+  "deploy.deploying": "Деплой на {target} в режиме {mode}, профиль {profile}",
+  "deploy.profileNotFound": "Профиль деплоя '{name}' не найден",
+  "deploy.profileImplicit": "{name} (встроенный)",
+  "deploy.mappingsNotFound": "Набор маппингов не найден: {key}",
+  "deploy.mappingDisabled": "Выключено: {from} → {to}",
+  "deploy.sourceNotExists": "Не найдено: {source}",
+  "deploy.transmitting": "Передача {from} → {to}",
+  "deploy.simulationComplete": "Симуляция завершена. Изменения не применены.",
+  "deploy.successful": "🎉 Деплой успешно выполнен!"
 }

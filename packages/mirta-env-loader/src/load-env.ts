@@ -4,8 +4,7 @@ import { ensureArray, ensureCompactArray } from '@mirta/basics/array'
 import { existsSync } from 'node:fs'
 
 /**
- * Регулярное выражение, определяющее допустимые префиксы для переменных окружения,
- * которые будут загружены в проект.
+ * Набор префиксов для переменных окружения, которые будут загружены в проект.
  *
  * @description
  * Константа используется для фильтрации переменных окружения по их префиксам:
@@ -232,20 +231,21 @@ function getEnvFileVariantsByMode(
 
 ) {
 
-  if (!mode)
-    return [envFile]
-
   if (mode === 'test' && envFile.endsWith('.local'))
     return []
 
   const envFiles: string[] = []
 
-  // 1. Формируем файлы с суффиксом .local для конкретного окружения (кроме test)
-  if (mode !== 'test')
-    envFiles.push(`${envFile}.${mode}.local`)
+  if (mode) {
 
-  // 2. Формируем файл для конкретного окружения без .local
-  envFiles.push(`${envFile}.${mode}`)
+    // 1. Формируем файлы с суффиксом .local для конкретного окружения (кроме test)
+    if (mode !== 'test')
+      envFiles.push(`${envFile}.${mode}.local`)
+
+    // 2. Формируем файл для конкретного окружения без .local
+    envFiles.push(`${envFile}.${mode}`)
+
+  }
 
   // 3. Формируем глобальный .local-файл (кроме test)
   if (mode !== 'test')

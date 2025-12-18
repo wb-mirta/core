@@ -2,7 +2,6 @@ import nodePath, { posix } from 'node:path'
 
 import pMap from 'p-map'
 
-import { readFileSync, existsSync } from 'node:fs'
 import { glob, writeFile } from 'node:fs/promises'
 
 import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace'
@@ -15,6 +14,7 @@ import { useLogger } from '#utils/logger'
 
 import chalk from 'chalk'
 import { t } from '../i18n'
+import type { MirtaConfig } from '#src/config/types'
 const { yellow } = chalk
 
 const logger = useLogger()
@@ -22,10 +22,6 @@ const logger = useLogger()
 const MAX_CONCURRENT_WRITES = 5
 
 type DepType = 'dependencies' | 'devDependencies'
-
-interface MirtaConfig {
-  templates?: string[]
-}
 
 const cwd = process.cwd()
 const context = await resolveMonorepoContextAsync(cwd)
@@ -67,35 +63,16 @@ export function hasScript(name: string) {
 
 }
 
-let _templatePathsCache: string[] | undefined
+export async function resolveTemplatePathsAsync(config: MirtaConfig): Promise<string[]> {
 
-export async function resolveTemplatePaths(): Promise<string[]> {
+  const templates = config.project?.templates
 
-  const configPath = posix.join(rootDir, 'mirta.config.json')
+  if (!Array.isArray(templates))
+    return []
 
   const pathPatterns: string[] = []
 
-  if (!existsSync(configPath))
-    return pathPatterns
-
-  let config: MirtaConfig
-
-  try {
-
-    config = JSON.parse(readFileSync(configPath, 'utf-8')) as MirtaConfig
-
-  }
-  catch (e: unknown) {
-
-    logger.warn(`Failed to parse mirta.config.json: ${String(e)}`)
-    return pathPatterns
-
-  }
-
-  if (!Array.isArray(config.templates))
-    return pathPatterns
-
-  for (const templatePath of config.templates) {
+  for (const templatePath of templates) {
 
     const resolvedDir = posix.resolve(rootDir, templatePath)
 
@@ -112,32 +89,21 @@ export async function resolveTemplatePaths(): Promise<string[]> {
 
   }
 
-  const templatePkgPaths = new Set<string>()
+  const realPaths = new Set<string>()
 
   if (pathPatterns.length === 0)
-    return pathPatterns
+    return []
 
   for await (const pkgPath of glob(pathPatterns, {
     cwd: rootDir,
     exclude: ['node_modules/**', 'dist/**'],
   })) {
 
-    templatePkgPaths.add(
-      toPosix(pkgPath)
-    )
+    realPaths.add(toPosix(pkgPath))
 
   }
 
-  return [...templatePkgPaths]
-
-}
-
-async function getTemplatePaths() {
-
-  if (__TEST__)
-    return await resolveTemplatePaths()
-
-  return _templatePathsCache ??= await resolveTemplatePaths()
+  return [...realPaths]
 
 }
 
@@ -201,7 +167,7 @@ async function updatePackageVersion(pkgRoot: string, version: string) {
 
 }
 
-export async function updateVersion(version: string) {
+export async function updateVersion(version: string, config: MirtaConfig) {
 
   logger.log(`Patching all packages to version ${version}`)
 
@@ -223,7 +189,8 @@ export async function updateVersion(version: string) {
     { concurrency: MAX_CONCURRENT_WRITES }
   )
 
-  const templatePaths = await getTemplatePaths()
+  // Повторное сканирование FS на каждое обновление - для безопасности.
+  const templatePaths = await resolveTemplatePathsAsync(config)
 
   // Обновляет пакеты, используемые в шаблонах.
   if (templatePaths.length > 0) {

@@ -1,5 +1,6 @@
-import { spawn, type SpawnOptionsWithoutStdio } from 'node:child_process'
+import { spawn, type SpawnOptions } from 'node:child_process'
 import { useLogger } from '#utils/logger'
+import type { WslDistro } from '#src/config/types'
 
 const logger = useLogger()
 
@@ -19,6 +20,21 @@ export class ShellError extends Error {
   }
 }
 
+export class OperationCanceledError extends Error {
+  constructor() {
+
+    super()
+
+    // Убедимся, что экземпляр имеет правильный прототип
+    Object.setPrototypeOf(this, OperationCanceledError.prototype)
+
+    this.name = 'OperationCanceledError'
+
+    Error.captureStackTrace(this, OperationCanceledError)
+
+  }
+}
+
 interface ExecutionResult {
   isDone: boolean
   code: number
@@ -26,25 +42,35 @@ interface ExecutionResult {
   stdout: string
 }
 
-async function execAsync(
-  command: string,
-  args?: readonly string[],
-  options?: SpawnOptionsWithoutStdio
-): Promise<ExecutionResult> {
+interface RunOptions extends SpawnOptions {
 
-  args ??= []
+  doneCodes?: number[]
+  cancelCodes?: number[]
+
+}
+
+export async function execAsync(
+  command: string,
+  args: string[] = [],
+  options: RunOptions = {}
+): Promise<ExecutionResult> {
 
   return new Promise((resolve, reject) => {
 
-    const runner = spawn(command, args, {
-      stdio: [
-        'ignore', // stdin
-        'pipe', // stdout
-        'pipe', // stderr
-      ],
-      ...options,
-      shell: process.platform === 'win32',
-    })
+    const { doneCodes = [0], cancelCodes = [130], ...spawnOptions } = options
+
+    spawnOptions.stdio ??= [
+      'ignore',
+      'pipe',
+      'pipe',
+    ]
+
+    // 🔧 Особое поведение для Windows: требует shell
+    //
+    if (process.platform === 'win32' && !spawnOptions.shell)
+      spawnOptions.shell = true
+
+    const runner = spawn(command, args, spawnOptions)
 
     const stdoutChunks: Buffer[] = []
     const stderrChunks: Buffer[] = []
@@ -61,15 +87,11 @@ async function execAsync(
 
     })
 
-    runner.on('error', (error) => {
-
-      reject(error)
-
-    })
+    runner.on('error', reject)
 
     runner.on('exit', (code) => {
 
-      const isDone = code === 0
+      const isDone = code !== null && doneCodes.includes(code)
 
       const stdout = Buffer.concat(stdoutChunks).toString().trim()
       const stderr = Buffer.concat(stderrChunks).toString().trim()
@@ -81,10 +103,14 @@ async function execAsync(
       }
       else {
 
+        const isCanceled = code !== null && cancelCodes.includes(code)
+
         reject(
-          new ShellError(
-            `Failed to execute command ${command} ${args.join(' ')}: ${stderr}`
-          )
+          isCanceled
+            ? new OperationCanceledError()
+            : new ShellError(
+                `Failed to execute command ${command} ${args.join(' ')}: ${stderr}`
+              )
         )
 
       }
@@ -95,23 +121,77 @@ async function execAsync(
 
 }
 
-const runCommandAsync = async (
-  command: string,
-  args?: readonly string[],
-  options: SpawnOptionsWithoutStdio = {}
-) => await execAsync(command, args, { ...options })
+export type RunAsync = (command: string, args?: string[], options?: RunOptions) => Promise<ExecutionResult>
 
-const dryRunCommandAsync = (
-  command: string,
-  args?: readonly string[]
-) => {
+interface RunCommandAsync {
 
-  logger.info(`${command} ${args?.join(' ')}`, 'Dry')
+  (
+    command: string,
+    args?: string[],
+    options?: RunOptions
+  ): Promise<ExecutionResult>
+
+  inUnixShell: (wsl?: WslDistro) => RunAsync
+
+  dry: (isDryRun: boolean) => RunAsync
 
 }
 
-runCommandAsync.ifNotDry = (isDryRun?: boolean) =>
-  isDryRun ? dryRunCommandAsync : runCommandAsync
+const runCommandAsync: RunCommandAsync = async (
+  command: string,
+  args?: string[],
+  options: RunOptions = {}
+) => await execAsync(command, args, { ...options })
+
+runCommandAsync.inUnixShell = (wsl?: WslDistro): RunAsync => (
+  command,
+  args = [],
+  options = {}
+) => {
+
+  let cmd: string
+  let fullArgs: string[] = []
+
+  if (process.platform === 'win32') {
+
+    cmd = 'wsl'
+
+    if (wsl)
+      fullArgs.push('-d', wsl)
+
+    fullArgs.push(command, ...args)
+
+  }
+  else {
+
+    cmd = command
+    fullArgs = args
+
+  }
+
+  return execAsync(cmd, fullArgs, { ...options })
+
+}
+
+runCommandAsync.dry = (isDryRun?: boolean): RunAsync => {
+
+  if (isDryRun === false)
+    return runCommandAsync
+
+  return (command, args = []): Promise<ExecutionResult> => {
+
+    logger.info(`${command} ${args.join(' ')}`.trimEnd() + ' (DRY RUN)')
+
+    return Promise.resolve({
+      isDone: true,
+      code: 0,
+      stdout: '',
+      stderr: '',
+    })
+
+  }
+
+}
 
 export {
   runCommandAsync

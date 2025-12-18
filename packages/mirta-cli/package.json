@@ -25,6 +25,7 @@
   "imports": {
     "#src/*": "./src/*.js",
     "#src/i18n": "./src/i18n/index.js",
+    "#src/auth": "./src/auth/index.js",
     "#src/staged-args": "./src/staged-args/index.js",
     "#src/staged-args/*": "./src/staged-args/*.js",
     "#utils/*": "./src/utils/*.js"
@@ -49,6 +50,7 @@
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "@mirta/basics": "workspace:*",
+    "@mirta/env-loader": "workspace:*",
     "@mirta/i18n": "workspace:*",
     "@mirta/package": "workspace:*",
     "@mirta/workspace": "workspace:*",
