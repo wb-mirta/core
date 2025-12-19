@@ -12,7 +12,7 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
 
     const result = await context.runAsync(
       MIRTA_AGENT_BINDING,
-      ['ssh-add', '-L'],
+      ['ssh-add', '-l'],
       {
         stdio: 'pipe',
         doneCodes: [0, 1],

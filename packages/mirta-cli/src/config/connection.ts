@@ -1,8 +1,24 @@
-import type { MirtaConfig, MirtaConnection, WslDistro, Pkcs11Path, KeyPath, TimeToLive } from './types'
+import type { MirtaConfig, MirtaConnection, WslDistroName, Pkcs11Path, KeyPath, TimeToLive } from './types'
 import { DEFAULT_SSH_USERNAME, DEFAULT_SSH_PORT } from './constants'
 import { replaceEnvVars } from '#src/utils/env'
 import { isString } from '@mirta/basics'
 import { useLogger } from '#src/utils/logger'
+
+/**
+ * Проверяет, является ли строка корректным временем в формате OpenSSH.
+ *
+ * Разрешены:
+ * - Чистые числа: `600` → 600 секунд
+ * - Последовательности с квалификаторами: `10m`, `1h30m`, `2d1w`
+ *
+ * Запрещены:
+ * - `1h30` (без квалификатора у `30`) → потенциальная ошибка
+ * - `30x`, `m`, `abc`
+ *
+ * @since 0.4.0
+ *
+ **/
+const SSH_TIME_PATTERN = /^(?:\d+[smhdw])+$|^\d+$/i
 
 const logger = useLogger()
 
@@ -46,7 +62,7 @@ export function assertConnectionIsValid(value: Partial<MirtaConnection>): assert
     if (!isString(value.ttl))
       throw new Error(`ttl must be a string`)
 
-    if (!/^\d+[smhd]$/.test(value.ttl.trim()))
+    if (!SSH_TIME_PATTERN.test(value.ttl.trim()))
       throw new Error(`ttl must be in format <number>[smhd]`)
 
   }
@@ -76,7 +92,19 @@ export function parseConnectionString(input: string): MirtaConnection {
 
   const parts = source.split(';')
 
-  const url = new URL(parts[0])
+  let url: URL
+
+  try {
+
+    url = new URL(parts[0])
+
+  }
+  catch {
+
+    throw new Error(`Invalid connection URL: "${parts[0]}`)
+
+  }
+
   const protocol = url.protocol.replace(':', '')
 
   const result: MirtaConnection = {
@@ -104,7 +132,7 @@ export function parseConnectionString(input: string): MirtaConnection {
   if (result.ttl && !result.pkcs11 && !result.key)
     logger.warn('No pkcs11 or key specified — ttl will be ignored')
 
-  result.wsl = params.wsl as WslDistro
+  result.wsl = params.wsl as WslDistroName
 
   return result
 
@@ -149,6 +177,6 @@ export function resolveConnection(
 
   }
 
-  throw new Error(`Connection key "${inputNorm}" not found.`)
+  throw new Error(`Connection key "${input}" not found.`)
 
 }

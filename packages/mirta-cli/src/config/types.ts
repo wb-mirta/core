@@ -4,7 +4,7 @@ export type KeyPath = Branded<string, 'KeyPath'>
 
 export type TimeToLive = Branded<string, 'TimeToLive'>
 
-export type WslDistro = Branded<string, 'WslDistro'>
+export type WslDistroName = Branded<string, 'WslDistro'>
 
 export interface MirtaConnection {
 
@@ -22,7 +22,7 @@ export interface MirtaConnection {
 
   ttl?: TimeToLive
 
-  wsl?: WslDistro
+  wsl?: WslDistroName
 
 }
 
@@ -33,6 +33,7 @@ export interface DeployMapping {
   enabled?: boolean
   from: DeployFrom
   to: DeployTo
+  toGroup?: string
   cleanup?: boolean
   protect?: string[]
   exclude?: string[]
@@ -41,6 +42,7 @@ export interface DeployMapping {
 export interface DeployProfile {
   connection?: string
   mappings?: string[]
+  toGroup?: string
 }
 
 export interface DeployConfig {

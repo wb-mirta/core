@@ -9,9 +9,14 @@ const logger = useLogger()
 
 export interface RunRsyncOptions {
 
-  mapping: DeployMapping
   connection: MirtaConnection
+
+  mapping: DeployMapping
+
+  toGroup?: string
+
   cwd: string
+
   isDryRun?: boolean
 
 }
@@ -19,8 +24,9 @@ export interface RunRsyncOptions {
 export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
 
   const {
-    mapping,
     connection,
+    mapping,
+    toGroup,
     cwd,
     isDryRun,
   } = options
@@ -63,17 +69,18 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
 
   mapping.exclude?.forEach((pattern) => {
 
-    args.push(`--exclude='${pattern}'`)
+    args.push('--exclude', pattern)
 
   })
 
   mapping.protect?.forEach((pattern) => {
 
-    args.push(`--filter='P ${pattern}'`)
+    args.push('--filter', `P ${pattern}`)
 
   })
 
-  args.push(`--groupmap=*:developers`)
+  if (toGroup)
+    args.push('--groupmap', `*:${toGroup}`)
 
   args.push(
     from,
@@ -86,7 +93,7 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
   }))
 
   await runCommandAsync.inUnixShell(connection.wsl)(
-    MIRTA_AGENT_BINDING, ['rsync', ...args], { cwd, stdio: 'inherit' }
+    MIRTA_AGENT_BINDING, ['rsync', ...args], { cwd, stdio: 'inherit', shell: false }
   )
 
 }

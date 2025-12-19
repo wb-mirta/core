@@ -1,6 +1,6 @@
 import { spawn, type SpawnOptions } from 'node:child_process'
 import { useLogger } from '#utils/logger'
-import type { WslDistro } from '#src/config/types'
+import type { WslDistroName } from '#src/config/types'
 
 const logger = useLogger()
 
@@ -65,10 +65,7 @@ export async function execAsync(
       'pipe',
     ]
 
-    // 🔧 Особое поведение для Windows: требует shell
-    //
-    if (process.platform === 'win32' && !spawnOptions.shell)
-      spawnOptions.shell = true
+    spawnOptions.shell ??= false
 
     const runner = spawn(command, args, spawnOptions)
 
@@ -131,7 +128,7 @@ interface RunCommandAsync {
     options?: RunOptions
   ): Promise<ExecutionResult>
 
-  inUnixShell: (wsl?: WslDistro) => RunAsync
+  inUnixShell: (wsl?: WslDistroName) => RunAsync
 
   dry: (isDryRun: boolean) => RunAsync
 
@@ -143,7 +140,7 @@ const runCommandAsync: RunCommandAsync = async (
   options: RunOptions = {}
 ) => await execAsync(command, args, { ...options })
 
-runCommandAsync.inUnixShell = (wsl?: WslDistro): RunAsync => (
+runCommandAsync.inUnixShell = (wsl?: WslDistroName): RunAsync => (
   command,
   args = [],
   options = {}

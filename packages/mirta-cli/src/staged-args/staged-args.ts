@@ -198,7 +198,7 @@ function mapToSchema(
 
     // Строковые опции можно указывать только вместе со значениями.
     if (foundKeys.has(key) && schema[key].type === 'string')
-      throw Error(`Missing value for '--${key}' option`)
+      throw Error(t('args.missingValue', { name: `--${key}` }))
 
     // Для отсутствующих ключей применяем значения по умолчанию.
     if (schema[key].default !== undefined) {

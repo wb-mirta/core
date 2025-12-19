@@ -10,6 +10,9 @@ import { resolveConfigAsync } from '#src/config/resolve'
 import { authenticateAsync } from '#src/auth'
 import { resolveWorkspaceContextAsync } from '@mirta/workspace'
 import { loadEnv } from '#src/utils/env'
+import { hasRemoteGroupAsync } from '#src/utils/ssh'
+import { RECOMMENDED_GROUP } from './constants'
+import { assertWsl2ConfiguredAsync } from '#src/utils/wsl'
 
 const { yellow } = chalk
 
@@ -60,9 +63,36 @@ export async function runAsync(args: StagedArgs) {
 
   }))
 
+  // Проверяем доступность WSL.
+  if (process.platform === 'win32')
+    await assertWsl2ConfiguredAsync(connection)
+
   // Аутентификация подключения к контроллеру.
   //
   await authenticateAsync(connection)
+
+  if (!profile.toGroup) {
+
+    // Если группа не указана явно,
+    // то проверяем наличие рекомендуемой группы.
+
+    const isGroupExists = await hasRemoteGroupAsync(RECOMMENDED_GROUP, connection)
+
+    if (isGroupExists) {
+
+      profile.toGroup = RECOMMENDED_GROUP
+
+    }
+    else {
+
+      // Если группы на контроллере нет,
+      // то выводим рекомендацию использовать отдельную группу.
+
+      logger.warn(t('deploy.useDedicatedGroup', { group: RECOMMENDED_GROUP }))
+
+    }
+
+  }
 
   for (const key of profile.mappings ?? []) {
 
@@ -86,6 +116,7 @@ export async function runAsync(args: StagedArgs) {
 
       await runRsyncAsync({
         mapping,
+        toGroup: mapping.toGroup ?? profile.toGroup,
         connection,
         cwd,
         isDryRun,

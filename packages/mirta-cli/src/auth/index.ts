@@ -2,8 +2,11 @@ import { runCommandAsync } from '#src/utils/shell'
 import type { MirtaConnection } from '#src/config/types'
 import type { AgentContext } from './ssh-agent/types'
 import { ensureAgentIsRunningAsync } from './ssh-agent/agent'
-import { hasTokenAsync, addTokenAsync } from './ssh-agent/token'
+import { hasTokenAsync, addTokenAsync, removeTokenAsync } from './ssh-agent/token'
 import { hasKeyAsync, addKeyAsync } from './ssh-agent/key'
+import { useLogger } from '#src/utils/logger'
+
+const logger = useLogger()
 
 export async function authenticateAsync(
   connection: MirtaConnection
@@ -32,8 +35,19 @@ export async function authenticateAsync(
 
       const hasToken = await hasTokenAsync(context.pkcs11, context)
 
-      if (!hasToken)
+      if (!hasToken) {
+
+        // Если срок действия токена истёк —
+        // выгружаем модуль, иначе повторно не добавить.
+        //
+        const isRemoved = await removeTokenAsync(context.pkcs11, context)
+
+        if (isRemoved)
+          logger.debug('Stale PKCS#11 module unloaded')
+
         await addTokenAsync(context.pkcs11, context)
+
+      }
 
     }
     else if (context.key) {
