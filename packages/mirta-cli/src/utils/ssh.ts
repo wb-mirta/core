@@ -1,4 +1,4 @@
-import { MIRTA_AGENT_BINDING } from '#src/auth/ssh-agent/constants'
+import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
 import type { MirtaConnection } from '#src/config/types'
 import { useLogger } from './logger'
 import { runCommandAsync } from './shell'
@@ -12,27 +12,24 @@ export async function hasRemoteGroupAsync(
 
   const { hostname, username, port } = connection
 
-  const target = `${username}@${hostname}`
-
   const args: string[] = []
 
   if (port)
     args.push('-p', String(port))
 
-  args.push('getent group', group, '> /dev/null 2>&1')
+  args.push(`${username}@${hostname}`, `getent group ${group} > /dev/null 2>&1`)
 
   try {
 
-    const result = await runCommandAsync.inUnixShell(connection.wsl)(
-      MIRTA_AGENT_BINDING,
-      ['ssh', target, ...args],
-      {
-        stdio: 'pipe',
-        shell: false,
-        doneCodes: [0, 2],
-        cancelCodes: [130],
-      }
-    )
+    const result = await runCommandAsync.inUnixShell(connection.wsl)('ssh', args, {
+      env: {
+        SSH_AUTH_SOCK,
+      },
+      stdio: 'pipe',
+      shell: false,
+      doneCodes: [0, 2],
+      cancelCodes: [130],
+    })
 
     return result.code === 0
 

@@ -3,7 +3,7 @@ import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 import { useLogger } from '#src/utils/logger'
 import { t } from '#src/i18n'
 import { runCommandAsync } from '#src/utils/shell'
-import { MIRTA_AGENT_BINDING } from '#src/auth/ssh-agent/constants'
+import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
 
 const logger = useLogger()
 
@@ -92,8 +92,13 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
     to: mapping.to,
   }))
 
-  await runCommandAsync.inUnixShell(connection.wsl)(
-    MIRTA_AGENT_BINDING, ['rsync', ...args], { cwd, stdio: 'inherit', shell: false }
-  )
+  await runCommandAsync.inUnixShell(connection.wsl)('rsync', [...args], {
+    env: {
+      SSH_AUTH_SOCK,
+    },
+    cwd,
+    stdio: 'inherit',
+    shell: false,
+  })
 
 }

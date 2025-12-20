@@ -51,6 +51,10 @@ export async function runAsync(args: StagedArgs) {
   // Используемое подключение к контроллеру.
   const connection = resolveConnection(config, argv.to ?? profile.connection)
 
+  // Проверяем доступность WSL.
+  if (process.platform === 'win32')
+    await assertWsl2ConfiguredAsync(connection)
+
   logger.log(t('deploy.deploying', {
 
     target: yellow(getConnectionTarget(connection)),
@@ -62,10 +66,6 @@ export async function runAsync(args: StagedArgs) {
       : yellow(profileName),
 
   }))
-
-  // Проверяем доступность WSL.
-  if (process.platform === 'win32')
-    await assertWsl2ConfiguredAsync(connection)
 
   // Аутентификация подключения к контроллеру.
   //

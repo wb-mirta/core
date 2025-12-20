@@ -1,6 +1,6 @@
 import type { KeyPath } from '#src/config/types'
 import { useLogger } from '#src/utils/logger'
-import { MIRTA_AGENT_BINDING } from './constants'
+import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'
 import type { AgentContext } from './types'
 
@@ -42,7 +42,7 @@ export async function hasKeyAsync(path: KeyPath, context: AgentContext): Promise
 
 export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise<void> {
 
-  const args = ['ssh-add', '-q']
+  const args = ['-q']
 
   if (context.ttl)
     args.push('-t', context.ttl)
@@ -50,9 +50,12 @@ export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise
   args.push(path)
 
   await context.runAsync(
-    MIRTA_AGENT_BINDING,
+    'ssh-add',
     args,
     {
+      env: {
+        SSH_AUTH_SOCK,
+      },
       stdio: 'inherit',
       cancelCodes: [2, 130],
     })

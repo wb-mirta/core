@@ -1,4 +1,4 @@
-import { MIRTA_AGENT_BINDING } from './constants'
+import { SSH_AUTH_SOCK } from './constants'
 import type { AgentContext } from './types'
 
 export async function hasEntryAsync(
@@ -7,9 +7,11 @@ export async function hasEntryAsync(
 ): Promise<boolean> {
 
   const response = await context.runAsync(
-    MIRTA_AGENT_BINDING,
-    ['ssh-add', '-l'],
+    'ssh-add', ['-l'],
     {
+      env: {
+        SSH_AUTH_SOCK,
+      },
       stdio: 'pipe',
       doneCodes: [0, 1], // 0 = есть ключи, 1 = нет ключей
     }

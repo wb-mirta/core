@@ -5,26 +5,7 @@
  * @since 0.4.0
  *
  **/
-export const MIRTA_SSH_AUTH_SOCK = '~/.ssh/mirta-agent.sock'
-
-/**
- * Контекст выполнения команд в изолированном экземпляре ssh-agent.
- * Используется как префикс в runAsync() для всех операций с агентом.
- *
- * Обеспечивает:
- * - Изоляцию от системного ssh-agent
- * - Единое пространство сокетов и ключей
- * - Безопасное управление токенами и ключами
- *
- * @example
- * ```ts
- * await runAsync(MIRTA_AGENT_BINDING, ['ssh-add', '-l'])
- * await runAsync(MIRTA_AGENT_BINDING, ['rsync', '-e', 'ssh', ...])
- * ```
- * @since 0.4.0
- *
- **/
-export const MIRTA_AGENT_BINDING = `SSH_AUTH_SOCK=${MIRTA_SSH_AUTH_SOCK}`
+export const SSH_AUTH_SOCK = '~/.ssh/mirta-agent.sock'
 
 /**
  * Время жизни ключа, используемое в ssh-agent по умолчанию.

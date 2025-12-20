@@ -156,6 +156,16 @@ runCommandAsync.inUnixShell = (wsl?: WslDistroName): RunAsync => (
     if (wsl)
       fullArgs.push('-d', wsl)
 
+    if (options.env) {
+
+      for (const [key, value] of Object.entries(options.env)) {
+
+        fullArgs.push(`${key}=${value}`)
+
+      }
+
+    }
+
     fullArgs.push(command, ...args)
 
   }

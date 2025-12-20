@@ -76,6 +76,10 @@ export async function assertWsl2ConfiguredAsync(connection: MirtaConnection) {
   }
   catch (e: unknown) {
 
+    // Пробрасываем внутренние ошибки валидации как есть
+    if (e instanceof Error && !('code' in e))
+      throw e
+
     if (e instanceof Error && 'code' in e && e.code === 'ENOENT')
       throw new Error(t('wsl.notInstalled'))
 

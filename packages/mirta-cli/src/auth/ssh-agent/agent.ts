@@ -1,4 +1,4 @@
-import { DEFAULT_SSH_KEY_TTL, MIRTA_AGENT_BINDING, MIRTA_SSH_AUTH_SOCK } from './constants'
+import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK } from './constants'
 import type { AgentContext } from './types'
 import { useLogger } from '#src/utils/logger'
 
@@ -11,9 +11,11 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
     // Проверяем, отвечает ли агент
 
     const result = await context.runAsync(
-      MIRTA_AGENT_BINDING,
-      ['ssh-add', '-l'],
+      'ssh-add', ['-l'],
       {
+        env: {
+          SSH_AUTH_SOCK,
+        },
         stdio: 'pipe',
         doneCodes: [0, 1],
       }
@@ -35,7 +37,7 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
 
   try {
 
-    await context.runAsync('rm', ['-f', MIRTA_SSH_AUTH_SOCK], { stdio: 'pipe' })
+    await context.runAsync('rm', ['-f', SSH_AUTH_SOCK], { stdio: 'pipe' })
 
   }
   catch (e: unknown) {
@@ -44,7 +46,7 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
 
   }
 
-  const args = ['-a', MIRTA_SSH_AUTH_SOCK, '-t', DEFAULT_SSH_KEY_TTL]
+  const args = ['-a', SSH_AUTH_SOCK, '-t', DEFAULT_SSH_KEY_TTL]
 
   if (context.pkcs11)
     args.push('-P', context.pkcs11)

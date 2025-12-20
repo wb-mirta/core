@@ -365,7 +365,7 @@ describe('createStagedArgs', () => {
         } as const
 
         const args = createStagedArgs(['--config'])
-        expect(() => args.parseFinal(schema)).toThrow(/missing value/i)
+        expect(() => args.parseFinal(schema)).toThrow('args.missingValue')
 
       })
 

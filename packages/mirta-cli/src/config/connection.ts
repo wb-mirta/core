@@ -101,7 +101,7 @@ export function parseConnectionString(input: string): MirtaConnection {
   }
   catch {
 
-    throw new Error(`Invalid connection URL: "${parts[0]}`)
+    throw new Error(`Invalid connection URL: "${parts[0]}"`)
 
   }
 
@@ -111,7 +111,7 @@ export function parseConnectionString(input: string): MirtaConnection {
     type: protocol,
     hostname: url.hostname,
     port: url.port ? parseInt(url.port, 10) : undefined,
-    username: decodeURIComponent(url.username) || DEFAULT_SSH_USERNAME,
+    username: decodeURIComponent(url.username),
   }
 
   const params = parts.slice(1).reduce<Record<string, string | undefined>>((items, nextItem) => {
@@ -145,35 +145,30 @@ export function resolveConnection(
 
   const inputNorm = replaceEnvVars(input)
 
-  let connectionString: string | undefined
+  let connection: string | MirtaConnection | undefined
 
   // Строки с указанным протоколом - явные подключения.
   if (/^(?:[\w]+\+)?[\w]+:\/\//.test(inputNorm)) {
 
-    connectionString = inputNorm
+    connection = inputNorm
 
   }
   else if (config.connections && inputNorm in config.connections) {
 
-    const storedValue = config.connections[inputNorm]
-
-    if (!isString(storedValue)) {
-
-      assertConnectionIsValid(storedValue)
-      return storedValue
-
-    }
-
-    connectionString = storedValue
+    connection = config.connections[inputNorm]
 
   }
 
-  if (connectionString) {
+  if (isString(connection))
+    connection = parseConnectionString(connection)
 
-    const result = parseConnectionString(connectionString)
+  if (connection) {
 
-    assertConnectionIsValid(result)
-    return result
+    connection.username ??= DEFAULT_SSH_USERNAME
+
+    assertConnectionIsValid(connection)
+
+    return connection
 
   }
 

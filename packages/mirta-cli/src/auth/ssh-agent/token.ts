@@ -1,6 +1,6 @@
 import type { Pkcs11Path } from '#src/config/types'
 import { useLogger } from '#src/utils/logger'
-import { MIRTA_AGENT_BINDING } from './constants'
+import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'
 import type { AgentContext } from './types'
 
@@ -14,9 +14,11 @@ export async function removeTokenAsync(
   try {
 
     await context.runAsync(
-      MIRTA_AGENT_BINDING,
-      ['ssh-add', '-qe', path],
+      'ssh-add', ['-qe', path],
       {
+        env: {
+          SSH_AUTH_SOCK,
+        },
         stdio: 'ignore',
       }
     )
@@ -49,7 +51,7 @@ export async function addTokenAsync(
   context: AgentContext
 ): Promise<void> {
 
-  const args = ['ssh-add', '-q']
+  const args = ['-q']
 
   if (context.ttl)
     args.push('-t', context.ttl)
@@ -57,9 +59,12 @@ export async function addTokenAsync(
   args.push('-s', path)
 
   await context.runAsync(
-    MIRTA_AGENT_BINDING,
+    'ssh-add',
     args,
     {
+      env: {
+        SSH_AUTH_SOCK,
+      },
       stdio: 'inherit',
       cancelCodes: [2, 130],
     })

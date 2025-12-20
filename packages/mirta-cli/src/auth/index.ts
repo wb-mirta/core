@@ -31,6 +31,9 @@ export async function authenticateAsync(
 
     await ensureAgentIsRunningAsync(context)
 
+    // Приоритет pkcs11 над key для кросс-машинной совместимости.
+    // TODO: добавить fallback на key, если токен pkcs11 не обнаружен.
+    //
     if (context.pkcs11) {
 
       const hasToken = await hasTokenAsync(context.pkcs11, context)
