@@ -1,9 +1,24 @@
-import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK } from './constants'
+import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from './constants'
 import type { AgentContext } from './types'
 import { useLogger } from '#src/utils/logger'
+import { STDIO_CAPTURE_ERRORS } from '#src/utils/shell'
 
 const logger = useLogger()
 
+/**
+ * Обеспечивает запуск изолированного SSH-агента для текущей сессии CLI.
+ *
+ * Проверяет, запущен ли агент. Если нет — удаляет старый сокет (если есть), создаёт директорию `~/.ssh`,
+ * и запускает новый экземпляр `ssh-agent` с ограниченным временем жизни ключей.
+ *
+ * Используется для безопасного управления ключами и токенами (PKCS#11) без влияния на основной агент системы.
+ *
+ * @param context - Контекст выполнения (включая поддержку WSL2).
+ * @throws Ошибка, если не удалось запустить `ssh-agent`.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<void> {
 
   try {
@@ -16,7 +31,7 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
         env: {
           SSH_AUTH_SOCK,
         },
-        stdio: 'pipe',
+        stdio: STDIO_CAPTURE_ERRORS,
         doneCodes: [0, 1],
       }
     )
@@ -31,13 +46,14 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
   }
   catch {
 
-    // Агент не отвечает — продолжаем
+    // Агент не отвечает — продолжаем инициализацию
 
   }
 
   try {
 
-    await context.runAsync('rm', ['-f', SSH_AUTH_SOCK], { stdio: 'pipe' })
+    // Удаляем старый сокет, если существует
+    await context.runAsync('rm', ['-f', SSH_AUTH_SOCK], { stdio: STDIO_CAPTURE_ERRORS })
 
   }
   catch (e: unknown) {
@@ -46,8 +62,24 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
 
   }
 
+  try {
+
+    // Создаём директорию ~/.ssh, если не существует
+    await context.runAsync('mkdir', ['-p', SSH_DIR], { stdio: STDIO_CAPTURE_ERRORS })
+
+  }
+  catch (e: unknown) {
+
+    logger.warn(
+      `Could not create SSH directory: ${e instanceof Error ? e.message : String(e)}`
+    )
+
+  }
+
+  // Аргументы для запуска ssh-agent
   const args = ['-a', SSH_AUTH_SOCK, '-t', DEFAULT_SSH_KEY_TTL]
 
+  // Если используется PKCS#11, указываем путь к модулю
   if (context.pkcs11)
     args.push('-P', context.pkcs11)
 
@@ -56,7 +88,9 @@ export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<
     await context.runAsync(
       'ssh-agent',
       args,
-      { stdio: 'pipe' }
+      {
+        stdio: STDIO_CAPTURE_ERRORS,
+      }
     )
 
     logger.debug('SSH agent started')

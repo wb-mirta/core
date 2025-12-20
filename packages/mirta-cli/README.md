@@ -5,14 +5,15 @@
 [![NPM Version](https://img.shields.io/npm/v/@mirta/cli?style=flat-square)](https://npmjs.com/package/@mirta/cli)
 [![NPM Downloads](https://img.shields.io/npm/dm/@mirta/cli?style=flat-square&logo=npm)](https://npmjs.com/package/@mirta/cli)
 
-> A universal command-line tool for releasing and publishing versions in monorepos with synchronized semantic versioning.
+> Universal CLI tool for versioning, publishing, and deployment in monorepos with synchronized semantic versioning.
 
-`@mirta/cli` is a release orchestrator that:
-- Synchronously updates versions across all packages in a monorepo,
-- Generates `CHANGELOG` (if configured),
-- Publishes packages to NPM with `--provenance` support in CI.
+`@mirta/cli` is a process orchestrator that:
+- Synchronously updates versions across monorepo packages,
+- Runs `CHANGELOG` generation (if configured),
+- Publishes packages to NPM with `--provenance` support in CI,
+- Synchronizes artifacts with Wiren Board controllers via `rsync`.
 
-Works in any monorepo using `pnpm` and following the principle of synchronized semantic versioning.
+Works in any monorepo using `pnpm` and synchronized semantic versioning.
 
 To recognize the monorepo structure, `@mirta/cli` relies on the packages `@mirta/workspace` and `@mirta/package`, which read the configuration from the workspaces field in the root `package.json`.
 
@@ -24,16 +25,16 @@ To recognize the monorepo structure, `@mirta/cli` relies on the packages `@mirta
 pnpm add -wD @mirta/cli
 ```
 
-✅ This package was designed for the Mirta framework but works in any `pnpm` monorepo with synchronized versioning.
+✅ This package is designed for the Mirta framework but works in any `pnpm` monorepo with synchronized versioning.
 
 ## 🚀 Quick Start
 
-**Trigger a release**:
+**Run a release**:
 
 ```sh
 pnpm mirta release
 ```
-Select the update type → all versions will be updated.
+Select the update type → versions will be updated.
 
 **Publish (in CI or locally)**:
 
@@ -47,83 +48,79 @@ All public packages will be published to NPM.
 ### `mirta [options]`
 
 These global options are available for all commands:
-- `--help` (`-h`) — displays help information about available commands and options.
-- `--version` (`-v`) — prints the version of `@mirta/cli`.
+- `--help` (`-h`) — displays help on available commands and options.
+- `--version` (`-v`) — prints `@mirta/cli` version.
+- `--locale <loc>` — sets the interface language (`en`, `ru`).
 
 ### `pnpm mirta release`
 
-Prepares a release: detects the current version, prompts you to choose an update type (`patch`, `minor`, `major`, `pre*`), and applies it to all packages containing the `version` field.
+Prepares a release: detects the current version, prompts to select an update type (`patch`, `minor`, `major`, `pre*`), and applies it to all packages with the `version` field.
 
 <details>
 <summary>Technical Details</summary>
 
-The process is divided into several steps.
+The process is divided into stages:
 
-Step 1: If the project is git-connected, it first checks:
-- Sync status with `origin`.
-- CI pipeline success (via the `build` workflow).
+**Stage 1: Git state check** (if project is under git)
+- Ensures synchronization with `origin`.
+- Verifies CI success (via `build` workflow).
 
-Step 2: For paths listed in `mirta.config.json#templates`, performs recursive discovery of `package.json` files and updates monorepo dependencies (`dependencies`, `devDependencies`) accordingly.
+**Stage 2: Dependency update**
+- Recursively discovers `package.json` in paths specified in `mirta.config.json#project.templates`.
+- Updates monorepo dependencies (`dependencies`, `devDependencies`) to the current version.
 
-Step 3: Runs `pnpm run changelog` if the script exists.
+**Stage 3: CHANGELOG generation**
+- Runs `pnpm run changelog` if the script exists.
 
-Step 4: If GitHub connection is via `ssh`, creates a commit and a tag:
-```sh
-git commit -m "release: vX.X.X"
-git tag vX.X.X
-```
-If connected via `https`, changes remain in the working directory. You can commit them manually or use a GUI client (e.g., GitHub Desktop).
+**Stage 4: Commit and tag**
+- If GitHub access is via `ssh`, creates a commit and tag:
+  ```sh
+  git commit -m "release: vX.X.X"
+  git tag vX.X.X
+  ```
+- If access is via `https`, changes remain in the working directory for manual commit.
 
 </details>
 
 #### Supported Options
 
-`--dry-run` (`--dry`) — runs the command in simulation mode. Shows what would change but does not apply modifications.
-
-`--preid` `<id>` — sets a custom pre-release identifier (e.g., `alpha`, `beta.1`, `rc`).
-
-`--skip-prompts` — skips interactive prompts, using default values.
-
-`--skip-git` — disables creating a commit and tag. Git changes remain uncommitted.
+- `--dry-run` (`--dry`) — simulation mode, shows changes without applying them.
+- `--preid` `<id>` — custom prerelease identifier (`alpha.0`, `beta.1`).
+- `--skip-prompts` — skips interactive prompts, uses defaults.
+- `--skip-git` — skips commit and tag creation.
 
 #### Frequently Asked Questions
 
 <details>
 <summary>Why synchronized versioning?</summary>
 
-All packages in the monorepo receive the same version upon release.
+All packages receive the same version on release. This ensures:
+- Guaranteed compatibility (`@mirta/cli@0.4.0` works with `@mirta/package@0.4.0`),
+- Atomic releases,
+- Simplified dependency management.
 
-This is useful when:
-- Packages are tightly coupled (e.g., parts of the same framework),
-- Compatibility matters: `@mirta/cli@0.4.0` is guaranteed to work with `@mirta/package@0.4.0`,
-- Dependency management needs to be simplified.
+💡 When using `workspace:*`, all references are replaced with the concrete version during release.
 
-Compared to independent versioning, synchronized versioning:
-- Simplifies publishing,
-- Reduces version conflicts,
-- Makes releases atomic: all packages update together.
-
-💡 If you use `workspace:*`, during release all such references are replaced with the exact version — this is synchronized versioning in action.
 </details>
 
 <details>
 <summary>What is "semantic" versioning?</summary>
 
-Semantic version follows the format `major.minor.patch`, where each segment indicates different levels of change:
-- `major` — breaking changes or major updates,
+Format: `major.minor.patch`:
+- `major` — breaking changes,
 - `minor` — new features without breaking compatibility,
 - `patch` — bug fixes.
 
-Versions before `1.0.0` (e.g., `0.4.0`) are considered experimental:<br/>
-any update may include breaking changes.
+Versions below `1.0.0` (e.g., `0.4.0`) are experimental: any update may include breaking changes.
 
-Learn more at [semver.org](https://semver.org/)
+More: [semver.org](https://semver.org/)
+
 </details>
 
 <details>
 <summary>How to set up CHANGELOG.md generation?</summary>
 
-To generate a changelog file, add the [conventional-changelog-cli](https://www.npmjs.com/package/conventional-changelog-cli) package to devDependencies in the root `package.json`, and include the `changelog` script:
+Add `conventional-changelog-cli` to devDependencies in the root `package.json` and define the script:
 
 ```json
 {
@@ -133,24 +130,26 @@ To generate a changelog file, add the [conventional-changelog-cli](https://www.n
 }
 ```
 
-The automatically generated changelog is based on commits within the version range. Commit messages must follow these rules:
-1. Total line length must not exceed 50 characters;
-2. Use prefixes like `fix:`, `feat:`, `docs:`, `chore:`, etc.
+The changelog is generated from commit messages. Requirements:
+- Subject line ≤ 50 characters,
+- Use prefixes: `fix:`, `feat:`, `docs:`, `chore:`, etc.
 
-See full requirements in the [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md) document.
+See: [Commit Convention](https://github.com/wb-mirta/core/blob/latest/.github/commit-convention.md)
+
 </details>
 
 #### Advanced Usage
 
 <details>
-<summary>Explicit version specification</summary>
+<summary>Explicit version</summary>
 
-Sets exactly the version passed as an argument:
+Sets the exact version passed as an argument:
 
 ```sh
 pnpm mirta release 1.2.3
 ```
-⚠️ **Warning!** Do not attempt to overwrite already published versions — NPM registry will reject them.
+⚠️ **Never overwrite published versions — NPM will reject them.**
+
 </details>
 
 <details>
@@ -202,56 +201,113 @@ pnpm mirta release prerelease --preid alpha
 
 ### `pnpm mirta publish`
 
-Publishes packages to NPM, skipping those marked as `private: true`.
+Publishes packages to NPM, skipping those with `private: true`.
 
 <details>
 <summary>Technical Details</summary>
 
-⚠️ Typically executed in CI/CD after pushing the `vX.X.X` git tag.
+⚠️ Typically runs in CI after `git push` of the `vX.X.X` tag.
 
-The NPM dist tag is determined automatically:
-- `alpha` → `--tag` `alpha`
-- `beta` → `--tag` `beta`
-- `rc` → `--tag` `rc`
+The publish tag is determined automatically:
+- `alpha` → `--tag alpha`
+- `beta` → `--tag beta`
+- `rc` → `--tag rc`
 
-In CI environments (when `process.env.CI` is set), adds `--provenance`.
+In CI, `--provenance` is added to attest package origin.
+
 </details>
 
 #### Supported Options
 
-`--dry-run` (`--dry`) — runs in simulation mode. Shows what would happen, but does not publish.
+- `--dry-run` (`--dry`) — simulation mode.
+- `--skip-build` — skips running `pnpm run build`.
+- `--skip-git` — disables git checks (equivalent to `--no-git-checks` in `pnpm publish`).
 
-`--skip-build` — skips running `pnpm run build` before publishing.
+---
 
-`--skip-git` — disables git state checks (equivalent to `--no-git-checks` in `pnpm publish`).
+### `pnpm mirta deploy`
+
+Synchronizes files with Wiren Board controllers via `rsync` over SSH.
+
+<details>
+<summary>Technical Details</summary>
+
+- Transport: `rsync -rtzgO` (recursive, compressed, preserves timestamps and group, omits directory timestamps — safe for overlayfs).
+- WSL2 support: on Windows, commands run inside WSL.
+- Authentication:
+  - Uses an isolated `ssh-agent`.
+  - Supports PKCS#11 (Rutoken) and SSH keys.
+  - `ttl` — key lifetime (e.g., `1h`).
+- `--dry-run` mode: shows changes without applying.
+- Symbolic links are not transferred — should be created on the controller manually.
+
+</details>
+
+#### Supported Options
+
+- `--config`, `-c <path>` — path to `mirta.config.json`.
+- `--profile`, `-p <name>` — deployment profile (default: `default`).
+- `--to <conn>` — override connection string.
+- `--dry-run` — simulate synchronization.
+
+#### Connection string example
+
+```sh
+ssh://deploy@192.168.42.1;pkcs11=/usr/lib/librtpkcs11ecp.so;ttl=1h;wsl=Debian
+```
+
+#### mirta.config.json structure
+
+```json
+{
+  "connections": {
+    "work": "ssh://user@10.200.200.1;pkcs11=/path/to/rutoken.so"
+  },
+  "deploy": {
+    "mappings": {
+      "wb-rules-es5": [
+        {
+          "from": "dist/es5/wb-rules",
+          "to": "/mnt/data/etc/wb-rules",
+          "cleanup": true,
+          "protect": ["alarms.conf"]
+        }
+      ]
+    },
+    "profiles": {
+      "default": {
+        "mappings": ["wb-rules-es5"],
+        "connection": "work"
+      }
+    }
+  }
+}
+```
 
 ## ✅ Testing
 
 The tool has been tested manually and in CI:
-- Interactive and automated releases,
-- Error handling (version rollback on failure),
-- Git state and CI checks,
+- Interactive and automated releases.
+- Error handling (version rollback on failure).
+- Git state and CI checks.
 - Support for `--dry-run`.
+
+Additional tests:
+- Deployment using `Rutoken`, deployment with `ED25519` key in WSL2 on Windows and standalone Linux Debian (Trixie).
 
 ## ⚠️ Limitations
 
 **Runs only in Node.js** (not in Duktape).<br/>
-Automatic commit and tag creation — only when connected to GitHub via `ssh`.
+Automatic commit and tag creation works only with `ssh` access to GitHub.<br/>
+WSL2 is required for deployment from Windows.
 
-## 🛠 Mirta Internal Configuration
+## 🛠 Mirta Configuration
 
-The `mirta.config.json` file allows you to configure the behavior of `@mirta/cli` specifically within the Mirta framework.
+The `mirta.config.json` file configures `@mirta/cli` behavior.
 
-Currently supported:
+Supported fields:
 
-`templates` — a list of paths to project templates (e.g. in `create-mirta`).
-
-Example:
-
-```json
-{
-  "templates": [
-    "packages/create-mirta/public/templates"
-  ]
-}
-```
+- `project.templates` — paths to templates (e.g., for `create-mirta`).
+- `connections` — named connections.
+- `deploy.mappings` — file sync rules.
+- `deploy.profiles` — deployment profiles.

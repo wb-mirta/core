@@ -1,7 +1,25 @@
+/**
+ * Имя файла конфигурации по умолчанию.
+ *
+ * @since 0.4.0
+ *
+ **/
 export const DEFAULT_CONFIG_FILE = 'mirta.config.json'
 
+/**
+ * Имя пользователя по умолчанию для SSH-подключения.
+ *
+ * Используется, если в строке подключения или конфигурации не указан `username`.
+ *
+ * @since 0.4.0
+ *
+ **/
 export const DEFAULT_SSH_USERNAME = 'root'
 
+/**
+ * Адрес хоста по умолчанию для подключения к контроллеру.
+ *
+ * Используется в сценариях разработки, если хост не задан.
+ *
+ **/
 export const DEFAULT_SSH_HOSTNAME = '10.200.200.1'
-
-export const DEFAULT_SSH_PORT = 22

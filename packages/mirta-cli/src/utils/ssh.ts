@@ -1,10 +1,23 @@
 import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
 import type { MirtaConnection } from '#src/config/types'
 import { useLogger } from './logger'
-import { runCommandAsync } from './shell'
+import { runCommandAsync, STDIO_CAPTURE_ERRORS } from './shell'
 
 const logger = useLogger()
 
+/**
+ * Проверяет, существует ли указанная группа на удалённом контроллере Wiren Board.
+ *
+ * Использует команду `getent group <group>` через SSH для проверки наличия группы.
+ * Поддерживает выполнение через WSL2 на Windows.
+ *
+ * @param group - Имя группы (например, 'wb-users').
+ * @param connection - Конфигурация подключения к контроллеру.
+ * @returns `true`, если группа найдена, иначе `false`.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function hasRemoteGroupAsync(
   group: string,
   connection: MirtaConnection
@@ -25,8 +38,7 @@ export async function hasRemoteGroupAsync(
       env: {
         SSH_AUTH_SOCK,
       },
-      stdio: 'pipe',
-      shell: false,
+      stdio: STDIO_CAPTURE_ERRORS,
       doneCodes: [0, 2],
       cancelCodes: [130],
     })

@@ -1,11 +1,25 @@
 import type { KeyPath } from '#src/config/types'
 import { useLogger } from '#src/utils/logger'
+import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'
 import type { AgentContext } from './types'
 
 const logger = useLogger()
 
+/**
+ * Получает отпечаток (fingerprint) приватного SSH-ключа с помощью `ssh-keygen -lf`.
+ *
+ * Используется для идентификации ключа перед проверкой его наличия в агенте.
+ *
+ * @param key - Путь к приватному SSH-ключу.
+ * @param context - Контекст выполнения (включая поддержку WSL2).
+ * @returns Отпечаток ключа в формате, выводимом `ssh-keygen`.
+ * @throws Ошибка, если не удалось получить или распарсить вывод.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function getFingerprintAsync(
   key: string,
   context: AgentContext
@@ -13,10 +27,8 @@ export async function getFingerprintAsync(
 
   const response = await context.runAsync(
     'ssh-keygen',
-    ['-lf', key],
-    {
-      stdio: 'pipe',
-    })
+    ['-lf', key]
+  )
 
   const output = response.stdout.trim()
 
@@ -32,6 +44,18 @@ export async function getFingerprintAsync(
 
 }
 
+/**
+ * Проверяет, добавлен ли SSH-ключ в агент.
+ *
+ * Сравнивает отпечаток ключа с отпечатками, возвращёнными `ssh-add -l`.
+ *
+ * @param path - Путь к приватному SSH-ключу.
+ * @param context - Контекст выполнения.
+ * @returns `true`, если ключ найден в агенте, иначе `false`.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function hasKeyAsync(path: KeyPath, context: AgentContext): Promise<boolean> {
 
   const fingerprint = await getFingerprintAsync(path, context)
@@ -40,6 +64,19 @@ export async function hasKeyAsync(path: KeyPath, context: AgentContext): Promise
 
 }
 
+/**
+ * Добавляет приватный SSH-ключ в SSH-агент.
+ *
+ * Использует `ssh-add` с опциональным временем жизни (`-t`) из контекста.
+ * Вывод команды передаётся в терминал для отображения подсказок (например, ввод пароля).
+ *
+ * @param path - Путь к приватному ключу.
+ * @param context - Контекст выполнения.
+ * @throws Ошибка, если команда завершилась с кодом, отличным от 0.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise<void> {
 
   const args = ['-q']
@@ -56,7 +93,7 @@ export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise
       env: {
         SSH_AUTH_SOCK,
       },
-      stdio: 'inherit',
+      stdio: STDIO_INTERACTIVE,
       cancelCodes: [2, 130],
     })
 

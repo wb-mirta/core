@@ -1,19 +1,19 @@
 import type { MirtaConfig, MirtaConnection, WslDistroName, Pkcs11Path, KeyPath, TimeToLive } from './types'
-import { DEFAULT_SSH_USERNAME, DEFAULT_SSH_PORT } from './constants'
+import { DEFAULT_SSH_USERNAME } from './constants'
 import { replaceEnvVars } from '#src/utils/env'
 import { isString } from '@mirta/basics'
 import { useLogger } from '#src/utils/logger'
 
 /**
- * Проверяет, является ли строка корректным временем в формате OpenSSH.
+ * Регулярное выражение для проверки формата времени в стиле OpenSSH.
  *
- * Разрешены:
- * - Чистые числа: `600` → 600 секунд
- * - Последовательности с квалификаторами: `10m`, `1h30m`, `2d1w`
+ * Разрешает:
+ * - Чистые числа: `600` (секунды)
+ * - С последовательностями: `10m`, `1h30m`, `2d`
  *
- * Запрещены:
- * - `1h30` (без квалификатора у `30`) → потенциальная ошибка
- * - `30x`, `m`, `abc`
+ * Запрещает: `1h30`, `30x`, `m`, `abc`.
+ *
+ * Используется для валидации параметра `ttl`.
  *
  * @since 0.4.0
  *
@@ -22,17 +22,40 @@ const SSH_TIME_PATTERN = /^(?:\d+[smhdw])+$|^\d+$/i
 
 const logger = useLogger()
 
+/**
+ * Формирует строку назначения подключения в формате `user@host[:port]`.
+ *
+ * Порт включается только если отличается от стандартного (22).
+ *
+ * @param connection - Объект подключения.
+ * @returns Строка вида `user@host` или `user@host:port`.
+ *
+ **/
 export function getConnectionTarget(connection: MirtaConnection) {
 
   let target = `${connection.username}@${connection.hostname}`
 
-  if (connection.port && connection.port !== DEFAULT_SSH_PORT)
+  if (connection.port && connection.port !== 22)
     target += `:${connection.port}`
 
   return target
 
 }
 
+/**
+ * Утверждает, что переданный объект является валидным `MirtaConnection`.
+ *
+ * Проверяет все поля на корректность типов и допустимые значения.
+ * При неудаче выбрасывает `Error` с описанием проблемы.
+ *
+ * Используется для runtime-валидации конфигурации.
+ *
+ * @param value - Частичный объект подключения.
+ * @throws Ошибка, если объект не проходит валидацию.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function assertConnectionIsValid(value: Partial<MirtaConnection>): asserts value is MirtaConnection {
 
   if (value.type !== 'ssh')
@@ -72,6 +95,16 @@ export function assertConnectionIsValid(value: Partial<MirtaConnection>): assert
 
 }
 
+/**
+ * Разделяет строку по первому вхождению указанного разделителя.
+ *
+ * @param input - Входная строка.
+ * @param separator - Разделитель.
+ * @returns Массив из двух элементов: до и после разделителя. Если разделитель не найден — возвращает `[input]`.
+ *
+ * @since 0.4.0
+ *
+ **/
 function splitByFirstOccurrence(input: string, separator: string): string[] {
 
   const index = input.indexOf(separator)
@@ -83,6 +116,24 @@ function splitByFirstOccurrence(input: string, separator: string): string[] {
 
 }
 
+/**
+ * Парсит строку подключения в формате:
+ *
+ *   protocol://user@host:port;param1=value1;param2=value2
+ *
+ * Поддерживает:
+ * - Протокол (на данный момент только `ssh`)
+ * - Пользователя, хост, порт из URL
+ * - Дополнительные параметры: pkcs11, key, ttl, wsl
+ * - Подстановку переменных окружения: ${VAR_NAME}
+ *
+ * @param input - Строка подключения.
+ * @returns Объект `MirtaConnection`.
+ * @throws Ошибка при невалидном URL или пустой строке.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function parseConnectionString(input: string): MirtaConnection {
 
   const source = replaceEnvVars(input).trim()
@@ -138,6 +189,24 @@ export function parseConnectionString(input: string): MirtaConnection {
 
 }
 
+/**
+ * Разрешает имя подключения в полный объект `MirtaConnection`.
+ *
+ * Поддерживает:
+ * - Прямые строки с URL (например, `ssh://...`)
+ * - Ссылки на имена из `config.connections`
+ * - Подстановку переменных окружения
+ *
+ * Если соединение найдено, применяет значение по умолчанию для `username` и проверяет валидность.
+ *
+ * @param config - Конфигурация проекта.
+ * @param input - Имя подключения или строка с URL (по умолчанию `'default'`).
+ * @returns Полный объект подключения.
+ * @throws Ошибка, если подключение не найдено или невалидно.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function resolveConnection(
   config: MirtaConfig,
   input = 'default'
@@ -147,18 +216,20 @@ export function resolveConnection(
 
   let connection: string | MirtaConnection | undefined
 
-  // Строки с указанным протоколом - явные подключения.
+  // Явная строка с протоколом
   if (/^(?:[\w]+\+)?[\w]+:\/\//.test(inputNorm)) {
 
     connection = inputNorm
 
   }
+  // Или ссылка на имя в config.connections
   else if (config.connections && inputNorm in config.connections) {
 
     connection = config.connections[inputNorm]
 
   }
 
+  // Если строка — парсим в объект
   if (isString(connection))
     connection = parseConnectionString(connection)
 

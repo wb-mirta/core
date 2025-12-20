@@ -8,6 +8,21 @@ import { useLogger } from '#src/utils/logger'
 
 const logger = useLogger()
 
+/**
+ * Выполняет аутентификацию подключения к контроллеру через SSH-агент.
+ *
+ * Добавляет в ssh-agent либо:
+ * - PKCS#11 токен (например, Rutoken), если указан `connection.pkcs11`
+ * - Приватный ключ, если указан `connection.key`
+ *
+ * Приоритет — у PKCS#11. Агент запускается автоматически при необходимости.
+ * Поддерживает выполнение в WSL2 на Windows.
+ *
+ * @param connection - Конфигурация подключения, содержащая параметры аутентификации.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function authenticateAsync(
   connection: MirtaConnection
 ): Promise<void> {

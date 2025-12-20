@@ -4,12 +4,44 @@ import type { MirtaConfig } from './types'
 import { SourceError } from '#src/errors/source-error'
 import { join } from 'node:path/posix'
 
+/**
+ * Обёртка для определения конфигурации. Позволяет использовать подсказки типов TypeScript.
+ *
+ * На этапе выполнения просто возвращает переданный объект без изменений.
+ * Предназначена для улучшения DX (developer experience).
+ *
+ * @example
+ * ```ts
+ * export default defineConfig({
+ *   deploy: {
+ *     profiles: { ... }
+ *   }
+ * })
+ * ```
+ * @param config - Объект конфигурации Mirta.
+ * @returns Тот же объект, что и входе.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function defineConfig(config: MirtaConfig): MirtaConfig {
 
   return config
 
 }
 
+/**
+ * Парсит строку JSON и проверяет, что корневой элемент — это объект (не массив и не примитив).
+ *
+ * Используется для валидации содержимого конфигурационного файла перед приведением к типу `MirtaConfig`.
+ *
+ * @param content - Строка с содержимым JSON-файла.
+ * @returns Распарсенный объект.
+ * @throws {SourceError} Если JSON имеет неверный формат или корень не является объектом.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function parseConfigJson(
   content: string
 ): object {
@@ -23,6 +55,21 @@ export function parseConfigJson(
 
 }
 
+/**
+ * Асинхронно читает и парсит конфигурационный файл.
+ *
+ * @param rootDir - Корневая директория проекта.
+ * @param pathInput - Относительный путь к конфигурационному файлу (например, 'mirta.config.json').
+ * @returns Объект конфигурации или `undefined`, если файл не существует.
+ * @throws {SourceError} С различными кодами ошибок в зависимости от типа проблемы:
+ * - `parse.invalidJson` — невалидный JSON
+ * - `file.notFound` — файл не найден
+ * - `file.accessDenied` — нет прав на чтение
+ * - `file.failedToRead` — другие ошибки чтения
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function readConfigAsync(rootDir: string, pathInput: string): Promise<MirtaConfig | undefined> {
 
   const configPath = join(

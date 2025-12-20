@@ -3,6 +3,14 @@ import { useLogger } from '#src/utils/logger'
 
 const logger = useLogger()
 
+/**
+ * Схема доступных опций команды `deploy`.
+ *
+ * Определяет типы и сокращённые формы флагов.
+ *
+ * @since 0.4.0
+ *
+ **/
 const options = ({
   'config': {
     type: 'string',
@@ -24,6 +32,18 @@ const options = ({
   },
 }) satisfies OptionSchema
 
+/**
+ * Парсит аргументы командной строки для команды `deploy`.
+ *
+ * - Обрабатывает опции в соответствии с объявленной схемой.
+ * - Если используется устаревший флаг `--dry`, выводит предупреждение и преобразует его в `--dry-run`.
+ *
+ * @param args - Объект с аргументами, управляемый `StagedArgs`.
+ * @returns Объект с распарсенными значениями и позиционными аргументами.
+ *
+ * @since 0.4.0
+ *
+ **/
 export function parseArgs(
   args: StagedArgs
 ) {

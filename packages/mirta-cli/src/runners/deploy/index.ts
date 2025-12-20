@@ -18,21 +18,38 @@ const { yellow } = chalk
 
 const logger = useLogger()
 
+/**
+ * Асинхронно выполняет команду `deploy`.
+ *
+ * - Парсит аргументы
+ * - Загружает конфигурацию
+ * - Настраивает подключение и аутентификацию
+ * - Проверяет окружение (WSL2)
+ * - Выполняет синхронизацию файлов по заданным маппингам
+ *
+ * @param args - Аргументы командной строки, управляемые `StagedArgs`.
+ *
+ * @since 0.4.0
+ *
+ **/
 export async function runAsync(args: StagedArgs) {
 
   const { values: argv } = parseArgs(args)
 
   const isDryRun = argv['dry-run']
 
+  // Определение профиля деплоя.
   const profileName = argv.profile && isString(argv.profile)
     ? argv.profile
     : 'default'
 
   const cwd = process.cwd()
 
+  // Определение корневой директории проекта.
   const context = await resolveWorkspaceContextAsync(cwd)
   const rootDir = context.rootDir
 
+  // Загрузка и объединение конфигурации.
   const { config, userConfig } = await resolveConfigAsync(rootDir, argv.config)
 
   // Полный набор маппингов из конфигурации.
@@ -45,16 +62,17 @@ export async function runAsync(args: StagedArgs) {
   if (!profile)
     throw new Error(t('deploy.profileNotFound', { name: profileName }))
 
-  // Загружаем .env ДО resolveConnection, чтобы работала подстановка dotenv.
+  // Загрузка переменных окружения ДО разрешения подключения.
   loadEnv(rootDir, cwd)
 
-  // Используемое подключение к контроллеру.
+  // Определение подключения: из CLI-аргумента или профиля.
   const connection = resolveConnection(config, argv.to ?? profile.connection)
 
-  // Проверяем доступность WSL.
+  // Проверка WSL2 на Windows.
   if (process.platform === 'win32')
     await assertWsl2ConfiguredAsync(connection)
 
+  // Логирование начала операции.
   logger.log(t('deploy.deploying', {
 
     target: yellow(getConnectionTarget(connection)),
@@ -67,8 +85,7 @@ export async function runAsync(args: StagedArgs) {
 
   }))
 
-  // Аутентификация подключения к контроллеру.
-  //
+  // Аутентификация через ssh-agent (PKCS#11 или ключ).
   await authenticateAsync(connection)
 
   if (!profile.toGroup) {
@@ -94,6 +111,7 @@ export async function runAsync(args: StagedArgs) {
 
   }
 
+  // Выполнение синхронизации по маппингам.
   for (const key of profile.mappings ?? []) {
 
     if (!(key in mappingPresets))
@@ -126,6 +144,7 @@ export async function runAsync(args: StagedArgs) {
 
   }
 
+  // Финальное сообщение.
   logger.success(isDryRun
     ? t('deploy.simulationComplete')
     : t('deploy.successful')

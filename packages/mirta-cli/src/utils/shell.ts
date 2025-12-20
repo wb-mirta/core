@@ -1,9 +1,44 @@
-import { spawn, type SpawnOptions } from 'node:child_process'
+import { spawn, type IOType, type SpawnOptions } from 'node:child_process'
 import { useLogger } from '#utils/logger'
 import type { WslDistroName } from '#src/config/types'
 
+/**
+ * Режим `stdio`: ввод и вывод наследуются от родительского процесса (терминал), `stderr` перехватывается.
+ *
+ * Используется, когда важно видеть прогресс команды (например, `rsync`).
+ *
+ * @since 0.4.0
+ *
+ **/
+export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe']
+
+/**
+ * Режим `stdio`: ввод игнорируется, `stdout` и `stderr` перехватываются.
+ *
+ * Используется для полного захвата вывода команды.
+ *
+ * @since 0.4.0
+ *
+ **/
+export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
+
+/**
+ * Режим `stdio`: ввод и `stdout` игнорируются, `stderr` перехватывается.
+ * Используется для проверки ошибок без сохранения основного вывода.
+ *
+ * @since 0.4.0
+ *
+ **/
+export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
+
 const logger = useLogger()
 
+/**
+ * Ошибка выполнения команды в shell.
+ *
+ * Возникает, когда команда завершилась с кодом, не входящим в `doneCodes` или `cancelCodes`.
+ *
+ **/
 export class ShellError extends Error {
   constructor(message: string) {
 
@@ -20,6 +55,14 @@ export class ShellError extends Error {
   }
 }
 
+/**
+ * Ошибка, указывающая на отмену операции (например, через Ctrl+C).
+ *
+ * Соответствует коду выхода 130 (SIGINT).
+ *
+ * @since 0.4.0
+ *
+ **/
 export class OperationCanceledError extends Error {
   constructor() {
 
@@ -35,20 +78,73 @@ export class OperationCanceledError extends Error {
   }
 }
 
+/**
+ * Результат выполнения команды.
+ *
+ **/
 interface ExecutionResult {
+
+  /**
+   * Успешно завершена ли команда (код в `doneCodes`).
+   *
+   **/
   isDone: boolean
+
+  /**
+   * Код завершения процесса.
+   *
+   **/
   code: number
+
+  /**
+   * Перехваченный стандартный вывод.
+   *
+   **/
   stderr: string
+
+  /**
+   * Перехваченный стандартный поток ошибок.
+   *
+   **/
   stdout: string
 }
 
+/**
+ * Расширенные оции для запуска команды.
+ *
+ * @since 0.4.0
+ *
+ **/
 interface RunOptions extends SpawnOptions {
 
+  /**
+   * Коды завершения, считающиеся успешными (по умолчанию: `[0]`).
+   *
+   **/
   doneCodes?: number[]
+
+  /**
+   * Коды завершения, интерпретируемые как отмена (по умолчанию: `[130]` — SIGINT).
+   *
+   **/
   cancelCodes?: number[]
 
 }
 
+/**
+ * Асинхронно выполняет команду и возвращает результат.
+ *
+ * Перехватывает `stdout` и `stderr`.
+ * Поддерживает кастомные коды успеха и отмены.
+ *
+ * @param command - Команда (например, `ls`, `rsync`).
+ * @param args - Аргументы команды.
+ * @param options - Опции запуска процесса.
+ * @returns Результат выполнения: код, вывод, ошибки.
+ * @throws {ShellError} Если команда завершилась с ошибкой.
+ * @throws {OperationCanceledError} Если операция была отменена пользователем.
+ *
+ **/
 export async function execAsync(
   command: string,
   args: string[] = [],
@@ -59,12 +155,7 @@ export async function execAsync(
 
     const { doneCodes = [0], cancelCodes = [130], ...spawnOptions } = options
 
-    spawnOptions.stdio ??= [
-      'ignore',
-      'pipe',
-      'pipe',
-    ]
-
+    spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT
     spawnOptions.shell ??= false
 
     const runner = spawn(command, args, spawnOptions)
@@ -118,22 +209,56 @@ export async function execAsync(
 
 }
 
+/**
+ * Тип функции для асинхронного запуска команды.
+ *
+ * @since 0.4.0
+ *
+ **/
 export type RunAsync = (command: string, args?: string[], options?: RunOptions) => Promise<ExecutionResult>
 
-interface RunCommandAsync {
+/**
+ * Интерфейс для универсального запуска команд с дополнительными режимами.
+ *
+ * Поддерживает:
+ * - Запуск в Unix-среде (через WSL2 на Windows)
+ * - Симуляцию без реального выполнения
+ *
+ * @since 0.4.0
+ *
+ **/
+interface RunCommandAsync extends RunAsync {
 
-  (
-    command: string,
-    args?: string[],
-    options?: RunOptions
-  ): Promise<ExecutionResult>
-
+  /**
+   * Возвращает функцию запуска, которая автоматически оборачивает команду в WSL2 при необходимости.
+   *
+   * @param wsl - Имя дистрибутива WSL2 (опционально).
+   * @returns Функция `RunAsync`, выполняющая команды в нужной среде.
+   *
+   **/
   inUnixShell: (wsl?: WslDistroName) => RunAsync
 
+  /**
+   * Возвращает функцию запуска в режиме симуляции.
+   *
+   * При вызове логирует команду и возвращает успех без выполнения.
+   *
+   * @param isDryRun - Включить ли режим симуляции.
+   * @returns Функция `RunAsync`, имитирующая выполнение.
+   *
+   **/
   dry: (isDryRun: boolean) => RunAsync
 
 }
 
+/**
+ * Универсальная функция для запуска команд.
+ *
+ * Расширяется методами:
+ * - `.inUnixShell()` — для выполнения в WSL2
+ * - `.dry()` — для режима симуляции
+ *
+ **/
 const runCommandAsync: RunCommandAsync = async (
   command: string,
   args?: string[],
