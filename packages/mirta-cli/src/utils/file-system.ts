@@ -1,6 +1,6 @@
 import { SourceError } from '#src/errors/source-error'
 import { toPosix } from '@mirta/package'
-import fs from 'node:fs/promises'
+import { access } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { resolve, sep, relative } from 'node:path'
 
@@ -19,14 +19,17 @@ export async function isExistsAsync(path: string): Promise<boolean> {
 
   try {
 
-    await fs.access(path)
+    await access(path)
 
     return true
 
   }
-  catch {
+  catch (e: unknown) {
 
-    return false
+    if (e && typeof e === 'object' && 'code' in e && e.code === 'ENOENT')
+      return false
+
+    throw e
 
   }
 
@@ -87,6 +90,6 @@ export function expandHomeDir(path: string): string {
   if (!path.startsWith('~') || process.platform === 'win32')
     return path
 
-  return path.replace(/^~/, homedir())
+  return path.replace(/^~($|\/|\\)/, homedir() + '$1')
 
 }

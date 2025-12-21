@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 import type { MirtaConfig } from './types'
 import { SourceError } from '#src/errors/source-error'
@@ -83,7 +83,7 @@ export async function readConfigAsync(rootDir: string, pathInput: string): Promi
 
   try {
 
-    const content = await fs.readFile(configPath, 'utf-8')
+    const content = await readFile(configPath, 'utf-8')
 
     return parseConfigJson(content) as MirtaConfig
 

@@ -4,6 +4,7 @@ import { useLogger } from '#src/utils/logger'
 import { t } from '#src/i18n'
 import { runCommandAsync, STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
+import { KNOWN_SSH_PORT } from '#src/config/constants'
 
 const logger = useLogger()
 
@@ -89,7 +90,7 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
 
   const sshParts: string[] = []
 
-  if (connection.port && connection.port !== 22)
+  if (connection.port && connection.port !== KNOWN_SSH_PORT)
     sshParts.push(`-p ${connection.port}`)
 
   if (sshParts.length > 0)

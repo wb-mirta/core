@@ -46,7 +46,7 @@ export type WslDistroName = Branded<string, 'WslDistro'>
  * @since 0.4.0
  *
  **/
-export interface MirtaConnection {
+export interface MirtaConnection extends Record<string, unknown> {
 
   /**
    * Тип подключения. На данный момент поддерживается только 'ssh'.
@@ -251,7 +251,7 @@ export interface MirtaConfig {
    * Ключ — имя, значение — строка или объект подключения.
    *
    **/
-  connections?: Record<string, string | MirtaConnection>
+  connections?: Record<string, string | Record<string, unknown>>
 
   /**
    * Настройки деплоя: маппинги, профили.
