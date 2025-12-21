@@ -17,10 +17,10 @@ vi.mock('#src/errors/source-error', () => ({
   },
 }))
 
-const fsPromises = await import('node:fs/promises')
+import * as fsPromises from 'node:fs/promises'
 const mockAccess = vi.mocked(fsPromises.access)
 
-const { isExistsAsync, resolveSubpath, expandHomeDir } = await import('#src/utils/file-system')
+import { isExistsAsync, resolveSubpath, expandHomeDir } from '#src/utils/file-system'
 
 describe('isExistsAsync', () => {
 
