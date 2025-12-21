@@ -61,18 +61,18 @@ Prepares a release: detects the current version, prompts to select an update typ
 
 The process is divided into stages:
 
-**Stage 1: Git state check** (if project is under git)
+#### Stage 1: Git state check (if project is under git)
 - Ensures synchronization with `origin`.
 - Verifies CI success (via `build` workflow).
 
-**Stage 2: Dependency update**
+#### Stage 2: Dependency update
 - Recursively discovers `package.json` in paths specified in `mirta.config.json#project.templates`.
 - Updates monorepo dependencies (`dependencies`, `devDependencies`) to the current version.
 
-**Stage 3: CHANGELOG generation**
+#### Stage 3: CHANGELOG generation
 - Runs `pnpm run changelog` if the script exists.
 
-**Stage 4: Commit and tag**
+#### Stage 4: Commit and tag
 - If GitHub access is via `ssh`, creates a commit and tag:
   ```sh
   git commit -m "release: vX.X.X"
