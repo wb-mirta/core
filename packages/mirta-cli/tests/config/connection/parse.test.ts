@@ -40,7 +40,7 @@ describe('parseConnectionString', () => {
 
     const result = parseConnectionString('ssh://admin@example.com:2222')
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       type: 'ssh',
       hostname: 'example.com',
       username: 'admin',

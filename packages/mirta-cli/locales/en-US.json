@@ -10,6 +10,8 @@
   "caption.error": "Error",
   "caption.warning": "Warning",
   "step.canceled": "Operation canceled",
+  "connection.emptyParameterSkipped": "Empty connection parameter '{key}' skipped",
+  "connection.ttlSkipped": "TTL param skipped — no pkcs11 or key specified",
   "package.templateOutsideRoot": "Template '{template}' is outside the root directory",
   "release.versionUpdated": "Version updated to {newVersion}",
   "release.versionReverting": "Release canceled. Reverting version...",

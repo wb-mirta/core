@@ -145,6 +145,22 @@ describe('assertConnectionIsValid', () => {
 
   })
 
+  it('should throw when username is not a string', () => {
+
+    const connection = {
+      type: 'ssh',
+      hostname: '192.168.1.1',
+      username: 123,
+    }
+
+    expect(() => {
+
+      assertConnectionIsValid(connection)
+
+    }).toThrow('username must be a non-empty string')
+
+  })
+
   it('should throw when pkcs11 is not a string', () => {
 
     const connection = {

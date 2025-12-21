@@ -1,3 +1,4 @@
+import { t } from '#src/i18n'
 import { replaceEnvVars } from '#src/utils/env'
 import { useLogger } from '#src/utils/logger'
 
@@ -13,7 +14,10 @@ const logger = useLogger()
  * @since 0.4.0
  *
  **/
-function splitByFirstOccurrence(input: string, separator: string): string[] {
+function splitByFirstOccurrence(
+  input: string,
+  separator: string
+): [string, ...(string | undefined)[]] {
 
   const index = input.indexOf(separator)
 
@@ -25,19 +29,22 @@ function splitByFirstOccurrence(input: string, separator: string): string[] {
 }
 
 /**
- * Парсит строку подключения в формате:
+ * Парсит строку подключения в структурированный объект.
  *
- *   protocol://user@host:port;param1=value1;param2=value2
+ * Формат строки:
+ * ```txt
+ * protocol://user@host:port;param1=value1;param2=value2
+ * ```
+ * Извлекает:
+ * - Протокол, имя пользователя, хост, порт из URL-части
+ * - Дополнительные параметры из пар ключ=значение после точки с запятой:
+ *   `pkcs11`, `key`, `ttl`, `wsl`
  *
- * Поддерживает:
- * - Протокол (на данный момент только `ssh`)
- * - Пользователя, хост, порт из URL
- * - Дополнительные параметры: pkcs11, key, ttl, wsl
- * - Подстановку переменных окружения: ${VAR_NAME}
+ * Выполняет подстановку переменных окружения в формате ${VAR_NAME}.
  *
- * @param input - Строка подключения.
- * @returns Объект `MirtaConnection`.
- * @throws Ошибка при невалидном URL или пустой строке.
+ * @param input - Строка подключения
+ * @returns Объект с распарсенными полями (требует последующей валидации)
+ * @throws Ошибка при невалидном URL или пустой строке
  *
  * @since 0.4.0
  *
@@ -83,8 +90,20 @@ export function parseConnectionString(input: string): Record<string, unknown> {
 
     const [key, value] = splitByFirstOccurrence(nextItem, '=')
 
-    if (key && value)
-      items[key] = value
+    if (key) {
+
+      if (value !== undefined) {
+
+        items[key] = value
+
+      }
+      else {
+
+        logger.warn(t('connection.emptyParameterSkipped', { key }))
+
+      }
+
+    }
 
     return items
 
@@ -95,7 +114,7 @@ export function parseConnectionString(input: string): Record<string, unknown> {
   result.ttl = params.ttl
 
   if (result.ttl && !result.pkcs11 && !result.key)
-    logger.warn('No pkcs11 or key specified — ttl will be ignored')
+    logger.warn(t('connection.ttlSkipped'))
 
   result.wsl = params.wsl
 

@@ -56,11 +56,11 @@ describe('isExistsAsync', () => {
   it('should throw on access denied', async () => {
 
     mockAccess.mockRejectedValue(
-      Object.assign(new Error('EACCESS'), { code: 'EACCESS' })
+      Object.assign(new Error('EACCES'), { code: 'EACCES' })
     )
 
     await expect(isExistsAsync('/forbidden/path'))
-      .rejects.toThrow('EACCESS')
+      .rejects.toThrow('EACCES')
 
   })
 
@@ -189,7 +189,7 @@ describe('expandHomeDir', () => {
     const result = expandHomeDir('~')
 
     expect(result).not.toBe('~')
-    expect(result).toMatch('/mocked/home')
+    expect(result).toBe('/mocked/home')
 
   })
 

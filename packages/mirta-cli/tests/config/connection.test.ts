@@ -1,3 +1,9 @@
+vi.mock('#src/i18n', () => ({
+  t: vi.fn((key: string) => key),
+  getLocale: vi.fn(() => 'en-US'),
+  setLocaleAsync: vi.fn(),
+}))
+
 vi.mock('#src/utils/logger', () => ({
   useLogger: () => ({
     warn: vi.fn(),

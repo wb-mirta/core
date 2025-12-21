@@ -16,6 +16,20 @@ describe('loadEnv', () => {
 
   })
 
+  let originalEnv: NodeJS.ProcessEnv
+
+  beforeEach(() => {
+
+    originalEnv = { ...process.env }
+
+  })
+
+  afterEach(() => {
+
+    process.env = originalEnv
+
+  })
+
   it('should load environment variables with WB_ and MIRTA_ prefixes', () => {
 
     mockLoadEnv.mockReturnValue({
@@ -35,8 +49,6 @@ describe('loadEnv', () => {
 
   it('should merge loaded variables into process.env', () => {
 
-    const originalEnv = { ...process.env }
-
     mockLoadEnv.mockReturnValue({
       WB_DEPLOY_HOST: '192.168.42.1',
       MIRTA_DEV: 'true',
@@ -46,9 +58,6 @@ describe('loadEnv', () => {
 
     expect(process.env.WB_DEPLOY_HOST).toBe('192.168.42.1')
     expect(process.env.MIRTA_DEV).toBe('true')
-
-    // Restore
-    process.env = originalEnv
 
   })
 
