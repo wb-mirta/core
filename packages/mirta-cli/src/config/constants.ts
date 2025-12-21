@@ -21,5 +21,7 @@ export const DEFAULT_SSH_USERNAME = 'root'
  *
  * Используется в сценариях разработки, если хост не задан.
  *
+ * @since 0.4.0
+ *
  **/
-export const DEFAULT_SSH_HOSTNAME = '10.200.200.1'
+export const DEFAULT_SSH_HOSTNAME = '192.168.42.1'

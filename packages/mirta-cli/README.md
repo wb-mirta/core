@@ -249,35 +249,114 @@ Synchronizes files with Wiren Board controllers via `rsync` over SSH.
 - `--profile`, `-p <name>` — deployment profile (default: `default`).
 - `--to <conn>` — override connection string.
 - `--dry-run` — simulate synchronization.
+Parameter `--to` accepts:
+- Connection name from `mirta.config.json`,
+- Connection string starting with `ssh://`.
 
-#### Connection string example
+#### Environment variables and secrets
+
+For secure credential storage, use `.env.local` (git-ignored):
 
 ```sh
-ssh://deploy@192.168.42.1;pkcs11=/usr/lib/librtpkcs11ecp.so;ttl=1h;wsl=Debian
+# .env.local
+
+SSH_KEY=~/.ssh/id_ed25519
+
+# Available in config:
+WB_CONN_OPTIONS=`key=${SSH_KEY};ttl=1h30m`
+WB_CONN_WORK=`ssh://user@mycompany.local;${WB_CONN_OPTIONS}`
 ```
 
-#### mirta.config.json structure
+Supported prefixes:
+- `WB_` — CLI-specific variables
+- `MIRTA_` — general Mirta context
+- `NODE_ENV` — standard environment value
 
-```json
+#### Connection string format
+
+```sh
+ssh://[user@]host[:port][;param1=value1;param2=value2...]
+```
+
+Supported parameters:
+
+| Parameter | Description | Example |
+|---------|-------------|---------|
+| `pkcs11` | Path to PKCS#11 library (Rutoken) | `pkcs11=/usr/lib/librtpkcs11ecp.so` |
+| `key` | Path to SSH key (ED25519, RSA) | `key=~/.ssh/id_ed25519` |
+| `ttl` | Key lifetime in ssh-agent | `ttl=1h` |
+| `wsl` | WSL2 distribution for Windows | `wsl=Debian` |
+
+> Note: `pkcs11` takes precedence over `key` if both are specified.
+
+Examples:
+
+```sh
+# ED25519 SSH key
+ssh://deploy@192.168.42.1;key=~/.ssh/id_ed25519;ttl=30m
+```
+
+```sh
+# PKCS#11 token (Rutoken) with WSL2 on Windows
+ssh://deploy@192.168.42.1;pkcs11=/usr/lib/librtpkcs11ecp.so;wsl=Ubuntu-22.04
+```
+
+```sh
+# With environment variables
+ssh://deploy@${WB_HOST};key=${MIRTA_SSH_KEY}
+```
+
+<details>
+<summary>PKCS#11 nuances</summary>
+
+If `ssh-agent` throws `agent refused operation`:
+
+- PKCS#11 module path must be real — symlinks are rejected
+- PIN code attempt limit exceeded, token is locked
+
+</details>
+
+#### Example and structure of `mirta.config.json`
+
+```json5
 {
+  // Connection strings to controllers
   "connections": {
-    "work": "ssh://user@10.200.200.1;pkcs11=/path/to/rutoken.so"
+    // Omitted details in public repository
+    "work": "${WB_CONN_WORK}",
+    // Partial detail hiding
+    "home": "ssh://user@192.168.42.1;${WB_CONN_OPTIONS};wsl=Ubuntu"
   },
   "deploy": {
+    // File sync rule sets
     "mappings": {
       "wb-rules-es5": [
         {
-          "from": "dist/es5/wb-rules",
-          "to": "/mnt/data/etc/wb-rules",
+          // Local folder (relative to project root)
+          "from": "dist/es5/wb-rules-rules",
+          // Target folder on controller
+          "to": "/mnt/data/etc/wb-rules-rules",
+          // User group with access on controller (optional)
+          "toGroup": "developers",
+          // Delete files in target if missing in source
           "cleanup": true,
+          // List of files/dirs to protect from deletion when cleanup: true
           "protect": ["alarms.conf"]
-        }
+        },
+        // {
+        //   Next sync rule...
+        // }
       ]
     },
+    // Predefined deployment profiles
     "profiles": {
       "default": {
+        // Array of rule set names from deploy.mappings
         "mappings": ["wb-rules-es5"],
-        "connection": "work"
+        // Connection name or string
+        "connection": "work",
+        // User group with access on controller (optional)
+        "toGroup": "developers"
       }
     }
   }

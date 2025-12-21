@@ -1,6 +1,7 @@
 import { SourceError } from '#src/errors/source-error'
 import { toPosix } from '@mirta/package'
 import fs from 'node:fs/promises'
+import { homedir } from 'node:os'
 import { resolve, sep, relative } from 'node:path'
 
 /**
@@ -56,5 +57,36 @@ export function resolveSubpath(rootDir: string, targetPath: string) {
     throw SourceError.get('path.outsideRoot', targetPath)
 
   return toPosix(relativePath)
+
+}
+
+/**
+ * Заменяет `~` в начале пути на домашнюю директорию пользователя.
+ *
+ * На Unix-подобных системах (Linux, macOS):
+ * - `~/dir` → `/home/username/dir`
+ * - `~/.ssh` → `/Users/username/.ssh`
+ *
+ * На Windows:
+ * - Путь остаётся без изменений (`~` не раскрывается).
+ * - Это сделано для совместимости с WSL2 и shell-средами, где `~` обрабатывается отдельно.
+ *
+ * @param path - Входной путь, возможно, начинающийся с `~`.
+ * @returns Путь с раскрытой домашней директорией (на Unix) или исходный путь (на Windows).
+ *
+ * @example
+ * expandHomeDir('~/projects') // → '/home/user/projects' (Linux)
+ * expandHomeDir('~/config')   // → '/Users/user/config' (macOS)
+ * expandHomeDir('~/data')     // → '~/data' (Windows — без изменений)
+ *
+ * @since 0.4.0
+ *
+ **/
+export function expandHomeDir(path: string): string {
+
+  if (!path.startsWith('~') || process.platform === 'win32')
+    return path
+
+  return path.replace(/^~/, homedir())
 
 }

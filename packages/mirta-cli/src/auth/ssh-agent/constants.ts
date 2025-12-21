@@ -1,4 +1,4 @@
-import { homedir } from 'node:os'
+import { expandHomeDir } from '#src/utils/file-system'
 
 /**
  * Базовая директория для SSH-файлов в зависимости от платформы.
@@ -11,11 +11,7 @@ import { homedir } from 'node:os'
  * @since 0.4.0
  *
  **/
-export const SSH_DIR = (
-  process.platform !== 'win32'
-    ? homedir()
-    : '~'
-) + '/.ssh'
+export const SSH_DIR = expandHomeDir('~/.ssh')
 
 /**
  * Путь к сокету изолированного ssh-agent.

@@ -3,6 +3,7 @@ import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 import type { MirtaConfig } from './types'
 import { SourceError } from '#src/errors/source-error'
 import { join } from 'node:path/posix'
+import JSON5 from 'json5'
 
 /**
  * Обёртка для определения конфигурации. Позволяет использовать подсказки типов TypeScript.
@@ -46,7 +47,7 @@ export function parseConfigJson(
   content: string
 ): object {
 
-  const parsed = JSON.parse(content) as unknown
+  const parsed = JSON5.parse<unknown>(content)
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
     throw SourceError.get('parse.invalidJsonRoot')

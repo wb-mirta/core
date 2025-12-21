@@ -43,10 +43,10 @@ export interface ResolvedConfig {
  **/
 export async function resolveConfigAsync(
   rootDir: string,
-  path: string = DEFAULT_CONFIG_FILE
+  path?: string
 ): Promise<ResolvedConfig> {
 
-  const userConfig = await readConfigAsync(rootDir, path)
+  const userConfig = await readConfigAsync(rootDir, path ?? DEFAULT_CONFIG_FILE)
 
   if (!userConfig && path)
     throw SourceError.get('file.notFound', path)

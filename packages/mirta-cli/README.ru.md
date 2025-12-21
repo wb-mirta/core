@@ -261,34 +261,108 @@ pnpm mirta release prerelease --preid alpha
 - `--to <conn>` — переопределение подключения.
 - `--dry-run` — симуляция синхронизации.
 
-#### Пример строки подключения
+Параметр `--to` принимает:
+- Название подключения из файла конфигурации `mirta.config.json`, 
+- Строку подключения, если она начинается с префикса `ssh://`.
+
+#### Переменные окружения и секреты
+
+Для безопасного хранения учётных данных используйте файл `.env.local` (игнорируется git):
 
 ```sh
-ssh://deploy@192.168.42.1;pkcs11=/usr/lib/librtpkcs11ecp.so;ttl=1h;wsl=Debian
+# .env.local
+
+SSH_KEY=~/.ssh/id_ed25519
+
+# Доступно в конфигурации:
+WB_CONN_OPTIONS=`key=${SSH_KEY};ttl=1h30m`
+WB_CONN_WORK=`ssh://user@mycompany.local;${WB_CONN_OPTIONS}`
+```
+Поддерживаемые префиксы:
+- `WB_` — переменные, специфичные для CLI
+- `MIRTA_` — переменные для использования в любом контексте Mirta
+- `NODE_ENV` — стандартное значение окружения
+
+#### Формат строки подключения
+
+```sh
+ssh://[user@]host[:port][;param1=value1;param2=value2...]
+```
+Поддерживаемые параметры:
+
+| Параметр | Описание | Пример |
+|----------|---------|---------|
+| `pkcs11` | Путь к библиотеке PKCS#11 (Rutoken) | `pkcs11=/usr/lib/librtpkcs11ecp.so` |
+| `key` | Путь к SSH-ключу (ED25519, RSA) | `key=~/.ssh/id_ed25519` |
+| `ttl` | Время жизни ключа в ssh-agent | `ttl=1h` |
+| `wsl` | Дистрибутив WSL2 для Windows | `wsl=Debian` |
+
+> Примечание: `pkcs11` имеет приоритет над `key`, если указаны одновременно.
+
+Примеры:
+
+```sh
+# SSH-ключ ED25519
+ssh://deploy@192.168.42.1;key=~/.ssh/id_ed25519;ttl=30m
+
+# PKCS#11 токен (Rutoken) с WSL2 на Windows
+ssh://deploy@192.168.42.1;pkcs11=/usr/lib/librtpkcs11ecp.so;wsl=Ubuntu-22.04
+
+# С переменными окружения
+ssh://deploy@${WB_HOST};key=${MIRTA_SSH_KEY}
 ```
 
-#### Структура mirta.config.json
+<details>
+<summary>Нюансы PKCS#11</summary>
 
-```json
+Если `ssh-agent` выбрасывает ошибку `agent refused operation`:
+
+- Путь к модулю PKCS#11 должен быть реальным — симлинки отклоняются
+- Превышено число попыток ввода PIN-кода, токен заблокирован
+
+</details>
+
+#### Пример и описание структуры `mirta.config.json`
+
+```json5
 {
+  // Строки подключений к контроллерам
   "connections": {
-    "work": "ssh://user@10.200.200.1;pkcs11=/path/to/rutoken.so"
+    // Без подробностей в публичном репозитории
+    "work": "${WB_CONN_WORK}",
+    // Частичное сокрытие подробностей
+    "home": "ssh://user@192.168.42.1;${WB_CONN_OPTIONS};wsl=Ubuntu",
   },
   "deploy": {
+    // Наборы правил синхронизации
     "mappings": {
       "wb-rules-es5": [
         {
-          "from": "dist/es5/wb-rules",
-          "to": "/mnt/data/etc/wb-rules",
+          // Локальная папка (относительно корня проекта)
+          "from": "dist/es5/wb-rules-rules",
+          // Целевая папка на контроллере
+          "to": "/mnt/data/etc/wb-rules-rules",
+          // Группа пользователей с доступом на контроллере (опционально)
+          "toGroup": "developers",
+          // Удалять файлы в целевой папке, если их нет в исходной
           "cleanup": true,
+          // Список файлов и папок, которые нельзя удалять при cleanup: true
           "protect": ["alarms.conf"]
-        }
+        },
+        // {
+        //   Следующее правило синхронизации...
+        // }
       ]
     },
+    // Заранее настроенные сценарии деплоя
     "profiles": {
       "default": {
+        // Массив имён наборов правил секции deploy.mappings
         "mappings": ["wb-rules-es5"],
-        "connection": "work"
+        // Имя или строка подключения
+        "connection": "work",
+        // Группа пользователей с доступом на контроллере (опционально)
+        "toGroup": "developers"
       }
     }
   }

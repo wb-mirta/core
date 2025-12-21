@@ -1,4 +1,5 @@
 import type { KeyPath } from '#src/config/types'
+import { expandHomeDir } from '#src/utils/file-system'
 import { useLogger } from '#src/utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
@@ -84,7 +85,9 @@ export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise
   if (context.ttl)
     args.push('-t', context.ttl)
 
-  args.push(path)
+  args.push(
+    expandHomeDir(path)
+  )
 
   await context.runAsync(
     'ssh-add',
