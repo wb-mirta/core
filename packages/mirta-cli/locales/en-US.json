@@ -42,7 +42,7 @@
   "wsl.distroNotWsl2": "Distribution {name} is not WSL2",
   "wsl.error": "WSL error: {error}",
   "deploy.useDedicatedGroup": "Use dedicated group (e.g. '{group}') to prevent system file loss",
-  "deploy.deploying": "Deploying to {target} in {mode} mode, {profile} profile",
+  "deploy.deploying": "Deploying to {target} ({mode}), {profile} profile",
   "deploy.profileNotFound": "Deploy profile '{name}' not found",
   "deploy.profileImplicit": "{name} (implicit)",
   "deploy.mappingsNotFound": "Mappings not found: {key}",

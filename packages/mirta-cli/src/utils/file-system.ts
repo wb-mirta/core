@@ -1,7 +1,7 @@
+import { homedir } from 'node:os'
 import { SourceError } from '#src/errors/source-error'
 import { toPosix } from '@mirta/package'
 import { access } from 'node:fs/promises'
-import { homedir } from 'node:os'
 import { resolve, sep, relative } from 'node:path'
 
 /**

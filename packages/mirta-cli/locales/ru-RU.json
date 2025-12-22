@@ -42,7 +42,7 @@
   "wsl.distroNotWsl2": "Дистрибутив {name} не поддерживает WSL2",
   "wsl.error": "Ошибка WSL: {error}",
   "deploy.useDedicatedGroup": "Используйте группы (например, '{group}') для защиты системных файлов",
-  "deploy.deploying": "Деплой на {target} в режиме {mode}, профиль {profile}",
+  "deploy.deploying": "Деплой по адресу {target} ({mode}), профиль {profile}",
   "deploy.profileNotFound": "Профиль деплоя '{name}' не найден",
   "deploy.profileImplicit": "{name} (встроенный)",
   "deploy.mappingsNotFound": "Набор маппингов не найден: {key}",
