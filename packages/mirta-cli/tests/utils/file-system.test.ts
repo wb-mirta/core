@@ -1,17 +1,19 @@
-import { access } from 'node:fs/promises'
-
-vi.mock(import('node:fs/promises'), () => ({
-  readFile: vi.fn(),
+vi.mock('node:fs/promises', () => ({
   access: vi.fn(),
 }))
 
-vi.mock(import('node:os'), () => ({
+vi.mock('node:os', () => ({
   homedir: vi.fn(() => '/mocked/home'),
 }))
 
-vi.mock(import('@mirta/package'), () => ({
-  toPosix: vi.fn((path: string) => path.replace(/\\/g, '/')),
-}))
+vi.mock('@mirta/package', async (importOriginal) => {
+
+  const actual = await importOriginal<typeof import('@mirta/package')>()
+  return {
+    toPosix: actual.toPosix,
+  }
+
+})
 
 vi.mock('#src/errors/source-error', () => ({
   SourceError: {
@@ -19,7 +21,8 @@ vi.mock('#src/errors/source-error', () => ({
   },
 }))
 
-const mockAccess = vi.mocked(access)
+const fsPromises = await import('node:fs/promises')
+const mockAccess = vi.mocked(fsPromises.access)
 
 const { isExistsAsync, resolveSubpath, expandHomeDir } = await import('#src/utils/file-system')
 
