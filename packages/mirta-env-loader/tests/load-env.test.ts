@@ -205,7 +205,7 @@ describe('loadEnv', () => {
 
     })
 
-    it('should load only base .env file when mode is undefined', () => {
+    it('should load only base .env and .env.local file when mode is undefined', () => {
 
       delete process.env.NODE_ENV
 
@@ -213,7 +213,10 @@ describe('loadEnv', () => {
 
       expectConfigCalledWith((config) => {
 
-        expect(config.path).toEqual(['/app/.env'])
+        expect(config.path).toEqual([
+          '/app/.env.local',
+          '/app/.env',
+        ])
 
       })
 
@@ -392,7 +395,10 @@ describe('loadEnv', () => {
 
       expectConfigCalledWith((config) => {
 
-        expect(config.path).toEqual(['/app/.env.custom'])
+        expect(config.path).toEqual([
+          '/app/.env.custom.local',
+          '/app/.env.custom',
+        ])
 
       })
 

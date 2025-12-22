@@ -10,6 +10,7 @@ import type { ReleaseContext } from './types'
 import { prompts } from '#src/utils/prompts'
 import { executeReleaseAsync } from './release'
 import chalk from 'chalk'
+import { resolveConfigAsync } from '#src/config/resolve'
 
 const logger = useLogger()
 const { yellow } = chalk
@@ -23,9 +24,9 @@ export async function runAsync(args: StagedArgs): Promise<void> {
   const currentVersion = getCurrentVersion()
   const preid = argv.preid ?? prerelease(currentVersion)?.[0] as string | undefined
 
-  const isDryRun = argv['dry-run']
-  const skipGit = argv['skip-git']
-  const skipPrompts = argv['skip-prompts']
+  const isDryRun = argv['dry-run'] ?? false
+  const skipGit = argv['skip-git'] ?? false
+  const skipPrompts = argv['skip-prompts'] ?? false
 
   // === 2. Проверка окружения ===
 
@@ -81,8 +82,11 @@ export async function runAsync(args: StagedArgs): Promise<void> {
 
   }
 
-  // === 7. Выполнение релиза ===
+  // === 7. Загружаем конфиг ===
+  const { config: mirtaConfig } = await resolveConfigAsync(process.cwd(), argv.config)
 
-  await executeReleaseAsync(context)
+  // === 8. Выполнение релиза ===
+
+  await executeReleaseAsync(context, mirtaConfig)
 
 }

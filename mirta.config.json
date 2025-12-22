@@ -1,7 +1,10 @@
 {
-  "scope": "mirta",
-  "scopeAsPackagePrefix": true,
-  "templates": [
-    "packages/create-mirta/public/templates"
-  ]
+  "connections": {
+    "default": "${WB_CONN_DEFAULT}"
+  },
+  "project": {
+    "templates": [
+      "packages/create-mirta/public/templates"
+    ]
+  }
 }

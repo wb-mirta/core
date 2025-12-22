@@ -130,7 +130,6 @@ function mapToSchema(
   const localConsumedIndices = new Set(consumedIndices)
 
   const foundKeys = new Set<string>()
-
   let nextIndex = 0
 
   for (let i = 0; i < tokens.length; i++) {
@@ -155,11 +154,11 @@ function mapToSchema(
     if (!option)
       continue
 
+    foundKeys.add(option.key)
+
     if (option.type === 'boolean') {
 
       values[option.key] = token.value !== 'false'
-
-      foundKeys.add(option.key)
 
     }
     else {
@@ -184,12 +183,8 @@ function mapToSchema(
 
       }
 
-      if (value !== undefined) {
-
+      if (value !== undefined)
         values[option.key] = value
-        foundKeys.add(option.key)
-
-      }
 
     }
 
@@ -197,18 +192,21 @@ function mapToSchema(
 
   for (const key of Object.keys(schema)) {
 
-    if (foundKeys.has(key))
+    // Пропускаем явно установленные значения.
+    if (key in values)
       continue
 
+    // Строковые опции можно указывать только вместе со значениями.
+    if (foundKeys.has(key) && schema[key].type === 'string')
+      throw Error(t('args.missingValue', { name: `--${key}` }))
+
+    // Для отсутствующих ключей применяем значения по умолчанию.
     if (schema[key].default !== undefined) {
 
       values[key] = schema[key].default
       continue
 
     }
-
-    if (schema[key].type === 'string')
-      throw Error(`Missing value for '--${key}' option`)
 
   }
 

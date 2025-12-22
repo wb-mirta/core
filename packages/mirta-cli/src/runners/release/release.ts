@@ -5,21 +5,23 @@ import { runCommandAsync } from '#src/utils/shell'
 import chalk from 'chalk'
 import type { ReleaseContext } from './types'
 import { t } from '#src/i18n/index'
+import type { MirtaConfig } from '#src/config/types'
 
 const logger = useLogger()
 const { yellow } = chalk
 
 export async function executeReleaseAsync(
-  context: ReleaseContext
+  context: ReleaseContext,
+  config: MirtaConfig
 ): Promise<void> {
 
-  const runIfNotDry = runCommandAsync.ifNotDry(context.isDryRun)
+  const runAsync = runCommandAsync.dry(context.isDryRun)
 
   let isCommitted = false
 
   try {
 
-    await updateVersion(context.targetVersion)
+    await updateVersion(context.targetVersion, config)
 
     logger.log(t('release.versionUpdated', {
       newVersion: yellow(`v${context.targetVersion}`),
@@ -45,7 +47,7 @@ export async function executeReleaseAsync(
 
           logger.step(t('release.versionReverting'))
 
-          await updateVersion(context.currentVersion)
+          await updateVersion(context.currentVersion, config)
 
           logger.step(t('release.versionReverted', {
             oldVersion: yellow(`v${context.currentVersion}`),
@@ -61,7 +63,7 @@ export async function executeReleaseAsync(
 
     logger.step(t('release.lockfileUpdating'))
 
-    await runIfNotDry('pnpm', ['install', '--prefer-offline'])
+    await runAsync('pnpm', ['install', '--prefer-offline'])
 
     if (!context.inWorkTree || !context.repository) {
 
@@ -78,8 +80,8 @@ export async function executeReleaseAsync(
 
         logger.step(t('release.committing'))
 
-        await runIfNotDry('git', ['add', '-A'])
-        await runIfNotDry('git', ['commit', '-m', `release: v${context.targetVersion}`])
+        await runAsync('git', ['add', '-A'])
+        await runAsync('git', ['commit', '-m', `release: v${context.targetVersion}`])
 
         if (!context.isDryRun)
           isCommitted = true
@@ -91,7 +93,7 @@ export async function executeReleaseAsync(
 
         if (!existingTag) {
 
-          await runIfNotDry('git', ['tag', tagName])
+          await runAsync('git', ['tag', tagName])
 
         }
         else {
@@ -102,8 +104,8 @@ export async function executeReleaseAsync(
 
         }
 
-        await runIfNotDry('git', ['push'])
-        await runIfNotDry('git', ['push', 'origin', `refs/tags/v${context.targetVersion}`])
+        await runAsync('git', ['push'])
+        await runAsync('git', ['push', 'origin', `refs/tags/v${context.targetVersion}`])
 
         logger.note(yellow(t('release.final.gitRemote')))
         logger.note(t('release.final.gitRemoteStatus', {
@@ -135,7 +137,7 @@ export async function executeReleaseAsync(
 
       try {
 
-        await updateVersion(context.currentVersion)
+        await updateVersion(context.currentVersion, config)
 
         logger.step(t('release.versionReverted', {
           oldVersion: yellow(`v${context.currentVersion}`),

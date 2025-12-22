@@ -46,6 +46,9 @@
   "engines": {
     "node": ">=20.6.0"
   },
+  "scripts": {
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
+  },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.51.1",
     "@mirta/basics": "workspace:*"

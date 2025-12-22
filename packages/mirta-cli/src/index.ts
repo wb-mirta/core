@@ -1,7 +1,7 @@
 import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'
 import { createStagedArgs } from '#src/staged-args'
-import { ShellError } from '#utils/shell'
+import { OperationCanceledError, ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
 import { getHelpMessage } from './message-help'
 
@@ -74,7 +74,7 @@ run().catch((e: unknown) => {
     logger.error(prettify(e.message, e.name))
 
   }
-  else if (e instanceof PromptCanceledError) {
+  else if (e instanceof PromptCanceledError || e instanceof OperationCanceledError) {
 
     logger.cancel(t('step.canceled'))
 

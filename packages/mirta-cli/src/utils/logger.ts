@@ -54,6 +54,16 @@ export function useLogger() {
 
   }
 
+  function debug(message: string) {
+
+    if (!__DEV__)
+      return
+
+    if (message)
+      console.log(dim(message))
+
+  }
+
   function step(message: string) {
 
     if (message)
@@ -106,6 +116,7 @@ export function useLogger() {
   return {
     log,
     step,
+    debug,
     info,
     note,
     success,

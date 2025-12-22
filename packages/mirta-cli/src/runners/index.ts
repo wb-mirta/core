@@ -8,6 +8,7 @@ const runners: Record<string, () => Promise<AsyncRunner>> = {
 
   release: async () => (await import('./release')).runAsync,
   publish: async () => (await import('./publish')).runAsync,
+  deploy: async () => (await import('./deploy')).runAsync,
 
 }
 

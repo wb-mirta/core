@@ -18,7 +18,10 @@ describe('resolveEnvFiles', () => {
         mode: undefined,
       })
 
-      expect(files).toEqual(['/app/.env'])
+      expect(files).toEqual([
+        '/app/.env.local',
+        '/app/.env',
+      ])
 
     })
 
@@ -204,7 +207,10 @@ describe('resolveEnvFiles', () => {
         envFile: '.env.custom',
       })
 
-      expect(files).toEqual(['/app/.env.custom'])
+      expect(files).toEqual([
+        '/app/.env.custom.local',
+        '/app/.env.custom',
+      ])
 
     })
 
@@ -257,7 +263,10 @@ describe('resolveEnvFiles', () => {
         envFile: ['.env', '.env', '.env'],
       })
 
-      expect(files).toEqual(['/app/.env'])
+      expect(files).toEqual([
+        '/app/.env.local',
+        '/app/.env',
+      ])
 
     })
 
