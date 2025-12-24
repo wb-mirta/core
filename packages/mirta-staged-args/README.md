@@ -13,7 +13,7 @@
 - Without aborting execution on input errors,
 - And supporting localized error messages.
 
-The `@mirta/staged-args` package is intended **exclusively for Node.js tools** (≥ 20.6.0) and is not used in Duktape runtime.
+The `@mirta/staged-args` package is intended **exclusively for Node.js tools** (≥ 20.10.0) and is not used in Duktape runtime.
 
 ## 📦 Installation
 
