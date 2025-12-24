@@ -42,11 +42,11 @@
   "bugs": {
     "url": "https://github.com/wb-mirta/core/issues"
   },
-  "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config-package"
-  },
   "funding": {
     "type": "individual",
     "url": "https://boosty.to/wihome/donate"
+  },
+  "scripts": {
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
   }
 }

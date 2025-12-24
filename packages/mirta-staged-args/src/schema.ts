@@ -139,13 +139,11 @@ export function mapToSchema(
 
     }
 
+    const defaultValue = schema[key].default
+
     // Для отсутствующих ключей применяем значения по умолчанию.
-    if (schema[key].default !== undefined) {
-
-      values[key] = schema[key].default
-      continue
-
-    }
+    if (defaultValue !== undefined)
+      values[key] = defaultValue
 
   }
 

@@ -111,6 +111,55 @@ describe('createStagedArgs', () => {
 
     })
 
+    it('should allow re-parsing of options in subsequent stages', () => {
+
+      const schema1 = { config: { type: 'string' } } as const
+      const schema2 = { config: { type: 'string' }, verbose: { type: 'boolean' } } as const
+
+      const args = createStagedArgs(['--config=dev', '--verbose'])
+
+      const result1 = args.parse(schema1)
+      assertNoParseErrors(result1)
+      const { stagedArgs } = result1.data
+
+      const result2 = stagedArgs.parseFinal(schema2)
+      assertNoParseErrors(result2)
+      const { values } = result2.data
+
+      expect(values.config).toBe('dev')
+      expect(values.verbose).toBe(true)
+
+    })
+
+    it('should re-parse option flag but not re-use consumed positional value', () => {
+
+      const schema1 = { port: { type: 'string' } } as const
+      const schema2 = { port: { type: 'string' } } as const
+
+      const args = createStagedArgs(['--port', '3000', 'deploy'])
+
+      // Этап 1: парсим --port
+      const result1 = args.parse(schema1)
+      assertNoParseErrors(result1)
+      const { values, positionals, stagedArgs } = result1.data
+
+      // Проверяем первый этап
+      expect(values.port).toBe('3000')
+      expect(positionals).toEqual(['deploy']) // ← '3000' не в positionals, потому что использовано как значение
+
+      // Этап 2: пытаемся снова парсить --port
+      const result2 = stagedArgs.parseFinal(schema2)
+      assertNoParseErrors(result2)
+      const { values: cmdValues, positionals: cmdPositionals } = result2.data
+
+      // Опция --port доступна снова
+      expect(cmdValues.port).toBe('3000')
+
+      // '3000' не возвращается как positional
+      expect(cmdPositionals).toEqual(['deploy'])
+
+    })
+
   })
 
   describe('suggest option', () => {
