@@ -1,5 +1,6 @@
-import type { StagedArgs, OptionSchema } from '#src/staged-args'
+import type { StagedArgs, OptionSchema } from '@mirta/staged-args'
 import { logger } from '#utils/logger'
+import { assertNoParseErrors } from '#utils/assertions'
 
 /**
  * Схема доступных опций команды `deploy`.
@@ -46,7 +47,10 @@ export function parseArgs(
   args: StagedArgs
 ) {
 
-  const { values, positionals } = args.parseFinal(options)
+  const parseResult = args.parseFinal(options)
+  assertNoParseErrors(parseResult)
+
+  const { values, positionals } = parseResult.data
 
   if (values.dry) {
 

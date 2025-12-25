@@ -1,9 +1,10 @@
 {
   "command.suggest": "{input} → did you mean {suggestion}?",
   "command.notFound": "Unknown command: {input}",
-  "args.suggest": "{input} → {suggestion}",
-  "args.notFound": "Unknown {count, plural, one{option} other{options}}",
-  "args.missingValue": "Missing value for {name}",
+  "args.errorHeader": "Invalid CLI {count, plural, one{argument} other{arguments}}",
+  "args.unknownOption": "{option} → unknown option",
+  "args.unknownOptionSuggest": "{option} → did you mean {suggestion}?",
+  "args.missingValue": "{option} → missing value",
   "label.debug": "Debug",
   "label.info": "Info",
   "label.warning": "Warning",

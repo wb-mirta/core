@@ -1,5 +1,5 @@
 import { PromptCanceledError } from '#utils/prompts'
-import { createStagedArgs } from '#src/staged-args'
+import { createStagedArgs } from '@mirta/staged-args'
 import { OperationCanceledError, ShellError } from '#utils/shell'
 import { GitError, GithubError, WorkflowStatusError } from './utils/github'
 import { getHelpMessage } from './message-help'
@@ -9,6 +9,7 @@ import { setLocaleAsync, t } from './i18n'
 import { resolveRunnerAsync } from './runners'
 
 import { logger } from '#utils/logger'
+import { assertNoParseErrors } from './utils/assertions'
 
 const commonOptions = {
 
@@ -32,7 +33,10 @@ async function run() {
     process.argv.slice(2)
   )
 
-  const { values: argv, positionals, stagedArgs: runnerArgs } = args.parse(commonOptions)
+  const parseResult = args.parse(commonOptions)
+  assertNoParseErrors(parseResult)
+
+  const { values: argv, positionals, stagedArgs: runnerArgs } = parseResult.data
 
   if (argv.locale)
     await setLocaleAsync(argv.locale)
@@ -80,7 +84,6 @@ run().catch((e: unknown) => {
   }
   else if (e instanceof Error && 'code' in e) {
 
-    // if (e.code === 'ERR_PARSE_ARGS_UNKNOWN_OPTION')
     // if (e.code === 'ENOENT')
 
     logger.error(prettify(e.message, e.name))

@@ -1,4 +1,4 @@
-import type { StagedArgs } from '#src/staged-args'
+import type { StagedArgs } from '@mirta/staged-args'
 import { suggestClosest } from '@mirta/basics/fuzzy'
 import { t } from '../i18n'
 

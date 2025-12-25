@@ -1,5 +1,5 @@
 import { buildPackagesAsync, getCurrentVersion, publishPackagesAsync } from '#src/utils/package'
-import type { StagedArgs } from '#src/staged-args'
+import type { StagedArgs } from '@mirta/staged-args'
 import { parseArgs } from './args'
 
 export async function runAsync(args: StagedArgs): Promise<void> {

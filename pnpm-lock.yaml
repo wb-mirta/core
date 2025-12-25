@@ -301,6 +301,9 @@ importers:
       '@mirta/package':
         specifier: workspace:*
         version: link:../mirta-package
+      '@mirta/staged-args':
+        specifier: workspace:*
+        version: link:../mirta-staged-args
       '@mirta/workspace':
         specifier: workspace:*
         version: link:../mirta-workspace
