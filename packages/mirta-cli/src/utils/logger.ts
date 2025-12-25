@@ -39,7 +39,7 @@ const banner = `Mirta ${dot}`
  * @since 0.4.0
  *
  **/
-const colors: Record<string, ChalkInstance> = {
+const colors: Record<LogLevelExtended, ChalkInstance> = {
 
   debug: chalk.magenta,
   info: chalk.cyan,
@@ -59,7 +59,7 @@ const colors: Record<string, ChalkInstance> = {
  * @since 0.4.0
  *
  **/
-const bgColors: Record<string, ChalkInstance> = {
+const bgColors: Partial<Record<LogLevelExtended, ChalkInstance>> = {
 
   debug: chalk.bgMagenta.black,
   info: chalk.bgCyan.black,
@@ -237,7 +237,7 @@ function formatMessage(
 
   const actualLevel = colorOverride ?? level
 
-  const color = colors[actualLevel] ?? ((...text: unknown[]) => text.join(' '))
+  const color = colors[actualLevel]
   const pill = createPill(actualLevel)
 
   let text = ''
