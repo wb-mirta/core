@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { isString } from '@mirta/basics'
 import { getConnectionTarget, resolveConnection } from '#src/config/connection'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { t } from '#src/i18n'
 import { runRsyncAsync } from './rsync'
 import type { StagedArgs } from '#src/staged-args'

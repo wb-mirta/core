@@ -4,7 +4,7 @@ import type { AgentContext } from './ssh-agent/types'
 import { ensureAgentIsRunningAsync } from './ssh-agent/agent'
 import { hasTokenAsync, addTokenAsync, removeTokenAsync } from './ssh-agent/token'
 import { hasKeyAsync, addKeyAsync } from './ssh-agent/key'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 
 /**
  * Выполняет аутентификацию подключения к контроллеру через SSH-агент.

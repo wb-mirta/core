@@ -1,4 +1,4 @@
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import type { OptionSchema, StagedArgs } from '#src/staged-args'
 
 const options = ({

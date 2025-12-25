@@ -1,5 +1,5 @@
 import { assertIsSyncedWithRemoteAsync, assertWorkflowResultAsync, getRepositoryDetails } from '#src/utils/github'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import chalk from 'chalk'
 import type { ReleaseContext } from './types'
 

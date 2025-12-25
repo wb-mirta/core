@@ -1,6 +1,6 @@
 import type { KeyPath } from '#src/config/types'
 import { expandHomeDir } from '#src/utils/file-system'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'

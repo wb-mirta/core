@@ -37,12 +37,18 @@ vi.mock('node:fs/promises', () => ({
 }))
 
 vi.mock('#utils/logger', () => ({
-  useLogger: () => ({
-    log: vi.fn(),
-    step: vi.fn(),
-    success: vi.fn(),
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
     warn: vi.fn(),
-  }),
+    error: vi.fn(),
+    success: vi.fn(),
+    cancel: vi.fn(),
+    step: vi.fn(),
+    note: vi.fn(),
+    log: vi.fn(),
+    setLevel: vi.fn(),
+  },
 }))
 
 vi.mock('#src/i18n', () => ({

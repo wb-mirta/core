@@ -1,6 +1,6 @@
 import { t } from '#src/i18n'
 import { replaceEnvVars } from '#src/utils/env'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 
 /**
  * Разделяет строку по первому вхождению указанного разделителя.

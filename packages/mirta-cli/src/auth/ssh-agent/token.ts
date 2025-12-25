@@ -1,5 +1,5 @@
 import type { Pkcs11Path } from '#src/config/types'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'

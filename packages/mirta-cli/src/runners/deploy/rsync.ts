@@ -1,6 +1,6 @@
 import type { DeployMapping, MirtaConnection } from '#src/config/types'
 import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
-import { logger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { t } from '#src/i18n'
 import { runCommandAsync, STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'

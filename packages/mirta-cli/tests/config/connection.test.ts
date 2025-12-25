@@ -4,10 +4,19 @@ vi.mock('#src/i18n', () => ({
   setLocaleAsync: vi.fn(),
 }))
 
-vi.mock('#src/utils/logger', () => ({
-  useLogger: () => ({
+vi.mock('#utils/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
     warn: vi.fn(),
-  }),
+    error: vi.fn(),
+    success: vi.fn(),
+    cancel: vi.fn(),
+    step: vi.fn(),
+    note: vi.fn(),
+    log: vi.fn(),
+    setLevel: vi.fn(),
+  },
 }))
 
 const {
