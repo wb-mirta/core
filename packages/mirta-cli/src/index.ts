@@ -1,4 +1,3 @@
-import { useLogger } from '#utils/logger'
 import { PromptCanceledError } from '#utils/prompts'
 import { createStagedArgs } from '#src/staged-args'
 import { OperationCanceledError, ShellError } from '#utils/shell'
@@ -9,7 +8,7 @@ import cliPackage from '../package.json' with { type: 'json' }
 import { setLocaleAsync, t } from './i18n'
 import { resolveRunnerAsync } from './runners'
 
-const logger = useLogger()
+import { logger } from '#utils/logger'
 
 const commonOptions = {
 

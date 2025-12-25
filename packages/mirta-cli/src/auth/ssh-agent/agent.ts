@@ -1,9 +1,7 @@
 import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from './constants'
 import type { AgentContext } from './types'
-import { useLogger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { STDIO_CAPTURE_ERRORS } from '#src/utils/shell'
-
-const logger = useLogger()
 
 /**
  * Обеспечивает запуск изолированного SSH-агента для текущей сессии CLI.

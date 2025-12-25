@@ -1,6 +1,6 @@
 import { spawn, type IOType, type SpawnOptions } from 'node:child_process'
-import { useLogger } from '#utils/logger'
 import type { WslDistroName } from '#src/config/types'
+import { logger } from '#utils/logger'
 
 /**
  * Режим `stdio`: ввод и вывод наследуются от родительского процесса (терминал), `stderr` перехватывается.
@@ -30,8 +30,6 @@ export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
  *
  **/
 export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
-
-const logger = useLogger()
 
 /**
  * Ошибка выполнения команды в shell.

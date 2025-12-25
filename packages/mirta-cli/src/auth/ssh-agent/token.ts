@@ -1,11 +1,9 @@
 import type { Pkcs11Path } from '#src/config/types'
-import { useLogger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'
 import type { AgentContext } from './types'
-
-const logger = useLogger()
 
 /**
  * Удаляет PKCS#11 токен из SSH-агента.

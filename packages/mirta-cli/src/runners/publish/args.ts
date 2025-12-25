@@ -1,7 +1,5 @@
-import { useLogger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import type { StagedArgs, OptionSchema } from '#src/staged-args'
-
-const logger = useLogger()
 
 const options = ({
   'dry-run': {

@@ -1,12 +1,10 @@
 import type { KeyPath } from '#src/config/types'
 import { expandHomeDir } from '#src/utils/file-system'
-import { useLogger } from '#src/utils/logger'
+import { logger } from '#utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
 import { SSH_AUTH_SOCK } from './constants'
 import { hasEntryAsync } from './entry'
 import type { AgentContext } from './types'
-
-const logger = useLogger()
 
 /**
  * Получает отпечаток (fingerprint) приватного SSH-ключа с помощью `ssh-keygen -lf`.

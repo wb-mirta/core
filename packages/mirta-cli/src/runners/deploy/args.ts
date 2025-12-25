@@ -1,7 +1,5 @@
 import type { StagedArgs, OptionSchema } from '#src/staged-args'
-import { useLogger } from '#src/utils/logger'
-
-const logger = useLogger()
+import { logger } from '#utils/logger'
 
 /**
  * Схема доступных опций команды `deploy`.
