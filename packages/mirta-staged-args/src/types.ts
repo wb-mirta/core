@@ -198,7 +198,7 @@ export type OptionSchema = Record<string, Option>
  **/
 export type Values<TSchema extends OptionSchema> = {
 
-  readonly [K in keyof TSchema]: TSchema[K] extends { type: 'string' }
+  [K in keyof TSchema]: TSchema[K] extends { type: 'string' }
     ? TSchema[K] extends { default: infer _TDefault extends string }
       ? string
       : string | undefined

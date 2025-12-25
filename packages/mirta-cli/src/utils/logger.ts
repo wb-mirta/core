@@ -341,6 +341,34 @@ function log(
 }
 
 /**
+ * Опции для метода `step`.
+ */
+interface StepOptions {
+  /**
+   * Количество пробелов для отступа вложенности.
+   * @default 0
+   */
+  indent?: number
+}
+
+/**
+ * Опции для метода `note`.
+ */
+interface NoteOptions {
+  /**
+   * Количество пробелов для отступа.
+   * @default 0
+   */
+  indent?: number
+
+  /**
+   * Включать ли префикс "Mirta • [note]".
+   * @default true
+   */
+  includePrefix?: boolean
+}
+
+/**
  * Публичный интерфейс логгера. Предоставляет методы для логирования на разных уровнях.
  *
  * @example
@@ -466,7 +494,7 @@ export const logger = {
    * @param options - Настройка отступа.
    *
    **/
-  step: (value: unknown, options = { indent: 2 }) => {
+  step: (value: unknown, options: StepOptions = { indent: 0 }) => {
 
     log('step', value, {
       includePrefix: false,
@@ -483,7 +511,7 @@ export const logger = {
    * @param options - Опции форматирования.
    *
    **/
-  note: (value: unknown, options = { indent: 0, includePrefix: true }) => {
+  note: (value: unknown, options: NoteOptions = { indent: 0, includePrefix: true }) => {
 
     log('note', value, {
       includePrefix: options.includePrefix,

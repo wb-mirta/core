@@ -1,5 +1,5 @@
 import { getCurrentVersion } from '#src/utils/package'
-import type { StagedArgs } from '#src/staged-args'
+import type { StagedArgs } from '@mirta/staged-args'
 import { prerelease } from 'semver'
 import { parseArgs } from './args'
 import { determineTargetVersion } from './version'

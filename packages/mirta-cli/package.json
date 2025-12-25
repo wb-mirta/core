@@ -54,6 +54,7 @@
     "@mirta/env-loader": "workspace:*",
     "@mirta/i18n": "workspace:*",
     "@mirta/package": "workspace:*",
+    "@mirta/staged-args": "workspace:*",
     "@mirta/workspace": "workspace:*",
     "p-map": "^7.0.4",
     "chalk": "^5.6.2",

@@ -1,5 +1,6 @@
+import { assertNoParseErrors } from '#src/utils/assertions'
 import { logger } from '#utils/logger'
-import type { OptionSchema, StagedArgs } from '#src/staged-args'
+import type { OptionSchema, StagedArgs } from '@mirta/staged-args'
 
 const options = ({
   'config': {
@@ -36,7 +37,10 @@ export function parseArgs(
   args: StagedArgs
 ) {
 
-  const { values, positionals } = args.parseFinal(options)
+  const parseResult = args.parseFinal(options)
+  assertNoParseErrors(parseResult)
+
+  const { values, positionals } = parseResult.data
 
   if (values.dry) {
 
