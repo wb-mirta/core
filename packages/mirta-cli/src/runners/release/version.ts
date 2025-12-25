@@ -1,8 +1,6 @@
-import { useLogger } from '#src/utils/logger'
 import { prompts } from '#src/utils/prompts'
 import { inc, valid, type ReleaseType } from 'semver'
-
-const logger = useLogger()
+import { logger } from '#utils/logger'
 
 function getReleaseTypes(preid: string | undefined): readonly ReleaseType[] {
 

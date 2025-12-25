@@ -1,4 +1,3 @@
-import { useLogger } from '#src/utils/logger'
 import { getCurrentVersion } from '#src/utils/package'
 import type { StagedArgs } from '#src/staged-args'
 import { prerelease } from 'semver'
@@ -11,8 +10,8 @@ import { prompts } from '#src/utils/prompts'
 import { executeReleaseAsync } from './release'
 import chalk from 'chalk'
 import { resolveConfigAsync } from '#src/config/resolve'
+import { logger } from '#utils/logger'
 
-const logger = useLogger()
 const { yellow } = chalk
 
 export async function runAsync(args: StagedArgs): Promise<void> {

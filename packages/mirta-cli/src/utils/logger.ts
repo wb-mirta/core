@@ -1,128 +1,275 @@
-import { t } from '../i18n'
-import chalk from 'chalk'
+import chalk, { type ChalkInstance } from 'chalk'
+import { t } from '#src/i18n'
 
-const {
-  dim,
-  red,
-  cyan,
-  green,
-  yellow,
-  bgRed,
-  bgCyan,
-  bgGreen,
-  bgYellow,
-} = chalk
+type LogLevel = | 'info' | 'warn' | 'error' | 'debug'
+
+type LogLevelExtended = LogLevel | 'success' | 'cancel' | 'step' | 'note'
 
 const dot = '•'
 const banner = `Mirta ${dot}`
-const redBanner = red(banner)
-const cyanBanner = cyan(banner)
-const greenBanner = green(banner)
-const yellowBanner = yellow(banner)
 
-const infoPill = (message?: string) =>
-  message ? bgCyan.black(` ${message} `) + (` ${cyan(dot)} `) : ''
+const colors: Record<string, ChalkInstance> = {
 
-const successPill = (message?: string) => message
-  ? bgGreen.black(` ${message} `) + ' '
-  : ''
+  debug: chalk.magenta,
+  info: chalk.cyan,
+  warn: chalk.yellow,
+  error: chalk.red,
 
-const warnPill = (message?: string) =>
-  message ? bgYellow.black(` ${message} `) + (` ${yellow(dot)} `) : ''
+  success: chalk.green,
+  cancel: chalk.red,
+  step: chalk.dim,
+  note: chalk.yellowBright,
 
-const errorPill = (message?: string) => message
-  ? bgRed.white(` ${message} `) + ' '
-  : ''
+}
 
-export const formatMessage = (message: string) =>
-  message ? `${greenBanner} ${message}` : ''
+const bgColors: Record<string, ChalkInstance> = {
 
-export const formatSuccess = (message: string, caption?: string) =>
-  message ? `${successPill(caption)}${green(dot, message)}` : ''
+  debug: chalk.bgMagenta.black,
+  info: chalk.bgCyan.black,
+  warn: chalk.bgYellow.black,
+  error: chalk.bgRed.white,
 
-export const formatError = (message: string, caption?: string) =>
-  message ? `${errorPill(caption)}${red(dot, message)}` : ''
+  success: chalk.bgGreen.black,
+  cancel: chalk.bgRed,
 
-export function useLogger() {
+}
 
-  function log(message: string) {
+const levelPriority: LogLevelExtended[] = [
+  'debug',
+  'info',
+  'warn',
+  'error',
+  'success',
+  'cancel',
+  'step',
+  'note',
+]
 
-    const formatted = formatMessage(message)
+let targetLevel = 0
 
-    if (formatted)
-      console.log(formatted)
+function shouldLog(level: LogLevelExtended): boolean {
 
-  }
+  const currentLevel = levelPriority.indexOf(level)
 
-  function debug(message: string) {
+  return currentLevel === -1 || currentLevel >= targetLevel
 
-    if (!__DEV__)
-      return
+}
 
-    if (message)
-      console.log(dim(message))
+function createPill(level: LogLevelExtended) {
 
-  }
+  const bgColor = bgColors[level] ?? ((text: string) => text)
 
-  function step(message: string) {
+  return (...text: (string | undefined)[]) => {
 
-    if (message)
-      console.log(dim(message))
+    const filteredText = text
+      .filter(x => x !== undefined)
+      .join(' ')
 
-  }
+    if (filteredText.length === 0)
+      return ''
 
-  function info(message: string, caption = t('caption.info')) {
+    return bgColor(` ${filteredText} `) + ` ${dot} `
 
-    if (message)
-      console.log(`${cyanBanner} ${infoPill(caption)}${cyan(message)}`)
-
-  }
-
-  function note(message: string) {
-
-    if (message)
-      console.log(`${yellowBanner} ${message}`)
-
-  }
-
-  function success(message: string, caption = t('caption.success')) {
-
-    if (message)
-      console.log(`${greenBanner} ${successPill(caption)}${green(dot, message)}`)
-
-  }
-
-  function warn(message: string, caption = t('caption.warning')) {
-
-    if (message)
-      console.log(`${yellowBanner} ${warnPill(caption)}${yellow(message)}`)
-
-  }
-
-  function error(message: string, caption = t('caption.error')) {
-
-    if (message)
-      console.log(`${redBanner} ${errorPill(caption)}${red(dot, message)}`)
-
-  }
-
-  function cancel(message: string, caption = t('caption.canceled')) {
-
-    if (message)
-      console.log(`${redBanner} ${errorPill(caption)}${red(dot, message)}`)
-
-  }
-
-  return {
-    log,
-    step,
-    debug,
-    info,
-    note,
-    success,
-    warn,
-    error,
-    cancel,
   }
 
 }
+
+type ColorScope = 'all' | 'first-line' | 'prefix' | 'none'
+
+interface FormattingOptions {
+
+  indent?: number
+  includePrefix?: boolean
+  colorScope?: ColorScope
+  colorOverride?: LogLevelExtended
+
+}
+
+function shouldColorLine(colorScope: ColorScope, lineIndex: number): boolean {
+
+  if (colorScope === 'all')
+    return true
+
+  if (colorScope === 'first-line')
+    return lineIndex === 0
+
+  return false
+
+}
+
+function formatMessage(
+  level: LogLevelExtended,
+  message: unknown,
+  labelOrOptions?: string | FormattingOptions,
+  options?: FormattingOptions
+): string {
+
+  let label: string | undefined
+  let finalOptions: FormattingOptions
+
+  if (typeof labelOrOptions === 'string') {
+
+    label = labelOrOptions
+    finalOptions = options ?? {}
+
+  }
+  else {
+
+    finalOptions = labelOrOptions ?? {}
+
+  }
+
+  const {
+    indent = 0,
+    includePrefix = true,
+    colorScope = 'first-line',
+    colorOverride,
+  } = finalOptions
+
+  const actualLevel = colorOverride ?? level
+
+  const color = colors[actualLevel] ?? ((...text: unknown[]) => text.join(' '))
+  const pill = createPill(actualLevel)
+
+  let text = ''
+
+  if (Array.isArray(message)) {
+
+    text = message.map(x => String(x)).join(' ')
+
+  }
+  else {
+
+    text = String(message)
+
+  }
+
+  const lineIndent = ' '.repeat(indent)
+
+  const lines = text.split('\n')
+
+  let prefix = includePrefix ? `${banner} ${pill(label)}` : ''
+
+  if (prefix && colorScope !== 'none')
+    prefix = color(prefix)
+
+  return lines
+    .map((line, lineIndex) => {
+
+      line = line.trim()
+
+      if (shouldColorLine(colorScope, lineIndex))
+        line = color(line)
+
+      return lineIndex === 0
+        ? lineIndent + prefix + line
+        : lineIndent + `${' '.repeat(2)}${line}`
+
+    })
+    .join('\n')
+
+}
+
+function log(
+  level: LogLevelExtended,
+  value: unknown,
+  label?: string,
+  options?: FormattingOptions
+): void
+
+function log(
+  level: LogLevelExtended,
+  value: unknown,
+  options?: FormattingOptions
+): void
+
+function log(
+  level: LogLevelExtended,
+  value: unknown,
+  labelOrOptions?: string | FormattingOptions,
+  options?: FormattingOptions
+): void {
+
+  if (!shouldLog(level))
+    return
+
+  console.log(
+    formatMessage(level, value, labelOrOptions, options)
+  )
+
+}
+
+export const logger = {
+
+  setLevel: (level: LogLevel) => {
+
+    targetLevel = levelPriority.indexOf(level)
+
+  },
+
+  log: (value: unknown) => {
+
+    log('info', value, {
+      colorScope: 'prefix',
+      colorOverride: 'success',
+    })
+
+  },
+
+  debug: (value: unknown, label = t('label.debug')) => {
+
+    log('debug', value, label)
+
+  },
+
+  info: (value: unknown, label = t('label.info')) => {
+
+    log('info', value, label)
+
+  },
+
+  warn: (value: unknown, label = t('label.warning')) => {
+
+    log('warn', value, label)
+
+  },
+
+  error: (value: unknown, label = t('label.error')) => {
+
+    log('error', value, label)
+
+  },
+
+  success: (value: unknown, label = t('label.success')) => {
+
+    log('success', value, label)
+
+  },
+
+  cancel: (value: unknown, label = t('label.canceled')) => {
+
+    log('cancel', value, label)
+
+  },
+
+  step: (value: unknown, options = { indent: 2 }) => {
+
+    log('step', value, {
+      includePrefix: false,
+      colorScope: 'all',
+      indent: options.indent,
+    })
+
+  },
+
+  note: (value: unknown, options = { indent: 0, includePrefix: true }) => {
+
+    log('note', value, {
+      includePrefix: options.includePrefix,
+      colorScope: 'prefix',
+      indent: options.indent,
+    })
+
+  },
+
+} as const

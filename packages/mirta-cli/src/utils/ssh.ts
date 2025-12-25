@@ -1,9 +1,7 @@
 import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
 import type { MirtaConnection } from '#src/config/types'
-import { useLogger } from './logger'
 import { runCommandAsync, STDIO_CAPTURE_ERRORS } from './shell'
-
-const logger = useLogger()
+import { logger } from '#utils/logger'
 
 /**
  * Проверяет, существует ли указанная группа на удалённом контроллере Wiren Board.

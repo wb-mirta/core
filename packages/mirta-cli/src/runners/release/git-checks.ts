@@ -1,9 +1,8 @@
 import { assertIsSyncedWithRemoteAsync, assertWorkflowResultAsync, getRepositoryDetails } from '#src/utils/github'
-import { useLogger } from '#src/utils/logger'
+import { logger } from '#src/utils/logger'
 import chalk from 'chalk'
 import type { ReleaseContext } from './types'
 
-const logger = useLogger()
 const { yellow } = chalk
 
 export async function runGitChecksAsync(

@@ -10,14 +10,13 @@ import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Packa
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
 import { runCommandAsync } from '#utils/shell'
-import { useLogger } from '#utils/logger'
 
 import chalk from 'chalk'
 import { t } from '../i18n'
 import type { MirtaConfig } from '#src/config/types'
-const { yellow } = chalk
+import { logger } from '#utils/logger'
 
-const logger = useLogger()
+const { yellow } = chalk
 
 const MAX_CONCURRENT_WRITES = 5
 
