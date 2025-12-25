@@ -64,6 +64,8 @@ const configs = [
       'src/config-package.ts',
     ]),
 
+  ...buildPackage('mirta-staged-args'),
+
   // TODO: Разобраться с зависимостями mirta-testing
 
   ...buildPackage('mirta-polyfills'),

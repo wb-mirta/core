@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: 'node',
     globals: true,
-    isolate: false,
+    isolate: !!process.env.CI,
     watch: false,
     exclude: [
       ...configDefaults.exclude,
