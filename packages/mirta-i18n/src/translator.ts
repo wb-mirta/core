@@ -323,12 +323,12 @@ export function parsePlural(content: string, variables: Record<string, MessageVa
  **/
 export function createTranslator<TShape extends GenericShape>(context: LocalizationContext<TShape>) {
 
-  return function translate<
+  const translate = <
     K extends keyof TShape['messages']
   >(
     key: Extract<K, string>,
     variables?: VariablesOf<TShape, K>
-  ) {
+  ) => {
 
     const message = context.messages[key] ?? context.fallbackAsset.messages[key]
 
@@ -396,5 +396,21 @@ export function createTranslator<TShape extends GenericShape>(context: Localizat
     return result
 
   }
+
+  translate.plain = (
+    key: string,
+    fallbackValue?: string
+  ) => {
+
+    const message = context.messages[key]
+      ?? context.fallbackAsset.messages[key]
+      ?? fallbackValue
+      ?? `{{${key}}}`
+
+    return message
+
+  }
+
+  return translate
 
 }

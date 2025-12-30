@@ -93,6 +93,57 @@ export type VariablesOf<TShape extends GenericShape, K extends keyof TShape['mes
     : never
 
 /**
+ * Переводчик сообщений для текущей локали.
+ *
+ * Поддерживает два режима работы:
+ * - `t('ключ', { переменные })` — интерполированная строка
+ * - `t.plain('ключ', 'резервный текст')` — прямой доступ к сообщению.
+ *
+ * @template TShape - Интерфейс локализации, совместимый с `GenericShape`
+ *
+ * @example
+ * ```ts
+ * t('greeting', { name: 'Анна' })
+ * // → "Привет, Анна!"
+ * ```
+ * @example
+ * ```ts
+ * t.plain('unknown.key', 'По умолчанию')
+ * // → "По умолчанию" (если ключ не найден)
+ * ```
+ * @since 0.4.0
+ *
+ **/
+export interface Translator<TShape extends GenericShape> {
+
+  /**
+   * Возвращает локализованное сообщение по ключу с подстановкой переменных.
+   * Ключ и структура переменных проверяются на этапе компиляции.
+   *
+   * @param key - Ключ сообщения
+   * @param variables - Данные для подстановки (если определены)
+   * @returns Локализованная строка с подставленными значениями
+   *
+   **/
+  <TMessageKey extends keyof TShape['messages']>(
+    key: TMessageKey,
+    variables?: VariablesOf<TShape, TMessageKey>
+  ): string
+
+  /**
+   * Возвращает сообщение без интерполяции. Подходит для динамических ключей.
+   * Не требует строгой типизации переменных.
+   *
+   * @param key - Ключ сообщения
+   * @param fallbackValue - Текст, возвращаемый при отсутствии ключа
+   * @returns Значение сообщения или `fallbackValue`
+   *
+   **/
+  plain: (key: string, fallbackValue?: string) => string
+
+}
+
+/**
  * Интерфейс локализации, предоставляемый после инициализации.
  *
  * @since 0.4.0
@@ -116,18 +167,10 @@ export interface Localization<TShape extends GenericShape> {
   setLocaleAsync: (locale: string) => Promise<void>
 
   /**
-   * Переводит сообщение по ключу с подстановкой переменных.
-   *
-   * @template TMessageKey - Ключ сообщения
-   * @param key - Ключ сообщения из `messages`
-   * @param variables - Опциональные переменные для подстановки в сообщение
-   * @returns Локализованная строка с подставленными значениями
+   * Переводчик сообщений для текущей локали.
    *
    **/
-  t: <TMessageKey extends keyof TShape['messages']>(
-    key: TMessageKey,
-    variables?: VariablesOf<TShape, TMessageKey>
-  ) => string
+  t: Translator<TShape>
 
 }
 
