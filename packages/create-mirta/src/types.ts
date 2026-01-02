@@ -10,3 +10,7 @@ export interface CliScope {
   sshPort?: string
   rutoken?: boolean
 }
+
+export type JsonObject = Branded<object, 'JsonObject'>
+
+export type FilePath = Branded<string, 'FilePath'>

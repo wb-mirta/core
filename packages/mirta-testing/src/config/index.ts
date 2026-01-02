@@ -61,7 +61,7 @@ export default defineConfig(({ mode }) => ({
     watch: false,
     exclude: [
       ...configDefaults.exclude,
-      '**/public/templates/**',
+      '**/templates/**',
       '**/dist/**',
     ],
     env: loadEnv({

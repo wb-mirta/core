@@ -1,7 +1,8 @@
 {
   "files.eol": "\n",
   "files.associations": {
-    "renovate.json": "jsonc"
+    "renovate.json": "jsonc",
+    "mirta.config.json": "jsonc"
   },
   "task.autoDetect": "off",
   "todohighlight.keywords": [

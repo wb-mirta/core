@@ -1,9 +1,7 @@
 import chalk from 'chalk'
-import { getLocale } from './utils/localization'
+import { getLocale } from '#i18n'
 
 const { dim, yellow } = chalk
-
-const locale = getLocale()
 
 const helpMessageEn = `\
 Creates a new wb-rules project with the Mirta Framework
@@ -73,6 +71,12 @@ ${yellow('Опции:')}
     ${dim('Отобразить данное сообщение')}
 `
 
-export const helpMessage = locale === 'ru-RU'
-  ? helpMessageRu
-  : helpMessageEn
+export function getHelpMessage() {
+
+  const locale = getLocale()
+
+  return locale === 'ru-RU'
+    ? helpMessageRu
+    : helpMessageEn
+
+}

@@ -1,0 +1,6 @@
+{
+  "connections": {
+    // Строка подключения находится в файле .env.local
+    "default": "${WB_CONN_SECRET}"
+  }
+}

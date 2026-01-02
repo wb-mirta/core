@@ -1,0 +1,23 @@
+{
+  "extends": "@mirta/tsconfig",
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      /** Deprecated, will be removed. Use #wbm/* instead */
+      "@wbm/*": [
+        "./src/wb-rules-modules/*"
+      ]
+    },
+    "types": [
+      "@mirta/globals",
+      "node"
+    ]
+  },
+  "include": [
+    "*.ts",
+    "src/**/*.js",
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "types/**/*.d.ts"
+  ]
+}

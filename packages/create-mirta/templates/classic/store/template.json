@@ -1,0 +1,11 @@
+{
+  "extends": "base",
+  "features": {
+    "global": {
+      "examples": "recommended",
+      "eslint": "recommended",
+      "vitest": "optional"
+    }
+  },
+  "order": 10
+}

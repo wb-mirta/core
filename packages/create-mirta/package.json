@@ -1,7 +1,7 @@
 {
   "name": "create-mirta",
   "description": "🛠️ The recommended way to start a Mirta project.",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "license": "Unlicense",
   "keywords": [
     "mirta",
@@ -11,8 +11,17 @@
     "node": ">=20.6.0"
   },
   "type": "module",
+  "imports": {
+    "#*": "./src/*.js",
+    "#i18n": "./src/i18n/index.js",
+    "#errors": "./src/errors/index.js",
+    "#runners": "./src/runners/index.js",
+    "#locales/*": "./locales/*.json"
+  },
   "files": [
     "dist",
+    "locales",
+    "templates",
     "LICENSE",
     "README.md"
   ],
@@ -29,27 +38,20 @@
     "url": "https://github.com/wb-mirta/core/issues"
   },
   "scripts": {
-    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports"
+    "build:mono": "rollup -c node:@mirta/rollup/config-package --config-skip-exports",
+    "i18n:shape-gen": "node ../../scripts/i18n/shape-gen.mjs",
+    "create": "node dist/index.mjs"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
+    "@mirta/basics": "workspace:*",
+    "@mirta/i18n": "workspace:*",
+    "@mirta/staged-args": "workspace:*",
+    "prompts": "^2.4.2",
     "chalk": "^5.6.2",
-    "ejs": "^3.1.10",
-    "fs-extra": "^11.3.2",
     "gradient-string": "^3.0.0",
-    "is-unicode-supported": "^2.1.0",
-    "lodash.merge": "^4.6.2"
+    "json5": "^2.2.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@stylistic/eslint-plugin": "^5.6.1",
-    "@types/cross-spawn": "^6.0.6",
-    "@types/ejs": "^3.1.5",
-    "@types/fs-extra": "^11.0.4",
-    "@types/lodash.merge": "^4.6.9",
-    "eslint": "^9.39.1",
-    "@vitest/eslint-plugin": "^1.5.2",
-    "globals": "^16.5.0",
-    "typescript-eslint": "^8.49.0"
+    "@types/prompts": "^2.4.9"
   }
 }

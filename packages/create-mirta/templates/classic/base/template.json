@@ -1,0 +1,15 @@
+{
+  "features": {
+    "global": {
+      "examples": "recommended",
+      "connection": "recommended",
+      "eslint": "recommended",
+      "vitest": "optional"
+    },
+    "compound": [
+      "examples-vitest",
+      "vitest-eslint"
+    ]
+  },
+  "order": 0
+}

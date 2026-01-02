@@ -1,4 +1,4 @@
-import { isObject } from './type-guards'
+import { isObject } from '@mirta/basics'
 
 const mergeArrayWithDedupe = (a: unknown[], b: unknown[]) => Array.from(new Set([...a, ...b]))
 
