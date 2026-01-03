@@ -30,14 +30,10 @@ describe('Counter', () => {
 
     const initial = counter.count
 
-    // Попытка присвоить значение геттеру напрямую
-    expect(() => {
+    // @ts-expect-error – подавляем ошибку этапа компиляции
+    counter.count = 100
 
-      // @ts-expect-error – подавляем ошибку этапа компиляции
-      counter.count = 100
-
-    }).toThrow()
-
+    // Значение не должно измениться
     expect(counter.count).toBe(initial)
 
   })

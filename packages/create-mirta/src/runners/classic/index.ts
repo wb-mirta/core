@@ -55,7 +55,7 @@ export async function runAsync(
   // Создаём директорию при её отсутствии.
   else if (context.shouldCreate) {
 
-    await fs.mkdir(rootDir)
+    await fs.mkdir(rootDir, { recursive: true })
 
   }
 

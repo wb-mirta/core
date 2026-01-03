@@ -15,7 +15,7 @@ export async function pickTargetAsync(
     const template = templates.get(templateName)
 
     if (!template)
-      throw new Error(`Unknown template ${templateName}`)
+      throw CreationError.get('template.notFound', templateName)
 
     return template
 
@@ -24,9 +24,9 @@ export async function pickTargetAsync(
   if (templates.size === 1)
     return templates.values().next().value as Template
 
-  const { name } = await prompts({
+  const response = await prompts({
     type: 'select',
-    name: 'name',
+    name: 'templateName',
     message: t('template.select'),
     hint: t('hint.select'),
     choices: [...templates.values()]
@@ -38,10 +38,10 @@ export async function pickTargetAsync(
       })),
   }) as Record<string, string>
 
-  const template = templates.get(name)
+  const template = templates.get(response.templateName)
 
   if (!template)
-    throw CreationError.get('template.notFound', name)
+    throw CreationError.get('template.notFound', response.templateName)
 
   return template
 

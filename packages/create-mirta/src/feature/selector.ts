@@ -1,13 +1,15 @@
 import type { Choice } from 'prompts'
 import type { ExtractedFeature } from './extractor'
-import { CLI_ORIGIN } from '#constants'
+import { FEATURE_ORIGIN_CLI } from '#constants'
 import { t } from '#i18n'
 import { prompts } from '#utils/prompts'
 import chalk from 'chalk'
 
 export async function selectFeaturesAsync(
+
   features: Record<string, ExtractedFeature>
-) {
+
+): Promise<string[]> {
 
   const required: string[] = []
 
@@ -22,7 +24,7 @@ export async function selectFeaturesAsync(
     if (isRequired)
       required.push(featureName)
 
-    if (origin === CLI_ORIGIN)
+    if (origin === FEATURE_ORIGIN_CLI)
       continue
 
     let hint = ''
@@ -47,11 +49,11 @@ export async function selectFeaturesAsync(
     instructions: '\n' + chalk.dim(t('features.instructions')),
     warn: t('hint.blocked'),
     choices: choices,
-  })
+  }) as { selected: string[] }
 
   return [
     ...required,
-    ...selected as string[],
+    ...selected,
   ]
 
 }

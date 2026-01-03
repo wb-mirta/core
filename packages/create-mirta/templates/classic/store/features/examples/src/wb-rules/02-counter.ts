@@ -6,7 +6,7 @@ log('Script: {}', __filename)
 // Использует счетчик из модуля counter
 const counter = useCounter()
 
-// Увеличивает значение счетчика на 1
+// Увеличивает значение счетчика на 2
 counter.increment()
 counter.increment()
 

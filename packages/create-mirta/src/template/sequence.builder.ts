@@ -13,14 +13,10 @@ export function buildSequence(
   // Для предотвращения зацикливания.
   const seen = new Set<string>()
 
-  while (stack.length > 0) {
+  let template: Template | undefined
 
-    // Извлекаем последний шаблон из стека.
-    const template = stack.pop()
-
-    // Если ничего не осталось, обработка завершена.
-    if (!template)
-      break
+  // Извлекаем последний шаблон из стека.
+  while ((template = stack.pop())) {
 
     if (seen.has(template.name))
       throw new Error('Cyclic template inheritance')

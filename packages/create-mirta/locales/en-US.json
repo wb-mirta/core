@@ -33,6 +33,7 @@
   "packageName.invalidFormat": "Invalid format",
 
   "template.select": "Select template",
+  "template.notFound": "Template '{name}' not found",
 
   "templates.base.name": "Base: Getting started",
   "templates.base.description": "A solid foundation",
@@ -80,6 +81,6 @@
 
   "project.outsideRoot": "Cannot create project outside current directory",
   "project.denyOverwrite": "Target directory is not empty",
-  "load.noTemplates": "No templates found for project type '{type}'",
-  "template.notFound": "Template '{name}' not found"
+
+  "load.noTemplates": "No templates found for project type '{type}'"
 }

@@ -33,6 +33,7 @@
   "packageName.invalidFormat": "Неверный формат",
 
   "template.select": "Выберите шаблон",
+  "template.notFound": "Шаблон '{name}' не найден",
 
   "templates.base.name": "Base: начните здесь",
   "templates.base.description": "Сильная основа",

@@ -8,4 +8,10 @@
  **/
 export const THIS_PACKAGE_NAME = 'create-mirta'
 
-export const CLI_ORIGIN = 'cli'
+/**
+ * Источник фичи - CLI.
+ *
+ * @since 0.4.0
+ *
+ **/
+export const FEATURE_ORIGIN_CLI = 'cli'

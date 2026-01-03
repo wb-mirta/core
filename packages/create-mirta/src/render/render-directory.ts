@@ -1,11 +1,11 @@
 import sortDependencies from '#utils/sort-dependencies'
 import fs, { glob } from 'node:fs/promises'
 import { relative, basename, join } from 'node:path'
-import { parseJson } from './parse-json'
-import { renderJsonAsync } from './render-json'
 import { isExistsAsync } from '#utils/file-system'
 import type { FilePath } from '#types'
 import { isPlainObject } from '@mirta/basics'
+import * as json from './json'
+import * as json5 from './json5'
 
 /** Папки и файлы, игнорируемые при обходе шаблона. */
 const IGNORED_DIRS = [
@@ -15,12 +15,16 @@ const IGNORED_DIRS = [
   '*.log',
 ]
 
+/** JSON5-файлы, которые мержатся с существующими при копировании. */
+const KNOWN_JSON5 = [
+  'tsconfig.json',
+]
+
 /** JSON-файлы, которые мержатся с существующими при копировании. */
 const KNOWN_JSON = [
   'extensions.json',
   'settings.json',
   'tasks.json',
-  'tsconfig.json',
 ]
 
 /**
@@ -192,9 +196,10 @@ export async function renderFileAsync(
   // Мерж package.json с сортировкой зависимостей
   if (toFileName === 'package.json' && await isExistsAsync(toPath)) {
 
-    await renderJsonAsync(
-      content ? parseJson(content) : fromPath,
+    await json.renderAsync(
+      fromPath,
       toPath,
+      content,
       json => sortDependencies(json)
     )
 
@@ -205,9 +210,23 @@ export async function renderFileAsync(
   // Мерж других известных JSON
   if (KNOWN_JSON.includes(toFileName) && await isExistsAsync(toPath)) {
 
-    await renderJsonAsync(
-      content ? parseJson(content) : fromPath,
-      toPath
+    await json.renderAsync(
+      fromPath,
+      toPath,
+      content
+    )
+
+    return
+
+  }
+
+  // Мерж известных JSON5
+  if (KNOWN_JSON5.includes(toFileName) && await isExistsAsync(toPath)) {
+
+    await json5.renderAsync(
+      fromPath,
+      toPath,
+      content
     )
 
     return

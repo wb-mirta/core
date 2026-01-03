@@ -51,9 +51,9 @@ export interface Template {
    **/
   features?: {
 
-    global: Record<string, FeatureState>
+    global: Readonly<Record<string, FeatureState>>
 
-    compound: string[]
+    compound: readonly string[]
 
   }
 

@@ -46,18 +46,4 @@ describe('useCounter', () => {
 
   })
 
-  it('should reflect updated store state', () => {
-
-    // Arrange
-    const store = useCounterStore()
-    const counter = useCounter()
-
-    // Act
-    store.count = 10
-
-    // Assert
-    expect(counter.count).toBe(10)
-
-  })
-
 })

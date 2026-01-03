@@ -70,9 +70,6 @@ export async function discoverTemplatesAsync(
 
   }
 
-  if (templates.size === 0)
-    throw CreationError.get('load.noTemplates', type)
-
   return templates
 
 }

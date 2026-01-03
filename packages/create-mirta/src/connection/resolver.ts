@@ -19,7 +19,7 @@ function createConnectionString(input: AddressInput) {
 
   let connection = `ssh://${input.username}@${input.hostname}`
 
-  if (input.port !== KNOWN_SSH_PORT)
+  if (Number(input.port) !== KNOWN_SSH_PORT)
     connection += `:${input.port}`
 
   if (input.rutoken)

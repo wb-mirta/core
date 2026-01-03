@@ -43,7 +43,7 @@ export async function resolveProjectContextAsync(
 
   const projectRoot = resolve(cwd, projectName)
 
-  if (!projectRoot.startsWith(cwd + sep) && projectRoot !== cwd)
+  if (!projectRoot.startsWith(cwd.endsWith('/') ? cwd : cwd + sep) && projectRoot !== cwd)
     throw CreationError.get('project.outsideRoot')
 
   const isExists = await isExistsAsync(projectRoot)

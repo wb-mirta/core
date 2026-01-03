@@ -34,10 +34,6 @@ async function loadAsync(
 
 export async function resolveRunnerAsync(projectType: ProjectType) {
 
-  const runner = await loadAsync(projectType)
-
-  return {
-    runAsync: runner.runAsync,
-  }
+  return await loadAsync(projectType)
 
 }

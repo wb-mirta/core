@@ -1,4 +1,4 @@
-import { CLI_ORIGIN } from '#constants'
+import { FEATURE_ORIGIN_CLI } from '#constants'
 import { t } from '#i18n'
 import type { ProjectContext } from '#project-context/types'
 import { logger } from '#utils/logger'
@@ -28,7 +28,7 @@ function overrideState(
       throw new Error(`Feature ${key} blocked by ${feature.origin}`)
 
     feature.state = 'required'
-    feature.origin = CLI_ORIGIN
+    feature.origin = FEATURE_ORIGIN_CLI
 
   }
   else {
@@ -37,7 +37,7 @@ function overrideState(
       throw new Error(`Feature ${key} required by ${feature.origin}`)
 
     feature.state = 'blocked'
-    feature.origin = CLI_ORIGIN
+    feature.origin = FEATURE_ORIGIN_CLI
 
   }
 

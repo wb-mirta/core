@@ -98,13 +98,13 @@ interface ExecutionResult {
    * Перехваченный стандартный вывод.
    *
    **/
-  stderr: string
+  stdout: string
 
   /**
    * Перехваченный стандартный поток ошибок.
    *
    **/
-  stdout: string
+  stderr: string
 }
 
 /**
