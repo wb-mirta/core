@@ -17,8 +17,11 @@ export async function renderAsync(
   resultHandler?: (result: JsonObject) => JsonObject
 ) {
 
+  const targetContent
+    = await fs.readFile(toPath, 'utf-8')
+
   const targetObject
-    = parse(await fs.readFile(toPath, 'utf-8'))
+    = parse(targetContent)
 
   const sourceObject
     = content !== undefined

@@ -64,7 +64,7 @@
   "ssh.rutoken": "Use Rutoken ECP?",
 
   "overwrite.notEmpty": "Location {path} is not empty",
-  "overwrite.prompt": "Remove existing files before continue?",
+  "overwrite.prompt": "Remove existing files before continuing?",
 
   "dependencies.prompt": "Install project dependencies?",
   "dependencies.answer.yesUsing": "Yes, using {manager}",

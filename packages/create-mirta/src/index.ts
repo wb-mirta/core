@@ -4,7 +4,7 @@ import { createStagedArgs } from '@mirta/staged-args'
 import { assertNoParseErrors } from '#assertions'
 import { setLocaleAsync, t } from '#i18n'
 import { logger } from '#utils/logger'
-import { OperationCanceledError, PromptCanceledError } from '#errors'
+import { CreationError, OperationCanceledError, PromptCanceledError } from '#errors'
 import { resolveRunnerAsync } from '#runners'
 import { banner } from '#banner'
 import { getFinalMessage } from '#message-final'
@@ -89,15 +89,6 @@ async function run() {
 
 }
 
-function prettify(message: string, name?: string) {
-
-  if (name && message.startsWith(name))
-    return message.slice(name.length)
-
-  return message
-
-}
-
 run().catch((e: unknown) => {
 
   if (e instanceof PromptCanceledError || e instanceof OperationCanceledError) {
@@ -105,9 +96,15 @@ run().catch((e: unknown) => {
     logger.cancel(t('step.canceled'))
 
   }
+  else if (e instanceof CreationError) {
+
+    logger.error(e.message)
+
+  }
   else if (e instanceof Error) {
 
-    logger.error(prettify(e.message, e.name))
+    // Unexpected internal error - rethrow to preserve stack trace
+    throw e
 
   }
   else if (typeof e === 'string') {

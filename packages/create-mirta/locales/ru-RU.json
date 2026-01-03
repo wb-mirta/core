@@ -79,6 +79,8 @@
   "validation.required": "Требуется указать значение",
   "validation.invalidFormat": "Неверный формат",
 
-  "errors.operationCanceled": "Операция прервана",
-  "errors.rootIsNotRelative": "Расположение находится вне рабочей директории"
+  "project.outsideRoot": "Невозможно создать проект вне текущей директории",
+  "project.denyOverwrite": "Целевая директория не пуста",
+
+  "load.noTemplates": "Шаблоны для типа проекта '{type}' не найдены"
 }
