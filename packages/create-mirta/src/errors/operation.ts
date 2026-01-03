@@ -11,9 +11,6 @@ export class OperationCanceledError extends Error {
 
     super()
 
-    // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, OperationCanceledError.prototype)
-
     this.name = 'OperationCanceledError'
 
     Error.captureStackTrace(this, OperationCanceledError)

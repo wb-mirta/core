@@ -35,17 +35,15 @@ export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
  *
  * Возникает, когда команда завершилась с кодом, не входящим в `doneCodes` или `cancelCodes`.
  *
+ * @since 0.4.0
+ *
  **/
 export class ShellError extends Error {
   constructor(message: string) {
 
     super(message)
 
-    // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, ShellError.prototype)
-
     this.name = 'ShellError'
-    this.message = message
 
     Error.captureStackTrace(this, ShellError)
 
@@ -54,6 +52,8 @@ export class ShellError extends Error {
 
 /**
  * Результат выполнения команды.
+ *
+ * @since 0.4.0
  *
  **/
 interface ExecutionResult {
@@ -117,6 +117,8 @@ interface RunOptions extends SpawnOptions {
  * @returns Результат выполнения: код, вывод, ошибки.
  * @throws {ShellError} Если команда завершилась с ошибкой.
  * @throws {OperationCanceledError} Если операция была отменена пользователем.
+ *
+ * @since 0.4.0
  *
  **/
 export async function execAsync(
@@ -185,6 +187,8 @@ export async function execAsync(
 
 /**
  * Универсальная функция для запуска команд.
+ *
+ * @since 0.4.0
  *
  **/
 export const runCommandAsync = async (

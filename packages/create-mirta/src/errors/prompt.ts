@@ -3,9 +3,6 @@ export class PromptCanceledError extends Error {
 
     super()
 
-    // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, PromptCanceledError.prototype)
-
     this.name = 'PromptCanceledError'
 
     Error.captureStackTrace(this, PromptCanceledError)

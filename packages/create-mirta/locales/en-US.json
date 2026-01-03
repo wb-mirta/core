@@ -47,8 +47,8 @@
   "features.examples.name": "Examples: Quick Start",
   "features.examples.description": "Typical use of the template and features",
 
-  "features.connection.name": "SSH: Remote Access",
-  "features.connection.description": "Connect to the controller via SSH",
+  "features.connection.name": "SSH: File Transfer",
+  "features.connection.description": "Configure connection to the controller",
 
   "features.eslint.name": "ESLint: Static Analysis",
   "features.eslint.description": "Enforce code style and catch errors",
