@@ -5,19 +5,19 @@ async function run() {
   await runCommand('pnpm', [
 
     // Для всех пакетов
-    '--filter', './packages/*',
+    '--filter=./packages/*',
 
     // Кроме тех, что собрали в режиме bootstrap
-    '--filter', '!@mirta/basics',
-    '--filter', '!@mirta/polyfills',
-    '--filter', '!@mirta/package',
-    '--filter', '!@mirta/workspace',
-    '--filter', '!@mirta/rollup',
-    '--filter', '!@mirta/testing',
-    '--filter', '!mirta',
+    '--filter=!@mirta/basics',
+    '--filter=!@mirta/polyfills',
+    '--filter=!@mirta/package',
+    '--filter=!@mirta/workspace',
+    '--filter=!@mirta/rollup',
+    '--filter=!@mirta/testing',
+    '--filter=!mirta',
 
     // Для всех примеров
-    '--filter', './examples/*/*',
+    '--filter=./examples/*/*',
 
     // Выполняем сборку в режиме монорепозитория
     'run', 'build:mono',
