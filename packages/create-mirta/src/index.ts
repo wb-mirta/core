@@ -1,501 +1,118 @@
-import { fileURLToPath } from 'node:url'
-import { resolve, basename } from 'node:path'
-import { parseArgs } from 'node:util'
-import { canSkipDir, emptyDir } from './utils/file-system'
-import { intro, confirm, text, multiselect, select, outro } from '@clack/prompts'
-import { usePrompts } from './utils/prompts'
-import { banner } from './banner'
-import { helpMessage } from './message-help'
-import fs from 'node:fs'
 import cliPackage from '../package.json' with { type: 'json' }
-import chalk from 'chalk'
 
-import { type CliScope } from './types'
-import { featureFlags, allOptions } from './cli-options'
-import { getLocalized } from './utils/localization'
-import { parseUrl } from './utils/parsers'
+import { createStagedArgs } from '@mirta/staged-args'
+import { assertNoParseErrors } from '#assertions'
+import { setLocaleAsync, t } from '#i18n'
+import { logger } from '#utils/logger'
+import { CreationError, OperationCanceledError, PromptCanceledError } from '#errors'
+import { resolveRunnerAsync } from '#runners'
+import { banner } from '#banner'
+import { getFinalMessage } from '#message-final'
+import { getHelpMessage } from '#message-help'
+import { pickProjectAsync } from '#project/picker'
+import { resolveProjectContextAsync } from '#project-context/resolver'
 
-import renderTemplate from './utils/render-template'
-import renderEslintConfig from './utils/render-eslint-config'
-import { installDependencies, runningPackageManager } from './utils/manager'
-import { formatSuccess } from './utils/logger'
-import { finalMessage } from './message-final'
+const initialSchema = ({
 
-const { dim, red, yellow } = chalk
+  // === Common options ===
 
-const templatesPath = './templates'
-
-const messages = await getLocalized()
-
-type FeatureKey = keyof typeof featureFlags
-
-interface FeatureOption {
-  value: FeatureKey
-  label: string
-  hint?: string
-}
-
-const featureOptions: FeatureOption[] = [
-  {
-    value: 'eslint',
-    label: messages.addEslint.message,
-    hint: messages.addEslint.hint,
+  version: {
+    type: 'boolean',
+    short: 'v',
   },
-  {
-    value: 'store',
-    label: messages.addStore.message,
-    hint: messages.addStore.hint,
+  help: {
+    type: 'boolean',
+    short: 'h',
   },
-  {
-    value: 'vitest',
-    label: messages.addVitest.message,
-    hint: messages.addVitest.hint,
+  locale: {
+    type: 'string',
   },
-]
+  template: {
+    type: 'string',
+  },
+  force: {
+    type: 'boolean',
+  },
+  bare: {
+    type: 'boolean',
+  },
 
-const { prompt, cancel, step, message, inlineSub } = usePrompts(messages)
-
-function isValidPackageName(packageName: string) {
-
-  return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/
-    .test(packageName)
-
-}
-
-function toValidPackageName(packageName: string) {
-
-  return packageName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/^[._]+/, '')
-    .replace(/[^a-z0-9-~]+/g, '-')
-
-}
+}) as const
 
 async function run() {
 
-  const cwd = process.cwd()
-  const args = process.argv.slice(2)
+  const args = createStagedArgs(
+    process.argv.slice(2)
+  )
 
-  const { values: argv, positionals } = parseArgs({
-    args,
-    options: allOptions,
-    allowPositionals: true,
-  })
+  const parseResult = args.parse(initialSchema)
+  assertNoParseErrors(parseResult)
 
-  if (argv.help) {
+  const { values: argv, positionals, stagedArgs: runnerArgs } = parseResult.data
 
-    console.log(helpMessage)
-    process.exit(0)
-
-  }
+  if (argv.locale)
+    await setLocaleAsync(argv.locale)
 
   if (argv.version) {
 
     console.log(`${cliPackage.name} v${cliPackage.version}`)
-    process.exit(0)
+    return
 
   }
 
-  // Если какой-либо функционал указан заранее, пропустить этот вопрос.
-  const isFeatureFlagsUsed = Object.keys(featureFlags)
-    .some(flag => typeof argv[flag] === 'boolean')
+  if (argv.help) {
 
-  let targetDir = positionals[0]
+    console.log(getHelpMessage())
+    return
 
-  const hasPositionalDir = targetDir && targetDir !== '.'
-  const defaultProjectName = hasPositionalDir ? targetDir : 'wb-rules-mirta'
-
-  const shouldOverwrite = argv.force
-
-  const sshAddress = parseUrl(argv.ssh)
-  const sshDefaultUser = 'root'
-  const sshDefaultHost = '10.200.200.1'
-  const sshDefaultPort = '22'
-
-  const sshFullyDefined = !!(sshAddress.username && sshAddress.hostname)
-
-  const scope: CliScope = {
-    projectName: defaultProjectName,
-    projectRoot: '',
-    packageName: defaultProjectName,
-    shouldOverwrite,
-
-    features: [],
-
-    sshUsername: sshAddress.username,
-    sshHostname: sshAddress.hostname,
-    sshPort: sshAddress.port,
-    rutoken: argv.rutoken,
   }
 
   console.log(banner)
-  console.log(messages.title)
+  console.log(t('title'))
   console.log()
 
-  intro(chalk.bgBlackBright.black(` ${messages.captions.intro} `))
+  // Определяем тип шаблона - по аргументам или через вопрос пользователю.
+  const selection = await pickProjectAsync(argv.template)
 
-  if (!targetDir) {
+  const runner = await resolveRunnerAsync(selection.type)
 
-    const answer = await prompt(
-      text({
-        message: messages.projectName.message,
-        placeholder: defaultProjectName,
-        defaultValue: defaultProjectName,
-        validate: (value) => {
+  const context = await resolveProjectContextAsync(selection, {
+    projectFolder: positionals[0],
+    forceOverwrite: argv.force,
+    barebone: argv.bare,
+  })
 
-          if (value.length !== 0 && value.trim().length === 0)
-            return messages.validation.required
-
-        },
-      })
-    )
-
-    targetDir = scope.projectName = scope.packageName = answer.trim()
-
-  }
-
-  const root = scope.projectRoot = resolve(cwd, targetDir)
-  const baseName = basename(root)
-
-  if (hasPositionalDir) {
-
-    step(`${messages.projectName.message}\n${dim(baseName)}`)
-
-  }
-
-  // Защита от выхода за пределы рабочей директории.
-  if (!root.startsWith(cwd)) {
-
-    cancel(messages.errors.rootIsNotRelative)
-    process.exit(1)
-
-  }
-
-  if (!isValidPackageName(targetDir)) {
-
-    scope.packageName = await prompt(
-      text({
-        message: messages.packageName.message,
-        initialValue: toValidPackageName(baseName),
-        validate: value =>
-          isValidPackageName(value)
-            ? undefined
-            : messages.packageName.errorMessage,
-      })
-    )
-
-  }
-
-  if (!canSkipDir(targetDir) && !shouldOverwrite) {
-
-    scope.shouldOverwrite = await prompt(
-      confirm({
-        message: `${
-          targetDir === '.'
-            ? messages.shouldOverwrite.directory.current
-            : messages.shouldOverwrite.directory.target
-        } "${baseName}" ${messages.shouldOverwrite.message} ${red(messages.shouldOverwrite.confirmDelete)}`,
-        initialValue: false,
-      })
-    )
-
-    if (!scope.shouldOverwrite) {
-
-      cancel()
-      process.exit(0)
-
-    }
-
-  }
-
-  message(chalk.bgBlackBright.black(
-    ` ${messages.captions.deploy} `
-  ))
-
-  if (!scope.sshUsername) {
-
-    scope.sshUsername = await prompt(
-      text({
-        message: messages.ssh.username,
-        placeholder: sshDefaultUser,
-        defaultValue: sshDefaultUser,
-        validate: (value) => {
-
-          if (value.length !== 0 && value.trim().length === 0)
-            return messages.validation.required
-
-        },
-      })
-    )
-
-  }
-  else {
-
-    step(`${messages.ssh.username}\n${dim(scope.sshUsername)}`)
-
-  }
-
-  if (!scope.sshHostname) {
-
-    scope.sshHostname = await prompt(
-      text({
-        message: messages.ssh.host,
-        placeholder: sshDefaultHost,
-        defaultValue: sshDefaultHost,
-        validate: (value) => {
-
-          if (value.length !== 0 && value.trim().length === 0)
-            return messages.validation.required
-
-        },
-      })
-    )
-
-  }
-  else {
-
-    step(`${messages.ssh.host}\n${dim(scope.sshHostname)}`)
-
-  }
-
-  if (!sshFullyDefined && !scope.sshPort) {
-
-    scope.sshPort = await prompt(
-      text({
-        message: messages.ssh.port,
-        placeholder: sshDefaultPort,
-        defaultValue: sshDefaultPort,
-        validate: (value) => {
-
-          if (value.length !== 0 && value.trim().length === 0)
-            return messages.validation.required
-
-        },
-      })
-    )
-
-  }
-  else if (scope.sshPort) {
-
-    step(`${messages.ssh.port}\n${dim(scope.sshPort)}`)
-
-  }
-
-  if (!sshFullyDefined && !scope.rutoken) {
-
-    scope.rutoken = await prompt(
-      confirm({
-        message: `${messages.ssh.useRutoken} ${dim(messages.accent.ifConfigured)}`,
-        initialValue: false,
-      })
-    )
-
-  }
-  else if (scope.rutoken) {
-
-    step(`${messages.ssh.useRutoken} ${dim(messages.accent.ifConfigured)}\n${dim('Yes')}`)
-
-  }
-
-  if (!isFeatureFlagsUsed) {
-
-    scope.features = await prompt(
-      multiselect({
-        message: `${messages.featureSelection.message}${inlineSub(dim(messages.featureSelection.hint))}`,
-        options: featureOptions,
-        required: false,
-      })
-    )
-
-  }
-
-  const { features } = scope
-
-  const addEslint = argv.eslint === true || features.includes('eslint')
-  const addStore = argv.store === true || features.includes('store')
-  const addVitest = argv.vitest === true || features.includes('vitest')
-
-  // Очистка целевой директории
-  if (fs.existsSync(root)) {
-
-    if (scope.shouldOverwrite)
-      emptyDir(root)
-
-  }
-  else {
-
-    fs.mkdirSync(root)
-
-  }
-
-  step(`${messages.status.scaffolding} ${yellow(root)}`)
-
-  const pkg = {
-    name: scope.packageName,
-    version: '0.0.0',
-    scripts: {
-      'wb:deploy': '',
-    },
-  }
-
-  const deployScript: string[] = ['rsync']
-
-  if (process.platform === 'win32') {
-
-    // Run rsync trough WSL on Windows systems.
-    deployScript.unshift('wsl ')
-
-  }
-
-  if (scope.rutoken || scope.sshPort) {
-
-    deployScript.push(' -e \'ssh')
-
-    if (scope.rutoken)
-      deployScript.push(' -I /usr/lib/librtpkcs11ecp.so')
-
-    if (scope.sshPort)
-      deployScript.push(` -p ${scope.sshPort}`)
-
-    deployScript.push('\'')
-
-  }
-
-  deployScript.push(' -rltzvgO --progress --delete --exclude=\'alarms.conf\'')
-  deployScript.push(' --groupmap=\'*:developers\' dist/es5/*')
-  deployScript.push(` '${scope.sshUsername}@${scope.sshHostname}:/mnt/data/etc/'`)
-
-  pkg.scripts['wb:deploy'] = deployScript.join('')
-
-  fs.writeFileSync(
-    resolve(root, 'package.json'),
-    JSON.stringify(pkg, null, 2)
-  )
-
-  const templateRoot = fileURLToPath(new URL(templatesPath, import.meta.url))
-
-  const render = function (templateName: string) {
-
-    const templateDir = resolve(templateRoot, templateName)
-    renderTemplate(templateDir, root)
-
-  }
-
-  // Create basic project structure
-  render('base')
-
-  // Add TypeScript support
-  render('config/typescript')
-
-  if (addEslint) {
-
-    renderEslintConfig(templateRoot, root, {
-      addVitest,
-    })
-
-    render('config/eslint')
-
-  }
-
-  if (!argv.bare) {
-
-    render('example/base')
-
-  }
-
-  if (addStore) {
-
-    render('config/store')
-
-    if (!argv.bare) {
-
-      render('example/store')
-
-    }
-
-  }
-
-  if (addVitest) {
-
-    render('config/vitest')
-
-    if (!argv.bare) {
-
-      render('example/vitest/base')
-
-      if (addStore) {
-
-        render('example/vitest/store')
-
-      }
-
-    }
-
-  }
-
-  step(formatSuccess(
-    messages.status.scaffolded,
-    messages.status.success
-  ))
-
-  scope.packageManager ??= await prompt(
-    select({
-      message: `${messages.dependencies.question} ${dim(messages.accent.recommended)}`,
-      options: runningPackageManager
-        ? [
-            {
-              value: runningPackageManager.name,
-              label: `${messages.dependencies.current.message} ${runningPackageManager.name}`,
-            },
-            {
-              value: '',
-              label: messages.dependencies.no.message,
-            },
-          ]
-        : [
-            {
-              value: 'pnpm',
-              label: messages.dependencies.pnpm.message,
-              hint: messages.dependencies.pnpm.hint,
-            },
-            {
-              value: 'yarn',
-              label: messages.dependencies.yarn.message,
-            },
-            {
-              value: 'npm',
-              label: messages.dependencies.npm.message,
-            },
-            {
-              value: 'bun',
-              label: messages.dependencies.bun.message,
-            },
-            {
-              value: '',
-              label: messages.dependencies.no.message,
-            },
-          ],
-    })
-  )
-
-  if (scope.packageManager) {
-
-    outro(messages.status.installingDependencies)
-
-    await installDependencies(scope)
-
-  }
+  await runner.runAsync(runnerArgs, context)
 
   console.log()
-  console.log(finalMessage)
+  console.log(getFinalMessage())
 
 }
 
 run().catch((e: unknown) => {
 
-  console.error(e)
+  if (e instanceof PromptCanceledError || e instanceof OperationCanceledError) {
+
+    logger.cancel(t('step.canceled'))
+
+  }
+  else if (e instanceof CreationError) {
+
+    logger.error(e.message)
+
+  }
+  else if (e instanceof Error) {
+
+    // Unexpected internal error - rethrow to preserve stack trace
+    throw e
+
+  }
+  else if (typeof e === 'string') {
+
+    logger.error(e)
+
+  }
+
   process.exit(1)
 
 })

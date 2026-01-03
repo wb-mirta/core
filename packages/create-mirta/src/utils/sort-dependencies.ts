@@ -1,6 +1,9 @@
-import { isObject } from './type-guards'
+import type { JsonObject } from '#types'
+import { isObject } from '@mirta/basics'
 
-export default function sortDependencies(packageJson: object) {
+export default function sortDependencies(
+  packageJson: JsonObject
+): JsonObject {
 
   const sorted = {}
 

@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "paths": {
+      /** Deprecated, will be removed. Use #wb/* instead */
+      "@wb/*": ["../src/wb-rules/*"],
+      /** Deprecated, will be removed. Use #wbm/* instead */
+      "@wbm/*": ["../src/wb-rules-modules/*"]
+    }
+  }
+}

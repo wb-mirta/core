@@ -121,7 +121,7 @@ export default defineConfig([
     'node_modules/',
     'dist/',
     'packages/*/dist/',
-    'packages/create-mirta/public/templates/**/*',
+    'packages/create-mirta/templates/**/*',
     'examples/*/*/dist/',
   ]),
 ])

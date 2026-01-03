@@ -1,0 +1,86 @@
+{
+  "title": "Ваш фреймворк для современных автоматизаций",
+
+  "yes": "Да",
+  "no": "Нет",
+
+  "args.errorHeader": "{count, plural, one{Недопустимый аргумент} other{Недопустимые аргументы}} CLI",
+  "args.unknownOption": "{option} → неизвестный параметр",
+  "args.unknownOptionSuggest": "{option} → возможно, {suggestion}?",
+  "args.missingValue": "{option} → отсутствует значение",
+
+  "label.debug": "Отладка",
+  "label.info": "Инфо",
+  "label.warning": "Предупреждение",
+  "label.error": "Ошибка",
+  "label.success": "Успешно",
+  "label.canceled": "Отмена",
+
+  "hint.recommended": "Рекомендуется",
+  "hint.blocked": "Не поддерживается шаблоном",
+  "hint.select": "Используйте стрелки. Enter — подтвердить",
+
+  "captions.intro": "Настройки проекта",
+  "captions.deploy": "Настройки развёртывания",
+
+  "projectType.prompt": "Тип проекта",
+  "projectType.classic": "Классический — для контроллера Wiren Board",
+  "projectType.modular": "Модульный — для связанных проектов и NPM",
+
+  "projectFolder.prompt": "Папка проекта",
+
+  "packageName.prompt": "Имя пакета",
+  "packageName.invalidFormat": "Неверный формат",
+
+  "template.select": "Выберите шаблон",
+  "template.notFound": "Шаблон '{name}' не найден",
+
+  "templates.base.name": "Base: начните здесь",
+  "templates.base.description": "Сильная основа",
+
+  "templates.store.name": "Store: управление состоянием",
+  "templates.store.description": "Доступ к данным из любого скрипта",
+
+  "features.select": "Выберите расширенные возможности",
+  "features.instructions": "Навигация: ↑ / ↓\nВыбрать: ← / → / Пробел\nВыбрать всё: A\nПодтвердить: Enter",
+
+  "features.examples.name": "Примеры: быстрый старт",
+  "features.examples.description": "Типовое использование шаблона и опций",
+
+  "features.connection.name": "SSH: передача файлов",
+  "features.connection.description": "Настроить подключение к контроллеру",
+
+  "features.eslint.name": "ESLint: статический анализ",
+  "features.eslint.description": "Контроль стиля и ошибок",
+
+  "features.vitest.name": "Vitest: модульные тесты",
+  "features.vitest.description": "Тесты и отладка без контроллера",
+
+  "feature.skipped": "Функция {feature} пропущена — не поддерживается шаблоном",
+
+  "ssh.username": "Пользователь SSH",
+  "ssh.hostname": "Хост SSH",
+  "ssh.port": "Порт SSH",
+  "ssh.rutoken": "Использовать Рутокен ЭЦП?",
+
+  "overwrite.notEmpty": "Расположение {path} уже содержит файлы",
+  "overwrite.prompt": "Удалить существующие файлы перед продолжением?",
+
+  "dependencies.prompt": "Установить зависимости проекта?",
+  "dependencies.answer.yesUsing": "Да, с помощью {manager}",
+  "dependencies.answer.no": "Нет, я сделаю это самостоятельно",
+
+  "step.canceled": "Операция прервана",
+  "step.removingFiles": "Удаление файлов...",
+  "step.scaffolding": "Создание проекта в {folder}",
+  "step.scaffolded": "Проект создан",
+  "step.installingDependencies": "Вызов менеджера пакетов",
+
+  "validation.required": "Требуется указать значение",
+  "validation.invalidFormat": "Неверный формат",
+
+  "project.outsideRoot": "Невозможно создать проект вне текущей директории",
+  "project.denyOverwrite": "Целевая директория не пуста",
+
+  "load.noTemplates": "Шаблоны для типа проекта '{type}' не найдены"
+}

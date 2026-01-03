@@ -1,0 +1,86 @@
+{
+  "title": "Your framework for smart home automations",
+
+  "yes": "Yes",
+  "no": "No",
+
+  "args.errorHeader": "Invalid CLI {count, plural, one{argument} other{arguments}}",
+  "args.unknownOption": "{option} → unknown option",
+  "args.unknownOptionSuggest": "{option} → did you mean {suggestion}?",
+  "args.missingValue": "{option} → missing value",
+
+  "label.debug": "Debug",
+  "label.info": "Info",
+  "label.warning": "Warning",
+  "label.error": "Error",
+  "label.success": "Success",
+  "label.canceled": "Canceled",
+
+  "hint.recommended": "Recommended",
+  "hint.blocked": "Not supported by template",
+  "hint.select": "Use arrow keys. Enter to submit",
+
+  "captions.intro": "Project Settings",
+  "captions.deploy": "Deploy Settings",
+
+  "projectType.prompt": "Project Type",
+  "projectType.classic": "Classic — for Wiren Board controller",
+  "projectType.modular": "Modular — for related projects and NPM",
+
+  "projectFolder.prompt": "Project folder",
+
+  "packageName.prompt": "Package name",
+  "packageName.invalidFormat": "Invalid format",
+
+  "template.select": "Select template",
+  "template.notFound": "Template '{name}' not found",
+
+  "templates.base.name": "Base: Getting started",
+  "templates.base.description": "A solid foundation",
+
+  "templates.store.name": "Store: Shared State",
+  "templates.store.description": "Access data from any script",
+
+  "features.select": "Select features",
+  "features.instructions": "Navigate: ↑ / ↓\nSelect: ← / → / Space\nSelect all: A\nComplete answer: Enter",
+
+  "features.examples.name": "Examples: Quick Start",
+  "features.examples.description": "Typical use of the template and features",
+
+  "features.connection.name": "SSH: File Transfer",
+  "features.connection.description": "Configure connection to the controller",
+
+  "features.eslint.name": "ESLint: Static Analysis",
+  "features.eslint.description": "Enforce code style and catch errors",
+
+  "features.vitest.name": "Vitest: Unit Testing",
+  "features.vitest.description": "Test and debug without the controller",
+
+  "feature.skipped": "Feature {feature} skipped — not supported by template",
+
+  "ssh.username": "SSH Username",
+  "ssh.hostname": "SSH Hostname",
+  "ssh.port": "SSH Port",
+  "ssh.rutoken": "Use Rutoken ECP?",
+
+  "overwrite.notEmpty": "Location {path} is not empty",
+  "overwrite.prompt": "Remove existing files before continuing?",
+
+  "dependencies.prompt": "Install project dependencies?",
+  "dependencies.answer.yesUsing": "Yes, using {manager}",
+  "dependencies.answer.no": "No, I will handle that myself",
+
+  "step.canceled": "Operation canceled",
+  "step.removingFiles": "Removing files...",
+  "step.scaffolding": "Scaffolding project in {folder}",
+  "step.scaffolded": "The project has been scaffolded",
+  "step.installingDependencies": "Calling the package manager",
+
+  "validation.required": "Must be provided",
+  "validation.invalidFormat": "Invalid format",
+
+  "project.outsideRoot": "Cannot create project outside current directory",
+  "project.denyOverwrite": "Target directory is not empty",
+
+  "load.noTemplates": "No templates found for project type '{type}'"
+}

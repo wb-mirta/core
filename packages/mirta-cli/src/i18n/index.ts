@@ -1,13 +1,9 @@
 import type { LocaleShape } from './locale-shape.gen'
 import { initLocalizationAsync } from '@mirta/i18n'
 
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+import { resolve } from 'node:path'
 
 export const { t, getLocale, setLocaleAsync }
   = await initLocalizationAsync<LocaleShape>({
-    cwd: resolve(__dirname, '../'),
+    cwd: resolve(import.meta.dirname, '../'),
   })

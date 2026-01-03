@@ -1,4 +1,0 @@
-APP_FRAMEWORK='Mirta'
-
-# Example environment variable with expansion
-APP_NAME='${APP_FRAMEWORK} Project'
