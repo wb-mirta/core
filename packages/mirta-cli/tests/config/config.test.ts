@@ -1,4 +1,3 @@
-import { JsoncSyntaxError } from '#src/errors/jsonc-error'
 import { SourceError } from '#src/errors/source-error'
 
 vi.mock('node:fs/promises', () => ({
@@ -199,14 +198,18 @@ describe('readConfigAsync', () => {
 
   })
 
-  it('should throw parse.invalidJson on malformed JSON', async () => {
+  it('should throw JsoncSyntaxError on malformed JSONC', async () => {
 
     mockAccess.mockResolvedValue(undefined)
     mockReadFile.mockResolvedValue('{ invalid json')
 
     await expect(readConfigAsync('/project', 'mirta.config.json'))
-      .rejects
-      .toThrow(JsoncSyntaxError)
+      .rejects.toEqual(
+        expect.objectContaining({
+          name: 'JsoncSyntaxError',
+          message: expect.stringContaining('offset') as unknown,
+        })
+      )
 
   })
 
