@@ -1,4 +1,6 @@
+import { JsoncContainer } from '#jsonc/index'
 import { parseJsonc } from '#jsonc/parser'
+import deepMerge from '#utils/deep-merge'
 
 describe('parseJsonc', () => {
 
@@ -264,6 +266,122 @@ describe('parseJsonc', () => {
         ],
       },
     })
+
+  })
+
+  it('should throw on invalid JSON', () => {
+
+    expect(() => parseJsonc('{ invalid }')).toThrow()
+
+  })
+
+  it('should throw when root is not an object', () => {
+
+    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object')
+
+  })
+
+})
+
+describe('deepMerge - JsoncNode structure handling', () => {
+
+  it('should preserve comments when merging JsoncNode structures', () => {
+
+    const targetText = `{
+  // Existing comment
+  "name": "old-name",
+  // Version comment
+  "version": "1.0.0"
+}`
+
+    const sourceText = `{
+  "name": "new-name"
+}`
+
+    const targetObject = parseJsonc(targetText)
+    const sourceObject = parseJsonc(sourceText)
+
+    const mergedObject = deepMerge(
+      targetObject,
+      sourceObject
+    ) as JsoncContainer
+
+    // Check if name value was updated
+    expect(mergedObject.name.value).toBe('new-name')
+
+    // Check if comment is preserved
+    expect(mergedObject.name.comments).toEqual(['// Existing comment'])
+
+    // Check if untouched field keeps its comment
+    expect(mergedObject.version.comments).toEqual(['// Version comment'])
+    expect(mergedObject.version.value).toBe('1.0.0')
+
+  })
+
+  it('should preserve comments in nested objects', () => {
+
+    const targetText = `{
+  // Config section
+  "config": {
+    // Port comment
+    "port": 3000,
+    // Host comment
+    "host": "localhost"
+  }
+}`
+
+    const sourceText = `{
+  "config": {
+    "port": 8080
+  }
+}`
+
+    const targetObject = parseJsonc(targetText)
+    const sourceObject = parseJsonc(sourceText)
+
+    const mergedObject = deepMerge(
+      targetObject,
+      sourceObject
+    ) as JsoncContainer
+
+    // Check top-level comment
+    expect(mergedObject.config.comments).toEqual(['// Config section'])
+
+    // Check nested structure
+    const configValue = mergedObject.config.value as JsoncContainer
+    expect(configValue.port.value).toBe(8080) // updated
+    expect(configValue.port.comments).toEqual(['// Port comment']) // preserved?
+
+    expect(configValue.host.value).toBe('localhost') // unchanged
+    expect(configValue.host.comments).toEqual(['// Host comment']) // preserved?
+
+  })
+
+  it('should handle adding new fields without losing existing comments', () => {
+
+    const targetText = `{
+  // Name comment
+  "name": "test"
+}`
+
+    const sourceText = `{
+  "description": "new field"
+}`
+
+    const targetObject = parseJsonc(targetText)
+    const sourceObject = parseJsonc(sourceText)
+
+    const mergedObject = deepMerge(
+      targetObject,
+      sourceObject
+    ) as JsoncContainer
+
+    // Existing field should keep its comment
+    expect(mergedObject.name.comments).toEqual(['// Name comment'])
+    expect(mergedObject.name.value).toBe('test')
+
+    // New field should be added
+    expect(mergedObject.description.value).toBe('new field')
 
   })
 

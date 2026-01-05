@@ -1,7 +1,7 @@
 import { THIS_PACKAGE_NAME } from '#src/constants'
 
 /**
- * Специализированный класс для обработки ошибок, связанных с ресурсами проекта.
+ * Специализированный класс для обработки ошибок, связанных с разбором JSONC.
  *
  * @since 0.4.0
  *
@@ -9,13 +9,11 @@ import { THIS_PACKAGE_NAME } from '#src/constants'
 export class JsoncSyntaxError extends Error {
 
   /**
-   * Приватный конструктор, используемый только внутри
-   * класса для создания экземпляров ошибки.
+   * Конструктор для создания экземпляра ошибки синтаксиса JSONC.
    *
    * @param message - Полное сообщение об ошибке.
-   * @param code - Код ошибки для идентификации.
-   * @param scope - Пространство имён или модуль, в котором возникла ошибка.
-   *                По умолчанию — {@link THIS_PACKAGE_NAME}.
+   * @param offset - Позиция начала ошибки в исходной строке.
+   * @param length - Длина фрагмента с ошибкой.
    *
    **/
   constructor(message: string, offset: number, length: number) {

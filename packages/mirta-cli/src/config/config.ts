@@ -6,44 +6,28 @@ import { join } from 'node:path/posix'
 import jsonc from 'jsonc-parser'
 import { JsoncSyntaxError } from '#src/errors/jsonc-error'
 
+const errorMessages: ReadonlyMap<jsonc.ParseErrorCode, string> = new Map<jsonc.ParseErrorCode, string>([
+  [jsonc.ParseErrorCode.InvalidSymbol, 'Invalid symbol encountered'],
+  [jsonc.ParseErrorCode.InvalidNumberFormat, 'Invalid number format'],
+  [jsonc.ParseErrorCode.PropertyNameExpected, 'Property name expected'],
+  [jsonc.ParseErrorCode.ValueExpected, 'Value expected'],
+  [jsonc.ParseErrorCode.ColonExpected, 'Colon expected'],
+  [jsonc.ParseErrorCode.CommaExpected, 'Comma expected'],
+  [jsonc.ParseErrorCode.CloseBraceExpected, 'Closing brace expected'],
+  [jsonc.ParseErrorCode.CloseBracketExpected, 'Closing bracket expected'],
+  [jsonc.ParseErrorCode.EndOfFileExpected, 'Unexpected end of file'],
+  [jsonc.ParseErrorCode.InvalidCommentToken, 'Invalid comment token'],
+  [jsonc.ParseErrorCode.UnexpectedEndOfComment, 'Unexpected end of comment'],
+  [jsonc.ParseErrorCode.UnexpectedEndOfString, 'Unexpected end of string'],
+  [jsonc.ParseErrorCode.UnexpectedEndOfNumber, 'Unexpected end of number'],
+  [jsonc.ParseErrorCode.InvalidUnicode, 'Invalid Unicode escape'],
+  [jsonc.ParseErrorCode.InvalidEscapeCharacter, 'Invalid escape character'],
+  [jsonc.ParseErrorCode.InvalidCharacter, 'Invalid character'],
+])
+
 function getErrorMessage(errorCode: jsonc.ParseErrorCode): string {
 
-  switch (errorCode) {
-    case jsonc.ParseErrorCode.InvalidSymbol:
-      return 'Invalid symbol encountered'
-    case jsonc.ParseErrorCode.InvalidNumberFormat:
-      return 'Invalid number format'
-    case jsonc.ParseErrorCode.PropertyNameExpected:
-      return 'Property name expected'
-    case jsonc.ParseErrorCode.ValueExpected:
-      return 'Value expected'
-    case jsonc.ParseErrorCode.ColonExpected:
-      return 'Colon expected'
-    case jsonc.ParseErrorCode.CommaExpected:
-      return 'Comma expected'
-    case jsonc.ParseErrorCode.CloseBraceExpected:
-      return 'Closing brace expected'
-    case jsonc.ParseErrorCode.CloseBracketExpected:
-      return 'Closing bracket expected'
-    case jsonc.ParseErrorCode.EndOfFileExpected:
-      return 'Unexpected end of file'
-    case jsonc.ParseErrorCode.InvalidCommentToken:
-      return 'Invalid comment token'
-    case jsonc.ParseErrorCode.UnexpectedEndOfComment:
-      return 'Unexpected end of comment'
-    case jsonc.ParseErrorCode.UnexpectedEndOfString:
-      return 'Unexpected end of string'
-    case jsonc.ParseErrorCode.UnexpectedEndOfNumber:
-      return 'Unexpected end of number'
-    case jsonc.ParseErrorCode.InvalidUnicode:
-      return 'Invalid Unicode escape'
-    case jsonc.ParseErrorCode.InvalidEscapeCharacter:
-      return 'Invalid escape character'
-    case jsonc.ParseErrorCode.InvalidCharacter:
-      return 'Invalid character'
-    default:
-      return 'Unknown parsing error'
-  }
+  return errorMessages.get(errorCode) ?? 'Unknown parsing error'
 
 }
 

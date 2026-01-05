@@ -1,6 +1,6 @@
 import { JsoncContainer, JsoncNode } from './types'
 
-function toString(value: unknown, indentSize = 0): string {
+function serializeNode(value: unknown, indentSize = 0): string {
 
   const indent = '  '.repeat(indentSize)
   const nextIndent = '  '.repeat(indentSize + 1)
@@ -19,12 +19,12 @@ function toString(value: unknown, indentSize = 0): string {
 
         const comments = item.comments ?? []
 
-        const printedValue = toString(item.value, indentSize + 1)
+        const serializedValue = serializeNode(item.value, indentSize + 1)
         const commentLines = comments.map(c => `${nextIndent}${c}`).join('\n')
 
         return commentLines
-          ? `${commentLines}\n${nextIndent}${printedValue}`
-          : `${nextIndent}${printedValue}`
+          ? `${commentLines}\n${nextIndent}${serializedValue}`
+          : `${nextIndent}${serializedValue}`
 
       })
 
@@ -46,9 +46,9 @@ function toString(value: unknown, indentSize = 0): string {
 
       const comments = node.comments?.map(c => `${nextIndent}${c}`).join('\n')
 
-      const valueStr = toString(node.value, indentSize + 1)
+      const serializedValue = serializeNode(node.value, indentSize + 1)
 
-      const field = `${nextIndent}${JSON.stringify(key)}: ${valueStr}`
+      const field = `${nextIndent}${JSON.stringify(key)}: ${serializedValue}`
 
       return [comments, field].filter(Boolean).join('\n')
 
@@ -65,6 +65,6 @@ function toString(value: unknown, indentSize = 0): string {
 
 export function stringify(container: JsoncContainer): string {
 
-  return toString(container, 0)
+  return serializeNode(container, 0)
 
 }

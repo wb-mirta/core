@@ -111,7 +111,7 @@ export function parseJsonc(text: string): JsoncContainer {
       return next()
 
     if (!isOptional)
-      throw new Error(`Expected ${getReadable(expected)}, got ${scanner.getTokenValue()}`)
+      throw new Error(`Expected ${getReadable(expected)}, got ${scanner.getTokenValue()} at position ${scanner.getPosition()}`)
 
   }
 
@@ -156,7 +156,7 @@ export function parseJsonc(text: string): JsoncContainer {
         break
 
       default:
-        throw new Error(`Unexpected token: ${token}`)
+        throw new Error(`Unexpected ${getReadable(token)} at position ${scanner.getPosition()}`)
     }
 
     return node
@@ -172,7 +172,7 @@ export function parseJsonc(text: string): JsoncContainer {
 
       // Проверяем, что текущий токен — строка
       if (token !== SyntaxKind.StringLiteral)
-        throw new Error('Expected key')
+        throw new Error(`Expected key at position ${scanner.getPosition()}`)
 
       // Сохраняем значение ДО продвижения
       const key = scanner.getTokenValue()

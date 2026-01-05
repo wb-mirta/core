@@ -7,7 +7,7 @@ export async function renderAsync(
   fromPath: FilePath,
   toPath: FilePath,
   content?: string
-) {
+): Promise<void> {
 
   const targetContent
     = await fs.readFile(toPath, 'utf-8')
