@@ -22,7 +22,7 @@ export class JsoncSyntaxError extends Error {
 
     this.name = 'JsoncSyntaxError'
 
-    Error.captureStackTrace(this)
+    Error.captureStackTrace(this, this.constructor)
 
   }
 

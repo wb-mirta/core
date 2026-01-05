@@ -349,11 +349,11 @@ describe('deepMerge - JsoncNode structure handling', () => {
 
     // Check nested structure
     const configValue = mergedObject.config.value as JsoncContainer
-    expect(configValue.port.value).toBe(8080) // updated
-    expect(configValue.port.comments).toEqual(['// Port comment']) // preserved?
+    expect(configValue.port.value).toBe(8080)
+    expect(configValue.port.comments).toEqual(['// Port comment'])
 
-    expect(configValue.host.value).toBe('localhost') // unchanged
-    expect(configValue.host.comments).toEqual(['// Host comment']) // preserved?
+    expect(configValue.host.value).toBe('localhost')
+    expect(configValue.host.comments).toEqual(['// Host comment'])
 
   })
 
