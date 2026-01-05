@@ -5,7 +5,7 @@ import { isExistsAsync } from '#utils/file-system'
 import type { FilePath } from '#types'
 import { isPlainObject } from '@mirta/basics'
 import * as json from './json'
-import * as json5 from './json5'
+import * as jsonc from './jsonc'
 
 /** Папки и файлы, игнорируемые при обходе шаблона. */
 const IGNORED_DIRS = [
@@ -15,9 +15,10 @@ const IGNORED_DIRS = [
   '*.log',
 ]
 
-/** JSON5-файлы, которые мержатся с существующими при копировании. */
-const KNOWN_JSON5 = [
+/** JSONC-файлы, которые мержатся с существующими при копировании. */
+const KNOWN_JSONC = [
   'tsconfig.json',
+  'mirta.config.json',
 ]
 
 /** JSON-файлы, которые мержатся с существующими при копировании. */
@@ -220,10 +221,10 @@ export async function renderFileAsync(
 
   }
 
-  // Мерж известных JSON5
-  if (KNOWN_JSON5.includes(toFileName) && await isExistsAsync(toPath)) {
+  // Мерж известных JSONC
+  if (KNOWN_JSONC.includes(toFileName) && await isExistsAsync(toPath)) {
 
-    await json5.renderAsync(
+    await jsonc.renderAsync(
       fromPath,
       toPath,
       content

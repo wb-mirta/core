@@ -20,7 +20,8 @@
       "mirta": [
         "packages/mirta/src"
       ]
-    }
+    },
+    "verbatimModuleSyntax": false
   },
   "include": [
     "*.ts",

@@ -51,12 +51,12 @@ describe('defineConfig', () => {
 
 describe('parseConfigJson', () => {
 
-  it('should parse valid JSON5', () => {
+  it('should parse valid JSONC', () => {
 
     const json = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1"
+      }
     }`
 
     const result = parseConfigJson(json)
@@ -73,9 +73,9 @@ describe('parseConfigJson', () => {
 
     const json = `{
       // Default connection
-      connections: {
-        default: "ssh://root@192.168.42.1", // Controller
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1" // Controller
+      }
     }`
 
     const result = parseConfigJson(json) as Record<string, unknown>
@@ -87,8 +87,8 @@ describe('parseConfigJson', () => {
   it('should parse JSON with trailing commas', () => {
 
     const json = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
+      "connections": {
+        "default": "ssh://root@192.168.42.1",
       },
     }`
 
@@ -144,9 +144,9 @@ describe('readConfigAsync', () => {
   it('should read and parse config file', async () => {
 
     const configContent = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1"
+      }
     }`
 
     mockAccess.mockResolvedValue(undefined)
@@ -198,14 +198,18 @@ describe('readConfigAsync', () => {
 
   })
 
-  it('should throw parse.invalidJson on malformed JSON', async () => {
+  it('should throw JsoncSyntaxError on malformed JSONC', async () => {
 
     mockAccess.mockResolvedValue(undefined)
     mockReadFile.mockResolvedValue('{ invalid json')
 
     await expect(readConfigAsync('/project', 'mirta.config.json'))
-      .rejects
-      .toThrow(/Invalid JSON in file/)
+      .rejects.toEqual(
+        expect.objectContaining({
+          name: 'JsoncSyntaxError',
+          message: expect.stringContaining('offset') as unknown,
+        })
+      )
 
   })
 

@@ -318,7 +318,7 @@ If `ssh-agent` throws `agent refused operation`:
 
 #### Example and structure of `mirta.config.json`
 
-```json5
+```jsonc
 {
   // Connection strings to controllers
   "connections": {

@@ -4,6 +4,12 @@
     "renovate.json": "jsonc",
     "mirta.config.json": "jsonc"
   },
+  "json.schemas": [{
+    "fileMatch": ["mirta.config.json"],
+    "schema": {
+      "allowTrailingCommas": true
+    }
+  }],
   "task.autoDetect": "off",
   "todohighlight.keywords": [
     {
