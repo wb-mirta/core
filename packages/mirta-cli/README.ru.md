@@ -324,7 +324,7 @@ ssh://deploy@${WB_HOST};key=${MIRTA_SSH_KEY}
 
 #### Пример и описание структуры `mirta.config.json`
 
-```json5
+```jsonc
 {
   // Строки подключений к контроллерам
   "connections": {

@@ -229,12 +229,12 @@ importers:
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
-      golden-fleece:
-        specifier: ^1.0.9
-        version: 1.0.9
       gradient-string:
         specifier: ^3.0.0
         version: 3.0.0
+      jsonc-parser:
+        specifier: ^3.3.1
+        version: 3.3.1
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -283,9 +283,9 @@ importers:
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
-      json5:
-        specifier: ^2.2.3
-        version: 2.2.3
+      jsonc-parser:
+        specifier: ^3.3.1
+        version: 3.3.1
       p-map:
         specifier: ^7.0.4
         version: 7.0.4
@@ -2049,9 +2049,6 @@ packages:
     resolution: {integrity: sha512-0Ia46fDOaT7k4og1PDW4YbodWWr3scS2vAr2lTbsplOt2WkKp0vQbkI9wKis/T5LV/dqPjO3bpS/z6GTJB82LA==}
     engines: {node: '>=18'}
 
-  golden-fleece@1.0.9:
-    resolution: {integrity: sha512-YSwLaGMOgSBx9roJlNLL12c+FRiw7VECphinc6mGucphc/ZxTHgdEz6gmJqH6NOzYEd/yr64hwjom5pZ+tJVpg==}
-
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
@@ -2185,6 +2182,9 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  jsonc-parser@3.3.1:
+    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
@@ -4645,8 +4645,6 @@ snapshots:
       slash: 5.1.0
       unicorn-magic: 0.3.0
 
-  golden-fleece@1.0.9: {}
-
   graceful-fs@4.2.11: {}
 
   gradient-string@3.0.0:
@@ -4746,6 +4744,8 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsonc-parser@3.3.1: {}
 
   jsonfile@4.0.0:
     optionalDependencies:

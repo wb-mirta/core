@@ -1,3 +1,4 @@
+import { JsoncSyntaxError } from '#src/errors/jsonc-error'
 import { SourceError } from '#src/errors/source-error'
 
 vi.mock('node:fs/promises', () => ({
@@ -51,12 +52,12 @@ describe('defineConfig', () => {
 
 describe('parseConfigJson', () => {
 
-  it('should parse valid JSON5', () => {
+  it('should parse valid JSONC', () => {
 
     const json = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1"
+      }
     }`
 
     const result = parseConfigJson(json)
@@ -73,9 +74,9 @@ describe('parseConfigJson', () => {
 
     const json = `{
       // Default connection
-      connections: {
-        default: "ssh://root@192.168.42.1", // Controller
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1" // Controller
+      }
     }`
 
     const result = parseConfigJson(json) as Record<string, unknown>
@@ -87,9 +88,9 @@ describe('parseConfigJson', () => {
   it('should parse JSON with trailing commas', () => {
 
     const json = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1"
+      }
     }`
 
     const result = parseConfigJson(json)
@@ -144,9 +145,9 @@ describe('readConfigAsync', () => {
   it('should read and parse config file', async () => {
 
     const configContent = `{
-      connections: {
-        default: "ssh://root@192.168.42.1",
-      },
+      "connections": {
+        "default": "ssh://root@192.168.42.1"
+      }
     }`
 
     mockAccess.mockResolvedValue(undefined)
@@ -205,7 +206,7 @@ describe('readConfigAsync', () => {
 
     await expect(readConfigAsync('/project', 'mirta.config.json'))
       .rejects
-      .toThrow(/Invalid JSON in file/)
+      .toThrow(JsoncSyntaxError)
 
   })
 

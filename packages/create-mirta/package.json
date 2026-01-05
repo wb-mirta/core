@@ -14,6 +14,7 @@
   "imports": {
     "#*": "./src/*.js",
     "#i18n": "./src/i18n/index.js",
+    "#jsonc": "./src/jsonc/index.js",
     "#errors": "./src/errors/index.js",
     "#runners": "./src/runners/index.js",
     "#locales/*": "./locales/*.json"
@@ -49,7 +50,7 @@
     "prompts": "^2.4.2",
     "chalk": "^5.6.2",
     "gradient-string": "^3.0.0",
-    "golden-fleece": "^1.0.9"
+    "jsonc-parser": "^3.3.1"
   },
   "devDependencies": {
     "@types/prompts": "^2.4.9"

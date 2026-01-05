@@ -3,7 +3,49 @@ import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 import type { MirtaConfig } from './types'
 import { SourceError } from '#src/errors/source-error'
 import { join } from 'node:path/posix'
-import JSON5 from 'json5'
+import jsonc from 'jsonc-parser'
+import { JsoncSyntaxError } from '#src/errors/jsonc-error'
+
+function getErrorMessage(errorCode: jsonc.ParseErrorCode): string {
+
+  switch (errorCode) {
+    case jsonc.ParseErrorCode.InvalidSymbol:
+      return 'Invalid symbol encountered'
+    case jsonc.ParseErrorCode.InvalidNumberFormat:
+      return 'Invalid number format'
+    case jsonc.ParseErrorCode.PropertyNameExpected:
+      return 'Property name expected'
+    case jsonc.ParseErrorCode.ValueExpected:
+      return 'Value expected'
+    case jsonc.ParseErrorCode.ColonExpected:
+      return 'Colon expected'
+    case jsonc.ParseErrorCode.CommaExpected:
+      return 'Comma expected'
+    case jsonc.ParseErrorCode.CloseBraceExpected:
+      return 'Closing brace expected'
+    case jsonc.ParseErrorCode.CloseBracketExpected:
+      return 'Closing bracket expected'
+    case jsonc.ParseErrorCode.EndOfFileExpected:
+      return 'Unexpected end of file'
+    case jsonc.ParseErrorCode.InvalidCommentToken:
+      return 'Invalid comment token'
+    case jsonc.ParseErrorCode.UnexpectedEndOfComment:
+      return 'Unexpected end of comment'
+    case jsonc.ParseErrorCode.UnexpectedEndOfString:
+      return 'Unexpected end of string'
+    case jsonc.ParseErrorCode.UnexpectedEndOfNumber:
+      return 'Unexpected end of number'
+    case jsonc.ParseErrorCode.InvalidUnicode:
+      return 'Invalid Unicode escape'
+    case jsonc.ParseErrorCode.InvalidEscapeCharacter:
+      return 'Invalid escape character'
+    case jsonc.ParseErrorCode.InvalidCharacter:
+      return 'Invalid character'
+    default:
+      return 'Unknown parsing error'
+  }
+
+}
 
 /**
  * Обёртка для определения конфигурации. Позволяет использовать подсказки типов TypeScript.
@@ -43,14 +85,30 @@ export function defineConfig(config: MirtaConfig): MirtaConfig {
  * @since 0.4.0
  *
  **/
-export function parseConfigJson(
-  content: string
-): object {
+export function parseConfigJson(content: string): object {
 
-  const parsed = JSON5.parse<unknown>(content)
+  const errors: jsonc.ParseError[] = []
 
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
+  const parsed = jsonc.parse(content, errors) as unknown
+
+  // Проверяем, есть ли ошибки парсинга
+  if (errors.length > 0) {
+
+    const firstError = errors[0]
+
+    throw new JsoncSyntaxError(
+      getErrorMessage(firstError.error),
+      firstError.offset,
+      firstError.length
+    )
+
+  }
+
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+
     throw SourceError.get('parse.invalidJsonRoot')
+
+  }
 
   return parsed
 
@@ -93,8 +151,8 @@ export async function readConfigAsync(rootDir: string, pathInput: string): Promi
     if (e instanceof SourceError)
       throw e
 
-    if (e instanceof SyntaxError)
-      throw SourceError.get('parse.invalidJson', configPath, e.message)
+    if (e instanceof JsoncSyntaxError)
+      throw e
 
     if (e && typeof e === 'object' && 'code' in e) {
 
