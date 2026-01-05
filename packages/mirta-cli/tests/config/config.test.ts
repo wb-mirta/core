@@ -89,8 +89,8 @@ describe('parseConfigJson', () => {
 
     const json = `{
       "connections": {
-        "default": "ssh://root@192.168.42.1"
-      }
+        "default": "ssh://root@192.168.42.1",
+      },
     }`
 
     const result = parseConfigJson(json)

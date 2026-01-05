@@ -73,7 +73,9 @@ export function parseConfigJson(content: string): object {
 
   const errors: jsonc.ParseError[] = []
 
-  const parsed = jsonc.parse(content, errors) as unknown
+  const parsed = jsonc.parse(content, errors, {
+    allowTrailingComma: true,
+  }) as unknown
 
   // Проверяем, есть ли ошибки парсинга
   if (errors.length > 0) {

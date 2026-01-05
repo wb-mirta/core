@@ -385,4 +385,43 @@ describe('deepMerge - JsoncNode structure handling', () => {
 
   })
 
+  it('should handle trailing commas in objects', () => {
+
+    const result = parseJsonc('{"name": "John", "age": 30,}')
+
+    expect(result).toEqual({
+      name: { value: 'John' },
+      age: { value: 30 },
+    })
+
+  })
+
+  it('should handle trailing commas in arrays', () => {
+
+    const result = parseJsonc('{"list": [1, 2, 3,]}')
+
+    expect(result).toEqual({
+      list: {
+        value: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 },
+        ],
+      },
+    })
+
+  })
+
+  it('should provide clear error message for invalid JSON', () => {
+
+    expect(() => parseJsonc('{ invalid }')).toThrow(/Expected|position/)
+
+  })
+
+  it('should provide clear error message when root is not an object', () => {
+
+    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object')
+
+  })
+
 })
