@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=22.17.1"
   },
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "pnpm@10.27.0",
   "workspaces": [
     "packages/*",
     "examples/*/*"
