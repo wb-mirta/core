@@ -41,6 +41,13 @@ describe('resolver', () => {
 
     })
 
+    it('should remove trailing dots and underscores', () => {
+
+      expect(toValidPackageName('my-module..')).toBe('my-module')
+      expect(toValidPackageName('my-module__')).toBe('my-module')
+
+    })
+
     it('should replace invalid chars with hyphens', () => {
 
       expect(toValidPackageName('my@module!')).toBe('my-module')
@@ -80,7 +87,7 @@ describe('resolver', () => {
 
   })
 
-  describe('isValidPackageName', () => {
+  describe('hasValidFormat', () => {
 
     it('should accept valid unscoped names', () => {
 

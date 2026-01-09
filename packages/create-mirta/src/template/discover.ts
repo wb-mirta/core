@@ -46,8 +46,6 @@ export async function discoverTemplatesAsync(
     assertConfigIsValid(rawConfig)
 
     const rootDir = dirname(filePath)
-
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const name = (rawConfig.name || basename(rootDir)) as TemplateName
 
     if (templates.has(name))

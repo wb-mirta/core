@@ -59,10 +59,19 @@ export default defineConfig([
           'ignoreRestSiblings': true,
         },
       ],
+      '@typescript-eslint/prefer-nullish-coalescing': ['error', {
+        'ignorePrimitives': {
+          'string': true,
+        },
+      }],
     },
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json'],
+        project: [
+          './tsconfig.json',
+          './packages/*/tsconfig.json',
+          './sites/*/tsconfig.json',
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },

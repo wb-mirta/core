@@ -35,7 +35,6 @@ export async function resolveProjectContextAsync(
 
   } = options
 
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const projectName = options.projectFolder || await promptProjectFolderAsync(`wb-mirta-${selection.type}`)
 
   if (options.projectFolder)

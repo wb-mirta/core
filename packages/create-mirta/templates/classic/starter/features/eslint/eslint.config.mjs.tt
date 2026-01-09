@@ -59,6 +59,11 @@ export default defineConfig([
           'ignoreRestSiblings': true,
         },
       ],
+      '@typescript-eslint/prefer-nullish-coalescing': ['error', {
+        'ignorePrimitives': {
+          'string': true,
+        },
+      }],
     },
     languageOptions: {
       parserOptions: {

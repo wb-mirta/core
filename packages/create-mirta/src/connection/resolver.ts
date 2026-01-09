@@ -39,16 +39,12 @@ export async function resolveConnectionStringAsync(
 
     const parsed = parseUrl(input)
 
-    /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-
     return createConnectionString({
       username: parsed.username || DEFAULT_SSH_USERNAME,
       hostname: parsed.hostname || DEFAULT_SSH_HOSTNAME,
       port: parsed.port || KNOWN_SSH_PORT,
       rutoken,
     })
-
-    /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
   }
 

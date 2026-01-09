@@ -36,7 +36,6 @@ export async function resolveGithubInfoAsync(
       return {
         owner: owner.trim(),
         repository: repository.trim(),
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         branch: branch?.trim() || DEFAULT_BRANCH,
       }
 
@@ -77,7 +76,6 @@ export async function resolveGithubInfoAsync(
       type: 'text',
       name: 'branch',
       message: t('github.branch.prompt'),
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       initial: branch || DEFAULT_BRANCH,
     },
   ]) as { owner: string, repository: string, branch: string | undefined }
@@ -90,7 +88,6 @@ export async function resolveGithubInfoAsync(
 
     owner,
     repository,
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     branch: branch || DEFAULT_BRANCH,
 
   }
