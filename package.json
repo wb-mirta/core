@@ -62,7 +62,7 @@
     "@vitest/eslint-plugin": "^1.5.2",
     "eslint-plugin-workspaces": "^0.11.0",
     "find-up": "^8.0.0",
-    "globals": "^16.5.0",
+    "globals": "^17.0.0",
     "magic-string": "^0.30.21",
     "lint-staged": "^16.2.7",
     "rollup": "^4.55.1",
