@@ -90,6 +90,8 @@ export function hasValidFormat(packageName: string) {
  * ```
  * @since 0.4.0
  *
+ * @internal
+ *
  **/
 export function sanitizePart(input: string): string {
 
