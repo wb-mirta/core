@@ -67,7 +67,7 @@ export function hasValidLength(packageName: string) {
  **/
 export function hasValidFormat(packageName: string) {
 
-  return /^(?:@[a-z0-9-][a-z0-9-._]*\/)?[a-z0-9-][a-z0-9-._]*$/
+  return /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/
     .test(packageName)
 
 }
@@ -84,21 +84,21 @@ export function hasValidFormat(packageName: string) {
  *
  * @example
  * ```ts
- * sanitizePart('My_Module') // → 'my-module'
+ * sanitizePart('My_Module') // → 'my_module'
  * sanitizePart('__test..')   // → 'test'
  * sanitizePart('...')        // → ''
  * ```
  * @since 0.4.0
  *
  **/
-function sanitizePart(input: string): string {
+export function sanitizePart(input: string): string {
 
   return input
     .toLowerCase()
-    // 1. Всё, что не разрешено → дефис (включая пробелы, _, .)
-    .replace(/[^a-z0-9]+/g, '-')
-    // 2. Убираем лишние дефисы: в начале и в конце
-    .replace(/^-+|-+$/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^[._-]+|[._-]+$/g, '')
 
 }
 

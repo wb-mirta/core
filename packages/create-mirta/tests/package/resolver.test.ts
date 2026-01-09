@@ -1,6 +1,7 @@
 import {
   toValidPackageName,
-  hasValidFormat
+  hasValidFormat,
+  sanitizePart
 } from '#package/resolver'
 
 // Mock dependencies
@@ -57,7 +58,7 @@ describe('resolver', () => {
     it('should collapse multiple hyphens', () => {
 
       expect(toValidPackageName('my---module')).toBe('my-module')
-      expect(toValidPackageName('my_-_module')).toBe('my-module')
+      expect(toValidPackageName('my_-_module')).toBe('my_-_module')
 
     })
 
@@ -69,7 +70,7 @@ describe('resolver', () => {
 
     it('should sanitize scope and name separately', () => {
 
-      expect(toValidPackageName('@Scope.Sub/Tool_1')).toBe('@scope-sub/tool-1')
+      expect(toValidPackageName('@Scope.Sub/Tool_1')).toBe('@scope.sub/tool_1')
 
     })
 
@@ -142,6 +143,84 @@ describe('resolver', () => {
 
       // Случай, когда и scope, и name очищаются до пустоты
       expect(toValidPackageName('@.../___')).toBe('')
+
+    })
+
+  })
+
+  describe('sanitizePart', () => {
+
+    describe('should not modify already valid parts', () => {
+
+      const validSamples = [
+        'my-package',
+        'my_package',
+        'my.package',
+        'a.b_c-d',
+        'valid123',
+        'dot.start',
+        'm.i.n.i.m.a.l',
+        'mixed_part.file_v1',
+        'no-changes-needed',
+      ]
+
+      test.each(validSamples)('preserves valid string: %s', (value) => {
+
+        const result = sanitizePart(value)
+
+        expect(result).toBe(value)
+        expect(hasValidFormat(result)).toBe(true)
+
+      })
+
+    })
+
+    describe('should clean only invalid characters', () => {
+
+      it('replaces invalid chars but keeps . and _', () => {
+
+        const result = sanitizePart('test@file#name$%.js_and_data')
+
+        expect(result).toBe('test-file-name-.js_and_data') // пробелы, @#$% → -, а . и _ остались
+        expect(hasValidFormat(result)).toBe(true)
+
+      })
+
+      it('collapses multiple dashes', () => {
+
+        expect(sanitizePart('a---b')).toBe('a-b')
+
+      })
+
+      it('trims dashes from ends', () => {
+
+        expect(sanitizePart('--hello--')).toBe('hello')
+
+      })
+
+    })
+
+    describe('edge cases', () => {
+
+      it('handles empty string', () => {
+
+        expect(sanitizePart('')).toBe('')
+
+      })
+
+      it('handles only invalid chars', () => {
+
+        expect(sanitizePart('!!!***$$$')).toBe('')
+
+      })
+
+      it('handles leading/trailing dots and underscores', () => {
+
+        expect(sanitizePart('..hidden..')).toBe('hidden')
+        expect(sanitizePart('__temp__')).toBe('temp')
+        expect(sanitizePart('__test..')).toBe('test')
+
+      })
 
     })
 
