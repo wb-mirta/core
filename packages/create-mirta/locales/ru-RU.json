@@ -25,43 +25,66 @@
 
   "projectType.prompt": "Тип проекта",
   "projectType.classic": "Классический — для контроллера Wiren Board",
-  "projectType.modular": "Модульный — для связанных проектов и NPM",
+  "projectType.mono": "Моно — для связанных проектов и NPM",
 
   "projectFolder.prompt": "Папка проекта",
 
   "packageName.prompt": "Имя пакета",
+  "packageName.tooLong": "Превышает {maxLength} символов",
   "packageName.invalidFormat": "Неверный формат",
 
   "template.select": "Выберите шаблон",
   "template.notFound": "Шаблон '{name}' не найден",
 
-  "templates.base.name": "Base: начните здесь",
-  "templates.base.description": "Сильная основа",
+  "templates.starter.name": "Стартер — начальный проект",
+  "templates.starter.description": "Сильная основа",
 
-  "templates.store.name": "Store: управление состоянием",
+  "templates.store.name": "Store — управление состоянием",
   "templates.store.description": "Доступ к данным из любого скрипта",
+
+  "templates.package.name": "Пакет — модули wb-rules для NPM",
+  "templates.package.description": "Распространение кода",
+
+  "templates.sites.name": "Sites — связанные проекты",
+  "templates.sites.description": "Дом и дача, работа",
 
   "features.select": "Выберите расширенные возможности",
   "features.instructions": "Навигация: ↑ / ↓\nВыбрать: ← / → / Пробел\nВыбрать всё: A\nПодтвердить: Enter",
 
-  "features.examples.name": "Примеры: быстрый старт",
+  "features.examples.name": "Примеры — быстрый старт",
   "features.examples.description": "Типовое использование шаблона и опций",
 
-  "features.connection.name": "SSH: передача файлов",
+  "features.connection.name": "SSH — передача файлов",
   "features.connection.description": "Настроить подключение к контроллеру",
 
-  "features.eslint.name": "ESLint: статический анализ",
+  "features.eslint.name": "ESLint — статический анализ",
   "features.eslint.description": "Контроль стиля и ошибок",
 
-  "features.vitest.name": "Vitest: модульные тесты",
+  "features.vitest.name": "Vitest — модульные тесты",
   "features.vitest.description": "Тесты и отладка без контроллера",
 
+  "features.package.name": "Пакет — модуль для NPM",
+  "features.package.description": "Распространение кода",
+
+  "features.github.name": "GitHub — репозиторий и CI",
+  "features.github.description": "Задать метаданные репозитория и настроить CI/CD",
+
   "feature.skipped": "Функция {feature} пропущена — не поддерживается шаблоном",
+
+  "connection.caption": "Настройки подключения к контроллеру",
 
   "ssh.username": "Пользователь SSH",
   "ssh.hostname": "Хост SSH",
   "ssh.port": "Порт SSH",
   "ssh.rutoken": "Использовать Рутокен ЭЦП?",
+
+  "github.caption": "Параметры репозитория",
+
+  "github.owner.prompt": "Владелец репозитория (owner)",
+  "github.repository.prompt": "Имя репозитория",
+  "github.branch.prompt": "Основная ветка репозитория",
+
+  "package.caption": "Настройки пакета",
 
   "overwrite.notEmpty": "Расположение {path} уже содержит файлы",
   "overwrite.prompt": "Удалить существующие файлы перед продолжением?",

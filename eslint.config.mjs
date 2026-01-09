@@ -13,11 +13,11 @@ export default defineConfig([
     ...workspaces.configs['flat/recommended'],
   },
   // TypeScript Defaults
-  tseslint.configs.strictTypeChecked.map(config => ({
+  ...tseslint.configs.strictTypeChecked.map(config => ({
     ...config,
     files: ['**/*.{ts,mts}'],
   })),
-  tseslint.configs.stylisticTypeChecked.map(config => ({
+  ...tseslint.configs.stylisticTypeChecked.map(config => ({
     ...config,
     files: ['**/*.{ts,mts}'],
   })),
@@ -53,6 +53,11 @@ export default defineConfig([
       ],
       '@typescript-eslint/no-empty-object-type': ['error', {
         allowObjectTypes: 'always',
+      }],
+      '@typescript-eslint/prefer-nullish-coalescing': ['error', {
+        'ignorePrimitives': {
+          'string': true,
+        },
       }],
     },
     languageOptions: {

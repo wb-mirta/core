@@ -25,46 +25,69 @@
 
   "projectType.prompt": "Project Type",
   "projectType.classic": "Classic — for Wiren Board controller",
-  "projectType.modular": "Modular — for related projects and NPM",
+  "projectType.mono": "Mono — for related projects and NPM",
 
   "projectFolder.prompt": "Project folder",
 
   "packageName.prompt": "Package name",
+  "packageName.tooLong": "Exceeds {maxLength} characters",
   "packageName.invalidFormat": "Invalid format",
 
   "template.select": "Select template",
   "template.notFound": "Template '{name}' not found",
 
-  "templates.base.name": "Base: Getting started",
-  "templates.base.description": "A solid foundation",
+  "templates.starter.name": "Starter — Base Project",
+  "templates.starter.description": "A solid foundation",
 
-  "templates.store.name": "Store: Shared State",
+  "templates.store.name": "Store — Shared State",
   "templates.store.description": "Access data from any script",
+
+  "templates.package.name": "Package — wb-rules modules for NPM",
+  "templates.package.description": "Code distribution",
+
+  "templates.sites.name": "Sites — connected projects",
+  "templates.sites.description": "Home and cottage, office",
 
   "features.select": "Select features",
   "features.instructions": "Navigate: ↑ / ↓\nSelect: ← / → / Space\nSelect all: A\nComplete answer: Enter",
 
-  "features.examples.name": "Examples: Quick Start",
+  "features.examples.name": "Examples — Quick Start",
   "features.examples.description": "Typical use of the template and features",
 
-  "features.connection.name": "SSH: File Transfer",
+  "features.connection.name": "SSH — File Transfer",
   "features.connection.description": "Configure connection to the controller",
 
-  "features.eslint.name": "ESLint: Static Analysis",
+  "features.eslint.name": "ESLint — Static Analysis",
   "features.eslint.description": "Enforce code style and catch errors",
 
-  "features.vitest.name": "Vitest: Unit Testing",
+  "features.vitest.name": "Vitest — Unit Testing",
   "features.vitest.description": "Test and debug without the controller",
 
+  "features.package.name": "Package — NPM module",
+  "features.package.description": "Publish your code to NPM",
+
+  "features.github.name": "GitHub — Repository & CI",
+  "features.github.description": "Set metadata and CI/CD workflows",
+
   "feature.skipped": "Feature {feature} skipped — not supported by template",
+
+  "connection.caption": "Controller Connection Settings",
 
   "ssh.username": "SSH Username",
   "ssh.hostname": "SSH Hostname",
   "ssh.port": "SSH Port",
   "ssh.rutoken": "Use Rutoken ECP?",
 
+  "github.caption": "GitHub Settings",
+
+  "github.owner.prompt": "Repository owner",
+  "github.repository.prompt": "Repository name",
+  "github.branch.prompt": "Repository main branch",
+
   "overwrite.notEmpty": "Location {path} is not empty",
   "overwrite.prompt": "Remove existing files before continuing?",
+
+  "package.caption": "Package Settings",
 
   "dependencies.prompt": "Install project dependencies?",
   "dependencies.answer.yesUsing": "Yes, using {manager}",

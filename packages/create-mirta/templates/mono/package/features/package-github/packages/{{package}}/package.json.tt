@@ -1,0 +1,11 @@
+{
+  "homepage": "https://github.com/{{githubOwner}}/{{githubRepository}}/tree/{{githubBranch}}/packages/{{package}}#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/{{githubOwner}}/{{githubRepository}}.git",
+    "directory": "packages/{{package}}"
+  },
+  "bugs": {
+    "url": "https://github.com/{{githubOwner}}/{{githubRepository}}/issues"
+  }
+}

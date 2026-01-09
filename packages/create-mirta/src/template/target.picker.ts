@@ -30,6 +30,7 @@ export async function pickTargetAsync(
     message: t('template.select'),
     hint: t('hint.select'),
     choices: [...templates.values()]
+      .filter(x => !x.hidden)
       .sort((a, b) => (a.order - b.order))
       .map(x => ({
         title: t.plain(`templates.${x.name}.name`, x.displayName),

@@ -1,17 +1,10 @@
 import type { ProjectType } from '#project/types'
 import { basename, dirname, resolve } from 'node:path'
 import type { RawTemplate, Template, TemplateName } from './types'
-import { fileURLToPath } from 'node:url'
 import fs from 'node:fs/promises'
 import { CreationError } from '#errors/create'
 
-const templatesDir = resolve(
-  fileURLToPath(
-    new URL('../templates',
-      import.meta.url
-    )
-  )
-)
+const templatesDir = resolve(import.meta.dirname, '../templates')
 
 function assertConfigIsValid(value: unknown): asserts value is RawTemplate {
 
@@ -26,7 +19,7 @@ export async function discoverTemplatesAsync(
 
 ): Promise<ReadonlyMap<string, Template>> {
 
-  const pathPattern = resolve(templatesDir, type, '*/template.json')
+  const pathPattern = resolve(templatesDir, `{shared,${type}}/*/template.json`)
 
   const templates = new Map<string, Template>()
 
@@ -52,20 +45,20 @@ export async function discoverTemplatesAsync(
 
     assertConfigIsValid(rawConfig)
 
-    const templateRoot = dirname(filePath)
+    const rootDir = dirname(filePath)
+    const name = (rawConfig.name || basename(rootDir)) as TemplateName
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const name = (rawConfig.name || basename(templateRoot)) as TemplateName
+    if (templates.has(name))
+      throw CreationError.get('template.duplicateName', name)
 
     templates.set(name, {
+      ...rawConfig,
       type: type,
-      extends: rawConfig.extends,
       name: name,
+      rootDir: rootDir,
       displayName: rawConfig.displayName ?? name,
       description: rawConfig.description ?? '',
-      features: rawConfig.features,
-      rootDir: templateRoot,
-      order: rawConfig.order ?? 1000,
+      order: rawConfig.order ?? Number.POSITIVE_INFINITY,
     })
 
   }

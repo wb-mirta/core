@@ -62,6 +62,9 @@ export class CreationError extends Error {
     'template.invalidConfig': (templateName: string) =>
       `Invalid template config of ${templateName}`,
 
+    'template.duplicateName': (templateName: string) =>
+      `Duplicate template name ${templateName}`,
+
     'project.outsideRoot': () =>
       t('project.outsideRoot'),
 

@@ -1,0 +1,9 @@
+{
+  "extends": "core",
+  "features": {
+    "global": {
+      "examples": "blocked"
+    }
+  },
+  "order": 2010
+}

@@ -24,7 +24,7 @@ export async function selectFeaturesAsync(
     if (isRequired)
       required.push(featureName)
 
-    if (origin === FEATURE_ORIGIN_CLI)
+    if (isRequired || origin === FEATURE_ORIGIN_CLI)
       continue
 
     let hint = ''
@@ -36,8 +36,8 @@ export async function selectFeaturesAsync(
       title: t.plain(`features.${featureName}.name`),
       description: t.plain(`features.${featureName}.description`) + hint,
       value: featureName,
-      selected: isRequired || isRecommended,
-      disabled: isRequired || isBlocked,
+      selected: isRecommended,
+      disabled: isBlocked,
     })
 
   }

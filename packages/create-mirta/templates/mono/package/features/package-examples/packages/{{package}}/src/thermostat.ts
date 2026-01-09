@@ -1,0 +1,99 @@
+import { isNumber, isString } from '@mirta/basics'
+
+import { type ThermostatOptions } from './types'
+
+// Thermostat Module Example
+
+// Примечание авторам модулей: обязательно используйте комментарии в формате JSDoc,
+// чтобы документировать ваши конструкции удобными всплывающими подсказками.
+
+/**
+ * Логика температурного регулятора.
+ *
+ * @param options Параметры термостата.
+ *
+ * @example
+ * ```ts
+ * import { useThermostat } from '@nickname/mirta-thermostat'
+ *
+ * const thermostat = useThermostat({
+ *   sensorTopic: 'A60-M1W3/External Sensor 1',
+ *   heaterTopic: 'wb-gpio/EXT4_R3A1',
+ *   targetTemp: 22,
+ *   hysteresis: 0.5
+ * })
+ *
+ * // Установить новое значение целевой температуры:
+ * thermostat.setTargetTemp(24)
+ *
+ * ```
+ **/
+export function useThermostat(options: ThermostatOptions) {
+
+  const { sensorTopic, heaterTopic, hysteresis = 0.5 } = options
+
+  let targetTemp = options.targetTemp
+
+  defineRule({
+
+    // При изменении показаний в топике датчика температуры...
+    whenChanged: sensorTopic,
+
+    // ...проверяем, не вышла ли температура за пределы допустимых значений.
+    then: (newValue) => {
+
+      let currentTemp: number | undefined
+
+      // Проверяем, является ли значение текущей температуры допустимым.
+
+      if (isNumber(newValue)) {
+
+        currentTemp = newValue
+
+      }
+      else if (isString(newValue)) {
+
+        currentTemp = parseFloat(newValue)
+
+      }
+
+      if (currentTemp === undefined || isNaN(currentTemp)) {
+
+        // Отключаем нагреватель, если значение температуры не удаётся прочитать.
+        dev[heaterTopic] = false
+
+        // Записываем в лог сообщение об ошибке.
+        log.error('[Thermostat Module] Invalid temperature value: {}', newValue)
+
+        // Прерываем дальше выполнения правила.
+        return
+
+      }
+
+      if (currentTemp <= (targetTemp - hysteresis)) {
+
+        // Если температура ниже минимальной, включаем нагреватель.
+        dev[heaterTopic] = true
+
+      }
+      else if (currentTemp >= (targetTemp + hysteresis)) {
+
+        // Если температура выше максимальной, выключаем нагреватель.
+        dev[heaterTopic] = false
+
+      }
+
+    },
+  })
+
+  return {
+
+    /** Позволяет установить новое значение целевой температуры. */
+    setTargetTemp(newValue: number) {
+
+      targetTemp = newValue
+
+    },
+  }
+
+}

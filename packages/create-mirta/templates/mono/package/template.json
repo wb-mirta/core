@@ -1,0 +1,16 @@
+{
+  "extends": "core",
+  "features": {
+    "global": {
+      "package": "required",
+      "github": "recommended",
+      "vitest": "recommended"
+    },
+    "compound": [
+      "package-github",
+      "package-examples",
+      "package-examples-vitest"
+    ]
+  },
+  "order": 2020
+}

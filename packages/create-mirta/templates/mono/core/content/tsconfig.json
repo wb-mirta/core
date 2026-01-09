@@ -1,0 +1,31 @@
+{
+  "extends": "@mirta/tsconfig",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "types": [
+      "@mirta/globals",
+      "node"
+    ]
+  },
+  "include": [
+    "*.ts",
+    "*.mts",
+
+    // === JS ===
+
+    "packages/*/src/**/*.js",
+    "packages/*/tests/**/*.js",
+
+    "sites/*/src/**/*.js",
+    "sites/*/tests/**/*.js",
+
+    // === TS ===
+
+    "packages/*/src/**/*.ts",
+    "packages/*/tests/**/*.ts",
+
+    "sites/*/src/**/*.ts",
+    "sites/*/tests/**/*.ts"
+  ]
+}

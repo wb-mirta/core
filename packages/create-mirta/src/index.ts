@@ -72,7 +72,7 @@ async function run() {
   console.log()
 
   // Определяем тип шаблона - по аргументам или через вопрос пользователю.
-  const selection = await pickProjectAsync(argv.template)
+  const selection = await pickProjectAsync(argv.template?.toLowerCase())
 
   const runner = await resolveRunnerAsync(selection.type)
 
