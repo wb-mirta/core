@@ -30,6 +30,7 @@
   "projectFolder.prompt": "Папка проекта",
 
   "packageName.prompt": "Имя пакета",
+  "packageName.tooLong": "Превышает {maxLength} символов",
   "packageName.invalidFormat": "Неверный формат",
 
   "template.select": "Выберите шаблон",

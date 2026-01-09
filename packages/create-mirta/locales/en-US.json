@@ -30,6 +30,7 @@
   "projectFolder.prompt": "Project folder",
 
   "packageName.prompt": "Package name",
+  "packageName.tooLong": "Exceeds {maxLength} characters",
   "packageName.invalidFormat": "Invalid format",
 
   "template.select": "Select template",
