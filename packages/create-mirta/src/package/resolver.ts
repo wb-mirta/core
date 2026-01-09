@@ -37,7 +37,7 @@ function sanitizePart(part: string): string {
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/^[._]+/, '')
-    .replace(/[^a-z0-9-~]+/g, '-')
+    .replace(/[^a-z0-9-]+/g, '-')
 
 }
 

@@ -1,7 +1,7 @@
 import type { StagedArgs } from '@mirta/staged-args'
 import { assertNoParseErrors } from '#assertions'
 
-// Опции классического режима сборки
+// Опции режима сборки mono
 const options = {
 
   eslint: {
@@ -20,7 +20,7 @@ const options = {
 } as const
 
 /**
- * Парсит аргументы командной строки для сборки в режиме `classic`.
+ * Парсит аргументы командной строки для сборки в режиме `mono`.
  *
  * @param args - Объект с аргументами, управляемый `StagedArgs`.
  * @returns Объект с распарсенными значениями и позиционными аргументами.

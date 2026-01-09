@@ -1,4 +1,4 @@
-[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,json,yml}]
+[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,json,yml,yaml}]
 charset = utf-8
 insert_final_newline = true
 end_of_line = lf

@@ -60,4 +60,13 @@ describe('useThermostat', () => {
 
   })
 
+  it('does not toggle heater inside hysteresis band (heater off)', () => {
+
+    dev[heaterTopic] = false
+
+    simulator.defineRule.run({ topic: sensorTopic, value: 21.6 })
+    expect(dev[heaterTopic]).toBe(false)
+
+  })
+
 })

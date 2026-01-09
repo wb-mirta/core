@@ -50,6 +50,9 @@ export async function discoverTemplatesAsync(
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const name = (rawConfig.name || basename(rootDir)) as TemplateName
 
+    if (templates.has(name))
+      throw CreationError.get('template.duplicateName', name)
+
     templates.set(name, {
       ...rawConfig,
       type: type,
