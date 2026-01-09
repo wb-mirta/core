@@ -2,6 +2,8 @@ import { prompts } from '#utils/prompts'
 import { t } from '#i18n'
 import { logger } from '#utils/logger'
 
+const SCOPED_PACKAGE_REGEX = /^(@[^/]+)\/(.+)$/
+
 const MAX_LENGTH = 214
 
 /**
@@ -78,12 +80,14 @@ export function hasValidFormat(packageName: string) {
  * последовательные дефисы в один.
  *
  * @param input - Часть имени (например, scope или basename)
- * @returns Очищенное имя, готовое к использованию в package.json
+ * @returns Очищенное имя или пустая строка, если все символы недопустимы
  *
  * @example
+ * ```ts
  * sanitizePart('My_Module') // → 'my-module'
  * sanitizePart('__test..')   // → 'test'
- *
+ * sanitizePart('...')        // → ''
+ * ```
  * @since 0.4.0
  *
  **/
@@ -120,7 +124,7 @@ function sanitizePart(input: string): string {
 export function toValidPackageName(input: string): string {
 
   const cleanInput = input.trim()
-  const match = /^(@[^/]+)\/(.+)$/.exec(cleanInput)
+  const match = SCOPED_PACKAGE_REGEX.exec(cleanInput)
 
   if (!match)
     return sanitizePart(cleanInput)
@@ -196,7 +200,7 @@ export async function resolvePackageInfoAsync(
 
   }
 
-  const scopeMatch = /^@([^/]+)\/(.+)$/.exec(packageName)
+  const scopeMatch = SCOPED_PACKAGE_REGEX.exec(packageName)
 
   return {
 

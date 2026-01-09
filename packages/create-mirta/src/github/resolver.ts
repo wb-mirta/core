@@ -22,20 +22,20 @@ export async function resolveGithubInfoAsync(
 
   if (input) {
 
-    const match = /^([^/]+)\/([^#]+)(?:#(.+))?$/.exec(input)
+    const match = /^([^/]+)\/([^/#]+)(?:#(.+))?$/.exec(input)
 
     if (match) {
 
-      owner = match[1]
-      repository = match[2]
+      owner = match[1].trim()
+      repository = match[2].trim()
       branch = match[3]
 
     }
 
     if (owner && repository)
       return {
-        owner: owner.trim(),
-        repository: repository.trim(),
+        owner: owner,
+        repository: repository,
         branch: branch?.trim() || DEFAULT_BRANCH,
       }
 
