@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "#wb/*": "./src/wb-rules/*.js",
+    "#wbm/*": "./src/wb-rules-modules/*.js"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config",
+    "build:dev": "rollup -c node:@mirta/rollup/config",
+    "wb:deploy": "mirta deploy"
+  }
+}

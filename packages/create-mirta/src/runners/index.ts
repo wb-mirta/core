@@ -20,8 +20,8 @@ async function loadAsync(
     case 'classic':
       return await import('./classic')
 
-      // case 'modular':
-      //   return await import('./modular')
+    case 'mono':
+      return await import('./mono')
 
     default:
       throw new Error(

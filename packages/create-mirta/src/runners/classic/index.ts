@@ -10,6 +10,8 @@ import type { ProjectContext } from '#project-context/types'
 import { resolveFeaturesAsync } from '#feature/resolver'
 import { resolveConnectionStringAsync } from '#connection/resolver'
 import { promptInstallDependenciesAsync } from '#dependency/installer'
+import { DEFAULT_SSH_HOSTNAME, DEFAULT_SSH_USERNAME } from '#connection/constants'
+import { resolveGithubInfoAsync } from '#github/resolver'
 
 export async function runAsync(
   args: StagedArgs,
@@ -31,7 +33,19 @@ export async function runAsync(
     name: context.name,
     features: features,
     barebone: context.barebone,
+    defaultConnectionString: `ssh://${DEFAULT_SSH_USERNAME}@${DEFAULT_SSH_HOSTNAME}`,
   })
+
+  // Если задействована опция настройки GitHub-репозитория.
+  if (features.includes('github')) {
+
+    const githubInfo = await resolveGithubInfoAsync()
+
+    data.githubOwner = githubInfo.owner
+    data.githubRepository = githubInfo.repository
+    data.githubBranch = githubInfo.branch
+
+  }
 
   // Если добавлено подключение к контроллеру, выполняем настройку.
   if (features.includes('connection')) {
@@ -63,7 +77,7 @@ export async function runAsync(
     folder: chalk.yellow(rootDir),
   }))
 
-  const knownCompounds = new Map<string, boolean>()
+  const seenCompounds = new Map<string, boolean>()
 
   for (const template of context.templates) {
 
@@ -91,7 +105,7 @@ export async function runAsync(
 
     for (const feature of compoundFeatures) {
 
-      let isApplicable = knownCompounds.get(feature)
+      let isApplicable = seenCompounds.get(feature)
 
       if (isApplicable === undefined) {
 
@@ -99,7 +113,7 @@ export async function runAsync(
           .split('-')
           .every(x => features.includes(x))
 
-        knownCompounds.set(feature, isApplicable)
+        seenCompounds.set(feature, isApplicable)
 
       }
 

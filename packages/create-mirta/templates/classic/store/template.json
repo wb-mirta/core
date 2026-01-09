@@ -1,5 +1,5 @@
 {
-  "extends": "base",
+  "extends": "starter",
   "features": {
     "global": {
       "examples": "recommended",
@@ -7,5 +7,5 @@
       "vitest": "optional"
     }
   },
-  "order": 10
+  "order": 1020
 }

@@ -1,0 +1,117 @@
+import js from '@eslint/js'
+import globals from 'globals'
+import globalsMirta from '@mirta/globals/eslint'
+import tseslint from 'typescript-eslint'
+import stylistic from '@stylistic/eslint-plugin'
+{{#if features.vitest}}
+import vitest from '@vitest/eslint-plugin'
+{{/if features.vitest}}
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    plugins: { js },
+    extends: ['js/recommended'],
+  },
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globalsMirta,
+      },
+    },
+  },
+  // TypeScript Defaults
+  ...tseslint.configs.strictTypeChecked.map(config => ({
+    ...config,
+    files: ['**/*.ts'],
+  })),
+  ...tseslint.configs.stylisticTypeChecked.map(config => ({
+    ...config,
+    files: ['**/*.ts'],
+  })),
+  // TypeScript Overrides
+  {
+    files: ['**/*.ts'],
+    rules: {
+      // Позволяет работать с dev['deviceId']['controlId']
+      '@typescript-eslint/dot-notation': 'off',
+      // Разрешает интерполяцию базовых типов
+      '@typescript-eslint/restrict-template-expressions': ['error', {
+        allowAny: false,
+        allowBoolean: true,
+        allowNullish: true,
+        allowNumber: true,
+        allowRegExp: true,
+      }],
+      // Разрешает неиспользуемые переменные с символом подчёркивания
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'args': 'all',
+          'argsIgnorePattern': '^_',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'ignoreRestSiblings': true,
+        },
+      ],
+    },
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  // Stylistic Defaults
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    ...stylistic.configs.customize({
+      quotes: 'single',
+      quoteProps: 'consistent',
+      indent: 2,
+    }),
+  },
+  // Stylistic Overrides
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    rules: {
+      '@stylistic/comma-dangle': ['error', {
+        'arrays': 'always-multiline',
+        'objects': 'always-multiline',
+      }],
+      '@stylistic/curly-newline': ['error', 'always'],
+      '@stylistic/nonblock-statement-body-position': ['error', 'below'],
+      '@stylistic/padded-blocks': ['error', {
+        'blocks': 'always',
+      }],
+    },
+  },
+{{#if features.vitest}}
+  // Vitest Defaults
+  {
+    files: ['packages/*/tests/**', 'sites/*/tests/**'],
+    plugins: {
+      vitest,
+    },
+    rules: {
+      ...vitest.configs.recommended.rules,
+    },
+    languageOptions: {
+      globals: {
+        ...vitest.environments.env.globals,
+      },
+    },
+  },
+{{/if features.vitest}}
+  globalIgnores([
+    'node_modules/',
+    'dist/',
+    'packages/*/dist/',
+    'sites/*/dist/',
+  ]),
+])

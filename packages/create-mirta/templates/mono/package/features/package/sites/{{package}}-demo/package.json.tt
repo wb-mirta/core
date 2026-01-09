@@ -1,0 +1,19 @@
+{
+  "name": "{{package}}-demo",
+  "private": true,
+  "imports": {
+    "#wb/*": [
+      "./src/wb-rules/*.js"
+    ],
+    "#wbm/*": [
+      "./src/wb-rules-modules/*.js"
+    ]
+  },
+  "scripts": {
+    "build:mono": "rollup -c node:@mirta/rollup/config",
+    "wb:deploy": "mirta deploy"
+  },
+  "dependencies": {
+    "{{packageFull}}": "workspace:*"
+  }
+}

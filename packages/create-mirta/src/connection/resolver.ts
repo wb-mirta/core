@@ -3,6 +3,7 @@ import { prompts } from '#utils/prompts'
 import type { PromptObject } from 'prompts'
 import { DEFAULT_SSH_HOSTNAME, DEFAULT_SSH_USERNAME, KNOWN_SSH_PORT } from './constants'
 import { hostnameRegex, parseUrl, usernameRegex } from './parser'
+import { logger } from '#utils/logger'
 
 const rutokenLib = 'pkcs11=/opt/aktivco/rutokenecp/amd64/librtpkcs11ecp.so'
 
@@ -105,6 +106,8 @@ export async function resolveConnectionStringAsync(
       active: t('yes'),
       inactive: t('no'),
     })
+
+  logger.step(t('connection.caption'))
 
   const response = await prompts(questions) as {
     username: string

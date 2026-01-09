@@ -1,0 +1,17 @@
+{
+  "deploy": {
+    // Профили деплоя.
+    "profiles": {
+      // Стабильные разработки
+      "home": {
+        "connection": "default",
+        "mappings": ["wb-rules-es5"]
+      },
+      // Экспериментальный код
+      "home-staging": {
+        "connection": "default",
+        "mappings": ["wb-rules-es5"]
+      }
+    }
+  }
+}

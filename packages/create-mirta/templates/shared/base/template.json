@@ -1,0 +1,18 @@
+{
+  "hidden": true,
+  "features": {
+    "global": {
+      "examples": "recommended",
+      "connection": "recommended",
+      "eslint": "recommended",
+      "vitest": "optional",
+      "github": "optional"
+    },
+    "compound": [
+      "examples-vitest",
+      "vitest-eslint",
+      "github-vitest"
+    ]
+  },
+  "order": 0
+}

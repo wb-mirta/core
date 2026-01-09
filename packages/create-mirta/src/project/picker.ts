@@ -4,7 +4,7 @@ import { isString } from '@mirta/basics'
 import type { ProjectSelection, ProjectType } from './types'
 
 // Префиксы для определения типа
-const MODULAR_PREFIX = /^(modular|mod)-/
+const MONO_PREFIX = /^(mono)-/
 
 export async function pickProjectAsync(
   templateInput: string | undefined
@@ -12,11 +12,11 @@ export async function pickProjectAsync(
 
   if (isString(templateInput)) {
 
-    if (MODULAR_PREFIX.test(templateInput)) {
+    if (MONO_PREFIX.test(templateInput)) {
 
       return {
-        type: 'modular',
-        templateName: templateInput.replace(MODULAR_PREFIX, ''),
+        type: 'mono',
+        templateName: templateInput.replace(MONO_PREFIX, ''),
       }
 
     }
@@ -42,8 +42,8 @@ export async function pickProjectAsync(
         value: 'classic',
       },
       {
-        title: t('projectType.modular'),
-        value: 'modular',
+        title: t('projectType.mono'),
+        value: 'mono',
       },
     ],
   }) as { projectType: ProjectType }

@@ -45,9 +45,9 @@ interface Dirent {
 
 }
 
-type BasicValue = string | number | boolean
+type PlainValue = string | number | boolean
 
-type TemplateData = Record<string, BasicValue>
+type TemplateData = Record<string, PlainValue>
 
 /**
  * Асинхронно перебирает файлы директории, исключая {@link IGNORED_DIRS}.
@@ -99,7 +99,7 @@ export function toTemplateData(
 
     if (supportedTypes.includes(valueType)) {
 
-      result[path] = value as BasicValue
+      result[path] = value as PlainValue
       continue
 
     }
@@ -151,6 +151,9 @@ export function applyTemplatedText(
   data: TemplateData
 ): string {
 
+  if (!content.includes('{{'))
+    return content
+
   // Сначала обрабатываем условные блоки: {{#if key}}...{{/if key}}
   content = content.replace(
     /{{#if\s+([a-zA-Z0-9_.]+)}}\n?([\s\S]*?)\n?{{\/if\s+\1}}/g,
@@ -164,9 +167,9 @@ export function applyTemplatedText(
   // Затем подставляем переменные: {{key}}
   content = content.replace(
     /{{([a-zA-Z0-9_.]+)}}/g,
-    (_, key: string) => {
+    (original, key: string) => {
 
-      return key in data ? String(data[key]) : ''
+      return key in data ? String(data[key]) : original
 
     }
   )
@@ -286,6 +289,13 @@ export async function renderFileTemplatedAsync(
 
 }
 
+function unescapeDot(path: string) {
+
+  // Экранированные точки заменяются в любом месте пути.
+  return path.replace(/_\./g, '.')
+
+}
+
 /**
  * Применяет шаблон из `fromRoot` в `toRoot` с подстановкой данных.
  * Поддерживает `.tt`, `_ → .`, мерж JSON.
@@ -309,8 +319,12 @@ export async function renderDirectoryAsync(
 
     if (entry.isDirectory) {
 
+      const toPath = unescapeDot(
+        applyTemplatedText(join(toRoot, entry.relativePath, entry.name), data)
+      )
+
       await fs.mkdir(
-        join(toRoot, entry.relativePath, entry.name),
+        toPath,
         { recursive: true }
       )
 
@@ -323,13 +337,10 @@ export async function renderDirectoryAsync(
     // Формируем путь к исходному файлу.
     const fromPath = join(fromRoot, entry.relativePath, entry.name) as FilePath
 
-    // Убираем экранирование точки в имени файла.
-    const toFileName = entry.name.startsWith('_.')
-      ? entry.name.slice(1)
-      : entry.name
-
     // Формируем путь к целевому файлу.
-    const toPath = join(toRoot, entry.relativePath, toFileName) as FilePath
+    const toPath = unescapeDot(
+      applyTemplatedText(join(toRoot, entry.relativePath, entry.name), data)
+    ) as FilePath
 
     // Если файл шаблонизирован, обрабатываем его особым образом.
     if (toPath.endsWith('.tt')) {

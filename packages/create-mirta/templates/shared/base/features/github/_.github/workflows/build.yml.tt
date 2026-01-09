@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - {{githubBranch}}
+  pull_request:
+    branches:
+      - {{githubBranch}}
+
+jobs:
+{{#if features.vitest}}
+  test:
+    if: ${{ !startsWith(github.event.head_commit.message, 'release') }}
+    uses: ./.github/workflows/test.yml
+{{/if features.vitest}}
+  build:
+    # Prevents this action from running on forks.
+    if: github.repository == '{{githubOwner}}/{{githubRepository}}'
+{{#if features.vitest}}
+    needs: test
+{{/if features.vitest}}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+{{#if templates.packages}}
+      - name: Continuous Release
+        # Prevents this step from running on pull requests.
+        # Runs only when commit message starts with 'fix' or 'feat'.
+        if: |
+          github.event_name == 'push' && (
+            startsWith(github.event.head_commit.message, 'fix') ||
+            startsWith(github.event.head_commit.message, 'feat')
+          )
+        # NOTE: --compact is temporarily removed
+        # because some packages in ./packages/* are not yet published to npm.
+        # It will be re-enabled once all packages are published or we add filtering.
+        run: pnpx pkg-pr-new publish --pnpm './packages/*' --template './sites/*'
+{{/if templates.packages}}

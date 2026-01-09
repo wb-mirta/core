@@ -1,10 +1,10 @@
 /**
- * Тип проекта: 'classic' — привычный формат, 'modular' — модульная структура
+ * Тип проекта: 'classic' — привычный формат, 'mono' — монорепозиторий
  *
  * @since 0.4.0
  *
  **/
-export type ProjectType = 'classic' | 'modular'
+export type ProjectType = 'classic' | 'mono'
 
 export interface ProjectSelection {
 
