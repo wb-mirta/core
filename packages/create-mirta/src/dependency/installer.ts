@@ -63,6 +63,6 @@ export async function promptInstallDependenciesAsync(cwd: string) {
   if (!manager)
     return
 
-  await runCommandAsync(manager, ['install'], { cwd })
+  await runCommandAsync(manager, ['install'], { cwd, shell: true })
 
 }
