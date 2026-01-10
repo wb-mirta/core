@@ -19,6 +19,7 @@ import { logger } from '#utils/logger'
 const { yellow } = chalk
 
 const MAX_CONCURRENT_WRITES = 5
+const MAX_CONCURRENT_REQUESTS = 5
 
 type DepType = 'dependencies' | 'devDependencies'
 
@@ -223,7 +224,15 @@ export async function buildPackagesAsync(skipBuild: boolean) {
 
 }
 
-async function checkPackageExistsAsync(pkgName: string): Promise<boolean> {
+/**
+ * Проверяет существование пакета в NPM.
+ *
+ * @since 0.4.0
+ *
+ * @internal
+ *
+ **/
+export async function checkPackageExistsAsync(pkgName: string): Promise<boolean> {
 
   try {
 
@@ -315,19 +324,21 @@ export async function publishPackagesAsync(
 
   logger.log(t('publish.begin'))
 
-  const unpublishedPackages: string[] = []
+  const packagesToPublish = Object.entries(packages)
+    .filter(([, pkg]) => !pkg.isPrivate)
 
-  for (const [pkgName, pkg] of Object.entries(packages)) {
+  const existenceChecks = await pMap(
+    packagesToPublish,
+    async ([pkgName]) => ({
+      name: pkgName,
+      isExists: await checkPackageExistsAsync(pkgName),
+    }),
+    { concurrency: MAX_CONCURRENT_REQUESTS }
+  )
 
-    if (pkg.isPrivate)
-      continue
-
-    const isExists = await checkPackageExistsAsync(pkgName)
-
-    if (!isExists)
-      unpublishedPackages.push(pkgName)
-
-  }
+  const unpublishedPackages = existenceChecks
+    .filter(({ isExists }) => !isExists)
+    .map(({ name }) => name)
 
   if (unpublishedPackages.length > 0) {
 

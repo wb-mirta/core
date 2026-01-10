@@ -368,9 +368,20 @@ describe('package utils', () => {
 
     it('should publish only public packages', async () => {
 
-      const { publishPackagesAsync } = await importModule()
-      await publishPackagesAsync('1.0.0', false, false)
-      expect(mockRunCommandAsync).toHaveBeenCalledTimes(1)
+      const utils = await importModule()
+
+      const spyCheck = vi.spyOn(utils, 'checkPackageExistsAsync')
+        .mockResolvedValue(true)
+
+      await utils.publishPackagesAsync('1.0.0', false, false)
+
+      const publishCalls = mockRunCommandAsync.mock.calls.filter(
+        ([cmd, args]) => cmd === 'pnpm' && args?.[0] === 'publish'
+      )
+
+      expect(publishCalls.length).toBe(1)
+
+      spyCheck.mockRestore()
 
     })
 
