@@ -243,9 +243,18 @@ export async function checkPackageExistsAsync(pkgName: string): Promise<boolean>
     return true
 
   }
-  catch {
+  catch (e: unknown) {
 
-    return false
+    if (e instanceof Error) {
+
+      const message = e.message
+
+      if (message.includes('404'))
+        return false
+
+    }
+
+    throw e
 
   }
 
@@ -327,28 +336,32 @@ export async function publishPackagesAsync(
   const packagesToPublish = Object.entries(packages)
     .filter(([, pkg]) => !pkg.isPrivate)
 
-  const existenceChecks = await pMap(
-    packagesToPublish,
-    async ([pkgName]) => ({
-      name: pkgName,
-      isExists: await checkPackageExistsAsync(pkgName),
-    }),
-    { concurrency: MAX_CONCURRENT_REQUESTS }
-  )
+  if (!isDryRun) {
 
-  const unpublishedPackages = existenceChecks
-    .filter(({ isExists }) => !isExists)
-    .map(({ name }) => name)
+    const existenceChecks = await pMap(
+      packagesToPublish,
+      async ([pkgName]) => ({
+        name: pkgName,
+        isExists: await checkPackageExistsAsync(pkgName),
+      }),
+      { concurrency: MAX_CONCURRENT_REQUESTS, stopOnError: true }
+    )
 
-  if (unpublishedPackages.length > 0) {
+    const unpublishedPackages = existenceChecks
+      .filter(({ isExists }) => !isExists)
+      .map(({ name }) => name)
 
-    logger.error(t('publish.newPackages', {
-      packages: unpublishedPackages.join(', '),
-    }))
+    if (unpublishedPackages.length > 0) {
 
-    logger.error(t('publish.initialPublishRequired'))
+      logger.error(t('publish.newPackages', {
+        packages: unpublishedPackages.join(', '),
+      }))
 
-    throw new Error('Packages not found in NPM registry')
+      logger.error(t('publish.initialPublishRequired'))
+
+      throw new Error('Packages not found in NPM registry')
+
+    }
 
   }
 
@@ -363,7 +376,7 @@ export async function publishPackagesAsync(
   if (process.env.CI)
     flags.push('--provenance')
 
-  for (const [pkgName, pkg] of Object.entries(packages)) {
+  for (const [pkgName, pkg] of packagesToPublish) {
 
     // Приватные пакеты не публикуются.
     if (pkg.isPrivate) {
