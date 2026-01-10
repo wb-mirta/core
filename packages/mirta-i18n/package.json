@@ -2,9 +2,6 @@
   "name": "@mirta/i18n",
   "description": "Lightweight, type-safe i18n for Node.js with ICU-like plural support",
   "version": "0.4.0",
-  "engines": {
-    "node": ">=20.6.0"
-  },
   "sideEffects": false,
   "license": "Unlicense",
   "keywords": [
@@ -50,5 +47,8 @@
   },
   "scripts": {
     "build:mono": "rollup -c node:@mirta/rollup/config-package"
+  },
+  "engines": {
+    "node": ">=24.12.0"
   }
 }

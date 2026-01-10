@@ -44,11 +44,11 @@
     "#context/*": "./src/context/*.js",
     "#errors": "./src/errors/index.js"
   },
-  "engines": {
-    "node": ">=20.6.0"
-  },
   "dependencies": {
     "@mirta/package": "workspace:*",
     "find-up": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=24.12.0"
   }
 }

@@ -8,9 +8,6 @@
     "mirta",
     "wb-rules"
   ],
-  "engines": {
-    "node": ">=20.10.0"
-  },
   "type": "module",
   "files": [
     "bin",
@@ -64,5 +61,8 @@
   },
   "devDependencies": {
     "@types/semver": "^7.7.1"
+  },
+  "engines": {
+    "node": ">=24.12.0"
   }
 }
