@@ -33,6 +33,8 @@
   "release.final.gitRemoteStatus": "Check status at {workflowLink}",
   "release.final.noGit": "Version update complete. Git operations skipped",
   "publish.begin": "Publishing packages...",
+  "publish.newPackages": "New packages: {packages}",
+  "publish.initialPublishRequired": "Trusted Publisher requires manual initial publish",
   "publish.skippingPrivate": "Skipping private {name}",
   "publish.skippingPublished": "Skipping already published {name}",
   "publish.packagePublishing": "Publishing {name}",

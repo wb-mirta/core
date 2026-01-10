@@ -223,6 +223,25 @@ export async function buildPackagesAsync(skipBuild: boolean) {
 
 }
 
+async function checkPackageExistsAsync(pkgName: string): Promise<boolean> {
+
+  try {
+
+    await runCommandAsync('npm', ['view', pkgName, 'version'], {
+      stdio: 'pipe',
+    })
+
+    return true
+
+  }
+  catch {
+
+    return false
+
+  }
+
+}
+
 async function publishSinglePackageAsync(
   pkgName: string,
   pkgPath: string,
@@ -295,6 +314,32 @@ export async function publishPackagesAsync(
 ) {
 
   logger.log(t('publish.begin'))
+
+  const unpublishedPackages: string[] = []
+
+  for (const [pkgName, pkg] of Object.entries(packages)) {
+
+    if (pkg.isPrivate)
+      continue
+
+    const isExists = await checkPackageExistsAsync(pkgName)
+
+    if (!isExists)
+      unpublishedPackages.push(pkgName)
+
+  }
+
+  if (unpublishedPackages.length > 0) {
+
+    logger.error(t('publish.newPackages', {
+      packages: unpublishedPackages.join(', '),
+    }))
+
+    logger.error(t('publish.initialPublishRequired'))
+
+    throw new Error('Packages not found in NPM registry')
+
+  }
 
   const flags: string[] = []
 
