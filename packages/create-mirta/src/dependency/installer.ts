@@ -1,6 +1,6 @@
 import { t } from '#i18n'
 import { prompts } from '#utils/prompts'
-import { runCommandAsync } from '#utils/shell'
+import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell'
 
 function getCurrentPackageManager() {
 
@@ -63,6 +63,10 @@ export async function promptInstallDependenciesAsync(cwd: string) {
   if (!manager)
     return
 
-  await runCommandAsync(manager, ['install'], { cwd, shell: true })
+  await runCommandAsync(manager, ['install'], {
+    cwd,
+    shell: true,
+    stdio: STDIO_INTERACTIVE,
+  })
 
 }

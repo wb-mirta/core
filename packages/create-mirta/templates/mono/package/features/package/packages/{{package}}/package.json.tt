@@ -21,5 +21,8 @@
   },
   "imports": {
     "#src/*": "./src/*.js"
+  },
+  "scripts": {
+    "build:mono": "rollup -c node:@mirta/rollup/config-package"
   }
 }
