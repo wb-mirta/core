@@ -30,7 +30,7 @@ export async function executeReleaseAsync(
 
       logger.step(t('release.changelogGenerating'))
 
-      await runCommandAsync('pnpm', ['run', 'changelog'])
+      await runCommandAsync('pnpm', ['run', 'changelog'], { shell: true })
 
       if (!context.skipPrompts) {
 
