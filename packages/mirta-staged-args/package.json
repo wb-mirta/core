@@ -12,9 +12,6 @@
     "typescript",
     "mirta"
   ],
-  "engines": {
-    "node": ">=20.10.0"
-  },
   "type": "module",
   "files": [
     "dist",
@@ -48,5 +45,8 @@
   },
   "scripts": {
     "build:mono": "rollup -c node:@mirta/rollup/config-package"
+  },
+  "engines": {
+    "node": ">=24.12.0"
   }
 }
