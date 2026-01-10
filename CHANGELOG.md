@@ -1,3 +1,85 @@
+# [0.4.0](https://github.com/wb-mirta/core/compare/v0.3.5...v0.4.0) (2026-01-10)
+
+
+### Bug Fixes
+
+* **mirta-cli:** root level protection ([#181](https://github.com/wb-mirta/core/issues/181)) ([04535a7](https://github.com/wb-mirta/core/commit/04535a7275374defb5ba4d431c9f30ab2fb45ce5))
+
+
+### Features
+
+* **config:** migrate to jsonc ([#175](https://github.com/wb-mirta/core/issues/175)) ([aa11d80](https://github.com/wb-mirta/core/commit/aa11d8050a7f6997f8d9fc3f05455f7c15f59c83))
+* **create-mirta:** add mono templates ([#177](https://github.com/wb-mirta/core/issues/177)) ([2670522](https://github.com/wb-mirta/core/commit/26705225b6f1a04f6e0236543b54470d3a367eee))
+* **create-mirta:** revamp generator ([#171](https://github.com/wb-mirta/core/issues/171)) ([b31f3d6](https://github.com/wb-mirta/core/commit/b31f3d63b9944ccafd20750f938ab22938f7f15f))
+* **create:** move Vitest setup to @mirta/testing ([#107](https://github.com/wb-mirta/core/issues/107)) ([5f773d0](https://github.com/wb-mirta/core/commit/5f773d064e714a03e19caa3b7ea933c4a24cc2a8))
+* introduce staged-args package ([#161](https://github.com/wb-mirta/core/issues/161)) ([427a47d](https://github.com/wb-mirta/core/commit/427a47dbc05711852ecc78d7e31a4baa5af90ae9))
+* **mirta-basics:** add utils, revamp guards ([#134](https://github.com/wb-mirta/core/issues/134)) ([ad20305](https://github.com/wb-mirta/core/commit/ad203057c0c637a61a44338089af9cfb5355f4a0))
+* **mirta-cli:** add deploy module ([#157](https://github.com/wb-mirta/core/issues/157)) ([d8bf015](https://github.com/wb-mirta/core/commit/d8bf015c58cc4c7cc7b5338b81737efc21092360))
+* **mirta-cli:** add modular runner system ([#153](https://github.com/wb-mirta/core/issues/153)) ([4b4df8e](https://github.com/wb-mirta/core/commit/4b4df8e67011ce559aa97c33e092f7c85cf5234d))
+* **mirta-cli:** add Trusted Publisher check ([#180](https://github.com/wb-mirta/core/issues/180)) ([1fc3065](https://github.com/wb-mirta/core/commit/1fc30650fa6cb1b88157ef856b6dd186b047c663))
+* **mirta-cli:** migrate to `@mirta/staged-args` ([#166](https://github.com/wb-mirta/core/issues/166)) ([3688fee](https://github.com/wb-mirta/core/commit/3688feea8a044cb52401508408e75edcb2de37d5))
+* **mirta-cli:** migrate to workspace package API ([#130](https://github.com/wb-mirta/core/issues/130)) ([912c5f0](https://github.com/wb-mirta/core/commit/912c5f031a1f7380ca3c9e43668c72273c0c8c2d))
+* **mirta-cli:** rewrite CLI options to kebab-case ([#132](https://github.com/wb-mirta/core/issues/132)) ([712fed7](https://github.com/wb-mirta/core/commit/712fed7565c7ec8d7c02dc1c14e41cb2c934a5ce))
+* **mirta-globals:** add Branded utility type ([#144](https://github.com/wb-mirta/core/issues/144)) ([f886f0b](https://github.com/wb-mirta/core/commit/f886f0be4dc1a8b9e9483fe25681b60f43a84789))
+* **mirta-globals:** add rule management ([#148](https://github.com/wb-mirta/core/issues/148)) ([c8f789c](https://github.com/wb-mirta/core/commit/c8f789c3e99541d824152ae1bdec7262f18c1208))
+* **mirta-i18n:** add t.plain support ([#169](https://github.com/wb-mirta/core/issues/169)) ([6246be7](https://github.com/wb-mirta/core/commit/6246be7ddcc70b5be375296dea9e7502b098f52b))
+* **mirta-i18n:** introduce i18n subsystem ([#146](https://github.com/wb-mirta/core/issues/146)) ([03475ee](https://github.com/wb-mirta/core/commit/03475eee778d0025b3732fdb752703fe3d612cf9))
+* **mirta-rollup:** add multi-manager support ([#110](https://github.com/wb-mirta/core/issues/110)) ([3359a2d](https://github.com/wb-mirta/core/commit/3359a2d30c98faccb73e6feb10c326cb4b606638))
+* **mirta-rollup:** expose context detection API ([#117](https://github.com/wb-mirta/core/issues/117)) ([0922b96](https://github.com/wb-mirta/core/commit/0922b968920e07e826f2bf0946f0814941ed44de))
+* **mirta-rollup:** extract env-loader to package ([#125](https://github.com/wb-mirta/core/issues/125)) ([7e86d70](https://github.com/wb-mirta/core/commit/7e86d70e35cd40a014c1f8bfb15c9e5878751900))
+* **mirta-rollup:** extract utils into packages ([#123](https://github.com/wb-mirta/core/issues/123)) ([ff586f0](https://github.com/wb-mirta/core/commit/ff586f0befdab175a6e299b1967953ac05920a3a))
+* **mirta-rollup:** migrate to dotenvx, unify env ([#104](https://github.com/wb-mirta/core/issues/104)) ([f60b591](https://github.com/wb-mirta/core/commit/f60b5910676c13a4a4144a80237e4e8342d4558c))
+* **mirta-store:** add getters, actions, scopes ([#140](https://github.com/wb-mirta/core/issues/140)) ([909bdff](https://github.com/wb-mirta/core/commit/909bdff81fad849ddb420fdd8ed90ab465dee49a))
+* **mirta-testing:** provide Vitest default config ([#121](https://github.com/wb-mirta/core/issues/121)) ([ab48bc2](https://github.com/wb-mirta/core/commit/ab48bc2adb60f330159205d8649210dadc4ea996))
+
+
+### BREAKING CHANGES
+
+* **mirta-rollup:** Remove dependency on dotenv-run and its Rollup/Vitest-specific configurations. Update project configuration files to use @mirta/rollup/env-loader
+
+
+
+# [0.4.0](https://github.com/wb-mirta/core/compare/v0.3.5...v0.4.0) (2026-01-10)
+
+
+### Bug Fixes
+
+* **mirta-cli:** root level protection ([#181](https://github.com/wb-mirta/core/issues/181)) ([04535a7](https://github.com/wb-mirta/core/commit/04535a7275374defb5ba4d431c9f30ab2fb45ce5))
+
+
+### Features
+
+* **config:** migrate to jsonc ([#175](https://github.com/wb-mirta/core/issues/175)) ([aa11d80](https://github.com/wb-mirta/core/commit/aa11d8050a7f6997f8d9fc3f05455f7c15f59c83))
+* **create-mirta:** add mono templates ([#177](https://github.com/wb-mirta/core/issues/177)) ([2670522](https://github.com/wb-mirta/core/commit/26705225b6f1a04f6e0236543b54470d3a367eee))
+* **create-mirta:** revamp generator ([#171](https://github.com/wb-mirta/core/issues/171)) ([b31f3d6](https://github.com/wb-mirta/core/commit/b31f3d63b9944ccafd20750f938ab22938f7f15f))
+* **create:** move Vitest setup to @mirta/testing ([#107](https://github.com/wb-mirta/core/issues/107)) ([5f773d0](https://github.com/wb-mirta/core/commit/5f773d064e714a03e19caa3b7ea933c4a24cc2a8))
+* introduce staged-args package ([#161](https://github.com/wb-mirta/core/issues/161)) ([427a47d](https://github.com/wb-mirta/core/commit/427a47dbc05711852ecc78d7e31a4baa5af90ae9))
+* **mirta-basics:** add utils, revamp guards ([#134](https://github.com/wb-mirta/core/issues/134)) ([ad20305](https://github.com/wb-mirta/core/commit/ad203057c0c637a61a44338089af9cfb5355f4a0))
+* **mirta-cli:** add deploy module ([#157](https://github.com/wb-mirta/core/issues/157)) ([d8bf015](https://github.com/wb-mirta/core/commit/d8bf015c58cc4c7cc7b5338b81737efc21092360))
+* **mirta-cli:** add modular runner system ([#153](https://github.com/wb-mirta/core/issues/153)) ([4b4df8e](https://github.com/wb-mirta/core/commit/4b4df8e67011ce559aa97c33e092f7c85cf5234d))
+* **mirta-cli:** add Trusted Publisher check ([#180](https://github.com/wb-mirta/core/issues/180)) ([1fc3065](https://github.com/wb-mirta/core/commit/1fc30650fa6cb1b88157ef856b6dd186b047c663))
+* **mirta-cli:** migrate to `@mirta/staged-args` ([#166](https://github.com/wb-mirta/core/issues/166)) ([3688fee](https://github.com/wb-mirta/core/commit/3688feea8a044cb52401508408e75edcb2de37d5))
+* **mirta-cli:** migrate to workspace package API ([#130](https://github.com/wb-mirta/core/issues/130)) ([912c5f0](https://github.com/wb-mirta/core/commit/912c5f031a1f7380ca3c9e43668c72273c0c8c2d))
+* **mirta-cli:** rewrite CLI options to kebab-case ([#132](https://github.com/wb-mirta/core/issues/132)) ([712fed7](https://github.com/wb-mirta/core/commit/712fed7565c7ec8d7c02dc1c14e41cb2c934a5ce))
+* **mirta-globals:** add Branded utility type ([#144](https://github.com/wb-mirta/core/issues/144)) ([f886f0b](https://github.com/wb-mirta/core/commit/f886f0be4dc1a8b9e9483fe25681b60f43a84789))
+* **mirta-globals:** add rule management ([#148](https://github.com/wb-mirta/core/issues/148)) ([c8f789c](https://github.com/wb-mirta/core/commit/c8f789c3e99541d824152ae1bdec7262f18c1208))
+* **mirta-i18n:** add t.plain support ([#169](https://github.com/wb-mirta/core/issues/169)) ([6246be7](https://github.com/wb-mirta/core/commit/6246be7ddcc70b5be375296dea9e7502b098f52b))
+* **mirta-i18n:** introduce i18n subsystem ([#146](https://github.com/wb-mirta/core/issues/146)) ([03475ee](https://github.com/wb-mirta/core/commit/03475eee778d0025b3732fdb752703fe3d612cf9))
+* **mirta-rollup:** add multi-manager support ([#110](https://github.com/wb-mirta/core/issues/110)) ([3359a2d](https://github.com/wb-mirta/core/commit/3359a2d30c98faccb73e6feb10c326cb4b606638))
+* **mirta-rollup:** expose context detection API ([#117](https://github.com/wb-mirta/core/issues/117)) ([0922b96](https://github.com/wb-mirta/core/commit/0922b968920e07e826f2bf0946f0814941ed44de))
+* **mirta-rollup:** extract env-loader to package ([#125](https://github.com/wb-mirta/core/issues/125)) ([7e86d70](https://github.com/wb-mirta/core/commit/7e86d70e35cd40a014c1f8bfb15c9e5878751900))
+* **mirta-rollup:** extract utils into packages ([#123](https://github.com/wb-mirta/core/issues/123)) ([ff586f0](https://github.com/wb-mirta/core/commit/ff586f0befdab175a6e299b1967953ac05920a3a))
+* **mirta-rollup:** migrate to dotenvx, unify env ([#104](https://github.com/wb-mirta/core/issues/104)) ([f60b591](https://github.com/wb-mirta/core/commit/f60b5910676c13a4a4144a80237e4e8342d4558c))
+* **mirta-store:** add getters, actions, scopes ([#140](https://github.com/wb-mirta/core/issues/140)) ([909bdff](https://github.com/wb-mirta/core/commit/909bdff81fad849ddb420fdd8ed90ab465dee49a))
+* **mirta-testing:** provide Vitest default config ([#121](https://github.com/wb-mirta/core/issues/121)) ([ab48bc2](https://github.com/wb-mirta/core/commit/ab48bc2adb60f330159205d8649210dadc4ea996))
+
+
+### BREAKING CHANGES
+
+* **mirta-rollup:** Remove dependency on dotenv-run and its Rollup/Vitest-specific configurations. Update project configuration files to use @mirta/rollup/env-loader
+
+
+
 ## [0.3.5](https://github.com/wb-mirta/core/compare/v0.3.4...v0.3.5) (2025-10-25)
 
 

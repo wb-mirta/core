@@ -1,17 +1,16 @@
 {
   "private": true,
   "type": "module",
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
-    "@mirta/basics": "^0.3.5",
-    "mirta": "0.3.5"
+    "@mirta/basics": "0.4.0",
+    "mirta": "0.4.0"
   },
   "devDependencies": {
     "@mirta/cli": "0.4.0",
-    "@mirta/globals": "0.3.5",
-    "@mirta/rollup": "0.3.5",
-    "@mirta/tsconfig": "0.3.5",
+    "@mirta/globals": "0.4.0",
+    "@mirta/rollup": "0.4.0",
+    "@mirta/tsconfig": "0.4.0",
     "@types/node": "^24.10.1",
     "cross-env": "^10.1.0",
     "rollup": "^4.55.1",
