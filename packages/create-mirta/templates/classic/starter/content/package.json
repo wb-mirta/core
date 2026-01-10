@@ -7,5 +7,9 @@
     "build": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config",
     "build:dev": "rollup -c node:@mirta/rollup/config",
     "wb:deploy": "mirta deploy"
+  },
+  "dependencies": {
+    "@mirta/basics": "0.4.3",
+    "mirta": "0.4.3"
   }
 }

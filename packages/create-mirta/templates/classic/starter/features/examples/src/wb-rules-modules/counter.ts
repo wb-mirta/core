@@ -5,7 +5,7 @@
 export interface Counter {
 
   /** Позволяет прочесть значение счётчика. */
-  get count(): number
+  count: number
 
   /** Увеличивает значение счётчика на единицу. */
   increment(): void
@@ -20,22 +20,16 @@ export interface Counter {
  **/
 export function useCounter(): Counter {
 
-  // Значение счётчика - его индивидуальное состояние
-  let count = 0
-
   return {
 
-    get count() {
-
-      return count
-
-    },
+    // Значение счётчика - его индивидуальное состояние
+    count: 0,
 
     increment() {
 
-      count += 1
+      this.count += 1
 
-    }
+    },
 
   }
 

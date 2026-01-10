@@ -1,5 +1,5 @@
 {
-  "name": "home-staging",
+  "name": "home",
   "private": true,
   "type": "module",
   "imports": {
@@ -12,6 +12,6 @@
   },
   "scripts": {
     "build:mono": "rollup -c node:@mirta/rollup/config",
-    "wb:deploy": "mirta deploy --profile=home-staging"
+    "wb:deploy": "mirta deploy --profile=home"
   }
 }

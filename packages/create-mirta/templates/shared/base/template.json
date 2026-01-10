@@ -9,7 +9,8 @@
       "github": "optional"
     },
     "compound": [
-      "github-vitest"
+      "github-vitest",
+      "vitest-eslint"
     ]
   },
   "order": 0

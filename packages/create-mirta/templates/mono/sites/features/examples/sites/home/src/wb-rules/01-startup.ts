@@ -1,0 +1,1 @@
+log('This is fine.')

@@ -2,8 +2,7 @@
   "extends": "base",
   "features": {
     "compound": [
-      "examples-vitest",
-      "vitest-eslint"
+      "examples-vitest"
     ]
   },
   "order": 1010

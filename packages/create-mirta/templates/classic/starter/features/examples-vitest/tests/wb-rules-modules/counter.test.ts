@@ -26,18 +26,6 @@ describe('Counter', () => {
 
   })
 
-  it('should not allow direct modification of count', () => {
-
-    const initial = counter.count
-
-    // @ts-expect-error – подавляем ошибку этапа компиляции
-    counter.count = 100
-
-    // Значение не должно измениться
-    expect(counter.count).toBe(initial)
-
-  })
-
   it('should have independent state for each instance', () => {
 
     const counter1 = useCounter()
