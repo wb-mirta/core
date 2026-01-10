@@ -1,6 +1,6 @@
 {
   "name": "@mirta/basics",
-  "description": "Utility functions providing core functionality for the Mirta Framework.",
+  "description": "Utility functions providing core functionality for the Mirta Framework",
   "version": "0.3.5",
   "license": "Unlicense",
   "keywords": [
