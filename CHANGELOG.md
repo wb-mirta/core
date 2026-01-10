@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/wb-mirta/core/compare/v0.4.1...v0.4.2) (2026-01-10)
+
+
+### Bug Fixes
+
+* **create-mirta:** compound features and installer ([#183](https://github.com/wb-mirta/core/issues/183)) ([0a29b45](https://github.com/wb-mirta/core/commit/0a29b4501e55fdc88af1de893991345b45add6ee))
+
+
+
 ## [0.4.1](https://github.com/wb-mirta/core/compare/v0.4.0...v0.4.1) (2026-01-10)
 
 

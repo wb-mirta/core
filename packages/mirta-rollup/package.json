@@ -1,6 +1,6 @@
 {
   "name": "@mirta/rollup",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "sideEffects": false,
   "description": "Predefined Rollup configuration for wb-rules project builds",
   "keywords": [
