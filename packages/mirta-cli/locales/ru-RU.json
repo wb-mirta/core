@@ -33,6 +33,8 @@
   "release.final.gitRemoteStatus": "Статус: {workflowLink}",
   "release.final.noGit": "Версии обновлены. Операции с Git пропущены",
   "publish.begin": "Публикация пакетов...",
+  "publish.newPackages": "Новые пакеты: {packages}",
+  "publish.initialPublishRequired": "Trusted Publisher требует ручную первичную публикацию",
   "publish.skippingPrivate": "Пропуск приватного пакета {name}",
   "publish.skippingPublished": "Пропуск уже опубликованного пакета {name}",
   "publish.packagePublishing": "Публикация пакета {name}",

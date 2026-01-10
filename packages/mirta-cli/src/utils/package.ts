@@ -19,6 +19,7 @@ import { logger } from '#utils/logger'
 const { yellow } = chalk
 
 const MAX_CONCURRENT_WRITES = 5
+const MAX_CONCURRENT_REQUESTS = 5
 
 type DepType = 'dependencies' | 'devDependencies'
 
@@ -223,6 +224,42 @@ export async function buildPackagesAsync(skipBuild: boolean) {
 
 }
 
+/**
+ * Проверяет существование пакета в NPM.
+ *
+ * @since 0.4.0
+ *
+ * @internal
+ *
+ **/
+export async function checkPackageExistsAsync(pkgName: string): Promise<boolean> {
+
+  try {
+
+    await runCommandAsync('npm', ['view', pkgName, 'version'], {
+      stdio: 'pipe',
+    })
+
+    return true
+
+  }
+  catch (e: unknown) {
+
+    if (e instanceof Error) {
+
+      const message = e.message
+
+      if (message.includes('404'))
+        return false
+
+    }
+
+    throw e
+
+  }
+
+}
+
 async function publishSinglePackageAsync(
   pkgName: string,
   pkgPath: string,
@@ -296,6 +333,38 @@ export async function publishPackagesAsync(
 
   logger.log(t('publish.begin'))
 
+  const packagesToPublish = Object.entries(packages)
+    .filter(([, pkg]) => !pkg.isPrivate)
+
+  if (!isDryRun) {
+
+    const existenceChecks = await pMap(
+      packagesToPublish,
+      async ([pkgName]) => ({
+        name: pkgName,
+        isExists: await checkPackageExistsAsync(pkgName),
+      }),
+      { concurrency: MAX_CONCURRENT_REQUESTS, stopOnError: true }
+    )
+
+    const unpublishedPackages = existenceChecks
+      .filter(({ isExists }) => !isExists)
+      .map(({ name }) => name)
+
+    if (unpublishedPackages.length > 0) {
+
+      logger.error(t('publish.newPackages', {
+        packages: unpublishedPackages.join(', '),
+      }))
+
+      logger.error(t('publish.initialPublishRequired'))
+
+      throw new Error('Packages not found in NPM registry')
+
+    }
+
+  }
+
   const flags: string[] = []
 
   if (isDryRun)
@@ -307,7 +376,7 @@ export async function publishPackagesAsync(
   if (process.env.CI)
     flags.push('--provenance')
 
-  for (const [pkgName, pkg] of Object.entries(packages)) {
+  for (const [pkgName, pkg] of packagesToPublish) {
 
     // Приватные пакеты не публикуются.
     if (pkg.isPrivate) {
