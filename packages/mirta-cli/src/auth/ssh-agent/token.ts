@@ -90,7 +90,7 @@ export async function addTokenAsync(
   const args = ['-q']
 
   if (context.ttl)
-    args.push('-t', context.ttl.toString())
+    args.push('-t', context.ttl)
 
   args.push('-s', path)
 

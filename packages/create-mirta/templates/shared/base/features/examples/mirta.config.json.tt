@@ -9,16 +9,16 @@
       "wb-rules-es5": [
         // Копирование модулей.
         {
-          "from": "dist/es5/wb-rules-modules",
-          "to": "/mnt/data/etc/wb-rules-modules",
+          "from": "dist/es5/wb-rules-modules/",
+          "to": "/mnt/data/etc/wb-rules-modules/",
 
           // Очистить целевое расположение от других файлов.
           "cleanup": true
         },
         // Копирование скриптов.
         {
-          "from": "dist/es5/wb-rules",
-          "to": "/mnt/data/etc/wb-rules",
+          "from": "dist/es5/wb-rules/",
+          "to": "/mnt/data/etc/wb-rules/",
 
           // Очистить целевое расположение от других файлов.
           "cleanup": true,
@@ -31,8 +31,8 @@
       // Расширенный набор: добавляем ещё и шаблоны устройств.
       "templates": [
         {
-          "from": "templates",
-          "to": "/etc/wb-mqtt-serial.conf.d/templates",
+          "from": "templates/",
+          "to": "/etc/wb-mqtt-serial.conf.d/templates/",
 
           // Существующие шаблоны не удаляем.
           "cleanup": false

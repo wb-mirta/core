@@ -1,5 +1,4 @@
 import type { DeployMapping, MirtaConnection } from '#src/config/types'
-import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 import { logger } from '#utils/logger'
 import { t } from '#src/i18n'
 import { runCommandAsync, STDIO_INTERACTIVE } from '#src/utils/shell'
@@ -68,22 +67,6 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
     isDryRun,
   } = options
 
-  const from = resolveSubpath(cwd, mapping.from)
-
-  if (!await isExistsAsync(from)) {
-
-    logger.step(t('deploy.sourceNotExists', {
-      source: from,
-    }))
-
-    // Файлы могут отсутствовать, это допустимо.
-
-    return
-
-  }
-
-  const to = `${connection.username}@${connection.hostname}:${mapping.to}/`
-
   const args: string[] = []
 
   const sshParts: string[] = []
@@ -106,7 +89,7 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
   )
 
   if (isDryRun)
-    args.unshift('--dry-run', '--itemize-changes')
+    args.push('--dry-run', '--itemize-changes')
 
   if (mapping.cleanup)
     args.push('--delete')
@@ -126,8 +109,10 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
   if (toGroup)
     args.push('--groupmap', `*:${toGroup}`)
 
+  const to = `${connection.username}@${connection.hostname}:${mapping.to}`
+
   args.push(
-    from,
+    mapping.from,
     to
   )
 
