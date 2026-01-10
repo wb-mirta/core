@@ -1,3 +1,12 @@
+## [0.4.4](https://github.com/wb-mirta/core/compare/v0.4.3...v0.4.4) (2026-01-10)
+
+
+### Bug Fixes
+
+* **create-mirta:** template generator issues ([#185](https://github.com/wb-mirta/core/issues/185)) ([1ea5150](https://github.com/wb-mirta/core/commit/1ea51505cedeebaf7d0835dd862e273af8afdada))
+
+
+
 ## [0.4.3](https://github.com/wb-mirta/core/compare/v0.4.2...v0.4.3) (2026-01-10)
 
 

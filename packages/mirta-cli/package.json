@@ -1,7 +1,7 @@
 {
   "name": "@mirta/cli",
   "description": "🛠️ Mirta Framework - the CLI",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "Unlicense",
   "keywords": [
     "cli",
