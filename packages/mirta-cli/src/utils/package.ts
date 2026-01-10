@@ -74,7 +74,7 @@ export async function resolveTemplatePathsAsync(config: MirtaConfig): Promise<st
 
   for (const templatePath of templates) {
 
-    const resolvedDir = posix.resolve(rootDir, templatePath)
+    const resolvedDir = toPosix(nodePath.resolve(rootDir, templatePath))
 
     if (!resolvedDir.startsWith(rootDir + posix.sep)) {
 
