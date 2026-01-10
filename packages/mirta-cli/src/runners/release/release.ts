@@ -62,7 +62,7 @@ export async function executeReleaseAsync(
 
     logger.step(t('release.lockfileUpdating'))
 
-    await runAsync('pnpm', ['install', '--prefer-offline'])
+    await runAsync('pnpm', ['install', '--prefer-offline'], { shell: true })
 
     if (!context.inWorkTree || !context.repository) {
 
