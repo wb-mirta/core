@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/wb-mirta/core/compare/v0.4.0...v0.4.1) (2026-01-10)
+
+
+### Bug Fixes
+
+* **create-mirta:** adjust locales path ([#182](https://github.com/wb-mirta/core/issues/182)) ([aa528f2](https://github.com/wb-mirta/core/commit/aa528f252fdf6e85830acbef2ed0695c1df33a6f))
+
+
+
 # [0.4.0](https://github.com/wb-mirta/core/compare/v0.3.5...v0.4.0) (2026-01-10)
 
 
