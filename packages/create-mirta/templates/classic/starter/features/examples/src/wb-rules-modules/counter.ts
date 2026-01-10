@@ -20,16 +20,14 @@ export interface Counter {
  **/
 export function useCounter(): Counter {
 
-  // Значение счётчика - его индивидуальное состояние
-  let count = 0
-
   return {
 
-    count,
+    // Значение счётчика - его индивидуальное состояние
+    count: 0,
 
     increment() {
 
-      count += 1
+      this.count += 1
 
     },
 
