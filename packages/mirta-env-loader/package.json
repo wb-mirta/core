@@ -1,6 +1,6 @@
 {
   "name": "@mirta/env-loader",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "sideEffects": false,
   "description": "Internal dotenvx-based environment loader, used by Mirta Framework",
   "keywords": [

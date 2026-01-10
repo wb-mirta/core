@@ -1,3 +1,12 @@
+## [0.4.3](https://github.com/wb-mirta/core/compare/v0.4.2...v0.4.3) (2026-01-10)
+
+
+### Bug Fixes
+
+* patch critical release issues ([#184](https://github.com/wb-mirta/core/issues/184)) ([897ce4d](https://github.com/wb-mirta/core/commit/897ce4d800326aa805ab279e73403c0c79ceff59))
+
+
+
 ## [0.4.2](https://github.com/wb-mirta/core/compare/v0.4.1...v0.4.2) (2026-01-10)
 
 
