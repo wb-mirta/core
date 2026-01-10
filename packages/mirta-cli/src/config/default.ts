@@ -40,14 +40,14 @@ export default defineConfig({
     mappings: {
       'wb-rules-es5': [
         {
-          from: 'dist/es5/wb-rules-modules' as DeployFrom,
-          to: '/mnt/data/etc/wb-rules-modules' as DeployTo,
+          from: 'dist/es5/wb-rules-modules/' as DeployFrom,
+          to: '/mnt/data/etc/wb-rules-modules/' as DeployTo,
 
           cleanup: true,
         },
         {
-          from: 'dist/es5/wb-rules' as DeployFrom,
-          to: '/mnt/data/etc/wb-rules' as DeployTo,
+          from: 'dist/es5/wb-rules/' as DeployFrom,
+          to: '/mnt/data/etc/wb-rules/' as DeployTo,
 
           cleanup: true,
           protect: ['alarms.conf'],

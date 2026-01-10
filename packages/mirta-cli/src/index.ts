@@ -24,6 +24,9 @@ const commonOptions = {
     type: 'boolean',
     short: 'h',
   },
+  debug: {
+    type: 'boolean',
+  },
 
 } as const
 
@@ -54,6 +57,9 @@ async function run() {
     return
 
   }
+
+  if (argv.debug)
+    logger.setLevel('debug')
 
   const module = await resolveRunnerAsync(positionals[0])
 

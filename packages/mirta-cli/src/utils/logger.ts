@@ -95,7 +95,7 @@ const levelPriority: LogLevelExtended[] = [
  * @since 0.4.0
  *
  **/
-let targetLevel = 0
+let targetLevel = 1
 
 /**
  * Проверяет, должно ли сообщение быть залогировано, исходя из текущего уровня.
