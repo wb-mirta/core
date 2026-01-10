@@ -5,7 +5,10 @@
       "examples": "recommended",
       "eslint": "recommended",
       "vitest": "optional"
-    }
+    },
+    "compound": [
+      "examples-vitest"
+    ]
   },
   "order": 1020
 }

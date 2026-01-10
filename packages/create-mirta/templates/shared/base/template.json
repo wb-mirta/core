@@ -9,8 +9,6 @@
       "github": "optional"
     },
     "compound": [
-      "examples-vitest",
-      "vitest-eslint",
       "github-vitest"
     ]
   },
