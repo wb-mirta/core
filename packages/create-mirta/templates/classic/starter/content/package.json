@@ -9,7 +9,7 @@
     "wb:deploy": "mirta deploy"
   },
   "dependencies": {
-    "@mirta/basics": "0.4.4",
-    "mirta": "0.4.4"
+    "@mirta/basics": "0.4.5",
+    "mirta": "0.4.5"
   }
 }

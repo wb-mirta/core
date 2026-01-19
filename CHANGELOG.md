@@ -1,3 +1,13 @@
+## [0.4.5](https://github.com/wb-mirta/core/compare/v0.4.4...v0.4.5) (2026-01-19)
+
+
+### Features
+
+* **mirta-cli:** prompt on unknown SSH host ([#189](https://github.com/wb-mirta/core/issues/189)) ([c6fb410](https://github.com/wb-mirta/core/commit/c6fb41010e9a83aad374eca020b0b604452ba392))
+* **mirta-testing:** add format(), block xformat() ([#191](https://github.com/wb-mirta/core/issues/191)) ([7a6545e](https://github.com/wb-mirta/core/commit/7a6545ef7af67821495851ae16a9cdf9dd5f3201))
+
+
+
 ## [0.4.4](https://github.com/wb-mirta/core/compare/v0.4.3...v0.4.4) (2026-01-10)
 
 
