@@ -1,10 +1,10 @@
-import type { KeyPath } from '#src/config/types'
-import { expandHomeDir } from '#src/utils/file-system'
+import type { KeyPath } from '#config/types'
+import { expandHomeDir } from '#utils/file-system'
 import { logger } from '#utils/logger'
-import { STDIO_INTERACTIVE } from '#src/utils/shell'
-import { SSH_AUTH_SOCK } from './constants'
+import { STDIO_INTERACTIVE } from '#utils/shell'
+import { SSH_AUTH_SOCK } from '#auth/constants'
 import { hasEntryAsync } from './entry'
-import type { AgentContext } from './types'
+import type { AuthContext } from '#auth/types'
 
 /**
  * Получает отпечаток (fingerprint) приватного SSH-ключа с помощью `ssh-keygen -lf`.
@@ -21,7 +21,7 @@ import type { AgentContext } from './types'
  **/
 export async function getFingerprintAsync(
   key: string,
-  context: AgentContext
+  context: AuthContext
 ): Promise<string> {
 
   const response = await context.runAsync(
@@ -55,7 +55,7 @@ export async function getFingerprintAsync(
  * @since 0.4.0
  *
  **/
-export async function hasKeyAsync(path: KeyPath, context: AgentContext): Promise<boolean> {
+export async function hasKeyAsync(path: KeyPath, context: AuthContext): Promise<boolean> {
 
   const fingerprint = await getFingerprintAsync(path, context)
 
@@ -76,7 +76,7 @@ export async function hasKeyAsync(path: KeyPath, context: AgentContext): Promise
  * @since 0.4.0
  *
  **/
-export async function addKeyAsync(path: KeyPath, context: AgentContext): Promise<void> {
+export async function addKeyAsync(path: KeyPath, context: AuthContext): Promise<void> {
 
   const args = ['-q']
 

@@ -1,4 +1,4 @@
-import { expandHomeDir } from '#src/utils/file-system'
+import { expandHomeDir } from '#utils/file-system'
 
 /**
  * Базовая директория для SSH-файлов в зависимости от платформы.

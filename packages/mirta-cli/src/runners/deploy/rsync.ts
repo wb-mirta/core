@@ -1,9 +1,9 @@
-import type { DeployMapping, MirtaConnection } from '#src/config/types'
+import type { DeployMapping, MirtaConnection } from '#config/types'
 import { logger } from '#utils/logger'
-import { t } from '#src/i18n'
-import { runCommandAsync, STDIO_INTERACTIVE } from '#src/utils/shell'
-import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
-import { KNOWN_SSH_PORT } from '#src/config/constants'
+import { t } from '#i18n'
+import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell'
+import { SSH_AUTH_SOCK } from '#auth/constants'
+import { KNOWN_SSH_PORT } from '#config/constants'
 
 /**
  * Параметры для выполнения команды rsync.

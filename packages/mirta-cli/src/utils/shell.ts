@@ -3,6 +3,14 @@ import type { WslDistroName } from '#src/config/types'
 import { logger } from '#utils/logger'
 
 /**
+ * Режим `stdio`: ввод и вывод перенаправляются в `stdin`, `stdout` и `stderr` соответственно.
+ *
+ * @since 0.4.5
+ *
+ **/
+export const STDIO_PIPED: IOType[] = ['pipe', 'pipe', 'pipe']
+
+/**
  * Режим `stdio`: ввод и вывод наследуются от родительского процесса (терминал), `stderr` перехватывается.
  *
  * Используется, когда важно видеть прогресс команды (например, `rsync`).
@@ -80,7 +88,7 @@ export class OperationCanceledError extends Error {
  * Результат выполнения команды.
  *
  **/
-interface ExecutionResult {
+export interface ExecutionResult {
 
   /**
    * Успешно завершена ли команда (код в `doneCodes`).
@@ -127,6 +135,14 @@ interface RunOptions extends SpawnOptions {
    **/
   cancelCodes?: number[]
 
+  /**
+   * Ввод для команды (требует pipe для stdin).
+   *
+   * @since 0.4.5
+   *
+   **/
+  input?: string
+
 }
 
 /**
@@ -151,10 +167,25 @@ export async function execAsync(
 
   return new Promise((resolve, reject) => {
 
-    const { doneCodes = [0], cancelCodes = [130], ...spawnOptions } = options
+    const { doneCodes = [0], cancelCodes = [130], input, ...spawnOptions } = options
 
     spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT
     spawnOptions.shell ??= false
+
+    const stdio = spawnOptions.stdio
+    const stdinMode = Array.isArray(stdio) ? stdio[0] : stdio
+
+    if (input !== undefined && stdinMode !== 'pipe') {
+
+      reject(
+        new ShellError(
+          'Input can only be piped to stdin when stdio[0] is set to "pipe"'
+        )
+      )
+
+      return
+
+    }
 
     const runner = spawn(command, args, spawnOptions)
 
@@ -172,6 +203,15 @@ export async function execAsync(
       stderrChunks.push(chunk)
 
     })
+
+    if (input !== undefined) {
+
+      runner.stdin?.on('error', reject)
+
+      runner.stdin?.write(input)
+      runner.stdin?.end()
+
+    }
 
     runner.on('error', reject)
 

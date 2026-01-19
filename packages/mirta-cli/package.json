@@ -26,7 +26,7 @@
     "#src/staged-args": "./src/staged-args/index.js",
     "#src/staged-args/*": "./src/staged-args/*.js",
     "#src/config/connection": "./src/config/connection/index.js",
-    "#utils/*": "./src/utils/*.js"
+    "#*": ["./src/*.js", "./src/*/index.js"]
   },
   "homepage": "https://github.com/wb-mirta/core/tree/latest/packages/mirta-cli#readme",
   "repository": {

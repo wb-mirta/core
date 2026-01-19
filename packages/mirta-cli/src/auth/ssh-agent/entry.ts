@@ -1,6 +1,6 @@
-import { STDIO_CAPTURE_OUTPUT } from '#src/utils/shell'
-import { SSH_AUTH_SOCK } from './constants'
-import type { AgentContext } from './types'
+import { STDIO_CAPTURE_OUTPUT } from '#utils/shell'
+import { SSH_AUTH_SOCK } from '#auth/constants'
+import type { AuthContext } from '#auth/types'
 
 /**
  * Проверяет, содержится ли указанный отпечаток (или путь к токену) в списке добавленных сущностей в SSH-агенте.
@@ -17,7 +17,7 @@ import type { AgentContext } from './types'
  **/
 export async function hasEntryAsync(
   fingerprint: string,
-  context: AgentContext
+  context: AuthContext
 ): Promise<boolean> {
 
   const response = await context.runAsync(

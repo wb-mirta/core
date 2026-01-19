@@ -1,7 +1,7 @@
-import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from './constants'
-import type { AgentContext } from './types'
+import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from '#auth/constants'
+import type { AuthContext } from '#auth/types'
 import { logger } from '#utils/logger'
-import { STDIO_CAPTURE_ERRORS } from '#src/utils/shell'
+import { STDIO_CAPTURE_ERRORS } from '#utils/shell'
 
 /**
  * Обеспечивает запуск изолированного SSH-агента для текущей сессии CLI.
@@ -17,7 +17,7 @@ import { STDIO_CAPTURE_ERRORS } from '#src/utils/shell'
  * @since 0.4.0
  *
  **/
-export async function ensureAgentIsRunningAsync(context: AgentContext): Promise<void> {
+export async function ensureAgentIsRunningAsync(context: AuthContext): Promise<void> {
 
   try {
 
