@@ -1,9 +1,9 @@
 import type { Pkcs11Path } from '#src/config/types'
 import { logger } from '#utils/logger'
 import { STDIO_INTERACTIVE } from '#src/utils/shell'
-import { SSH_AUTH_SOCK } from './constants'
+import { SSH_AUTH_SOCK } from '#auth/constants'
 import { hasEntryAsync } from './entry'
-import type { AgentContext } from './types'
+import type { AuthContext } from '#auth/types'
 
 /**
  * Удаляет PKCS#11 токен из SSH-агента.
@@ -19,7 +19,7 @@ import type { AgentContext } from './types'
  **/
 export async function removeTokenAsync(
   path: Pkcs11Path,
-  context: AgentContext
+  context: AuthContext
 ): Promise<boolean> {
 
   try {
@@ -59,7 +59,7 @@ export async function removeTokenAsync(
  **/
 export async function hasTokenAsync(
   path: Pkcs11Path,
-  context: AgentContext
+  context: AuthContext
 ): Promise<boolean> {
 
   // Для PKCS#11 токенов ssh-add -l выводит путь к библиотеке,
@@ -84,7 +84,7 @@ export async function hasTokenAsync(
  **/
 export async function addTokenAsync(
   path: Pkcs11Path,
-  context: AgentContext
+  context: AuthContext
 ): Promise<void> {
 
   const args = ['-q']

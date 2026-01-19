@@ -1,10 +1,11 @@
 import { runCommandAsync } from '#src/utils/shell'
 import type { MirtaConnection } from '#src/config/types'
-import type { AgentContext } from './ssh-agent/types'
+import type { AuthContext } from './types'
 import { ensureAgentIsRunningAsync } from './ssh-agent/agent'
 import { hasTokenAsync, addTokenAsync, removeTokenAsync } from './ssh-agent/token'
 import { hasKeyAsync, addKeyAsync } from './ssh-agent/key'
 import { logger } from '#utils/logger'
+import { confirmHost } from './ssh/host'
 
 /**
  * Выполняет аутентификацию подключения к контроллеру через SSH-агент.
@@ -28,8 +29,9 @@ export async function authenticateAsync(
   if (connection.type !== 'ssh')
     return
 
-  const context: AgentContext = {
+  const context: AuthContext = {
 
+    hostname: connection.hostname,
     pkcs11: connection.pkcs11,
     key: connection.key,
     ttl: connection.ttl,
@@ -37,6 +39,8 @@ export async function authenticateAsync(
     runAsync: runCommandAsync.inUnixShell(connection.wsl),
 
   }
+
+  await confirmHost(context)
 
   // Ленивая инициализация агента SSH - только если это имеет смысл.
 

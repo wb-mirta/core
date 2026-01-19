@@ -1,4 +1,6 @@
 {
+  "yes": "yes",
+  "no": "no",
   "command.suggest": "{input} → did you mean {suggestion}?",
   "command.notFound": "Unknown command: {input}",
   "args.errorHeader": "Invalid CLI {count, plural, one{argument} other{arguments}}",
@@ -54,5 +56,9 @@
   "deploy.sourceNotExists": "Skipping non-existent: {source}",
   "deploy.transmitting": "Transmitting {from} → {to}",
   "deploy.simulationComplete": "Simulation complete. No changes applied.",
-  "deploy.successful": "🎉 Deployment successful!"
+  "deploy.successful": "🎉 Deployment successful!",
+  "ssh.hostUntrusted": "Host {hostname} is untrusted",
+  "ssh.keyType": "Key type: {type}",
+  "ssh.fingerprint": "Fingerprint: {fingerprint}",
+  "ssh.confirmHostIsTrusted": "Is this host trusted?"
 }

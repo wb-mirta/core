@@ -1,4 +1,6 @@
 {
+  "yes": "да",
+  "no": "нет",
   "command.suggest": "{input} → возможно, {suggestion}?",
   "command.notFound": "Неизвестная команда: {input}",
   "args.errorHeader": "{count, plural, one{Недопустимый аргумент} other{Недопустимые аргументы}} CLI",
@@ -54,5 +56,9 @@
   "deploy.sourceNotExists": "Не найдено: {source}",
   "deploy.transmitting": "Передача {from} → {to}",
   "deploy.simulationComplete": "Симуляция завершена. Изменения не применены.",
-  "deploy.successful": "🎉 Деплой успешно выполнен!"
+  "deploy.successful": "🎉 Деплой успешно выполнен!",
+  "ssh.hostUntrusted": "Хост {hostname} не является доверенным",
+  "ssh.keyType": "Тип ключа: {type}",
+  "ssh.fingerprint": "Отпечаток: {fingerprint}",
+  "ssh.confirmHostIsTrusted": "Вы доверяете этому хосту?"
 }

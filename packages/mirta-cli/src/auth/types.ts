@@ -2,15 +2,21 @@ import type { Pkcs11Path, KeyPath, TimeToLive } from '#src/config/types'
 import type { RunAsync } from '#src/utils/shell'
 
 /**
- * Контекст выполнения операций с SSH-агентом.
+ * Контекст выполнения операций аутентификации.
  *
  * Содержит параметры аутентификации и метод для выполнения команд в нужной среде (локально или в WSL2).
  * Используется для управления добавлением токенов (PKCS#11) или ключей в ssh-agent.
  *
- * @since 0.4.0
+ * @since 0.4.5
  *
  **/
-export interface AgentContext {
+export interface AuthContext {
+
+  /**
+   * Имя хоста для аутентификации.
+   *
+   **/
+  hostname: string
 
   /**
    * Путь к модулю PKCS#11 (например, для Rutoken).

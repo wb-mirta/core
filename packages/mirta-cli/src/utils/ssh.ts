@@ -1,5 +1,5 @@
-import { SSH_AUTH_SOCK } from '#src/auth/ssh-agent/constants'
-import type { MirtaConnection } from '#src/config/types'
+import { SSH_AUTH_SOCK } from '#auth/constants'
+import type { MirtaConnection } from '#config/types'
 import { runCommandAsync, STDIO_CAPTURE_ERRORS } from './shell'
 import { logger } from '#utils/logger'
 
