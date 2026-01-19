@@ -62,6 +62,45 @@ export interface RuntimeConfigOptions {
 }
 
 /**
+ * Определяет файл tsconfig для сборки: сначала ищет `tsconfig.build.json`,
+ * при его отсутствии возвращает `tsconfig.json`.
+ *
+ * @param cwd - Рабочая директория проекта
+ * @returns Полный путь к найденному файлу конфигурации
+ *
+ * @since 0.4.6
+ *
+ **/
+async function resolveTsConfigAsync(
+  cwd: string,
+  filePath: string,
+  ignoreMissing?: boolean
+): Promise<string | false | undefined> {
+
+  const tsconfig = nodePath.resolve(cwd, filePath)
+
+  try {
+
+    await fs.access(tsconfig)
+    return tsconfig
+
+  }
+  catch {
+
+    if (ignoreMissing)
+      return false
+
+    if (nodePath.resolve(cwd) === process.cwd())
+      return undefined
+
+    // Fallback на явный путь для изоляции
+    return resolveTsConfigAsync(cwd, tsConfigFile, true)
+
+  }
+
+}
+
+/**
  * Собирает Rollup-конфигурацию для сборки runtime-кода проекта с учётом монорепозитория и подстановки переменных окружения.
  *
  * @param options - Параметры: `cwd` — рабочая директория проекта; `external` — список внешних зависимостей; `envLoader` — опции загрузчика окружения; `plugins` — дополнительные Rollup-плагины
@@ -82,11 +121,9 @@ export async function defineRuntimeConfig(
 
   const monorepoContext = await resolveMonorepoContextAsync(cwd)
 
-  const tsconfig = options.tsconfig ?? (
-    await fs.access(nodePath.join(cwd, tsConfigBuildFile))
-      .then(() => tsConfigBuildFile)
-      .catch(() => tsConfigFile)
-  )
+  const tsconfig = options.tsconfig
+    ? nodePath.resolve(cwd, options.tsconfig)
+    : await resolveTsConfigAsync(cwd, tsConfigBuildFile)
 
   const defaultPlugins = [
 
@@ -105,7 +142,7 @@ export async function defineRuntimeConfig(
     resolve(),
 
     // Транспиляция TypeScript
-    ts({ tsconfig }),
+    ts({ tsconfig, outDir }),
 
     // Обработка импортов для wb-rules
     wbRulesImports(),
