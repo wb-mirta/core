@@ -1,8 +1,9 @@
 import type { ExternalOption, Plugin, RollupOptions } from 'rollup'
 
+import fs from 'node:fs/promises'
 import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
-import ts from 'rollup-plugin-typescript2'
+import ts from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader'
@@ -27,13 +28,28 @@ const isProduction = mode === 'production'
 
 const outDir = 'dist/es5'
 
+const tsConfigFile = 'tsconfig.json'
+const tsConfigBuildFile = 'tsconfig.build.json'
+
 /**
  * Опции конфигурации сборки.
  *
  **/
 export interface RuntimeConfigOptions {
+
   /** Корневая директория проекта. */
   cwd?: string
+
+  /**
+   * Имя файла `tsconfig.json` для плагина TypeScript.
+   *
+   * Поведение по умолчанию:
+   * - Если в целевом расположении существует `tsconfig.build.json` — будет использован он
+   * - Иначе — `tsconfig.json`
+   *
+   **/
+  tsconfig?: string
+
   /** Внешние зависимости, исключённые из сборки. */
   external?: ExternalOption
 
@@ -42,6 +58,7 @@ export interface RuntimeConfigOptions {
 
   /** Дополнительные плагины. */
   plugins?: Plugin[]
+
 }
 
 /**
@@ -65,6 +82,12 @@ export async function defineRuntimeConfig(
 
   const monorepoContext = await resolveMonorepoContextAsync(cwd)
 
+  const tsconfig = options.tsconfig ?? (
+    await fs.access(nodePath.join(cwd, tsConfigBuildFile))
+      .then(() => tsConfigBuildFile)
+      .catch(() => tsConfigFile)
+  )
+
   const defaultPlugins = [
 
     // Очистка директории dist перед сборкой
@@ -82,7 +105,7 @@ export async function defineRuntimeConfig(
     resolve(),
 
     // Транспиляция TypeScript
-    ts({ clean: true }),
+    ts({ tsconfig }),
 
     // Обработка импортов для wb-rules
     wbRulesImports(),

@@ -71,7 +71,6 @@
     "magic-string": "^0.30.21",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.3.0",
-    "rollup-plugin-typescript2": "^0.36.0",
     "find-up": "^8.0.0"
   },
   "devDependencies": {
