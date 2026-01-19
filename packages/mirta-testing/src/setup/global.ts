@@ -78,3 +78,60 @@ global.Notify = mock<WbRules.Notify>()
 
 // Мок сервиса оповещения.
 global.Alarms = mock<WbRules.Alarms>()
+
+// Реализация String.prototype.format для тестов
+String.prototype.format = function (...args: (string | number | boolean)[]): string {
+
+  let result = ''
+  let argIndex = 0
+  const str = this as string
+
+  // Шаг 1: парсим строку, заменяя {} и обрабатывая {{, }}
+  for (let i = 0; i < str.length; i++) {
+
+    if (str[i] === '{' && str[i + 1] === '{') {
+
+      result += '{'
+      i++
+      continue
+
+    }
+    if (str[i] === '}' && str[i + 1] === '}') {
+
+      result += '}'
+      i++
+      continue
+
+    }
+    if (str[i] === '{' && str[i + 1] === '}') {
+
+      result += argIndex < args.length ? String(args[argIndex++]) : ''
+      i++
+      continue
+
+    }
+    result += str[i]
+
+  }
+
+  // Шаг 2: добавляем лишние аргументы
+  if (argIndex < args.length) {
+
+    const rest = args.slice(argIndex).map(String).join(' ')
+    // Всегда добавляем пробел перед rest, даже если строка пустая
+    result += ' ' + rest
+
+  }
+
+  return result
+
+}
+
+String.prototype.xformat = function () {
+
+  throw new Error(
+    'string.xformat() is not allowed in tests. '
+    + 'Use string.format() or mock the result'
+  )
+
+}
