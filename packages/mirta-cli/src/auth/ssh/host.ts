@@ -123,7 +123,9 @@ export async function fetchHostKeyAsync(
       '-HT5',
       // Сканируемый хост
       context.hostname,
-    ])
+    ], {
+      stdio: STDIO_CAPTURE_OUTPUT,
+    })
 
   }
   catch {
@@ -182,7 +184,6 @@ export async function fetchHostKeyAsync(
  *
  * @remarks
  * Запись добавляется с символом перевода строки (`\n`) для корректного форматирования файла.
- * Ошибки записи (например, нет прав) не прерывают выполнение, но могут быть добавлены в будущем.
  *
  * @since 0.4.5
  *

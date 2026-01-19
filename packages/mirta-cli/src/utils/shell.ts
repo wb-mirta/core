@@ -175,7 +175,7 @@ export async function execAsync(
     const stdio = spawnOptions.stdio
     const stdinMode = Array.isArray(stdio) ? stdio[0] : stdio
 
-    if (input && stdinMode !== 'pipe') {
+    if (input !== undefined && stdinMode !== 'pipe') {
 
       reject(
         new ShellError(
