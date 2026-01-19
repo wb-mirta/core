@@ -172,7 +172,10 @@ export async function execAsync(
     spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT
     spawnOptions.shell ??= false
 
-    if (input && spawnOptions.stdio[0] !== 'pipe') {
+    const stdio = spawnOptions.stdio
+    const stdinMode = Array.isArray(stdio) ? stdio[0] : stdio
+
+    if (input && stdinMode !== 'pipe') {
 
       reject(
         new ShellError(
@@ -201,7 +204,7 @@ export async function execAsync(
 
     })
 
-    if (input) {
+    if (input !== undefined) {
 
       runner.stdin?.on('error', reject)
 

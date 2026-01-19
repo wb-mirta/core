@@ -1,4 +1,4 @@
-import { ExecutionResult, OperationCanceledError, STDIO_CAPTURE_OUTPUT, STDIO_PIPED } from '#utils/shell'
+import { ExecutionResult, OperationCanceledError, STDIO_CAPTURE_ERRORS, STDIO_CAPTURE_OUTPUT, STDIO_PIPED } from '#utils/shell'
 import { AuthContext } from '#auth/types'
 import { t } from '#i18n'
 import { logger } from '#utils/logger'
@@ -191,6 +191,10 @@ export async function addToKnownHostsAsync(
   key: HostKey,
   context: AuthContext
 ): Promise<void> {
+
+  await context.runAsync('mkdir', ['-p', SSH_DIR], {
+    stdio: STDIO_CAPTURE_ERRORS,
+  })
 
   await context.runAsync('tee', ['-a', `${SSH_DIR}/known_hosts`], {
     stdio: STDIO_PIPED,
