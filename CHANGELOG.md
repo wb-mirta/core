@@ -1,3 +1,13 @@
+## [0.4.6](https://github.com/wb-mirta/core/compare/v0.4.5...v0.4.6) (2026-01-20)
+
+
+### Features
+
+* **create-mirta:** add src mappings, env types ([#195](https://github.com/wb-mirta/core/issues/195)) ([d206d49](https://github.com/wb-mirta/core/commit/d206d493c9f01540d59edd4f016f5a2dc87029c3))
+* **mirta-rollup:** unify runtime build ([#193](https://github.com/wb-mirta/core/issues/193)) ([c2ce0f7](https://github.com/wb-mirta/core/commit/c2ce0f7a0ef5511a073045a33974a55ce16e2bda))
+
+
+
 ## [0.4.5](https://github.com/wb-mirta/core/compare/v0.4.4...v0.4.5) (2026-01-19)
 
 
