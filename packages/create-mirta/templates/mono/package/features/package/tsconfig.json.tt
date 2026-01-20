@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "{{packageFull}}": ["packages/{{package}}/src"]
+    }
+  }
+}

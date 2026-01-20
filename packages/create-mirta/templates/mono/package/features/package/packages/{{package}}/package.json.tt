@@ -20,7 +20,7 @@
     }
   },
   "imports": {
-    "#src/*": "./src/*.js"
+    "#*": ["./src/*.js", "./src/*/index.js"]
   },
   "scripts": {
     "build:mono": "rollup -c node:@mirta/rollup/config-package"

@@ -14,7 +14,7 @@ import { type ThermostatOptions } from './types'
  *
  * @example
  * ```ts
- * import { useThermostat } from '@nickname/mirta-thermostat'
+ * import { useThermostat } from '{{packageFull}}'
  *
  * const thermostat = useThermostat({
  *   sensorTopic: 'A60-M1W3/External Sensor 1',
