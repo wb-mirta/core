@@ -1,3 +1,12 @@
+## [0.4.7](https://github.com/wb-mirta/core/compare/v0.4.6...v0.4.7) (2026-01-20)
+
+
+### Bug Fixes
+
+* add tslib dependency, remove unused rpt2 ([#196](https://github.com/wb-mirta/core/issues/196)) ([31c53c9](https://github.com/wb-mirta/core/commit/31c53c96d466166a29e6c64fd883169ed5aa3bbf))
+
+
+
 ## [0.4.6](https://github.com/wb-mirta/core/compare/v0.4.5...v0.4.6) (2026-01-20)
 
 
