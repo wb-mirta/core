@@ -11,6 +11,7 @@
   "include": [
     "*.ts",
     "*.mts",
+    "types/*.d.ts",
 
     // === JS ===
 
