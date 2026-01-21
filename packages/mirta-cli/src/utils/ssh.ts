@@ -1,7 +1,6 @@
 import { SSH_AUTH_SOCK } from '#auth/constants'
 import type { MirtaConnection } from '#config/types'
-import { runCommandAsync, STDIO_CAPTURE_ERRORS } from './shell'
-import { logger } from '#utils/logger'
+import { runCommandAsync, STDIO_CAPTURE_ERRORS, STDIO_INTERACTIVE } from './shell'
 
 /**
  * Проверяет, существует ли указанная группа на удалённом контроллере Wiren Board.
@@ -18,7 +17,8 @@ import { logger } from '#utils/logger'
  **/
 export async function hasRemoteGroupAsync(
   group: string,
-  connection: MirtaConnection
+  connection: MirtaConnection,
+  isPasswordAuth: boolean
 ): Promise<boolean> {
 
   const { hostname, username, port } = connection
@@ -30,26 +30,17 @@ export async function hasRemoteGroupAsync(
 
   args.push(`${username}@${hostname}`, `getent group ${group} > /dev/null 2>&1`)
 
-  try {
+  const result = await runCommandAsync.inUnixShell(connection.wsl)('ssh', args, {
+    env: {
+      SSH_AUTH_SOCK,
+    },
+    stdio: isPasswordAuth
+      ? STDIO_INTERACTIVE
+      : STDIO_CAPTURE_ERRORS,
+    doneCodes: [0, 2],
+    cancelCodes: [130],
+  })
 
-    const result = await runCommandAsync.inUnixShell(connection.wsl)('ssh', args, {
-      env: {
-        SSH_AUTH_SOCK,
-      },
-      stdio: STDIO_CAPTURE_ERRORS,
-      doneCodes: [0, 2],
-      cancelCodes: [130],
-    })
-
-    return result.code === 0
-
-  }
-  catch (e: unknown) {
-
-    logger.warn(e instanceof Error ? e.message : String(e))
-
-    return false
-
-  }
+  return result.code === 0
 
 }

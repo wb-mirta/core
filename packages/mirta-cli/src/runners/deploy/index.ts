@@ -86,19 +86,28 @@ export async function runAsync(args: StagedArgs) {
   // Аутентификация через ssh-agent (PKCS#11 или ключ).
   await authenticateAsync(connection)
 
+  const isPasswordAuth = !connection.key && !connection.pkcs11
+  const allowInsecure = argv.insecure
+
+  if (isPasswordAuth && !allowInsecure)
+    logger.warn([
+      t('connection.useKeyAuth') + '\n',
+      'https://wiki.wirenboard.com/wiki/SSH\n',
+    ])
+
   if (!profile.toGroup) {
 
     // Если группа не указана явно,
     // то проверяем наличие рекомендуемой группы.
 
-    const isGroupExists = await hasRemoteGroupAsync(RECOMMENDED_GROUP, connection)
+    const isGroupExists = await hasRemoteGroupAsync(RECOMMENDED_GROUP, connection, isPasswordAuth)
 
     if (isGroupExists) {
 
       profile.toGroup = RECOMMENDED_GROUP
 
     }
-    else {
+    else if (!allowInsecure) {
 
       // Если группы на контроллере нет,
       // то выводим рекомендацию использовать отдельную группу.
