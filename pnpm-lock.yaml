@@ -9,11 +9,11 @@ importers:
   .:
     devDependencies:
       '@dotenvx/dotenvx':
-        specifier: ^1.51.1
-        version: 1.51.1
+        specifier: ^1.51.4
+        version: 1.51.4
       '@eslint/js':
-        specifier: ^9.39.1
-        version: 9.39.1
+        specifier: ^9.39.2
+        version: 9.39.2
       '@eslint/json':
         specifier: ^0.14.0
         version: 0.14.0
@@ -57,14 +57,14 @@ importers:
         specifier: ^5.6.1
         version: 5.6.1(eslint@9.39.1)
       '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
+        specifier: ^24.10.9
+        version: 24.10.9
       '@types/prompts':
         specifier: ^2.4.9
         version: 2.4.9
       '@vitest/eslint-plugin':
         specifier: ^1.5.2
-        version: 1.5.2(eslint@9.39.1)(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1))
+        version: 1.5.2(eslint@9.39.1)(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1))
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
@@ -121,10 +121,10 @@ importers:
         version: 8.49.0(eslint@9.39.1)(typescript@5.9.2)
       vitest:
         specifier: ^4.0.15
-        version: 4.0.15(@types/node@24.10.1)(yaml@2.8.1)
+        version: 4.0.15(@types/node@24.10.9)(yaml@2.8.1)
       vitest-mock-extended:
         specifier: ^3.1.0
-        version: 3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1))
 
   examples/classic/basic:
     dependencies:
@@ -133,8 +133,8 @@ importers:
         version: link:../../../packages/mirta
     devDependencies:
       '@eslint/js':
-        specifier: ^9.39.1
-        version: 9.39.1
+        specifier: ^9.39.2
+        version: 9.39.2
       '@mirta/globals':
         specifier: workspace:*
         version: link:../../../packages/mirta-globals
@@ -148,8 +148,8 @@ importers:
         specifier: ^5.6.1
         version: 5.6.1(eslint@9.39.1)
       '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
+        specifier: ^24.10.9
+        version: 24.10.9
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -176,8 +176,8 @@ importers:
         version: link:../../../packages/mirta
     devDependencies:
       '@eslint/js':
-        specifier: ^9.39.1
-        version: 9.39.1
+        specifier: ^9.39.2
+        version: 9.39.2
       '@mirta/globals':
         specifier: workspace:*
         version: link:../../../packages/mirta-globals
@@ -191,8 +191,8 @@ importers:
         specifier: ^5.6.1
         version: 5.6.1(eslint@9.39.1)
       '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
+        specifier: ^24.10.9
+        version: 24.10.9
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -300,8 +300,8 @@ importers:
   packages/mirta-env-loader:
     dependencies:
       '@dotenvx/dotenvx':
-        specifier: ^1.51.1
-        version: 1.51.1
+        specifier: ^1.51.4
+        version: 1.51.4
       '@mirta/basics':
         specifier: workspace:*
         version: link:../mirta-basics
@@ -326,8 +326,8 @@ importers:
         specifier: ^7.28.5
         version: 7.28.5(@babel/core@7.28.5)
       '@dotenvx/dotenvx':
-        specifier: ^1.51.1
-        version: 1.51.1
+        specifier: ^1.51.4
+        version: 1.51.4
       '@mirta/basics':
         specifier: workspace:*
         version: link:../mirta-basics
@@ -408,7 +408,7 @@ importers:
         version: link:../mirta
       vitest-mock-extended:
         specifier: ^3.1.0
-        version: 3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1))
     devDependencies:
       '@mirta/rollup':
         specifier: workspace:*
@@ -936,8 +936,8 @@ packages:
       conventional-commits-parser:
         optional: true
 
-  '@dotenvx/dotenvx@1.51.1':
-    resolution: {integrity: sha512-fqcQxcxC4LOaUlW8IkyWw8x0yirlLUkbxohz9OnWvVWjf73J5yyw7jxWnkOJaUKXZotcGEScDox9MU6rSkcDgg==}
+  '@dotenvx/dotenvx@1.51.4':
+    resolution: {integrity: sha512-AoziS8lRQ3ew/lY5J4JSlzYSN9Fo0oiyMBY37L3Bwq4mOQJT5GSrdZYLFPt6pH1LApDI3ZJceNyx+rHRACZSeQ==}
     hasBin: true
 
   '@ecies/ciphers@0.2.4':
@@ -1133,6 +1133,10 @@ packages:
 
   '@eslint/js@9.39.1':
     resolution: {integrity: sha512-S26Stp4zCy88tH94QbBv3XCuzRQiZ9yXofEILmglYTh/Ug/a9/umqvgFtYBAo3Lp0nsI/5/qH1CCrbdK3AP1Tw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@eslint/js@9.39.2':
+    resolution: {integrity: sha512-q1mjIoW1VX4IvSocvM/vbTiveKC4k9eLrajNEuSsmjymSDEbpGddtpfOoN7YGAqBK3NG+uqo8ia4PDTt8buCYA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/json@0.14.0':
@@ -1459,8 +1463,8 @@ packages:
     resolution: {integrity: sha512-zmPitbQ8+6zNutpwgcQuLcsEpn/Cj54Kbn7L5pX0Os5kdWplB7xPgEh/g+SWOB/qmows2gpuCaPyduq8ZZRnxA==}
     deprecated: This is a stub types definition. minimatch provides its own type definitions, so you do not need this installed.
 
-  '@types/node@24.10.1':
-    resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
+  '@types/node@24.10.9':
+    resolution: {integrity: sha512-ne4A0IpG3+2ETuREInjPNhUGis1SFjv1d5asp8MzEAGtOZeTeHVDOYqOgqfhvseqg/iXty2hjBf1zAOb7RNiNw==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3520,7 +3524,7 @@ snapshots:
       conventional-commits-filter: 5.0.0
       conventional-commits-parser: 6.2.0
 
-  '@dotenvx/dotenvx@1.51.1':
+  '@dotenvx/dotenvx@1.51.4':
     dependencies:
       commander: 11.1.0
       dotenv: 17.2.3
@@ -3654,6 +3658,8 @@ snapshots:
       - supports-color
 
   '@eslint/js@9.39.1': {}
+
+  '@eslint/js@9.39.2': {}
 
   '@eslint/json@0.14.0':
     dependencies:
@@ -3895,12 +3901,12 @@ snapshots:
 
   '@types/fs-extra@8.1.5':
     dependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.9
 
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 24.10.1
+      '@types/node': 24.10.9
 
   '@types/json-schema@7.0.15': {}
 
@@ -3908,7 +3914,7 @@ snapshots:
     dependencies:
       minimatch: 10.0.3
 
-  '@types/node@24.10.1':
+  '@types/node@24.10.9':
     dependencies:
       undici-types: 7.16.0
 
@@ -3916,7 +3922,7 @@ snapshots:
 
   '@types/prompts@2.4.9':
     dependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.9
       kleur: 3.0.3
 
   '@types/resolve@1.20.2': {}
@@ -4016,14 +4022,14 @@ snapshots:
       '@typescript-eslint/types': 8.49.0
       eslint-visitor-keys: 4.2.1
 
-  '@vitest/eslint-plugin@1.5.2(eslint@9.39.1)(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1))':
+  '@vitest/eslint-plugin@1.5.2(eslint@9.39.1)(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1))':
     dependencies:
       '@typescript-eslint/scope-manager': 8.49.0
       '@typescript-eslint/utils': 8.49.0(eslint@9.39.1)(typescript@5.9.2)
       eslint: 9.39.1
     optionalDependencies:
       typescript: 5.9.2
-      vitest: 4.0.15(@types/node@24.10.1)(yaml@2.8.1)
+      vitest: 4.0.15(@types/node@24.10.9)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -4036,13 +4042,13 @@ snapshots:
       chai: 6.2.1
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.15(vite@7.1.7(@types/node@24.10.1)(yaml@2.8.1))':
+  '@vitest/mocker@4.0.15(vite@7.1.7(@types/node@24.10.9)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 4.0.15
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.1.7(@types/node@24.10.1)(yaml@2.8.1)
+      vite: 7.1.7(@types/node@24.10.9)(yaml@2.8.1)
 
   '@vitest/pretty-format@4.0.15':
     dependencies:
@@ -5203,7 +5209,7 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  vite@7.1.7(@types/node@24.10.1)(yaml@2.8.1):
+  vite@7.1.7(@types/node@24.10.9)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
@@ -5212,20 +5218,20 @@ snapshots:
       rollup: 4.55.1
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.9
       fsevents: 2.3.3
       yaml: 2.8.1
 
-  vitest-mock-extended@3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1)):
+  vitest-mock-extended@3.1.0(typescript@5.9.2)(vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1)):
     dependencies:
       ts-essentials: 10.1.1(typescript@5.9.2)
       typescript: 5.9.2
-      vitest: 4.0.15(@types/node@24.10.1)(yaml@2.8.1)
+      vitest: 4.0.15(@types/node@24.10.9)(yaml@2.8.1)
 
-  vitest@4.0.15(@types/node@24.10.1)(yaml@2.8.1):
+  vitest@4.0.15(@types/node@24.10.9)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.15
-      '@vitest/mocker': 4.0.15(vite@7.1.7(@types/node@24.10.1)(yaml@2.8.1))
+      '@vitest/mocker': 4.0.15(vite@7.1.7(@types/node@24.10.9)(yaml@2.8.1))
       '@vitest/pretty-format': 4.0.15
       '@vitest/runner': 4.0.15
       '@vitest/snapshot': 4.0.15
@@ -5242,10 +5248,10 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.1.7(@types/node@24.10.1)(yaml@2.8.1)
+      vite: 7.1.7(@types/node@24.10.9)(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.9
     transitivePeerDependencies:
       - jiti
       - less
