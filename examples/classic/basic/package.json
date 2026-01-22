@@ -1,6 +1,6 @@
 {
   "name": "classic-basic",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "private": true,
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c node:@mirta/rollup/config",

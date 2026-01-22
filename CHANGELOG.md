@@ -1,3 +1,17 @@
+## [0.4.8](https://github.com/wb-mirta/core/compare/v0.4.7...v0.4.8) (2026-01-22)
+
+
+### Bug Fixes
+
+* **mirta-cli:** handle password auth in deploy ([#198](https://github.com/wb-mirta/core/issues/198)) ([c98b3b0](https://github.com/wb-mirta/core/commit/c98b3b0c482cecb418960b1dc97f87a8b7f316e4))
+
+
+### Features
+
+* **create-mirta:** add TS badge in npm packages ([#199](https://github.com/wb-mirta/core/issues/199)) ([d3bbba9](https://github.com/wb-mirta/core/commit/d3bbba951b98da606e34b5fb8117d4bedcd18252))
+
+
+
 ## [0.4.7](https://github.com/wb-mirta/core/compare/v0.4.6...v0.4.7) (2026-01-20)
 
 
