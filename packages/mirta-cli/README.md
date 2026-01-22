@@ -51,6 +51,7 @@ These global options are available for all commands:
 - `--help` (`-h`) — displays help on available commands and options.
 - `--version` (`-v`) — prints `@mirta/cli` version.
 - `--locale <loc>` — sets the interface language (`en`, `ru`).
+- `--debug` — enables debug mode with detailed logging output.
 
 ### `pnpm mirta release`
 
@@ -84,7 +85,7 @@ The process is divided into stages:
 
 #### Supported Options
 
-- `--dry-run` (`--dry`) — simulation mode, shows changes without applying them.
+- `--dry-run` — simulation mode, shows changes without applying them.
 - `--preid` `<id>` — custom prerelease identifier (`alpha.0`, `beta.1`).
 - `--skip-prompts` — skips interactive prompts, uses defaults.
 - `--skip-git` — skips commit and tag creation.
@@ -219,7 +220,7 @@ In CI, `--provenance` is added to attest package origin.
 
 #### Supported Options
 
-- `--dry-run` (`--dry`) — simulation mode.
+- `--dry-run` — simulation mode.
 - `--skip-build` — skips running `pnpm run build`.
 - `--skip-git` — disables git checks (equivalent to `--no-git-checks` in `pnpm publish`).
 
@@ -237,9 +238,10 @@ Synchronizes files with Wiren Board controllers via `rsync` over SSH.
 - Authentication:
   - Uses an isolated `ssh-agent`.
   - Supports PKCS#11 (Rutoken) and SSH keys.
-  - `ttl` — key lifetime (e.g., `1h`).
-- `--dry-run` mode: shows changes without applying.
+  - `ttl` — passphrase/PIN lifetime in ssh-agent (e.g., `1h`).
+  - Password authentication is supported but does not use ssh-agent and has no TTL support.
 - Symbolic links are not transferred — should be created on the controller manually.
+- `--dry-run` mode: shows changes without applying.
 
 </details>
 
@@ -249,6 +251,8 @@ Synchronizes files with Wiren Board controllers via `rsync` over SSH.
 - `--profile`, `-p <name>` — deployment profile (default: `default`).
 - `--to <conn>` — override connection string.
 - `--dry-run` — simulate synchronization.
+- `--insecure` — disables security warnings.
+
 Parameter `--to` accepts:
 - Connection name from `mirta.config.json`,
 - Connection string starting with `ssh://`.
