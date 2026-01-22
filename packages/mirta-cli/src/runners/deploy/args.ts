@@ -25,6 +25,9 @@ const options = ({
   'to': {
     type: 'string',
   },
+  'insecure': {
+    type: 'boolean',
+  },
   // Deprecated. Use 'dry-run' instead
   'dry': {
     type: 'boolean',

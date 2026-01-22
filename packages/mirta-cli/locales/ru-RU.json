@@ -16,6 +16,7 @@
   "step.canceled": "Операция отменена",
   "connection.emptyParameterSkipped": "Пустой параметр подключения '{key}' пропущен",
   "connection.ttlSkipped": "Параметр TTL пропущен — не указаны PKCS#11 или ключ",
+  "connection.useKeyAuth": "Используйте подключение к SSH по ключу для повышения безопасности",
   "package.templateOutsideRoot": "Пропуск шаблона {template} — вне корневой директории",
   "release.versionUpdated": "Версия обновлена до {newVersion}",
   "release.versionReverting": "Релиз отменён. Откат версии...",
