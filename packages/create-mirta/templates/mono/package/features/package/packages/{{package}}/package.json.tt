@@ -11,6 +11,7 @@
     "LICENSE",
     "README.md"
   ],
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": {
