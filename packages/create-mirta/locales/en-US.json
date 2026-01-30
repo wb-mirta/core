@@ -45,8 +45,8 @@
   "templates.package.name": "Package — wb-rules modules for NPM",
   "templates.package.description": "Code distribution",
 
-  "templates.sites.name": "Sites — connected projects",
-  "templates.sites.description": "Home and cottage, office",
+  "templates.projects.name": "Projects — related implementations",
+  "templates.projects.description": "Apartment, cottage, office",
 
   "features.select": "Select features",
   "features.instructions": "Navigate: ↑ / ↓\nSelect: ← / → / Space\nSelect all: A\nComplete answer: Enter",

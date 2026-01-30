@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "cross-env NODE_ENV=production pnpm --filter ./projects/* run build:mono",
+    "build:dev": "pnpm --filter ./projects/* run build:mono"
+  }
+}

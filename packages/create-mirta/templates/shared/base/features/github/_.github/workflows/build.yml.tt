@@ -52,5 +52,5 @@ jobs:
         # NOTE: --compact is temporarily removed
         # because some packages in ./packages/* are not yet published to npm.
         # It will be re-enabled once all packages are published or we add filtering.
-        run: pnpx pkg-pr-new publish --pnpm './packages/*' --template './sites/*'
+        run: pnpx pkg-pr-new publish --pnpm './packages/*' --template './projects/*'
 {{/if templates.packages}}
