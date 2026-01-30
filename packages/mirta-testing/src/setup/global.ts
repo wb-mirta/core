@@ -79,6 +79,15 @@ global.Notify = mock<WbRules.Notify>()
 // Мок сервиса оповещения.
 global.Alarms = mock<WbRules.Alarms>()
 
+// Мок таймеров.
+global.timers = {}
+
+// Мок стартера однократного таймера.
+global.startTimer = vi.fn()
+
+// Мок стартера периодического таймера.
+global.startTicker = vi.fn()
+
 // Реализация String.prototype.format для тестов
 String.prototype.format = function (...args: (string | number | boolean)[]): string {
 
