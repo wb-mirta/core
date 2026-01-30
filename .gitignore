@@ -24,6 +24,7 @@ coverage
 
 # Editor directories and files
 !.vscode/extensions.json
+.gigaide
 .idea
 *.suo
 *.ntvs*

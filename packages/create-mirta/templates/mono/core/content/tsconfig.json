@@ -18,15 +18,15 @@
     "packages/*/src/**/*.js",
     "packages/*/tests/**/*.js",
 
-    "sites/*/src/**/*.js",
-    "sites/*/tests/**/*.js",
+    "projects/*/src/**/*.js",
+    "projects/*/tests/**/*.js",
 
     // === TS ===
 
     "packages/*/src/**/*.ts",
     "packages/*/tests/**/*.ts",
 
-    "sites/*/src/**/*.ts",
-    "sites/*/tests/**/*.ts"
+    "projects/*/src/**/*.ts",
+    "projects/*/tests/**/*.ts"
   ]
 }

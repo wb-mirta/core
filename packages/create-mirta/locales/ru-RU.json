@@ -45,8 +45,8 @@
   "templates.package.name": "Пакет — модули wb-rules для NPM",
   "templates.package.description": "Распространение кода",
 
-  "templates.sites.name": "Sites — связанные проекты",
-  "templates.sites.description": "Дом и дача, работа",
+  "templates.projects.name": "Проекты — связанные реализации",
+  "templates.projects.description": "Квартира, дача, офис",
 
   "features.select": "Выберите расширенные возможности",
   "features.instructions": "Навигация: ↑ / ↓\nВыбрать: ← / → / Пробел\nВыбрать всё: A\nПодтвердить: Enter",

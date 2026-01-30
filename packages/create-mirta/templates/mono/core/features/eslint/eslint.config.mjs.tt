@@ -70,7 +70,7 @@ export default defineConfig([
         project: [
           './tsconfig.json',
           './packages/*/tsconfig.json',
-          './sites/*/tsconfig.json',
+          './projects/*/tsconfig.json',
         ],
         tsconfigRootDir: import.meta.dirname,
       },
@@ -103,7 +103,7 @@ export default defineConfig([
 {{#if features.vitest}}
   // Vitest Defaults
   {
-    files: ['packages/*/tests/**', 'sites/*/tests/**'],
+    files: ['packages/*/tests/**', 'projects/*/tests/**'],
     plugins: {
       vitest,
     },
@@ -121,6 +121,6 @@ export default defineConfig([
     'node_modules/',
     'dist/',
     'packages/*/dist/',
-    'sites/*/dist/',
+    'projects/*/dist/',
   ]),
 ])
