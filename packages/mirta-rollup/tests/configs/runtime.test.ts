@@ -91,10 +91,10 @@ describe('defineRuntimeConfig', () => {
         tsconfig: 'custom.tsconfig.json',
       })
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: nodePath.resolve(mockCwd, 'custom.tsconfig.json'),
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -108,10 +108,10 @@ describe('defineRuntimeConfig', () => {
 
       const expectedPath = nodePath.resolve(mockCwd, 'tsconfig.build.json')
       expect(fs.access).toHaveBeenCalledWith(expectedPath)
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: expectedPath,
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -134,10 +134,10 @@ describe('defineRuntimeConfig', () => {
         2,
         nodePath.resolve(mockCwd, 'tsconfig.json')
       )
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: nodePath.resolve(mockCwd, 'tsconfig.json'),
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -150,10 +150,10 @@ describe('defineRuntimeConfig', () => {
         cwd: currentCwd,
       })
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: undefined,
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -169,10 +169,10 @@ describe('defineRuntimeConfig', () => {
       expect(fs.access)
         .toHaveBeenCalledTimes(2)
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: false,
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 

@@ -143,8 +143,14 @@ export async function defineRuntimeConfig(
 
     // Компиляция TypeScript
     ts({
-      tsconfig, outDir, compilerOptions: { target: 'es5' },
-      include: ['{,**/}*.{cts,mts,ts,tsx,js,jsx,mjs,cjs}'],
+      tsconfig,
+      outDir,
+      compilerOptions: {
+        target: 'es5',
+      },
+      include: [
+        '{,**/}*.{cts,mts,ts,tsx,js,jsx,mjs,cjs}',
+      ],
     }),
 
     // Обработка импортов для wb-rules
