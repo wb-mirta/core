@@ -32,6 +32,9 @@ coverage
 *.sln
 *.sw?
 
+# Rollup
+.rollup.cache
+
 # TypeScript cache
 *.tsbuildinfo
 
