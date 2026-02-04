@@ -30,7 +30,7 @@ vi.mock('@rollup/plugin-replace', () => ({
 }))
 
 vi.mock('@rollup/plugin-babel', () => ({
-  getBabelOutputPlugin: vi.fn(() => ({ name: 'babel' })),
+  babel: vi.fn(() => ({ name: 'babel' })),
 }))
 
 vi.mock('@mirta/env-loader', () => ({
@@ -52,7 +52,7 @@ import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
 import ts from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
-import { getBabelOutputPlugin } from '@rollup/plugin-babel'
+import { babel } from '@rollup/plugin-babel'
 import { loadEnvReplacements } from '@mirta/env-loader'
 import { resolveMonorepoContextAsync } from '@mirta/workspace'
 import del from '#plugins/del'
@@ -176,6 +176,17 @@ describe('defineRuntimeConfig', () => {
 
     })
 
+    it('should set alwaysStrict to false to prevent "use strict" emission for Duktape runtime', async () => {
+
+      vi.mocked(fs.access).mockResolvedValue(undefined)
+
+      await defineRuntimeConfig({ cwd: mockCwd })
+      const tsCall = vi.mocked(ts).mock.calls[0][0]
+
+      expect(tsCall?.alwaysStrict).toBe(false)
+
+    })
+
   })
 
   describe('monorepo context', () => {
@@ -223,7 +234,7 @@ describe('defineRuntimeConfig', () => {
       expect(ts).toHaveBeenCalled()
       expect(wbRulesImports).toHaveBeenCalled()
       expect(replace).toHaveBeenCalled()
-      expect(getBabelOutputPlugin).toHaveBeenCalled()
+      expect(babel).toHaveBeenCalled()
 
     })
 

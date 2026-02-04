@@ -79,6 +79,9 @@ function tryGetEntryPath(sourcePath: string, type: 'wb-rules' | 'wb-rules-module
  **/
 export function getEntryPath(filePath: string) {
 
+  if (filePath.endsWith('_rollupPluginBabelHelpers'))
+    return 'wb-rules-modules/babel/helpers.js'
+
   if (filePath.startsWith('_virtual'))
     return filePath
 
