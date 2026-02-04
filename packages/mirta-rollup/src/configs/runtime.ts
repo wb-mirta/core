@@ -151,7 +151,7 @@ export async function defineRuntimeConfig(
     // Транспиляция Babel
     babel({
       babelHelpers: 'bundled',
-      extensions: ['.js', '.mjs'],
+      extensions: ['.ts', '.js', '.mjs'],
       presets: [
         ['@babel/preset-env', {
           exclude: [
