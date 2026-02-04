@@ -61,7 +61,7 @@
     "globals": "^17.0.0",
     "magic-string": "^0.30.21",
     "lint-staged": "^16.2.7",
-    "rollup": "^4.55.1",
+    "rollup": "^4.57.1",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.3.0",
     "simple-git-hooks": "^2.13.1",
