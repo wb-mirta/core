@@ -1,3 +1,12 @@
+## [0.4.10](https://github.com/wb-mirta/core/compare/v0.4.9...v0.4.10) (2026-02-04)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** handle ts files by babel ([#211](https://github.com/wb-mirta/core/issues/211)) ([ea1f596](https://github.com/wb-mirta/core/commit/ea1f596689913d992968a37c5dd010fdc3b37bd2))
+
+
+
 ## [0.4.9](https://github.com/wb-mirta/core/compare/v0.4.8...v0.4.9) (2026-02-04)
 
 
