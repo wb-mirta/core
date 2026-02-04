@@ -1,3 +1,18 @@
+## [0.4.9](https://github.com/wb-mirta/core/compare/v0.4.8...v0.4.9) (2026-02-04)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** avoid use strict in runtime ([#209](https://github.com/wb-mirta/core/issues/209)) ([f247bd6](https://github.com/wb-mirta/core/commit/f247bd6057d235fe199b0ab9343c6b916051bd05))
+
+
+### Features
+
+* **create-mirta:** rename sites to projects ([#205](https://github.com/wb-mirta/core/issues/205)) ([e02eb55](https://github.com/wb-mirta/core/commit/e02eb55cccd8719ecc734492290f5a2dacd7f580))
+* **mirta-testing:** add timer mocks ([#203](https://github.com/wb-mirta/core/issues/203)) ([2506f2e](https://github.com/wb-mirta/core/commit/2506f2e0b63f6a513f78ea5aa3f369ccd3440c87))
+
+
+
 ## [0.4.8](https://github.com/wb-mirta/core/compare/v0.4.7...v0.4.8) (2026-01-22)
 
 
