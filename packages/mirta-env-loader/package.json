@@ -47,7 +47,7 @@
     "build:mono": "rollup -c node:@mirta/rollup/config-package"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.51.4",
+    "@dotenvx/dotenvx": "^1.52.0",
     "@mirta/basics": "workspace:*"
   },
   "engines": {
