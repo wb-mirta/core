@@ -30,7 +30,7 @@ vi.mock('@rollup/plugin-replace', () => ({
 }))
 
 vi.mock('@rollup/plugin-babel', () => ({
-  getBabelOutputPlugin: vi.fn(() => ({ name: 'babel' })),
+  babel: vi.fn(() => ({ name: 'babel' })),
 }))
 
 vi.mock('@mirta/env-loader', () => ({
@@ -52,7 +52,7 @@ import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
 import ts from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
-import { getBabelOutputPlugin } from '@rollup/plugin-babel'
+import { babel } from '@rollup/plugin-babel'
 import { loadEnvReplacements } from '@mirta/env-loader'
 import { resolveMonorepoContextAsync } from '@mirta/workspace'
 import del from '#plugins/del'
@@ -91,10 +91,10 @@ describe('defineRuntimeConfig', () => {
         tsconfig: 'custom.tsconfig.json',
       })
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: nodePath.resolve(mockCwd, 'custom.tsconfig.json'),
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -108,10 +108,10 @@ describe('defineRuntimeConfig', () => {
 
       const expectedPath = nodePath.resolve(mockCwd, 'tsconfig.build.json')
       expect(fs.access).toHaveBeenCalledWith(expectedPath)
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: expectedPath,
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -134,10 +134,10 @@ describe('defineRuntimeConfig', () => {
         2,
         nodePath.resolve(mockCwd, 'tsconfig.json')
       )
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: nodePath.resolve(mockCwd, 'tsconfig.json'),
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -150,10 +150,10 @@ describe('defineRuntimeConfig', () => {
         cwd: currentCwd,
       })
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: undefined,
         outDir: 'dist/es5',
-      })
+      }))
 
     })
 
@@ -169,10 +169,21 @@ describe('defineRuntimeConfig', () => {
       expect(fs.access)
         .toHaveBeenCalledTimes(2)
 
-      expect(ts).toHaveBeenCalledWith({
+      expect(ts).toHaveBeenCalledWith(expect.objectContaining({
         tsconfig: false,
         outDir: 'dist/es5',
-      })
+      }))
+
+    })
+
+    it('should set alwaysStrict to false to prevent "use strict" emission for Duktape runtime', async () => {
+
+      vi.mocked(fs.access).mockResolvedValue(undefined)
+
+      await defineRuntimeConfig({ cwd: mockCwd })
+      const tsCall = vi.mocked(ts).mock.calls[0][0]
+
+      expect(tsCall?.alwaysStrict).toBe(false)
 
     })
 
@@ -223,7 +234,7 @@ describe('defineRuntimeConfig', () => {
       expect(ts).toHaveBeenCalled()
       expect(wbRulesImports).toHaveBeenCalled()
       expect(replace).toHaveBeenCalled()
-      expect(getBabelOutputPlugin).toHaveBeenCalled()
+      expect(babel).toHaveBeenCalled()
 
     })
 

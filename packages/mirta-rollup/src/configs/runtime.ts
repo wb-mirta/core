@@ -5,7 +5,7 @@ import multi from '@rollup/plugin-multi-entry'
 import resolve from '@rollup/plugin-node-resolve'
 import ts from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
-import { getBabelOutputPlugin } from '@rollup/plugin-babel'
+import { babel } from '@rollup/plugin-babel'
 import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader'
 import { resolveMonorepoContextAsync } from '@mirta/workspace'
 
@@ -141,8 +141,29 @@ export async function defineRuntimeConfig(
     // Поиск зависимостей в node_modules
     resolve(),
 
-    // Транспиляция TypeScript
-    ts({ tsconfig, outDir }),
+    // Компиляция TypeScript
+    ts({
+      tsconfig,
+      outDir,
+      alwaysStrict: false,
+    }),
+
+    // Транспиляция Babel
+    babel({
+      babelHelpers: 'bundled',
+      extensions: ['.js', '.mjs'],
+      presets: [
+        ['@babel/preset-env', {
+          exclude: [
+            '@babel/transform-typeof-symbol',
+          ],
+        }],
+      ],
+      plugins: [
+        '@babel/transform-spread',
+        'array-includes',
+      ],
+    }),
 
     // Обработка импортов для wb-rules
     wbRulesImports(),
@@ -166,15 +187,6 @@ export async function defineRuntimeConfig(
         __TEST__: 'false',
 
       },
-    }),
-
-    // Транспиляция через Babel
-    getBabelOutputPlugin({
-      presets: ['@babel/preset-env'],
-      plugins: [
-        '@babel/plugin-transform-spread',
-        'array-includes',
-      ],
     }),
 
     // Очистка виртуальных файлов после сборки
