@@ -32,7 +32,7 @@
     ]
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.51.4",
+    "@dotenvx/dotenvx": "^1.52.0",
     "@eslint/js": "^9.39.2",
     "@eslint/json": "^0.14.0",
     "@mirta/cli": "workspace:*",
@@ -48,7 +48,7 @@
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-babel": "^6.1.0",
     "@stylistic/eslint-plugin": "^5.7.0",
-    "@types/node": "^24.10.9",
+    "@types/node": "^24.10.10",
     "@types/prompts": "^2.4.9",
     "chalk": "^5.6.2",
     "conventional-changelog-cli": "^5.0.0",
@@ -58,7 +58,7 @@
     "@vitest/eslint-plugin": "^1.5.2",
     "eslint-plugin-workspaces": "^0.11.1",
     "find-up": "^8.0.0",
-    "globals": "^17.0.0",
+    "globals": "^17.3.0",
     "magic-string": "^0.30.21",
     "lint-staged": "^16.2.7",
     "rollup": "^4.57.1",
