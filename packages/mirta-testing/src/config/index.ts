@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => ({
     // Здесь осуществляется перенаправление на src/index.ts
     alias: packages.reduce<Record<string, string>>((items, nextItem) => {
 
-      items[nextItem.name] = nodePath.join(rootDir, nextItem.workspacePath, 'src', 'index.ts')
+      items[nextItem.name] = nodePath.join(rootDir, nextItem.workspacePath, 'src')
 
       return items
 
