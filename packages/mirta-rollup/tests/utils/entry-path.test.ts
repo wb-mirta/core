@@ -138,6 +138,15 @@ describe('getEntryPath', () => {
 
     })
 
+    it('should handle path without wb-rules/', () => {
+
+      const sourcePath = 'controller'
+      const result = getEntryPath(sourcePath)
+
+      expect(result).toBe('wb-rules/controller.js')
+
+    })
+
     it('should handle nested structures', () => {
 
       const sourcePath = 'src/wb-rules/devices/sensors/temperature'

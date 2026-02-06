@@ -4,8 +4,8 @@ const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
 
 const entryMatchers = {
 
-  'wb-rules': /(?:src[\\/])?wb-rules[\\/](.*)/,
-  'wb-rules-modules': /(?:src[\\/])?wb-rules-modules[\\/](.*)/,
+  'wb-rules': /^(?:src[\\/])?((?:wb-rules[\\/])(.+)|([^/]+$))/,
+  'wb-rules-modules': /^(?:src[\\/])?wb-rules-modules[\\/](.+)/,
 
 } as const
 
@@ -64,7 +64,9 @@ function tryGetEntryPath(sourcePath: string, type: 'wb-rules' | 'wb-rules-module
   if (!match)
     return
 
-  return `${type}/${match[1]}.js`
+  const value = match[1]
+
+  return value.startsWith(type) ? `${value}.js` : `${type}/${value}.js`
 
 }
 
