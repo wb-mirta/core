@@ -1,3 +1,13 @@
+## [0.4.11](https://github.com/wb-mirta/core/compare/v0.4.10...v0.4.11) (2026-02-06)
+
+
+### Bug Fixes
+
+* **mirta-cli:** skip missing source directories ([#215](https://github.com/wb-mirta/core/issues/215)) ([497a8be](https://github.com/wb-mirta/core/commit/497a8be5a55c543b542b678ca4dcbfd8622db659))
+* **mirta-rollup:** output resolution for wb-rules ([#213](https://github.com/wb-mirta/core/issues/213)) ([8e89749](https://github.com/wb-mirta/core/commit/8e897494497d719c2aa7b8bf7b1c243e02ffb70d))
+
+
+
 ## [0.4.10](https://github.com/wb-mirta/core/compare/v0.4.9...v0.4.10) (2026-02-04)
 
 
