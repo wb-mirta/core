@@ -54,7 +54,7 @@
   "deploy.profileImplicit": "{name} (встроенный)",
   "deploy.mappingsNotFound": "Набор маппингов не найден: {key}",
   "deploy.mappingDisabled": "Выключено: {from} → {to}",
-  "deploy.sourceNotExists": "Не найдено: {source}",
+  "deploy.sourceNotExists": "Отсутствует: {source}",
   "deploy.transmitting": "Передача {from} → {to}",
   "deploy.simulationComplete": "Симуляция завершена. Изменения не применены.",
   "deploy.successful": "🎉 Деплой успешно выполнен!",

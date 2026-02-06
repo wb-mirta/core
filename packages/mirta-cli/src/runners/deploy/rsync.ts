@@ -4,6 +4,7 @@ import { t } from '#i18n'
 import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell'
 import { SSH_AUTH_SOCK } from '#auth/constants'
 import { KNOWN_SSH_PORT } from '#config/constants'
+import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
 
 /**
  * Параметры для выполнения команды rsync.
@@ -66,6 +67,20 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
     cwd,
     isDryRun,
   } = options
+
+  const fromDirectory = resolveSubpath(cwd, mapping.from)
+
+  if (!await isExistsAsync(fromDirectory)) {
+
+    logger.step(t('deploy.sourceNotExists', {
+      source: fromDirectory,
+    }))
+
+    // Файлы могут отсутствовать, это допустимо.
+
+    return
+
+  }
 
   const args: string[] = []
 
