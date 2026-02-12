@@ -52,8 +52,8 @@
     "build:mono": "rollup -c --configPlugin typescript={tsconfig:\\\"./tsconfig.build.json\\\"}"
   },
   "dependencies": {
-    "@babel/core": "^7.28.6",
-    "@babel/preset-env": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
     "@babel/plugin-transform-spread": "^7.28.6",
     "@dotenvx/dotenvx": "^1.52.0",
     "@mirta/basics": "workspace:*",
