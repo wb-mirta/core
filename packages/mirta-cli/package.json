@@ -49,7 +49,6 @@
     "url": "https://boosty.to/wihome/donate"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
     "@mirta/basics": "workspace:*",
     "@mirta/env-loader": "workspace:*",
     "@mirta/i18n": "workspace:*",
