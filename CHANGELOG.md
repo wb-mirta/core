@@ -1,3 +1,12 @@
+## [0.4.12](https://github.com/wb-mirta/core/compare/v0.4.11...v0.4.12) (2026-02-21)
+
+
+### Features
+
+* **create-mirta:** add telegram template ([#221](https://github.com/wb-mirta/core/issues/221)) ([c75f965](https://github.com/wb-mirta/core/commit/c75f9651d184f6c6e4ab3ff66c054b259fdf3126))
+
+
+
 ## [0.4.11](https://github.com/wb-mirta/core/compare/v0.4.10...v0.4.11) (2026-02-06)
 
 
