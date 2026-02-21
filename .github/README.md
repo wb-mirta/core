@@ -222,7 +222,7 @@ import hello from '#wbm/my-module'
 При импорте таких конструкций, сборщик Rollup автоматически создаст соответствующий файл в следующем расположении:
 
 ```
-dist/wb-rules-modules/packages/package-name
+dist/es5/wb-rules-modules/packages/package-name
 ```
 Ко второму - наборы конфигураций по умолчанию, определения типов для подсветки кода, инструменты вроде Rollup, ESLint, Vitest и т.п.
 
