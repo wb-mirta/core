@@ -198,6 +198,7 @@ export async function renderFileAsync(
   const toFileName = basename(toPath)
 
   // Мерж package.json с сортировкой зависимостей
+  //
   if (toFileName === 'package.json' && await isExistsAsync(toPath)) {
 
     await json.renderAsync(
@@ -212,6 +213,7 @@ export async function renderFileAsync(
   }
 
   // Мерж других известных JSON
+  //
   if (KNOWN_JSON.includes(toFileName) && await isExistsAsync(toPath)) {
 
     await json.renderAsync(
@@ -225,6 +227,7 @@ export async function renderFileAsync(
   }
 
   // Мерж известных JSONC
+  //
   if (KNOWN_JSONC.includes(toFileName) && await isExistsAsync(toPath)) {
 
     await jsonc.renderAsync(
@@ -237,8 +240,9 @@ export async function renderFileAsync(
 
   }
 
-  // Дописывание в .gitignore
-  if (toFileName === '.gitignore' && await isExistsAsync(toPath)) {
+  // Дописывание в .gitignore и файлы .env
+  //
+  if ((toFileName === '.gitignore' || toFileName.startsWith('.env')) && await isExistsAsync(toPath)) {
 
     const oldContent = await fs.readFile(toPath, 'utf-8')
     const newContent = content ?? await fs.readFile(fromPath, 'utf-8')
@@ -251,6 +255,7 @@ export async function renderFileAsync(
   }
 
   // Запись обработанного контента
+  //
   if (content) {
 
     await fs.writeFile(toPath, content)
@@ -259,6 +264,7 @@ export async function renderFileAsync(
   }
 
   // Для остальных файлов — простое копирование
+  //
   await fs.copyFile(fromPath, toPath)
 
 }

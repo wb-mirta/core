@@ -1,0 +1,10 @@
+{
+  "extends": "starter",
+  "features": {
+    "global": {
+      "telegram": "required",
+      "examples": "recommended"
+    }
+  },
+  "order": 1030
+}
