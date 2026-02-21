@@ -28,6 +28,9 @@ const KNOWN_JSON = [
   'tasks.json',
 ]
 
+/** Файлы .env, которые дополняются (а не перезаписываются) при копировании. */
+const ENV_FILE_PATTERN = /^\.env(\.|$)/
+
 /**
  * Элемент файловой системы из шаблона.
  *
@@ -242,7 +245,7 @@ export async function renderFileAsync(
 
   // Дописывание в .gitignore и файлы .env
   //
-  if ((toFileName === '.gitignore' || toFileName.startsWith('.env')) && await isExistsAsync(toPath)) {
+  if ((toFileName === '.gitignore' || ENV_FILE_PATTERN.test(toFileName)) && await isExistsAsync(toPath)) {
 
     const oldContent = await fs.readFile(toPath, 'utf-8')
     const newContent = content ?? await fs.readFile(fromPath, 'utf-8')

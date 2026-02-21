@@ -27,10 +27,12 @@ export async function resolveTelegramInfoAsync() {
       message: t('telegram.user'),
       validate: (value: string) => {
 
-        if (value.trim().length === 0)
+        const trimmedValue = value.trim()
+
+        if (trimmedValue.length === 0)
           return t('validation.required')
 
-        if (/^[0-9]+$/.test(value))
+        if (/^[0-9]+$/.test(trimmedValue))
           return true
 
         return t('validation.digitsOnly')
@@ -43,7 +45,7 @@ export async function resolveTelegramInfoAsync() {
 
   return {
     token: token.trim(),
-    user: user,
+    user: user.trim(),
   }
 
 }

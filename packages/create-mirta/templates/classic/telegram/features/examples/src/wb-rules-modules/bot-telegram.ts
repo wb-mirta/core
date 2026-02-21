@@ -43,7 +43,6 @@ export const useTelegramBot = defineTelegramBot(auth, {
   token,
   commands: {
     start: { policy: 'admin' },
-    counter: { policy: 'admin' },
   },
   callbacks: {
     counter_reset: { policy: 'admin' },
