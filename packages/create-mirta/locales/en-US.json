@@ -42,6 +42,9 @@
   "templates.store.name": "Store — Shared State",
   "templates.store.description": "Access data from any script",
 
+  "templates.telegram.name": "Telegram Bot — Remote Access",
+  "templates.telegram.description": "Manage your system via Telegram",
+
   "templates.package.name": "Package — wb-rules modules for NPM",
   "templates.package.description": "Code distribution",
 
@@ -84,6 +87,10 @@
   "github.repository.prompt": "Repository name",
   "github.branch.prompt": "Repository main branch",
 
+  "telegram.caption": "Telegram Bot Settings",
+  "telegram.token": "Bot Token",
+  "telegram.user": "User ID",
+
   "overwrite.notEmpty": "Location {path} is not empty",
   "overwrite.prompt": "Remove existing files before continuing?",
 
@@ -101,6 +108,7 @@
 
   "validation.required": "Must be provided",
   "validation.invalidFormat": "Invalid format",
+  "validation.digitsOnly": "Only digits allowed",
 
   "project.outsideRoot": "Cannot create project outside current directory",
   "project.denyOverwrite": "Target directory is not empty",

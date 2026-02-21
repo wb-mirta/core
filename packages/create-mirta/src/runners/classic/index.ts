@@ -12,6 +12,7 @@ import { resolveConnectionStringAsync } from '#connection/resolver'
 import { promptInstallDependenciesAsync } from '#dependency/installer'
 import { DEFAULT_SSH_HOSTNAME, DEFAULT_SSH_USERNAME } from '#connection/constants'
 import { resolveGithubInfoAsync } from '#github/resolver'
+import { resolveTelegramInfoAsync } from '#telegram/resolver'
 
 export async function runAsync(
   args: StagedArgs,
@@ -35,6 +36,16 @@ export async function runAsync(
     barebone: context.barebone,
     defaultConnectionString: `ssh://${DEFAULT_SSH_USERNAME}@${DEFAULT_SSH_HOSTNAME}`,
   })
+
+  // Если выбрана опция настройки телеграма.
+  if (features.includes('telegram')) {
+
+    const { token, user } = await resolveTelegramInfoAsync()
+
+    data.telegramToken = token
+    data.telegramUser = user
+
+  }
 
   // Если задействована опция настройки GitHub-репозитория.
   if (features.includes('github')) {

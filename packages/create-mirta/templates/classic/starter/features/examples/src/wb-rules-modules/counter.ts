@@ -1,5 +1,6 @@
 /**
- * Простой счётчик с возможностью инкремента и чтения текущего значения
+ * Простой счётчик с возможностью инкремента,
+ * декремента, сброса и чтения текущего значения.
  *
  **/
 export interface Counter {
@@ -9,6 +10,12 @@ export interface Counter {
 
   /** Увеличивает значение счётчика на единицу. */
   increment(): void
+
+  /** Уменьшает значение счётчика на единицу. */
+  decrement(): void
+
+  /** Сбрасывает счётчик к исходному значению. */
+  reset(): void
 
 }
 
@@ -20,14 +27,28 @@ export interface Counter {
  **/
 export function useCounter(): Counter {
 
+  const initialCount = 0
+
   return {
 
     // Значение счётчика - его индивидуальное состояние
-    count: 0,
+    count: initialCount,
 
     increment() {
 
       this.count += 1
+
+    },
+
+    decrement() {
+
+      this.count -= 1
+
+    },
+
+    reset() {
+
+      this.count = initialCount
 
     },
 

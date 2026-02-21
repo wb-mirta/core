@@ -42,6 +42,9 @@
   "templates.store.name": "Store — управление состоянием",
   "templates.store.description": "Доступ к данным из любого скрипта",
 
+  "templates.telegram.name": "Телеграм-бот — удалённое управление",
+  "templates.telegram.description": "Контроль системы через мессенджер",
+
   "templates.package.name": "Пакет — модули wb-rules для NPM",
   "templates.package.description": "Распространение кода",
 
@@ -84,6 +87,10 @@
   "github.repository.prompt": "Имя репозитория",
   "github.branch.prompt": "Основная ветка репозитория",
 
+  "telegram.caption": "Настройки Телеграм-бота",
+  "telegram.token": "Токен бота",
+  "telegram.user": "ID пользователя",
+
   "package.caption": "Настройки пакета",
 
   "overwrite.notEmpty": "Расположение {path} уже содержит файлы",
@@ -101,6 +108,7 @@
 
   "validation.required": "Требуется указать значение",
   "validation.invalidFormat": "Неверный формат",
+  "validation.digitsOnly": "Только цифры",
 
   "project.outsideRoot": "Невозможно создать проект вне текущей директории",
   "project.denyOverwrite": "Целевая директория не пуста",

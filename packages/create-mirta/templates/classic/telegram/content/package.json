@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@mirta/chatbot": "~0.4.12"
+  }
+}
