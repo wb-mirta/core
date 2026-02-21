@@ -1,5 +1,7 @@
 import { defineTelegramBot, defineAuthorization } from '@mirta/chatbot'
 
+// Актуальные значения переменных окружения берутся из файла .env.local
+
 const token = process.env.APP_TELEGRAM_TOKEN
 
 if (!token)
