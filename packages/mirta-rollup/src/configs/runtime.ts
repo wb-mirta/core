@@ -152,6 +152,11 @@ export async function defineRuntimeConfig(
     babel({
       babelHelpers: 'bundled',
       extensions: ['.ts', '.js', '.mjs'],
+      generatorOpts: {
+        jsescOption: {
+          minimal: true,
+        },
+      },
       presets: [
         ['@babel/preset-env', {
           exclude: [
