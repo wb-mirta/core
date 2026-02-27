@@ -1,4 +1,4 @@
-import { createDtsMappings } from '#configs/package'
+import { createDtsMappings } from '#configs/package';
 
 describe('createDtsMappings', () => {
 
@@ -17,16 +17,16 @@ describe('createDtsMappings', () => {
           dtsSourceFile: 'dist/dts/utils.d.ts',
           dtsOutputFile: 'utils.d.mts',
         },
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
       expect(result).toEqual({
         'dist/dts/index.d.ts': 'index.d.mts',
         'dist/dts/utils.d.ts': 'utils.d.mts',
-      })
+      });
 
-    })
+    });
 
     it('should handle nested directory structures', () => {
 
@@ -41,16 +41,16 @@ describe('createDtsMappings', () => {
           dtsSourceFile: 'dist/dts/utils/helper.d.ts',
           dtsOutputFile: 'utils/helper.d.mts',
         },
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
       expect(result).toEqual({
         'dist/dts/lib/core/index.d.ts': 'lib/core/index.d.mts',
         'dist/dts/utils/helper.d.ts': 'utils/helper.d.mts',
-      })
+      });
 
-    })
+    });
 
     it('should handle single entry', () => {
 
@@ -60,17 +60,17 @@ describe('createDtsMappings', () => {
           dtsSourceFile: 'dist/dts/main.d.ts',
           dtsOutputFile: 'main.d.mts',
         },
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
       expect(result).toEqual({
         'dist/dts/main.d.ts': 'main.d.mts',
-      })
+      });
 
-    })
+    });
 
-  })
+  });
 
   describe('entries without dtsOutputFile', () => {
 
@@ -82,13 +82,13 @@ describe('createDtsMappings', () => {
           dtsSourceFile: 'dist/dts/index.d.ts',
           dtsOutputFile: undefined,
         },
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
-      expect(result).toEqual({})
+      expect(result).toEqual({});
 
-    })
+    });
 
     it('should skip mixed entries, only mapping those with dtsOutputFile', () => {
 
@@ -108,29 +108,29 @@ describe('createDtsMappings', () => {
           dtsSourceFile: 'dist/dts/another.d.ts',
           dtsOutputFile: 'another.d.mts',
         },
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
       expect(result).toEqual({
         'dist/dts/typed.d.ts': 'typed.d.mts',
         'dist/dts/another.d.ts': 'another.d.mts',
-      })
-      expect(result).not.toHaveProperty('dist/dts/untyped.d.ts')
+      });
+      expect(result).not.toHaveProperty('dist/dts/untyped.d.ts');
 
-    })
+    });
 
-  })
+  });
 
   describe('edge cases', () => {
 
     it('should handle empty input bindings', () => {
 
-      const result = createDtsMappings({})
+      const result = createDtsMappings({});
 
-      expect(result).toEqual({})
+      expect(result).toEqual({});
 
-    })
+    });
 
     it('should handle bindings with undefined entries', () => {
 
@@ -141,16 +141,16 @@ describe('createDtsMappings', () => {
           dtsOutputFile: 'valid.d.mts',
         },
         'src/invalid.ts': undefined,
-      }
+      };
 
-      const result = createDtsMappings(inputBindings)
+      const result = createDtsMappings(inputBindings);
 
       expect(result).toEqual({
         'dist/dts/valid.d.ts': 'valid.d.mts',
-      })
+      });
 
-    })
+    });
 
-  })
+  });
 
-})
+});

@@ -1,5 +1,5 @@
-import { useEvent, type EventRaiser } from 'mirta'
-import { type MqttMessageEventHandler, type SimulatorInstance } from './types'
+import { useEvent, type EventRaiser } from 'mirta';
+import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
 
 class SameTopicValueError extends Error {
   constructor(message: WbRules.MqttMessage) {
@@ -8,9 +8,9 @@ class SameTopicValueError extends Error {
       = `[Behavior] Value of the topic "${message.topic}"`
         + ` must be different from a previous one,`
         + ` got "${message.value.toString()}".`
-        + `\nYou can suppress this error by passing 'allowSameValue: true' option to 'useDefineRule' call.`
+        + `\nYou can suppress this error by passing 'allowSameValue: true' option to 'useDefineRule' call.`;
 
-    super(text)
+    super(text);
 
   }
 }
@@ -21,41 +21,41 @@ export interface DefineRuleOptions {
    *
    * Контроллер не отправляет одно и то же значение дважды при использовании `whenChanged`.
    */
-  allowSameValue?: boolean
+  allowSameValue?: boolean;
 }
 
 export interface DefineRuleSimulator extends SimulatorInstance {
   /** Отправляет одно или несколько сообщений. */
-  run(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void
+  run(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void;
 }
 
 function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
 
-  let mqttEvent: EventRaiser<MqttMessageEventHandler>
-  let values: Record<string, WbRules.MqttValue> = {}
+  let mqttEvent: EventRaiser<MqttMessageEventHandler>;
+  let values: Record<string, WbRules.MqttValue> = {};
 
   function reset() {
 
-    mqttEvent = useEvent<MqttMessageEventHandler>()
-    values = {}
+    mqttEvent = useEvent<MqttMessageEventHandler>();
+    values = {};
 
     global.defineRule = (variantA: WbRules.RuleOptions | string, variantB?: WbRules.RuleOptions) => {
 
       const rule = typeof variantA !== 'string'
         ? variantA
-        : variantB
+        : variantB;
 
       if (!rule)
-        return
+        return;
 
       mqttEvent.on(({ topic, value }) => {
 
         if (rule.whenChanged === topic)
-          rule.then(value)
+          rule.then(value);
 
-      })
+      });
 
-    }
+    };
 
   }
 
@@ -63,18 +63,18 @@ function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
   function isValueChanged(message: WbRules.MqttMessage) {
 
     if (options.allowSameValue)
-      return true
+      return true;
 
     if (values[message.topic] === message.value) {
 
-      const error = new SameTopicValueError(message)
-      Error.captureStackTrace(error, isValueChanged)
-      throw error
+      const error = new SameTopicValueError(message);
+      Error.captureStackTrace(error, isValueChanged);
+      throw error;
 
     }
 
-    values[message.topic] = message.value
-    return true
+    values[message.topic] = message.value;
+    return true;
 
   }
 
@@ -84,7 +84,7 @@ function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
     if (!Array.isArray(payload)) {
 
       if (isValueChanged(payload))
-        mqttEvent.raise(payload)
+        mqttEvent.raise(payload);
 
     }
     else {
@@ -92,20 +92,20 @@ function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
       payload.forEach((item) => {
 
         if (isValueChanged(item))
-          mqttEvent.raise(item)
+          mqttEvent.raise(item);
 
-      })
+      });
 
     }
 
   }
 
-  reset()
+  reset();
 
   return {
     reset,
     run,
-  }
+  };
 
 }
 
@@ -114,6 +114,6 @@ function createInstance(options: DefineRuleOptions): DefineRuleSimulator {
 /** Имитатор конструкции defineRule. */
 export function useDefineRule(options: DefineRuleOptions = {}) {
 
-  return /* instance ??= */ createInstance(options)
+  return /* instance ??= */ createInstance(options);
 
 }

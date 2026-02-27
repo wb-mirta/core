@@ -1,28 +1,28 @@
 interface DebounceOptions {
-  leading?: boolean
-  trailing?: boolean
-  maxWait?: number
+  leading?: boolean;
+  trailing?: boolean;
+  maxWait?: number;
 }
 
 interface DebouncedFunc<TArgs extends unknown[]> {
-  (...args: TArgs): void
-  cancel(): void
-  flush(): void
+  (...args: TArgs): void;
+  cancel(): void;
+  flush(): void;
 }
 
 interface ThrottleOptions {
-  leading?: boolean
-  trailing?: boolean
+  leading?: boolean;
+  trailing?: boolean;
 }
 
 interface ThrottledFunc<TArgs extends unknown[]> {
-  (...args: TArgs): void
-  cancel(): void
-  flush(): void
+  (...args: TArgs): void;
+  cancel(): void;
+  flush(): void;
 }
 
-const { now } = Date
-const { min, max } = Math
+const { now } = Date;
+const { min, max } = Math;
 
 export function debounce<TArgs extends unknown[]>(
   callback: (...args: TArgs) => void,
@@ -34,54 +34,54 @@ export function debounce<TArgs extends unknown[]>(
     timeoutId: NodeJS.Timeout | undefined,
     lastCallTime = 0,
     lastInvokeTime = 0,
-    lastArgs: TArgs | undefined
+    lastArgs: TArgs | undefined;
 
   const maxWait = options.maxWait
     ? max(options.maxWait, wait)
-    : 0
+    : 0;
 
-  const { leading = false, trailing = true } = options
+  const { leading = false, trailing = true } = options;
 
   function invokeCallback(time: number) {
 
-    const args = lastArgs
+    const args = lastArgs;
 
     if (!args)
-      return
+      return;
 
-    lastArgs = void 0
-    lastInvokeTime = time
+    lastArgs = void 0;
+    lastInvokeTime = time;
 
-    callback(...args)
+    callback(...args);
 
   }
 
   function leadingEdge(time: number) {
 
     // Reset any `maxWait` timer.
-    lastInvokeTime = time
+    lastInvokeTime = time;
 
     // Start the timer for the trailing edge.
-    timeoutId = setTimeout(timeoutReached, wait)
+    timeoutId = setTimeout(timeoutReached, wait);
 
     // Invoke the leading edge.
     if (leading)
-      invokeCallback(time)
+      invokeCallback(time);
 
   }
 
   function trailingEdge(time: number) {
 
-    timeoutId = void 0
+    timeoutId = void 0;
 
     if (trailing && lastArgs) {
 
-      invokeCallback(time)
-      return
+      invokeCallback(time);
+      return;
 
     }
 
-    lastArgs = undefined
+    lastArgs = undefined;
 
   }
 
@@ -90,11 +90,11 @@ export function debounce<TArgs extends unknown[]>(
     const
       timeSinceLastCall = time - lastCallTime,
       timeSinceLastInvoke = time - lastInvokeTime,
-      timeWaiting = wait - timeSinceLastCall
+      timeWaiting = wait - timeSinceLastCall;
 
     return maxWait > 0
       ? min(timeWaiting, maxWait - timeSinceLastInvoke)
-      : timeWaiting
+      : timeWaiting;
 
   }
 
@@ -102,27 +102,27 @@ export function debounce<TArgs extends unknown[]>(
 
     const
       timeSinceLastCall = time - lastCallTime,
-      timeSinceLastInvoke = time - lastInvokeTime
+      timeSinceLastInvoke = time - lastInvokeTime;
 
     return lastCallTime == 0
       || (timeSinceLastCall >= wait)
       || (timeSinceLastCall < 0)
-      || (maxWait > 0 && timeSinceLastInvoke >= maxWait)
+      || (maxWait > 0 && timeSinceLastInvoke >= maxWait);
 
   }
 
   function timeoutReached() {
 
-    const time = now()
+    const time = now();
 
     if (shouldInvoke(time)) {
 
-      trailingEdge(time)
-      return
+      trailingEdge(time);
+      return;
 
     }
 
-    timeoutId = setTimeout(timeoutReached, remainingWait(time))
+    timeoutId = setTimeout(timeoutReached, remainingWait(time));
 
   }
 
@@ -130,55 +130,55 @@ export function debounce<TArgs extends unknown[]>(
 
     const
       time = now(),
-      isInvoking = shouldInvoke(time)
+      isInvoking = shouldInvoke(time);
 
-    lastArgs = args
-    lastCallTime = time
+    lastArgs = args;
+    lastCallTime = time;
 
     if (isInvoking) {
 
       if (!timeoutId) {
 
-        leadingEdge(lastCallTime)
-        return
+        leadingEdge(lastCallTime);
+        return;
 
       }
 
       if (maxWait > 0) {
 
-        clearTimeout(timeoutId)
-        timeoutId = setTimeout(timeoutReached, wait)
-        invokeCallback(lastCallTime)
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(timeoutReached, wait);
+        invokeCallback(lastCallTime);
 
       }
 
     }
 
-    timeoutId ??= setTimeout(timeoutReached, wait)
+    timeoutId ??= setTimeout(timeoutReached, wait);
 
-  }
+  };
 
   debouncedFunc.cancel = () => {
 
     if (timeoutId !== undefined) {
 
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId);
 
     }
 
-    lastInvokeTime = 0
-    lastArgs = timeoutId = undefined
+    lastInvokeTime = 0;
+    lastArgs = timeoutId = undefined;
 
-  }
+  };
 
   debouncedFunc.flush = () => {
 
     if (timeoutId)
-      trailingEdge(now())
+      trailingEdge(now());
 
-  }
+  };
 
-  return debouncedFunc
+  return debouncedFunc;
 
 }
 
@@ -188,12 +188,12 @@ export function throttle<TArgs extends unknown[]>(
   options: ThrottleOptions = {}
 ) {
 
-  const { leading = true, trailing = true } = options
+  const { leading = true, trailing = true } = options;
 
   return debounce(callback, wait, {
     leading,
     trailing,
     maxWait: wait,
-  }) as ThrottledFunc<TArgs>
+  }) as ThrottledFunc<TArgs>;
 
 }

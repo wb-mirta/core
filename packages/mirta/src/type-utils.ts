@@ -3,7 +3,7 @@
 export type When<TCondition extends boolean | undefined, ThenType, ElseType>
   = TCondition extends true
     ? ThenType
-    : ElseType
+    : ElseType;
 
 /**
  * Определяет, имеет ли свойство строго заданное значение.
@@ -26,7 +26,7 @@ export type IsSpecified<
           ? false
           : true
       )
-    : false
+    : false;
 
 /**
  * Выбирает тип в зависимости от наличия явно заданного значения.
@@ -40,7 +40,7 @@ export type WhenSpecified<
 >
   = IsSpecified<TObject, TKey> extends true
     ? ThenType
-    : ElseType
+    : ElseType;
 
 /**
  * На основе заданного свойства определяет, будет ли
@@ -83,7 +83,7 @@ export type StrictWhenSpecified<
 >
   = IsSpecified<TObject, TKey> extends true
     ? TReturn
-    : TReturn | undefined
+    : TReturn | undefined;
 
 /**
  * Устанавливает указанное свойство в readonly при выполнении указанного условия.
@@ -92,7 +92,7 @@ export type StrictWhenSpecified<
 export type ReadonlyPropWhen<TObject, K extends keyof TObject, TCondition extends boolean | undefined>
   = TCondition extends true
     ? Expand<Omit<TObject, K> & { +readonly [P in K]-?: TObject[P]; }>
-    : TObject
+    : TObject;
 
 /**
  * Проверяет, что указанный тип объекта имеет хотя бы одно свойство заданного типа.
@@ -116,7 +116,7 @@ export type HasPropertyOfType<TObject extends object, TProperty> = {
   ? {} extends R
       ? false
       : true
-  : never
+  : never;
 
 /**
  * Извлекает из массива функций типы возвращаемых значений
@@ -126,4 +126,4 @@ export type HasPropertyOfType<TObject extends object, TProperty> = {
 export type IntersectReturnTypes<TArray>
   = TArray extends [(...args: unknown[]) => infer TReturn, ...infer TRest]
     ? TReturn & IntersectReturnTypes<TRest>
-    : object
+    : object;

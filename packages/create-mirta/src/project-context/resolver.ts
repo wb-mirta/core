@@ -1,23 +1,23 @@
-import { t } from '#i18n'
-import type { ProjectSelection } from '#project/types'
-import { resolveTemplateSequenceAsync } from '#template/index'
-import { logger } from '#utils/logger'
-import { resolve, sep } from 'node:path'
-import { confirmOverwriteAsync } from './overwrite.confirm'
-import { promptProjectFolderAsync } from './project-folder.prompt'
-import type { ProjectContext } from './types'
-import { CreationError, OperationCanceledError } from '#errors'
-import { isDirEmptyAsync, isExistsAsync } from '#utils/file-system'
+import { t } from '#i18n';
+import type { ProjectSelection } from '#project/types';
+import { resolveTemplateSequenceAsync } from '#template/index';
+import { logger } from '#utils/logger';
+import { resolve, sep } from 'node:path';
+import { confirmOverwriteAsync } from './overwrite.confirm';
+import { promptProjectFolderAsync } from './project-folder.prompt';
+import type { ProjectContext } from './types';
+import { CreationError, OperationCanceledError } from '#errors';
+import { isDirEmptyAsync, isExistsAsync } from '#utils/file-system';
 
 export interface ResolutionOptions {
 
-  cwd?: string
+  cwd?: string;
 
-  projectFolder?: string
+  projectFolder?: string;
 
-  forceOverwrite?: boolean
+  forceOverwrite?: boolean;
 
-  barebone?: boolean
+  barebone?: boolean;
 
 }
 
@@ -33,34 +33,34 @@ export async function resolveProjectContextAsync(
     cwd = process.cwd(),
     barebone,
 
-  } = options
+  } = options;
 
-  const projectName = options.projectFolder || await promptProjectFolderAsync(`wb-mirta-${selection.type}`)
+  const projectName = options.projectFolder || await promptProjectFolderAsync(`wb-mirta-${selection.type}`);
 
   if (options.projectFolder)
-    logger.step(`${t('projectFolder.prompt')}: ${options.projectFolder}`)
+    logger.step(`${t('projectFolder.prompt')}: ${options.projectFolder}`);
 
-  const projectRoot = resolve(cwd, projectName)
+  const projectRoot = resolve(cwd, projectName);
 
   if (!projectRoot.startsWith(cwd.endsWith('/') ? cwd : cwd + sep) && projectRoot !== cwd)
-    throw CreationError.get('project.outsideRoot')
+    throw CreationError.get('project.outsideRoot');
 
-  const isExists = await isExistsAsync(projectRoot)
-  const isEmpty = !isExists || await isDirEmptyAsync(projectRoot)
+  const isExists = await isExistsAsync(projectRoot);
+  const isEmpty = !isExists || await isDirEmptyAsync(projectRoot);
 
-  let shouldOverwrite = false
+  let shouldOverwrite = false;
 
   if (!isEmpty) {
 
     shouldOverwrite
-      = options.forceOverwrite === true || await confirmOverwriteAsync(projectRoot)
+      = options.forceOverwrite === true || await confirmOverwriteAsync(projectRoot);
 
     if (!shouldOverwrite)
-      throw new OperationCanceledError()
+      throw new OperationCanceledError();
 
   }
 
-  const templates = await resolveTemplateSequenceAsync(selection)
+  const templates = await resolveTemplateSequenceAsync(selection);
 
   return {
 
@@ -73,6 +73,6 @@ export async function resolveProjectContextAsync(
     templates: templates,
     barebone: barebone,
 
-  }
+  };
 
 }

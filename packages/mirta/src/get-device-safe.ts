@@ -8,7 +8,7 @@ export function getDeviceSafe(
   isReadyFunc = () => true
 ) {
 
-  let device: WbRules.Device | undefined
+  let device: WbRules.Device | undefined;
 
   return {
     /** Возвращает существующий объект или пытается найти, если его ещё нет. */
@@ -18,9 +18,9 @@ export function getDeviceSafe(
         isReadyFunc()
           ? device = getDevice(deviceId)
           : undefined
-      )
+      );
 
     },
-  }
+  };
 
 }

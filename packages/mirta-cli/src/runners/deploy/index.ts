@@ -1,20 +1,20 @@
-import chalk from 'chalk'
-import { isString } from '@mirta/basics'
-import { getConnectionTarget, resolveConnection } from '#config/connection'
-import { logger } from '#utils/logger'
-import { t } from '#i18n'
-import { runRsyncAsync } from './rsync'
-import type { StagedArgs } from '@mirta/staged-args'
-import { parseArgs } from './args'
-import { resolveConfigAsync } from '#config/resolve'
-import { authenticateAsync } from '#auth'
-import { resolveWorkspaceContextAsync } from '@mirta/workspace'
-import { loadEnv } from '#utils/env'
-import { hasRemoteGroupAsync } from '#utils/ssh'
-import { RECOMMENDED_GROUP } from './constants'
-import { assertWsl2ConfiguredAsync } from '#utils/wsl'
+import chalk from 'chalk';
+import { isString } from '@mirta/basics';
+import { getConnectionTarget, resolveConnection } from '#config/connection';
+import { logger } from '#utils/logger';
+import { t } from '#i18n';
+import { runRsyncAsync } from './rsync';
+import type { StagedArgs } from '@mirta/staged-args';
+import { parseArgs } from './args';
+import { resolveConfigAsync } from '#config/resolve';
+import { authenticateAsync } from '#auth';
+import { resolveWorkspaceContextAsync } from '@mirta/workspace';
+import { loadEnv } from '#utils/env';
+import { hasRemoteGroupAsync } from '#utils/ssh';
+import { RECOMMENDED_GROUP } from './constants';
+import { assertWsl2ConfiguredAsync } from '#utils/wsl';
 
-const { yellow } = chalk
+const { yellow } = chalk;
 
 /**
  * Асинхронно выполняет команду `deploy`.
@@ -32,43 +32,43 @@ const { yellow } = chalk
  **/
 export async function runAsync(args: StagedArgs) {
 
-  const { values: argv } = parseArgs(args)
+  const { values: argv } = parseArgs(args);
 
-  const isDryRun = argv['dry-run']
+  const isDryRun = argv['dry-run'];
 
   // Определение профиля деплоя.
   const profileName = argv.profile && isString(argv.profile)
     ? argv.profile
-    : 'default'
+    : 'default';
 
-  const cwd = process.cwd()
+  const cwd = process.cwd();
 
   // Определение корневой директории проекта.
-  const context = await resolveWorkspaceContextAsync(cwd)
-  const rootDir = context.rootDir
+  const context = await resolveWorkspaceContextAsync(cwd);
+  const rootDir = context.rootDir;
 
   // Загрузка и объединение конфигурации.
-  const { config, userConfig } = await resolveConfigAsync(rootDir, argv.config)
+  const { config, userConfig } = await resolveConfigAsync(rootDir, argv.config);
 
   // Полный набор маппингов из конфигурации.
-  const mappingPresets = config.deploy?.mappings ?? {}
+  const mappingPresets = config.deploy?.mappings ?? {};
 
   // Используемый профиль.
-  const profile = config.deploy?.profiles?.[profileName]
-  const isImplicitProfile = !userConfig?.deploy?.profiles?.[profileName]
+  const profile = config.deploy?.profiles?.[profileName];
+  const isImplicitProfile = !userConfig?.deploy?.profiles?.[profileName];
 
   if (!profile)
-    throw new Error(t('deploy.profileNotFound', { name: profileName }))
+    throw new Error(t('deploy.profileNotFound', { name: profileName }));
 
   // Загрузка переменных окружения ДО разрешения подключения.
-  loadEnv(rootDir, cwd)
+  loadEnv(rootDir, cwd);
 
   // Определение подключения: из CLI-аргумента или профиля.
-  const connection = resolveConnection(config, argv.to ?? profile.connection)
+  const connection = resolveConnection(config, argv.to ?? profile.connection);
 
   // Проверка WSL2 на Windows.
   if (process.platform === 'win32')
-    await assertWsl2ConfiguredAsync(connection)
+    await assertWsl2ConfiguredAsync(connection);
 
   // Логирование начала операции.
   logger.log(t('deploy.deploying', {
@@ -81,30 +81,30 @@ export async function runAsync(args: StagedArgs) {
       ? t('deploy.profileImplicit', { name: yellow(profileName) })
       : yellow(profileName),
 
-  }))
+  }));
 
   // Аутентификация через ssh-agent (PKCS#11 или ключ).
-  await authenticateAsync(connection)
+  await authenticateAsync(connection);
 
-  const isPasswordAuth = !connection.key && !connection.pkcs11
-  const allowInsecure = argv.insecure
+  const isPasswordAuth = !connection.key && !connection.pkcs11;
+  const allowInsecure = argv.insecure;
 
   if (isPasswordAuth && !allowInsecure)
     logger.warn([
       t('connection.useKeyAuth') + '\n',
       'https://wiki.wirenboard.com/wiki/SSH\n',
-    ])
+    ]);
 
   if (!profile.toGroup) {
 
     // Если группа не указана явно,
     // то проверяем наличие рекомендуемой группы.
 
-    const isGroupExists = await hasRemoteGroupAsync(RECOMMENDED_GROUP, connection, isPasswordAuth)
+    const isGroupExists = await hasRemoteGroupAsync(RECOMMENDED_GROUP, connection, isPasswordAuth);
 
     if (isGroupExists) {
 
-      profile.toGroup = RECOMMENDED_GROUP
+      profile.toGroup = RECOMMENDED_GROUP;
 
     }
     else if (!allowInsecure) {
@@ -112,7 +112,7 @@ export async function runAsync(args: StagedArgs) {
       // Если группы на контроллере нет,
       // то выводим рекомендацию использовать отдельную группу.
 
-      logger.warn(t('deploy.useDedicatedGroup', { group: RECOMMENDED_GROUP }))
+      logger.warn(t('deploy.useDedicatedGroup', { group: RECOMMENDED_GROUP }));
 
     }
 
@@ -122,9 +122,9 @@ export async function runAsync(args: StagedArgs) {
   for (const key of profile.mappings ?? []) {
 
     if (!(key in mappingPresets))
-      throw new Error(t('deploy.mappingsNotFound', { key }))
+      throw new Error(t('deploy.mappingsNotFound', { key }));
 
-    const mappings = mappingPresets[key]
+    const mappings = mappingPresets[key];
 
     for (const mapping of mappings) {
 
@@ -133,9 +133,9 @@ export async function runAsync(args: StagedArgs) {
         logger.log(t('deploy.mappingDisabled', {
           from: mapping.from,
           to: mapping.to,
-        }))
+        }));
 
-        continue
+        continue;
 
       }
 
@@ -145,7 +145,7 @@ export async function runAsync(args: StagedArgs) {
         connection,
         cwd,
         isDryRun,
-      })
+      });
 
     }
 
@@ -155,6 +155,6 @@ export async function runAsync(args: StagedArgs) {
   logger.success(isDryRun
     ? t('deploy.simulationComplete')
     : t('deploy.successful')
-  )
+  );
 
 }

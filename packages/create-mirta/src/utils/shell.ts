@@ -1,5 +1,5 @@
-import { OperationCanceledError } from '#errors/operation'
-import { spawn, type IOType, type SpawnOptions } from 'node:child_process'
+import { OperationCanceledError } from '#errors/operation';
+import { spawn, type IOType, type SpawnOptions } from 'node:child_process';
 
 /**
  * Режим `stdio`: ввод и вывод наследуются от родительского процесса (терминал), `stderr` перехватывается.
@@ -9,7 +9,7 @@ import { spawn, type IOType, type SpawnOptions } from 'node:child_process'
  * @since 0.4.0
  *
  **/
-export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe']
+export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe'];
 
 /**
  * Режим `stdio`: ввод игнорируется, `stdout` и `stderr` перехватываются.
@@ -19,7 +19,7 @@ export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe']
  * @since 0.4.0
  *
  **/
-export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
+export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe'];
 
 /**
  * Режим `stdio`: ввод и `stdout` игнорируются, `stderr` перехватывается.
@@ -28,7 +28,7 @@ export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
  * @since 0.4.0
  *
  **/
-export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
+export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe'];
 
 /**
  * Ошибка выполнения команды в shell.
@@ -41,11 +41,11 @@ export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
 export class ShellError extends Error {
   constructor(message: string) {
 
-    super(message)
+    super(message);
 
-    this.name = 'ShellError'
+    this.name = 'ShellError';
 
-    Error.captureStackTrace(this, ShellError)
+    Error.captureStackTrace(this, ShellError);
 
   }
 }
@@ -62,25 +62,25 @@ interface ExecutionResult {
    * Успешно завершена ли команда (код в `doneCodes`).
    *
    **/
-  isDone: boolean
+  isDone: boolean;
 
   /**
    * Код завершения процесса.
    *
    **/
-  code: number
+  code: number;
 
   /**
    * Перехваченный стандартный вывод.
    *
    **/
-  stdout: string
+  stdout: string;
 
   /**
    * Перехваченный стандартный поток ошибок.
    *
    **/
-  stderr: string
+  stderr: string;
 }
 
 /**
@@ -95,13 +95,13 @@ interface RunOptions extends SpawnOptions {
    * Коды завершения, считающиеся успешными (по умолчанию: `[0]`).
    *
    **/
-  doneCodes?: number[]
+  doneCodes?: number[];
 
   /**
    * Коды завершения, интерпретируемые как отмена (по умолчанию: `[130]` — SIGINT).
    *
    **/
-  cancelCodes?: number[]
+  cancelCodes?: number[];
 
 }
 
@@ -129,45 +129,45 @@ export async function execAsync(
 
   return new Promise((resolve, reject) => {
 
-    const { doneCodes = [0], cancelCodes = [130], ...spawnOptions } = options
+    const { doneCodes = [0], cancelCodes = [130], ...spawnOptions } = options;
 
-    spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT
-    spawnOptions.shell ??= false
+    spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT;
+    spawnOptions.shell ??= false;
 
-    const runner = spawn(command, args, spawnOptions)
+    const runner = spawn(command, args, spawnOptions);
 
-    const stdoutChunks: Buffer[] = []
-    const stderrChunks: Buffer[] = []
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
 
     runner.stdout?.on('data', (chunk: Buffer) => {
 
-      stdoutChunks.push(chunk)
+      stdoutChunks.push(chunk);
 
-    })
+    });
 
     runner.stderr?.on('data', (chunk: Buffer) => {
 
-      stderrChunks.push(chunk)
+      stderrChunks.push(chunk);
 
-    })
+    });
 
-    runner.on('error', reject)
+    runner.on('error', reject);
 
     runner.on('exit', (code) => {
 
-      const isDone = code !== null && doneCodes.includes(code)
+      const isDone = code !== null && doneCodes.includes(code);
 
-      const stdout = Buffer.concat(stdoutChunks).toString().trim()
-      const stderr = Buffer.concat(stderrChunks).toString().trim()
+      const stdout = Buffer.concat(stdoutChunks).toString().trim();
+      const stderr = Buffer.concat(stderrChunks).toString().trim();
 
       if (isDone) {
 
-        resolve({ isDone, code, stdout, stderr })
+        resolve({ isDone, code, stdout, stderr });
 
       }
       else {
 
-        const isCanceled = code !== null && cancelCodes.includes(code)
+        const isCanceled = code !== null && cancelCodes.includes(code);
 
         reject(
           isCanceled
@@ -175,13 +175,13 @@ export async function execAsync(
             : new ShellError(
                 `Failed to execute command ${command} ${args.join(' ')}: ${stderr}`
               )
-        )
+        );
 
       }
 
-    })
+    });
 
-  })
+  });
 
 }
 
@@ -195,4 +195,4 @@ export const runCommandAsync = async (
   command: string,
   args?: string[],
   options: RunOptions = {}
-) => await execAsync(command, args, { ...options })
+) => await execAsync(command, args, { ...options });

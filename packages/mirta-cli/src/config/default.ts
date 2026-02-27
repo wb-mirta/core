@@ -1,6 +1,6 @@
-import { defineConfig } from './config'
-import { DEFAULT_SSH_HOSTNAME, DEFAULT_SSH_USERNAME } from './constants'
-import type { DeployFrom, DeployTo } from './types'
+import { defineConfig } from './config';
+import { DEFAULT_SSH_HOSTNAME, DEFAULT_SSH_USERNAME } from './constants';
+import type { DeployFrom, DeployTo } from './types';
 
 /**
  * Экспортируемая конфигурация по умолчанию (zero-config).
@@ -71,4 +71,4 @@ export default defineConfig({
     },
   },
 
-})
+});

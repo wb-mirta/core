@@ -1,11 +1,11 @@
-import { useThermostat } from '{{packageFull}}'
+import { useThermostat } from '{{packageFull}}';
 
 const thermostat = useThermostat({
   sensorTopic: 'A60-M1W3/External Sensor 1',
   heaterTopic: 'wb-gpio/EXT4_R3A1',
   targetTemp: 22,
   hysteresis: 0.5,
-})
+});
 
 // Установить новое значение целевой температуры:
-thermostat.setTargetTemp(24)
+thermostat.setTargetTemp(24);

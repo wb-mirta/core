@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
-import type { DeviceType, DeviceContext } from './device'
-import { createControl, ChangePolicies, type ChangePolicy, type VirtualChangePolicy, type MaybeReadonlyControl } from './control'
-import type { StrictWhenSpecified, HasPropertyOfType } from './type-utils'
-import { isFunction } from '@mirta/basics'
-import '@mirta/polyfills'
+import type { DeviceType, DeviceContext } from './device';
+import { createControl, ChangePolicies, type ChangePolicy, type VirtualChangePolicy, type MaybeReadonlyControl } from './control';
+import type { StrictWhenSpecified, HasPropertyOfType } from './type-utils';
+import { isFunction } from '@mirta/basics';
+import '@mirta/polyfills';
 
 // Внимание! Внутренняя типизация, может измениться.
 
@@ -15,9 +15,9 @@ import '@mirta/polyfills'
  **/
 interface ControlType<TControl, TValue> {
   /** Тип контрола. */
-  type: TControl
+  type: TControl;
   /** Значение по умолчанию. */
-  defaultValue?: TValue
+  defaultValue?: TValue;
 }
 
 /**
@@ -27,7 +27,7 @@ interface ControlType<TControl, TValue> {
 type TypeMapper<K extends keyof WbRules.TypeMappings = keyof WbRules.TypeMappings>
   = K extends infer TControl
     ? ControlType<TControl, WbRules.TypeMappings[K]>
-    : never
+    : never;
 
 type VirtualTypeMapper<K extends keyof WbRules.TypeMappings = keyof WbRules.TypeMappings>
   = K extends infer TControl
@@ -36,16 +36,16 @@ type VirtualTypeMapper<K extends keyof WbRules.TypeMappings = keyof WbRules.Type
         // Добавляет расширенные свойства, соответственно типу контрола.
         & WbRules.ControlTypeExtension<TControl>
       )
-    : never
+    : never;
 
 interface BaseControlDef {
   /** Идентификатор контрола. Если не указан, используется название свойства. */
-  controlId?: string
+  controlId?: string;
 
   // TODO: Разделить changePolicy соответственно типу устройства - реальное или виртуальное.
 
   /** Политика доступа на запись значения. */
-  changePolicy?: VirtualChangePolicy | ChangePolicy
+  changePolicy?: VirtualChangePolicy | ChangePolicy;
 }
 
 /**
@@ -55,7 +55,7 @@ interface BaseControlDef {
 type ControlDef = Expand<
   TypeMapper
   & BaseControlDef
->
+>;
 
 /**
  * Определения виртуальных контролов.
@@ -67,22 +67,22 @@ type VirtualControlDef = Expand<
   & BaseControlDef
   & {
   /** Имя, публикуемое в MQTT-топике */
-    title?: WbRules.Title
+    title?: WbRules.Title;
     /** Если включено, устанавливает значение по умолчанию при перезапуске. */
-    forceDefault?: boolean
+    forceDefault?: boolean;
     /** Если включено, не создаёт контрол в MQTT, пока ему не будет присвоено какое-либо значение. */
-    lazyInit?: boolean
+    lazyInit?: boolean;
     /** Порядок следования полей */
-    order?: number
-  }>
+    order?: number;
+  }>;
 
 /** Набор контролов, не поддерживающий переопределение. */
 type Controls
-  = Record<string, ControlDef>
+  = Record<string, ControlDef>;
 
 /** Набор контролов с поддержкой переопределения. */
 type VirtualControls
-  = Record<string, VirtualControlDef>
+  = Record<string, VirtualControlDef>;
 
 /**
  * Обеспечивает строго контролируемую вариативность в зависимости
@@ -93,7 +93,7 @@ type VirtualControls
  * что используются только для виртуальных устройств).
  **/
 type StrictControls<TControls extends Controls>
-  = TControls & Controls
+  = TControls & Controls;
 
 /**
  * Обеспечивает строго контролируемую вариативность в зависимости
@@ -103,7 +103,7 @@ type StrictControls<TControls extends Controls>
  * предотвращая появление неучтённых свойств.
  **/
 type StrictVirtualControls<TControls extends VirtualControls>
-  = TControls & VirtualControls
+  = TControls & VirtualControls;
 
 /**
  * Набор готовых к использованию контролов, передаётся в `setup()`
@@ -122,7 +122,7 @@ type CreatedControls<
       TControls[K]['changePolicy'] extends ChangePolicies.ReadOnly ? true : false
     >
   >
-}
+};
 
 /** Используется для извлечения типа значения из значения по умолчанию. */
 type InferDefaultType<TProp>
@@ -130,7 +130,7 @@ type InferDefaultType<TProp>
     ? TDefault extends (() => infer TReturn)
       ? TReturn
       : TDefault
-    : TProp
+    : TProp;
 
 /** Извлекает реальный тип свойства из его определения. */
 type InferPropType<TProp>
@@ -148,7 +148,7 @@ type InferPropType<TProp>
                     : [TProp] extends [PropType<infer TValue> | { type: PropType<infer TValue> } | undefined]
                         ? TValue
                         // Когда ничего подходящего не нашлось, извлечь тип из свойства `defaultValue`.
-                        : InferDefaultType<TProp>
+                        : InferDefaultType<TProp>;
 
 /** Обязательные ключи свойств - потребуют их явного указания при вызове useDevice(). */
 type RequiredKeys<TProps> = {
@@ -157,7 +157,7 @@ type RequiredKeys<TProps> = {
       ? never
       : K
     : never
-}[keyof TProps]
+}[keyof TProps];
 
 /**
  * Опциональные ключи свойств - указываются по необходимости.
@@ -165,7 +165,7 @@ type RequiredKeys<TProps> = {
  * Рекомендуется использовать совместно с параметром {@link PropMetadata.defaultValue}.
  */
 type OptionalKeys<TProps>
-  = Exclude<keyof TProps, RequiredKeys<TProps>>
+  = Exclude<keyof TProps, RequiredKeys<TProps>>;
 
 type RequiredSetupKeys<TProps> = {
   [K in keyof TProps]: TProps[K] extends { isRequired: true } | { defaultValue: unknown }
@@ -173,9 +173,9 @@ type RequiredSetupKeys<TProps> = {
       ? never
       : K
     : never
-}[keyof TProps]
+}[keyof TProps];
 
-type OptionalSetupKeys<TProps> = Exclude<keyof TProps, RequiredKeys<TProps>>
+type OptionalSetupKeys<TProps> = Exclude<keyof TProps, RequiredKeys<TProps>>;
 
 /**
  * Параметры устройства для уточнения стартовой конфигурации.
@@ -186,7 +186,7 @@ type Props<TProps> = {
   [K in keyof Pick<TProps, RequiredKeys<TProps>>]: InferPropType<TProps[K]>
 } & {
   [K in keyof Pick<TProps, OptionalKeys<TProps>>]?: InferPropType<TProps[K]>
-}
+};
 
 /**
  * В отличие от {@link Props}, формирует строгое значение свойства
@@ -197,18 +197,18 @@ type SetupProps<TProps> = {
   [K in keyof Pick<TProps, RequiredSetupKeys<TProps>>]: Readonly<InferPropType<TProps[K]>>
 } & {
   [K in keyof Pick<TProps, OptionalSetupKeys<TProps>>]?: Readonly<InferPropType<TProps[K]>>
-}
+};
 
 type PropMethod<TProp, TConstructor = unknown> = [TProp] extends [
   ((...args: unknown[]) => unknown) | undefined
 ] // if is function with args, allowing non-required functions
-  ? { new (): TConstructor, (): TProp, readonly prototype: TConstructor } // Create Function like constructor
-  : never
+  ? { new (): TConstructor; (): TProp; readonly prototype: TConstructor } // Create Function like constructor
+  : never;
 
 type PropConstructor<TProp = unknown>
   = | (new(...args: unknown[]) => TProp & {})
     | (() => TProp)
-    | PropMethod<TProp>
+    | PropMethod<TProp>;
 
 /**
  * Тип параметра контрола.
@@ -236,7 +236,7 @@ type PropConstructor<TProp = unknown>
  * })
  * ```
  **/
-export type PropType<TProp> = PropConstructor<TProp> | (PropConstructor<TProp>)[]
+export type PropType<TProp> = PropConstructor<TProp> | (PropConstructor<TProp>)[];
 
 /**
  * Метаданные свойства.
@@ -272,11 +272,11 @@ export type PropType<TProp> = PropConstructor<TProp> | (PropConstructor<TProp>)[
  **/
 interface PropMetadata<TProp> {
   /** Тип свойства. */
-  type: TProp
+  type: TProp;
   /** Признак обязательности. */
-  isRequired?: boolean
+  isRequired?: boolean;
   /** Значение по умолчанию. */
-  defaultValue?: TProp | (() => TProp)
+  defaultValue?: TProp | (() => TProp);
 }
 
 /**
@@ -295,34 +295,34 @@ interface PropMetadata<TProp> {
  * })
  * ```
  */
-type Prop<TProp> = PropMetadata<TProp> | PropType<TProp>
+type Prop<TProp> = PropMetadata<TProp> | PropType<TProp>;
 
 type PropsDefinition<TProps = Record<string, unknown>> = {
   [K in keyof TProps]: Prop<TProps[K]>
-}
+};
 
 /** Определение проводного устройства. */
 interface WiredDeviceOptions<TProps, TControls extends Controls, TResult> {
-  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>, controls: CreatedControls<TControls> }) => TResult
-  props?: TProps
+  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>; controls: CreatedControls<TControls> }) => TResult;
+  props?: TProps;
   /** Контролы проводного устройства. */
-  controls: StrictControls<TControls>
+  controls: StrictControls<TControls>;
 }
 
 /** Определение виртуального устройства. */
 interface VirtualDeviceOptions<TProps, TControls extends VirtualControls, TResult> {
-  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>, controls: CreatedControls<TControls> }) => TResult
-  props?: TProps
+  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>; controls: CreatedControls<TControls> }) => TResult;
+  props?: TProps;
   /** Контролы виртуального устройства. */
-  controls: StrictVirtualControls<TControls>
+  controls: StrictVirtualControls<TControls>;
 }
 
 /** Определение Zigbee-устройства. */
 interface ZigbeeDeviceOptions<TProps, TControls extends VirtualControls, TResult> {
-  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>, controls: CreatedControls<TControls> }) => TResult
-  props?: TProps
+  setup: (options: { props: Readonly<Expand<SetupProps<TProps>>>; controls: CreatedControls<TControls> }) => TResult;
+  props?: TProps;
   /** Контролы Zigbee-устройства. */
-  controls: StrictVirtualControls<TControls>
+  controls: StrictVirtualControls<TControls>;
 }
 
 /**
@@ -347,12 +347,12 @@ type DeviceOptions<
             ? ZigbeeDeviceOptions<TProps, TControls, TResult>
             : never
           )
-      )
+      );
 
 /** Состояние устройства, общее для всех скриптов. */
 interface SharedDeviceState {
-  isReady: boolean
-  isConfigurable: boolean
+  isReady: boolean;
+  isConfigurable: boolean;
 }
 
 /**
@@ -365,19 +365,19 @@ export interface DeviceWithContext {
   /** Контекст устройства - ключевая информация. */
   context: {
     /** Идентификатор устройства. */
-    deviceId: string
+    deviceId: string;
     /** Признак готовности к работе. */
-    isReady: boolean
-  }
+    isReady: boolean;
+  };
 }
 
 /** Итоговый тип устройства. */
-type Device<TDefinition> = TDefinition & DeviceWithContext
+type Device<TDefinition> = TDefinition & DeviceWithContext;
 
-const { assign } = Object
+const { assign } = Object;
 
 if (__TEST__)
-  module.static = {}
+  module.static = {};
 
 /**
  * Содержит список проинициализированных устройств,
@@ -389,7 +389,7 @@ if (__TEST__)
  **/
 const alreadyConfigured = (
   module.static.configured ??= {}
-) as Record<string, SharedDeviceState | undefined>
+) as Record<string, SharedDeviceState | undefined>;
 
 function createContext(
   deviceType: DeviceType,
@@ -400,52 +400,52 @@ function createContext(
   const context: DeviceContext = {
     get deviceType() {
 
-      return deviceType
+      return deviceType;
 
     },
 
     get deviceId() {
 
-      return deviceId
+      return deviceId;
 
     },
 
     get isReady() {
 
-      return state.isReady
+      return state.isReady;
 
     },
-  }
+  };
 
-  return context
+  return context;
 
 }
 
 const extendWithReadonly = (changePolicy: ChangePolicy | VirtualChangePolicy | undefined) =>
   changePolicy && changePolicy !== ChangePolicies.Default
     ? { readonly: changePolicy === ChangePolicies.Script || changePolicy === ChangePolicies.ReadOnly }
-    : {}
+    : {};
 
 function configureControls(
   deviceId: string,
   controls: VirtualControls
 ) {
 
-  const device = getDevice(deviceId)
+  const device = getDevice(deviceId);
 
   if (!device)
-    return
+    return;
 
   Object.keys(controls).forEach((key) => {
 
-    const control = controls[key]
-    const controlId = control.controlId ?? key
+    const control = controls[key];
+    const controlId = control.controlId ?? key;
 
     if (__DEV__)
-      log.debug(`Replacing the control '${controlId}' on '${deviceId}'`)
+      log.debug(`Replacing the control '${controlId}' on '${deviceId}'`);
 
     if (device.isControlExists(controlId))
-      device.removeControl(controlId)
+      device.removeControl(controlId);
 
     device.addControl(
       controlId,
@@ -457,9 +457,9 @@ function configureControls(
         },
         extendWithReadonly(control.changePolicy)
       ) as WbRules.ControlOptions
-    )
+    );
 
-  })
+  });
 
 }
 
@@ -471,44 +471,44 @@ function configureContext(
 ) {
 
   if (__TEST__)
-    alreadyConfigured[deviceId] = undefined
+    alreadyConfigured[deviceId] = undefined;
 
   if (alreadyConfigured[deviceId])
-    return createContext(type, deviceId, alreadyConfigured[deviceId])
+    return createContext(type, deviceId, alreadyConfigured[deviceId]);
 
   const state = alreadyConfigured[deviceId] = {
     isReady: false,
     isConfigurable: true,
-  } as SharedDeviceState
+  } as SharedDeviceState;
 
-  const context = createContext(type, deviceId, state)
+  const context = createContext(type, deviceId, state);
 
   if (state.isReady || !state.isConfigurable)
-    return
+    return;
 
   if (type === 'zigbee') {
 
     trackMqtt(`zigbee2mqtt/${deviceId}`, () => {
 
       if (state.isReady || !state.isConfigurable)
-        return
+        return;
 
-      configureControls(deviceId, controls)
+      configureControls(deviceId, controls);
 
-      state.isReady = true
+      state.isReady = true;
 
-    })
+    });
 
   }
   else {
 
     if (type === 'virtual') {
 
-      const cells: Record<string, WbRules.ControlOptions> = {}
+      const cells: Record<string, WbRules.ControlOptions> = {};
 
       Object.keys(controls).forEach((key) => {
 
-        const control = controls[key]
+        const control = controls[key];
 
         const cell = assign(
           {},
@@ -517,24 +517,24 @@ function configureContext(
             value: control['defaultValue'],
           },
           extendWithReadonly(control['changePolicy'])
-        )
+        );
 
-        cells[key] = cell as WbRules.ControlOptions
+        cells[key] = cell as WbRules.ControlOptions;
 
-      })
+      });
 
       global.defineVirtualDevice(deviceId, {
         title: title ?? 'Untitled Virtual Device',
         cells,
-      })
+      });
 
     }
 
-    state.isReady = true
+    state.isReady = true;
 
   }
 
-  return context
+  return context;
 
 }
 
@@ -544,7 +544,7 @@ function getValueOrDefault<TValue>(value?: TValue, defaultValue?: TValue | (() =
     isFunction(defaultValue)
       ? defaultValue()
       : defaultValue
-  )
+  );
 
 }
 
@@ -561,19 +561,19 @@ function createDevice<
   options: DeviceOptions<TDeviceType, TProps, TControls, TDevice>
 ): Device<TDevice> {
 
-  const controlDefs = options.controls
+  const controlDefs = options.controls;
 
-  const setupProps: Record<string, unknown> = {}
-  const controls: Record<string, unknown> = {}
+  const setupProps: Record<string, unknown> = {};
+  const controls: Record<string, unknown> = {};
 
   Object.keys(propDefs).forEach((key) => {
 
     // Устанавливает значение свойства по умолчанию,
     // если не указано иного.
     //
-    setupProps[key] = getValueOrDefault(props[key], propDefs[key]['defaultValue'])
+    setupProps[key] = getValueOrDefault(props[key], propDefs[key]['defaultValue']);
 
-  })
+  });
 
   const context = configureContext(
     deviceType,
@@ -582,12 +582,12 @@ function createDevice<
     deviceType === 'virtual'
       ? setupProps['title'] as WbRules.Title
       : ''
-  )
+  );
 
   Object.keys(controlDefs).forEach((key) => {
 
-    const controlDef = controlDefs[key] as VirtualControlDef
-    const controlId = controlDef.controlId ?? key
+    const controlDef = controlDefs[key] as VirtualControlDef;
+    const controlId = controlDef.controlId ?? key;
 
     const control = createControl({ deviceType, deviceId, isReady: true }, controlId, {
       type: controlDef.type,
@@ -595,18 +595,18 @@ function createDevice<
       defaultValue: controlDef.defaultValue,
       forceDefault: controlDef.forceDefault,
       lazyInit: controlDef.lazyInit,
-    })
+    });
 
-    controls[key] = control
+    controls[key] = control;
 
-  })
+  });
 
   const device = options.setup({
     props: setupProps as SetupProps<TProps>,
     controls: controls as CreatedControls<TControls>,
-  })
+  });
 
-  return assign(device, { context }) as Device<TDevice>
+  return assign(device, { context }) as Device<TDevice>;
 
 }
 
@@ -616,12 +616,12 @@ function createDevice<
  * переданному в `useDevice()` идентификатору.
  *
  */
-const devices: Record<string, DeviceWithContext | undefined> = {}
+const devices: Record<string, DeviceWithContext | undefined> = {};
 
 type UseDeviceFunc<TProps extends object, TDevice>
   = HasPropertyOfType<TProps, { isRequired: true }> extends true
     ? (deviceId: string, props: Expand<Props<TProps>>) => Device<TDevice>
-    : (deviceId: string, props?: Expand<Props<TProps>>) => Device<TDevice>
+    : (deviceId: string, props?: Expand<Props<TProps>>) => Device<TDevice>;
 
 function defineDevice<
   TDeviceType extends DeviceType,
@@ -637,15 +637,15 @@ function defineDevice<
 
     // Девайс должен проходить полный цикл построения в юнит-тестах.
     if (__TEST__)
-      devices[deviceId] = void 0
+      devices[deviceId] = void 0;
 
     return (
       // Строится единожды на скрипт, далее берётся из кэша.
       // При повторном вызове переданные свойства будут проигнорированы.
       devices[deviceId] ??= createDevice(type, deviceId, options.props ?? {}, props ?? {}, options)
-    ) as Device<TDevice>
+    ) as Device<TDevice>;
 
-  }
+  };
 
 }
 
@@ -662,15 +662,15 @@ export function defineWiredDevice<
   options: DeviceOptions<TDeviceType, TProps, TControls, TDevice>
 ) {
 
-  return defineDevice('wired', options)
+  return defineDevice('wired', options);
 
 }
 
 interface WithIntegratedTitleProp {
-  title?: PropMetadata<PropType<WbRules.Title>> | PropType<WbRules.Title>
+  title?: PropMetadata<PropType<WbRules.Title>> | PropType<WbRules.Title>;
 }
 
-let virtualPerScript = 0
+let virtualPerScript = 0;
 
 /**
  * Обеспечивает нумерацию безымянных виртуальных
@@ -678,7 +678,7 @@ let virtualPerScript = 0
  *
  **/
 const getNextVirtualNumber
-  = () => virtualPerScript += 1
+  = () => virtualPerScript += 1;
 
 /**
  * Использует {@link getNextVirtualNumber} и возвращает
@@ -689,15 +689,15 @@ const getNextVirtualNumber
  **/
 function getNextVirtualNumberPadded() {
 
-  const nextNumber = String(getNextVirtualNumber())
+  const nextNumber = String(getNextVirtualNumber());
 
   if (nextNumber.length < 2)
-    return '00' + nextNumber
+    return '00' + nextNumber;
 
   if (nextNumber.length < 3)
-    return '0' + nextNumber
+    return '0' + nextNumber;
 
-  return nextNumber
+  return nextNumber;
 
 }
 
@@ -723,16 +723,16 @@ export function defineVirtualDevice<
       title: {
         type: Object as PropType<WbRules.Title>, defaultValue: () => {
 
-          const match = /\/([^/]+?)(?:\.js)?$/.exec(__filename)
-          return `Virtual #${getNextVirtualNumberPadded()}${match?.[1] ? ` at '${match[1]}'` : ''}`
+          const match = /\/([^/]+?)(?:\.js)?$/.exec(__filename);
+          return `Virtual #${getNextVirtualNumberPadded()}${match?.[1] ? ` at '${match[1]}'` : ''}`;
 
         },
       },
     },
     options.props
-  )
+  );
 
-  return defineDevice('virtual', options)
+  return defineDevice('virtual', options);
 
 }
 
@@ -749,6 +749,6 @@ export function defineZigbeeDevice<
   options: DeviceOptions<TDeviceType, TProps, TControls, TDevice>
 ) {
 
-  return defineDevice('zigbee', options)
+  return defineDevice('zigbee', options);
 
 }

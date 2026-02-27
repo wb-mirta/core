@@ -4,7 +4,7 @@ export {
   type WorkspaceContext,
   type PackageManager
 
-} from './context/workspace'
+} from './context/workspace';
 
 export {
 
@@ -12,4 +12,4 @@ export {
   type MonorepoContext,
   type PackageDefinition
 
-} from './context/monorepo'
+} from './context/monorepo';

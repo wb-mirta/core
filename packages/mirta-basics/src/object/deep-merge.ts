@@ -1,5 +1,5 @@
-import { isObject, isPlainObject } from '../guards'
-import { hasOwn } from './helpers'
+import { isObject, isPlainObject } from '../guards';
+import { hasOwn } from './helpers';
 
 /**
  * Результат рекурсивного объединения `TBase` и `TPatch`.
@@ -26,7 +26,7 @@ export type DeepMerged<TBase, TPatch> = [TBase, TPatch] extends [object, object]
           ? TBase[K]
           : never
     }
-  : TBase
+  : TBase;
 
 /**
  * Рекурсивно объединяет базовый объект с патчем.
@@ -58,7 +58,7 @@ export type DeepMerged<TBase, TPatch> = [TBase, TPatch] extends [object, object]
 export function deepMerge<TBase extends object, TPatch extends object | null | undefined>(
   base: TBase,
   patch: TPatch
-): DeepMerged<TBase, TPatch>
+): DeepMerged<TBase, TPatch>;
 
 export function deepMerge(
   base: object,
@@ -66,34 +66,34 @@ export function deepMerge(
 ): object {
 
   if (!isObject(base))
-    throw new TypeError('[deepMerge] first argument must be an object')
+    throw new TypeError('[deepMerge] first argument must be an object');
 
-  const output = { ...base }
+  const output = { ...base };
 
   if (patch == null || typeof patch !== 'object')
-    return output
+    return output;
 
   for (const key in patch) {
 
     if (!hasOwn(patch, key))
-      continue
+      continue;
 
-    const fromBase = output[key] as unknown
-    const fromPatch = patch[key] as unknown
+    const fromBase = output[key] as unknown;
+    const fromPatch = patch[key] as unknown;
 
     if (isPlainObject(fromBase) && isPlainObject(fromPatch)) {
 
-      output[key] = deepMerge(fromBase, fromPatch)
+      output[key] = deepMerge(fromBase, fromPatch);
 
     }
     else {
 
-      output[key] = fromPatch
+      output[key] = fromPatch;
 
     }
 
   }
 
-  return output
+  return output;
 
 }

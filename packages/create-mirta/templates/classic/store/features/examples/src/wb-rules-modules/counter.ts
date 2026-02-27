@@ -1,4 +1,4 @@
-import { useCounterStore } from '#wbm/counter-store'
+import { useCounterStore } from '#wbm/counter-store';
 
 /**
  * Простой счётчик с возможностью инкремента и чтения текущего значения
@@ -7,10 +7,10 @@ import { useCounterStore } from '#wbm/counter-store'
 export interface Counter {
 
   /** Позволяет прочесть значение счётчика. */
-  get count(): number
+  get count(): number;
 
   /** Увеличивает значение счётчика на единицу. */
-  increment(): void
+  increment(): void;
 
 }
 
@@ -23,22 +23,22 @@ export interface Counter {
 export function useCounter(): Counter {
 
   // Значение счётчика - глобальное состояние
-  const store = useCounterStore()
+  const store = useCounterStore();
 
   return {
 
     get count() {
 
-      return store.count
+      return store.count;
 
     },
 
     increment() {
 
-      store.increment()
+      store.increment();
 
     },
 
-  }
+  };
 
 }

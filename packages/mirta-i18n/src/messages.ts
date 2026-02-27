@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import type { Locale, GenericShape } from './types'
-import { SourceError } from './errors/source'
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import type { Locale, GenericShape } from './types';
+import { SourceError } from './errors/source';
 
 /**
  * Кэш загруженных сообщений по локалям.
@@ -13,7 +13,7 @@ import { SourceError } from './errors/source'
  * @private
  *
  **/
-const loadedMessages = new Map<Locale, object | null>()
+const loadedMessages = new Map<Locale, object | null>();
 
 /**
  * Парсит JSON и возвращает объект.
@@ -30,12 +30,12 @@ export function parseLocaleJson(
   content: string
 ): object {
 
-  const parsed = JSON.parse(content) as unknown
+  const parsed = JSON.parse(content) as unknown;
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
-    throw SourceError.get('parse.invalidJsonRoot')
+    throw SourceError.get('parse.invalidJsonRoot');
 
-  return parsed
+  return parsed;
 
 }
 
@@ -56,31 +56,31 @@ export async function readLocaleFileAsync<TMessages extends object>(
 
   try {
 
-    const content = await readFile(filePath, 'utf-8')
+    const content = await readFile(filePath, 'utf-8');
 
     return Object.freeze(
       parseLocaleJson(content)
-    ) as TMessages
+    ) as TMessages;
 
   }
   catch (e: unknown) {
 
     if (e instanceof SourceError)
-      throw e
+      throw e;
 
     if (e instanceof SyntaxError)
-      throw SourceError.get('parse.invalidJson', filePath, e.message)
+      throw SourceError.get('parse.invalidJson', filePath, e.message);
 
     if (e && typeof e === 'object' && 'code' in e) {
 
       switch (e.code) {
 
         case 'ENOENT':
-          throw SourceError.get('file.notFound', filePath)
+          throw SourceError.get('file.notFound', filePath);
 
         case 'EACCES':
         case 'EPERM':
-          throw SourceError.get('file.accessDenied', filePath)
+          throw SourceError.get('file.accessDenied', filePath);
 
       }
 
@@ -88,9 +88,9 @@ export async function readLocaleFileAsync<TMessages extends object>(
 
     const message = e instanceof Error
       ? e.message
-      : String(e)
+      : String(e);
 
-    throw SourceError.get('file.failedToRead', filePath, message)
+    throw SourceError.get('file.failedToRead', filePath, message);
 
   }
 
@@ -120,33 +120,33 @@ export async function loadMessagesAsync<TShape extends GenericShape>(
   cwd: string
 ): Promise<TShape['messages'] | null> {
 
-  let messages = loadedMessages.get(locale)
+  let messages = loadedMessages.get(locale);
 
   if (messages || messages === null)
-    return messages as TShape['messages'] | null
+    return messages as TShape['messages'] | null;
 
-  const filePath = resolve(cwd, './locales', `${locale}.json`)
+  const filePath = resolve(cwd, './locales', `${locale}.json`);
 
   try {
 
-    messages = await readLocaleFileAsync<TShape['messages']>(filePath)
+    messages = await readLocaleFileAsync<TShape['messages']>(filePath);
 
-    loadedMessages.set(locale, messages)
+    loadedMessages.set(locale, messages);
 
-    return messages as TShape['messages']
+    return messages as TShape['messages'];
 
   }
   catch (e: unknown) {
 
     if (SourceError.isFileError(e) && e.code === 'file.notFound') {
 
-      loadedMessages.set(locale, null)
+      loadedMessages.set(locale, null);
 
-      return null
+      return null;
 
     }
 
-    throw e
+    throw e;
 
   }
 
@@ -165,8 +165,8 @@ export async function loadMessagesAsync<TShape extends GenericShape>(
 export function __resetInternalState() {
 
   if (!__TEST__)
-    return
+    return;
 
-  loadedMessages.clear()
+  loadedMessages.clear();
 
 }

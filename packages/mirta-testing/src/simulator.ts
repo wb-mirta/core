@@ -1,49 +1,49 @@
-import { useDefineRule, type DefineRuleSimulator, type DefineRuleOptions } from './define-rule'
-import { useTrackMqtt, type TrackMqttSimulator } from './track-mqtt'
-import { useGetDevice, type GetDeviceSimulator } from './get-device'
-import { useGetControl, type GetControlSimulator } from './get-control'
-import { defineZigbeeDevice, type ZigbeeDevice } from './define-device'
-import { type SimulatorInstance } from './types'
+import { useDefineRule, type DefineRuleSimulator, type DefineRuleOptions } from './define-rule';
+import { useTrackMqtt, type TrackMqttSimulator } from './track-mqtt';
+import { useGetDevice, type GetDeviceSimulator } from './get-device';
+import { useGetControl, type GetControlSimulator } from './get-control';
+import { defineZigbeeDevice, type ZigbeeDevice } from './define-device';
+import { type SimulatorInstance } from './types';
 
 interface CoreSimulator extends SimulatorInstance {
-  get getDevice(): GetDeviceSimulator
-  get getControl(): GetControlSimulator
-  get defineRule(): DefineRuleSimulator
-  get trackMqtt(): TrackMqttSimulator
-  defineZigbeeDevice(deviceId: string): ZigbeeDevice
+  get getDevice(): GetDeviceSimulator;
+  get getControl(): GetControlSimulator;
+  get defineRule(): DefineRuleSimulator;
+  get trackMqtt(): TrackMqttSimulator;
+  defineZigbeeDevice(deviceId: string): ZigbeeDevice;
 }
 
 interface CoreSimulatorOptions {
   /** Параметры имитатора `defineRule`. */
-  defineRule?: DefineRuleOptions
+  defineRule?: DefineRuleOptions;
 }
 
 function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
 
-  const simulators: Record<string, SimulatorInstance | undefined> = {}
+  const simulators: Record<string, SimulatorInstance | undefined> = {};
 
   function reset() {
 
     for (const key in simulators)
-      simulators[key]?.reset()
+      simulators[key]?.reset();
 
   }
 
   const getDevice = (
     simulators.getDevice ??= useGetDevice()
-  ) as GetDeviceSimulator
+  ) as GetDeviceSimulator;
 
   const getControl = (
     simulators.getControl ??= useGetControl()
-  ) as GetControlSimulator
+  ) as GetControlSimulator;
 
   const defineRule = (
     simulators.defineRule ??= useDefineRule(options.defineRule)
-  ) as DefineRuleSimulator
+  ) as DefineRuleSimulator;
 
   const trackMqtt = (
     simulators.trackMqtt ??= useTrackMqtt()
-  ) as TrackMqttSimulator
+  ) as TrackMqttSimulator;
 
   return {
     reset,
@@ -52,15 +52,15 @@ function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
     defineRule,
     trackMqtt,
     defineZigbeeDevice,
-  }
+  };
 
 }
 
-let instance: CoreSimulator | undefined
+let instance: CoreSimulator | undefined;
 
 /** Единая точка входа для настройки симуляции. */
 export function useSimulator(options: CoreSimulatorOptions = {}) {
 
-  return instance ??= createSimulator(options)
+  return instance ??= createSimulator(options);
 
 }

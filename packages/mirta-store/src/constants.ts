@@ -17,4 +17,4 @@
  * @since 0.4.0
  *
  **/
-export const THIS_PACKAGE_NAME = '@mirta/store'
+export const THIS_PACKAGE_NAME = '@mirta/store';

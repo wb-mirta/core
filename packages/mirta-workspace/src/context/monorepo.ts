@@ -1,9 +1,9 @@
-import nodePath from 'node:path'
-import { glob } from 'node:fs/promises'
-import { readPackageAsync, toPosix } from '@mirta/package'
-import { WorkspaceError } from '../errors'
+import nodePath from 'node:path';
+import { glob } from 'node:fs/promises';
+import { readPackageAsync, toPosix } from '@mirta/package';
+import { WorkspaceError } from '../errors';
 
-import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace'
+import { resolveWorkspaceContextAsync, type WorkspaceContext, type PackageManager } from './workspace';
 
 /**
  * Контекст монорепозитория, содержащий корневую директорию и список пакетов.
@@ -18,20 +18,20 @@ export interface MonorepoContext {
    * Абсолютный путь к корневой директории монорепозитория в формате POSIX.
    *
    **/
-  readonly rootDir: string
+  readonly rootDir: string;
 
   /**
    * Определённый пакетный менеджер, используемый в проекте.
    *
    **/
-  readonly manager: PackageManager
+  readonly manager: PackageManager;
 
   /**
    * Список всех пакетов, объявленных в рабочих пространствах.
    * Отсортирован по длине пути (от самых вложенных).
    *
    **/
-  readonly packages: readonly PackageDefinition[]
+  readonly packages: readonly PackageDefinition[];
 }
 
 /**
@@ -47,9 +47,9 @@ export interface PackageDefinition {
    * Имя пакета, указанное в `package.json`.
    *
    **/
-  readonly name: string
+  readonly name: string;
 
-  readonly version?: string
+  readonly version?: string;
 
   /**
    * Признак того, что пакет не предназначен для публикации.
@@ -58,14 +58,14 @@ export interface PackageDefinition {
    * Используется для защиты от случайной публикации внутренних или служебных пакетов.
    *
    **/
-  readonly isPrivate: boolean
+  readonly isPrivate: boolean;
 
   /**
    * Путь к пакету относительно корня монорепозитория.
    * Используется для сопоставления чанков с пакетами.
    *
    **/
-  readonly workspacePath: string
+  readonly workspacePath: string;
 }
 
 /**
@@ -75,7 +75,7 @@ export interface PackageDefinition {
  * @since 0.4.0
  *
  **/
-const packagesCache = new Map<string, readonly PackageDefinition[]>()
+const packagesCache = new Map<string, readonly PackageDefinition[]>();
 
 /**
  * Сбрасывает внутреннее состояние модуля, очищая кэш обнаруженных пакетов.
@@ -93,9 +93,9 @@ const packagesCache = new Map<string, readonly PackageDefinition[]>()
 export function __resetInternalState() {
 
   if (!__TEST__)
-    return
+    return;
 
-  packagesCache.clear()
+  packagesCache.clear();
 
 }
 
@@ -120,15 +120,15 @@ export async function resolveMonorepoContextAsync(
   cwd: string
 ): Promise<MonorepoContext> {
 
-  const context = await resolveWorkspaceContextAsync(cwd)
+  const context = await resolveWorkspaceContextAsync(cwd);
 
-  const packages = await resolveMonorepoPackagesAsync(context)
+  const packages = await resolveMonorepoPackagesAsync(context);
 
   return {
     rootDir: context.rootDir,
     manager: context.manager,
     packages,
-  }
+  };
 
 }
 
@@ -154,36 +154,36 @@ export async function resolveMonorepoPackagesAsync(
 
 ): Promise<readonly PackageDefinition[]> {
 
-  const { rootDir, workspaces = [] } = context
+  const { rootDir, workspaces = [] } = context;
 
-  const cachedPackages = packagesCache.get(rootDir)
+  const cachedPackages = packagesCache.get(rootDir);
 
   // 1. Проверяем кэш
   if (cachedPackages !== undefined)
-    return cachedPackages
+    return cachedPackages;
 
   // 2. Пробуем найти пакеты, фиксируясь на обязательном наличии `package.json`
-  const pkgPatterns = workspaces.map(w => `${w}/package.json`)
+  const pkgPatterns = workspaces.map(w => `${w}/package.json`);
 
-  const packages: PackageDefinition[] = []
+  const packages: PackageDefinition[] = [];
 
   for await (const rawPkgPath of glob(pkgPatterns, {
     cwd: rootDir,
     exclude: ['node_modules/**'],
   })) {
 
-    const pkgPath = toPosix(rawPkgPath)
-    const pkg = await readPackageAsync(`${rootDir}/${pkgPath}`)
+    const pkgPath = toPosix(rawPkgPath);
+    const pkg = await readPackageAsync(`${rootDir}/${pkgPath}`);
 
     if (!pkg.name)
-      throw WorkspaceError.get('noPackageName', pkgPath)
+      throw WorkspaceError.get('noPackageName', pkgPath);
 
     packages.push({
       name: pkg.name,
       version: pkg.version,
       isPrivate: pkg.private === true,
       workspacePath: nodePath.dirname(pkgPath),
-    })
+    });
 
   }
 
@@ -195,19 +195,19 @@ export async function resolveMonorepoPackagesAsync(
   //
   packages.sort((a, b) => {
 
-    const lengthDiff = b.workspacePath.length - a.workspacePath.length
+    const lengthDiff = b.workspacePath.length - a.workspacePath.length;
 
     if (lengthDiff !== 0)
-      return lengthDiff
+      return lengthDiff;
 
-    return a.workspacePath.localeCompare(b.workspacePath) // Лексикографически
+    return a.workspacePath.localeCompare(b.workspacePath); // Лексикографически
 
-  })
+  });
 
-  const frozenPackages = Object.freeze(packages)
+  const frozenPackages = Object.freeze(packages);
 
-  packagesCache.set(rootDir, frozenPackages)
+  packagesCache.set(rootDir, frozenPackages);
 
-  return frozenPackages
+  return frozenPackages;
 
 }

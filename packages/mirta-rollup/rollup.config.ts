@@ -1,4 +1,4 @@
-import { definePackageConfig } from '#src/index'
+import { definePackageConfig } from '#src/index';
 
 export default definePackageConfig({
   input: [
@@ -6,4 +6,4 @@ export default definePackageConfig({
     'src/config.ts',
     'src/config-package.ts',
   ],
-})
+});

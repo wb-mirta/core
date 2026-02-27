@@ -1,13 +1,13 @@
-import { isNumber, isString } from './guards'
+import { isNumber, isString } from './guards';
 
 export const mqttToBoolean = (value: WbRules.MqttValue): boolean => {
 
   if (isString(value))
-    return !['', '0', 'off', 'false'].includes(value)
+    return !['', '0', 'off', 'false'].includes(value);
 
   if (isNumber(value))
-    return value !== 0
+    return value !== 0;
 
-  return value
+  return value;
 
-}
+};

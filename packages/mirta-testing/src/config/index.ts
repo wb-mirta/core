@@ -1,10 +1,10 @@
-import nodePath from 'node:path'
-import { defineConfig, configDefaults, type TestProjectConfiguration } from 'vitest/config'
-import { resolveMonorepoContextAsync } from '@mirta/workspace'
-import { loadEnv } from '@mirta/env-loader'
+import nodePath from 'node:path';
+import { defineConfig, configDefaults, type TestProjectConfiguration } from 'vitest/config';
+import { resolveMonorepoContextAsync } from '@mirta/workspace';
+import { loadEnv } from '@mirta/env-loader';
 
-const cwd = process.cwd()
-const { rootDir, packages } = await resolveMonorepoContextAsync(cwd)
+const cwd = process.cwd();
+const { rootDir, packages } = await resolveMonorepoContextAsync(cwd);
 
 /**
  * Формирует конфигурации проектов Vitest для каждого пакета монорепозитория в соответствии с указанным режимом.
@@ -15,7 +15,7 @@ const { rootDir, packages } = await resolveMonorepoContextAsync(cwd)
 function getProjects(mode: string) {
 
   if (packages.length === 0)
-    return
+    return;
 
   return packages.map<TestProjectConfiguration>(pkg => ({
     extends: true,
@@ -31,7 +31,7 @@ function getProjects(mode: string) {
         enabled: true,
       },
     },
-  }))
+  }));
 
 }
 
@@ -48,9 +48,9 @@ export default defineConfig(({ mode }) => ({
     // Здесь осуществляется перенаправление на src/index.ts
     alias: packages.reduce<Record<string, string>>((items, nextItem) => {
 
-      items[nextItem.name] = nodePath.join(rootDir, nextItem.workspacePath, 'src')
+      items[nextItem.name] = nodePath.join(rootDir, nextItem.workspacePath, 'src');
 
-      return items
+      return items;
 
     }, {}),
   },
@@ -74,4 +74,4 @@ export default defineConfig(({ mode }) => ({
     ],
     projects: getProjects(mode),
   },
-}))
+}));

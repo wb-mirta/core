@@ -1,7 +1,7 @@
-import chalk from 'chalk'
-import { getLocale } from '#src/i18n'
+import chalk from 'chalk';
+import { getLocale } from '#src/i18n';
 
-const { dim, yellow } = chalk
+const { dim, yellow } = chalk;
 
 const helpMessageEn = `\
 Performs operations over projects powered by the Mirta Framework.
@@ -50,7 +50,7 @@ ${yellow(`Options for 'deploy':`)}
     ${dim('Use custom configuration file.')}
   --insecure
     ${dim('Disable security warnings.')}
-`
+`;
 
 const helpMessageRu = `\
 Выполняет операции над проектами, работающими на базе фреймворка Mirta.
@@ -97,9 +97,9 @@ ${yellow(`Опции для 'deploy':`)}
     ${dim('Использовать кастомный файл конфигурации.')}
   --insecure
     ${dim('Отключить предупреждения безопасности.')}
-`
+`;
 
 export const getHelpMessage
   = () => getLocale() === 'ru-RU'
     ? helpMessageRu
-    : helpMessageEn
+    : helpMessageEn;

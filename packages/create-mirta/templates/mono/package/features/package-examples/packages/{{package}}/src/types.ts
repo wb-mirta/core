@@ -2,13 +2,13 @@
 export interface ThermostatOptions {
 
   /** MQTT-топик датчика температуры. */
-  sensorTopic: string
+  sensorTopic: string;
 
   /** MQTT-топик нагревательного элемента. */
-  heaterTopic: string
+  heaterTopic: string;
 
   /** Начальное значение целевой температуры. */
-  targetTemp: number
+  targetTemp: number;
 
   /**
    * Разница температур для предотвращения частых переключений между включением и выключением нагрева.
@@ -21,5 +21,5 @@ export interface ThermostatOptions {
    * точность поддержания заданной температуры снизится.
    *
    **/
-  hysteresis?: number
+  hysteresis?: number;
 }

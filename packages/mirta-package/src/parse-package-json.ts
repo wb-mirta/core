@@ -1,5 +1,5 @@
-import { PackageError } from './errors'
-import type { Package } from './types'
+import { PackageError } from './errors';
+import type { Package } from './types';
 
 /**
  * Парсит строку JSON и возвращает объект типа {@link Package}.
@@ -24,11 +24,11 @@ import type { Package } from './types'
  **/
 export function parsePackageJson(content: string) {
 
-  const parsed = JSON.parse(content) as unknown
+  const parsed = JSON.parse(content) as unknown;
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
-    throw PackageError.get('invalidJsonRoot')
+    throw PackageError.get('invalidJsonRoot');
 
-  return parsed as Package
+  return parsed as Package;
 
 }

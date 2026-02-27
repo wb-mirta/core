@@ -1,4 +1,4 @@
-import { defineStore } from '@mirta/store'
+import { defineStore } from '@mirta/store';
 
 export const useCounterStore = defineStore('counter', {
 
@@ -18,16 +18,16 @@ export const useCounterStore = defineStore('counter', {
 
     increment() {
 
-      this.count++
+      this.count++;
 
     },
 
     setCount(value: number) {
 
-      this.count = value
+      this.count = value;
 
     },
 
   },
 
-})
+});

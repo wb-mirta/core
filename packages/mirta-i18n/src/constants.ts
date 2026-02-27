@@ -1,4 +1,4 @@
-import type { Locale } from './types'
+import type { Locale } from './types';
 
 /**
  * Имя текущего пакета в формате, используемом в npm-реестре.
@@ -8,7 +8,7 @@ import type { Locale } from './types'
  * @internal
  *
  **/
-export const THIS_PACKAGE_NAME = '@mirta/i18n'
+export const THIS_PACKAGE_NAME = '@mirta/i18n';
 
 /**
  * Локаль по умолчанию (fallback), если параметр `options.fallbackLocale` не указан.
@@ -18,4 +18,4 @@ export const THIS_PACKAGE_NAME = '@mirta/i18n'
  * @internal
  *
  **/
-export const DEFAULT_FALLBACK_LOCALE = 'en-US' as Locale
+export const DEFAULT_FALLBACK_LOCALE = 'en-US' as Locale;

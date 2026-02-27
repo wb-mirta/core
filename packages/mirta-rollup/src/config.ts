@@ -1,4 +1,4 @@
-import { defineRuntimeConfig } from '#configs/runtime'
+import { defineRuntimeConfig } from '#configs/runtime';
 
 /**
  * Конфигурация Rollup по умолчанию, предназначенная
@@ -7,4 +7,4 @@ import { defineRuntimeConfig } from '#configs/runtime'
  * @since 0.4.0
  *
  **/
-export default defineRuntimeConfig()
+export default defineRuntimeConfig();

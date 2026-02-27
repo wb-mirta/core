@@ -1,7 +1,7 @@
-import { mqttToBoolean, useEvent, type OnEvent } from '@mirta/basics'
-import type { DeviceContext } from './device'
-import { getControlSafe } from './get-control-safe'
-import type { ReadonlyPropWhen, StrictWhenSpecified } from './type-utils'
+import { mqttToBoolean, useEvent, type OnEvent } from '@mirta/basics';
+import type { DeviceContext } from './device';
+import { getControlSafe } from './get-control-safe';
+import type { ReadonlyPropWhen, StrictWhenSpecified } from './type-utils';
 
 /**
  * Набор политик, управляющих доступностью смены значения контрола.
@@ -53,7 +53,7 @@ export enum ChangePolicies {
  * @since 0.2.0
  *
  **/
-export type ChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.Public | ChangePolicies.Script>}`
+export type ChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.Public | ChangePolicies.Script>}`;
 
 /**
  * Определяет политику установки значений контролов виртуальных устройств.
@@ -61,33 +61,33 @@ export type ChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.Public | Ch
  * @since 0.2.0
  *
  **/
-export type VirtualChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.ReadOnly>}`
+export type VirtualChangePolicy = `${Exclude<ChangePolicies, ChangePolicies.ReadOnly>}`;
 
 interface ControlOptions<
   TControl extends WbRules.ControlType,
   TValue
 > {
-  type: TControl
-  defaultValue?: TValue
-  forceDefault?: boolean
-  lazyInit?: boolean
-  changePolicy?: VirtualChangePolicy | ChangePolicy
+  type: TControl;
+  defaultValue?: TValue;
+  forceDefault?: boolean;
+  lazyInit?: boolean;
+  changePolicy?: VirtualChangePolicy | ChangePolicy;
 }
 
 type ValueEventHandler<TValue>
-  = (newValue: TValue, oldValue: TValue) => void
+  = (newValue: TValue, oldValue: TValue) => void;
 
 export interface Control<TValue> {
   /** Актуальное значение контрола. */
-  value: TValue
+  value: TValue;
   /** Событие, происходящее когда поступило новое значение. */
-  onValueReceived: OnEvent<ValueEventHandler<TValue>>
+  onValueReceived: OnEvent<ValueEventHandler<TValue>>;
   /** Событие, происходящее когда значение изменилось. */
-  onValueChanged: OnEvent<ValueEventHandler<TValue>>
+  onValueChanged: OnEvent<ValueEventHandler<TValue>>;
 }
 
 export type MaybeReadonlyControl<TValue, TReadonly extends boolean | undefined>
-  = ReadonlyPropWhen<Control<TValue>, 'value', TReadonly>
+  = ReadonlyPropWhen<Control<TValue>, 'value', TReadonly>;
 
 const typeMappings = {
   'text': 'string',
@@ -97,7 +97,7 @@ const typeMappings = {
   'rgb': 'string',
   'range': 'number',
   'alarm': 'boolean',
-} as const
+} as const;
 
 /**
  * Создаёт контрол устройства.
@@ -115,38 +115,38 @@ export function createControl<
   options: TOptions
 ): MaybeReadonlyControl<TReturn, TOptions['changePolicy'] extends ChangePolicies.ReadOnly ? true : false> {
 
-  const { deviceType, deviceId } = context
-  const { type, changePolicy = ChangePolicies.Default } = options
+  const { deviceType, deviceId } = context;
+  const { type, changePolicy = ChangePolicies.Default } = options;
 
   const defaultValue = 'defaultValue' in options
     ? options['defaultValue']
-    : void 0
+    : void 0;
 
-  const control = getControlSafe(context, controlId)
+  const control = getControlSafe(context, controlId);
 
   /** Отправляет новое значение в контрол устройства. */
   const emitValue = (newValue: TReturn) => {
 
     if (newValue === void 0)
-      return
+      return;
 
     if (deviceType === 'zigbee') {
 
-      publish(`zigbee2mqtt/${deviceId}/set`, JSON.stringify({ [controlId]: newValue }))
+      publish(`zigbee2mqtt/${deviceId}/set`, JSON.stringify({ [controlId]: newValue }));
 
     }
     else {
 
-      control.safe?.setValue(newValue)
+      control.safe?.setValue(newValue);
 
     }
 
-  }
+  };
 
-  const valueReceived = useEvent<ValueEventHandler<TReturn>>()
-  const valueChanged = useEvent<ValueEventHandler<TReturn>>()
+  const valueReceived = useEvent<ValueEventHandler<TReturn>>();
+  const valueChanged = useEvent<ValueEventHandler<TReturn>>();
 
-  let localValue: TReturn
+  let localValue: TReturn;
 
   /**
    * Устанавливает новое значение, если оно отличается от существующего.
@@ -156,63 +156,63 @@ export function createControl<
    **/
   function setValue(newValue: TReturn, preventEmit = false) {
 
-    const oldValue = localValue
+    const oldValue = localValue;
 
-    valueReceived.raise(newValue, oldValue)
+    valueReceived.raise(newValue, oldValue);
 
     if (oldValue === newValue)
-      return
+      return;
 
-    localValue = newValue
+    localValue = newValue;
 
     if (!preventEmit)
-      emitValue(newValue)
+      emitValue(newValue);
 
-    valueChanged.raise(newValue, oldValue)
+    valueChanged.raise(newValue, oldValue);
 
   }
 
   trackMqtt(`/devices/${deviceId}/controls/${controlId}`, (payload) => {
 
-    const incomingType = typeof payload.value
-    const expectingType = typeMappings[type]
+    const incomingType = typeof payload.value;
+    const expectingType = typeMappings[type];
 
-    let value: TReturn
+    let value: TReturn;
 
     if (incomingType === 'string' && expectingType === 'number') {
 
-      const parsedValue = Number(payload.value)
+      const parsedValue = Number(payload.value);
 
       if (isNaN(parsedValue)) {
 
-        log.error(`Value ignored: control '${deviceId}/${controlId}' expects number, but Number(value) is NaN.`)
-        return
+        log.error(`Value ignored: control '${deviceId}/${controlId}' expects number, but Number(value) is NaN.`);
+        return;
 
       }
 
-      value = parsedValue as TReturn
+      value = parsedValue as TReturn;
 
     }
     else if (expectingType === 'boolean') {
 
-      value = mqttToBoolean(payload.value) as TReturn
+      value = mqttToBoolean(payload.value) as TReturn;
 
     }
     else if (incomingType !== expectingType) {
 
-      log.error(`Value ignored: control '${deviceId}/${controlId}' expects type '${expectingType}', but received '${incomingType}'`)
-      return
+      log.error(`Value ignored: control '${deviceId}/${controlId}' expects type '${expectingType}', but received '${incomingType}'`);
+      return;
 
     }
     else {
 
-      value = payload.value as TReturn
+      value = payload.value as TReturn;
 
     }
 
-    setValue(value, true)
+    setValue(value, true);
 
-  })
+  });
 
   return {
 
@@ -221,14 +221,14 @@ export function createControl<
       if (localValue === undefined) {
 
         if (options.forceDefault)
-          return localValue = defaultValue as TReturn
+          return localValue = defaultValue as TReturn;
 
         if (!options.lazyInit)
-          return localValue ??= control.safe?.getValue() as TReturn
+          return localValue ??= control.safe?.getValue() as TReturn;
 
       }
 
-      return localValue
+      return localValue;
 
     },
 
@@ -236,18 +236,18 @@ export function createControl<
 
       if (changePolicy === ChangePolicies.ReadOnly) {
 
-        log.warning(`A new value of '${deviceId}/${controlId}' has been rejected: control is readonly.`)
-        return
+        log.warning(`A new value of '${deviceId}/${controlId}' has been rejected: control is readonly.`);
+        return;
 
       }
 
-      setValue(newValue)
+      setValue(newValue);
 
     },
 
     onValueReceived: valueReceived.on,
 
     onValueChanged: valueChanged.on,
-  }
+  };
 
 }

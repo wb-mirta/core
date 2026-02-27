@@ -7,7 +7,7 @@
 export class BuildError extends Error {
 
   /** Код ошибки для программной идентификации. */
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор для создания экземпляра ошибки.
@@ -19,14 +19,14 @@ export class BuildError extends Error {
    **/
   private constructor(message: string, code: string, scope = '@mirta/rollup') {
 
-    super(`[${scope}] ${message}`)
+    super(`[${scope}] ${message}`);
 
-    this.name = 'BuildError'
-    this.code = code
+    this.name = 'BuildError';
+    this.code = code;
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, BuildError.get)
+      Error.captureStackTrace(this, BuildError.get);
 
   }
 
@@ -37,7 +37,7 @@ export class BuildError extends Error {
     chunkOutsidePackage: (chunkName: string, packageName: string, workspacePath: string) =>
       `Chunk "${chunkName}" is not within package "${packageName}" workspace path "${workspacePath}"`,
 
-  } as const
+  } as const;
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
@@ -54,11 +54,11 @@ export class BuildError extends Error {
   ): BuildError {
 
     const messageFn
-      = this.codeMappings[code] as ((...args: unknown[]) => string)
+      = this.codeMappings[code] as ((...args: unknown[]) => string);
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new BuildError(message, code)
+    return new BuildError(message, code);
 
   }
 }
@@ -72,7 +72,7 @@ export class BuildError extends Error {
 export class NpmBuildError extends Error {
 
   /** Код ошибки для программной идентификации. */
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор для создания экземпляра ошибки.
@@ -84,14 +84,14 @@ export class NpmBuildError extends Error {
    **/
   private constructor(message: string, code: string, scope = '@mirta/rollup NPM') {
 
-    super(`[${scope}] ${message}`)
+    super(`[${scope}] ${message}`);
 
-    this.name = 'NpmBuildError'
-    this.code = code
+    this.name = 'NpmBuildError';
+    this.code = code;
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, NpmBuildError.get)
+      Error.captureStackTrace(this, NpmBuildError.get);
 
   }
 
@@ -138,7 +138,7 @@ export class NpmBuildError extends Error {
     exportMustStartWithDot: (key: string) =>
       `Package Config: Invalid export path "${key}", it must start with "."`,
 
-  } as const
+  } as const;
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
@@ -155,11 +155,11 @@ export class NpmBuildError extends Error {
   ): NpmBuildError {
 
     const messageFn
-      = this.codeMappings[code] as ((...args: unknown[]) => string)
+      = this.codeMappings[code] as ((...args: unknown[]) => string);
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new NpmBuildError(message, code)
+    return new NpmBuildError(message, code);
 
   }
 }
@@ -173,7 +173,7 @@ export class NpmBuildError extends Error {
 export class AstTransformError extends Error {
 
   /** Код ошибки для программной идентификации. */
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор для создания экземпляра ошибки.
@@ -185,13 +185,13 @@ export class AstTransformError extends Error {
    **/
   private constructor(message: string, code: string, scope = '@mirta/rollup AST') {
 
-    super(`[${scope}] ${message}`)
-    this.name = 'AstTransformError'
-    this.code = code
+    super(`[${scope}] ${message}`);
+    this.name = 'AstTransformError';
+    this.code = code;
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, AstTransformError.get)
+      Error.captureStackTrace(this, AstTransformError.get);
 
   }
 
@@ -210,7 +210,7 @@ export class AstTransformError extends Error {
     invalidChars: (path: string) =>
       `Invalid chars in path: "${path}"`,
 
-  } as const
+  } as const;
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
@@ -227,11 +227,11 @@ export class AstTransformError extends Error {
   ): AstTransformError {
 
     const messageFn
-      = this.codeMappings[code] as ((...args: unknown[]) => string)
+      = this.codeMappings[code] as ((...args: unknown[]) => string);
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new AstTransformError(message, code)
+    return new AstTransformError(message, code);
 
   }
 }

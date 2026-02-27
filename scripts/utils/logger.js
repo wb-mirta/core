@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import chalk from 'chalk';
 
 const {
   dim,
@@ -10,15 +10,15 @@ const {
   bgCyan,
   bgGreen,
   bgYellow,
-} = chalk
+} = chalk;
 
-const dot = '•'
-const banner = `Mirta ${dot}`
-const redBanner = red(banner)
-const cyanBanner = cyan(banner)
-const greenBanner = green(banner)
-const yellowBanner = yellow(banner)
-const dimmedBanner = dim(banner)
+const dot = '•';
+const banner = `Mirta ${dot}`;
+const redBanner = red(banner);
+const cyanBanner = cyan(banner);
+const greenBanner = green(banner);
+const yellowBanner = yellow(banner);
+const dimmedBanner = dim(banner);
 
 const messages = {
   info: 'Info',
@@ -27,41 +27,41 @@ const messages = {
   warn: 'Warning',
   error: 'Error',
   note: 'Note',
-}
+};
 
 /** @param {string|undefined} message */
 const infoPill = message =>
-  message ? bgCyan.black(` ${message} `) + (` ${cyan(dot)} `) : ''
+  message ? bgCyan.black(` ${message} `) + (` ${cyan(dot)} `) : '';
 
 /** @param {string|undefined} message */
 const successPill = message =>
-  message ? bgGreen.black(` ${message} `) + (` ${green(dot)} `) : ''
+  message ? bgGreen.black(` ${message} `) + (` ${green(dot)} `) : '';
 
 /** @param {string} message */
 const errorPill = message =>
-  message ? bgRed.white(` ${message} `) + (` ${red(dot)} `) : ''
+  message ? bgRed.white(` ${message} `) + (` ${red(dot)} `) : '';
 
 /** @param {string} message */
 const warnPill = message =>
-  message ? bgYellow.black(` ${message} `) + (` ${yellow(dot)} `) : ''
+  message ? bgYellow.black(` ${message} `) + (` ${yellow(dot)} `) : '';
 
 /** @param {string|undefined} message */
 export const formatMessage = message =>
-  message ? `${greenBanner} ${message}` : ''
+  message ? `${greenBanner} ${message}` : '';
 
 /**
  * @param {string} message
  * @param {string|undefined} title
  **/
 export const formatSuccess = (message, title) =>
-  message ? `${successPill(title)}${green(message)}` : ''
+  message ? `${successPill(title)}${green(message)}` : '';
 
 /**
  * @param {string} message
  * @param {string|undefined} title
  **/
 export const formatError = (message, title) =>
-  message ? `${errorPill(title)}${red(message)}` : ''
+  message ? `${errorPill(title)}${red(message)}` : '';
 
 export function useLogger() {
 
@@ -69,7 +69,7 @@ export function useLogger() {
   function log(message) {
 
     if (message)
-      console.log(`${greenBanner} ${message}`)
+      console.log(`${greenBanner} ${message}`);
 
   }
 
@@ -77,7 +77,7 @@ export function useLogger() {
   function step(message) {
 
     if (message)
-      console.log(`${dimmedBanner} ${dim(message)}`)
+      console.log(`${dimmedBanner} ${dim(message)}`);
 
   }
 
@@ -85,7 +85,7 @@ export function useLogger() {
   function info(message, title = messages.info) {
 
     if (message)
-      console.log(`${cyanBanner} ${infoPill(title)}${cyan(message)}`)
+      console.log(`${cyanBanner} ${infoPill(title)}${cyan(message)}`);
 
   }
 
@@ -93,7 +93,7 @@ export function useLogger() {
   function success(message, title = messages.success) {
 
     if (message)
-      console.log(`${greenBanner} ${successPill(title)}${green(message)}`)
+      console.log(`${greenBanner} ${successPill(title)}${green(message)}`);
 
   }
 
@@ -101,7 +101,7 @@ export function useLogger() {
   function cancel(message, title = messages.canceled) {
 
     if (message)
-      console.log(`${redBanner} ${errorPill(title)}${red(message)}`)
+      console.log(`${redBanner} ${errorPill(title)}${red(message)}`);
 
   }
 
@@ -109,7 +109,7 @@ export function useLogger() {
   function error(message, title = messages.error) {
 
     if (message)
-      console.log(`${redBanner} ${errorPill(title)}${red(message)}`)
+      console.log(`${redBanner} ${errorPill(title)}${red(message)}`);
 
   }
 
@@ -117,7 +117,7 @@ export function useLogger() {
   function warn(message, title = messages.warn) {
 
     if (message)
-      console.log(`${yellowBanner} ${warnPill(title)}${yellow(message)}`)
+      console.log(`${yellowBanner} ${warnPill(title)}${yellow(message)}`);
 
   }
 
@@ -125,7 +125,7 @@ export function useLogger() {
   function note(message, title = messages.note) {
 
     if (message)
-      console.log(`${yellowBanner} ${warnPill(title)}${message}`)
+      console.log(`${yellowBanner} ${warnPill(title)}${message}`);
 
   }
 
@@ -138,6 +138,6 @@ export function useLogger() {
     error,
     warn,
     note,
-  }
+  };
 
 }

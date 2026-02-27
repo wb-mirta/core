@@ -5,85 +5,85 @@ describe('wb-rules composite types', () => {
     const controlOptions: WbRules.ControlOptions = {
       type: 'text',
 
-    }
+    };
 
     expectTypeOf(controlOptions.enum)
-      .toEqualTypeOf<Record<string, WbRules.Title> | undefined>()
+      .toEqualTypeOf<Record<string, WbRules.Title> | undefined>();
 
-  })
+  });
 
   it('Should expand dedicated type "text"', () => {
 
     const controlOptions: WbRules.TextControlOptions = {
       type: 'text',
 
-    }
+    };
 
     expectTypeOf(controlOptions.enum)
-      .toEqualTypeOf<Record<string, WbRules.Title> | undefined>()
+      .toEqualTypeOf<Record<string, WbRules.Title> | undefined>();
 
-  })
+  });
 
   it('Should expand type "value"', () => {
 
     const controlOptions: WbRules.ControlOptions = {
       type: 'value',
-    }
+    };
 
     expectTypeOf(controlOptions.enum)
-      .toEqualTypeOf<Record<number, WbRules.Title> | undefined>()
+      .toEqualTypeOf<Record<number, WbRules.Title> | undefined>();
 
     expectTypeOf(controlOptions.min)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
     expectTypeOf(controlOptions.max)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
-  })
+  });
 
   it('Should expand dedicated type "value"', () => {
 
     const controlOptions: WbRules.ValueControlOptions = {
       type: 'value',
-    }
+    };
 
     expectTypeOf(controlOptions.enum)
-      .toEqualTypeOf<Record<number, WbRules.Title> | undefined>()
+      .toEqualTypeOf<Record<number, WbRules.Title> | undefined>();
 
     expectTypeOf(controlOptions.min)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
     expectTypeOf(controlOptions.max)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
-  })
+  });
 
   it('Should expand type "range"', () => {
 
     const controlOptions: WbRules.ControlOptions = {
       type: 'range',
-    }
+    };
 
     expectTypeOf(controlOptions.min)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
     expectTypeOf(controlOptions.max)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
-  })
+  });
 
   it('Should expand dedicated type "range"', () => {
 
     const controlOptions: WbRules.RangeControlOptions = {
       type: 'range',
-    }
+    };
 
     expectTypeOf(controlOptions.min)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
     expectTypeOf(controlOptions.max)
-      .toEqualTypeOf<number | undefined>()
+      .toEqualTypeOf<number | undefined>();
 
-  })
+  });
 
-})
+});

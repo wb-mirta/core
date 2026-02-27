@@ -9,11 +9,11 @@
 export class OperationCanceledError extends Error {
   constructor() {
 
-    super()
+    super();
 
-    this.name = 'OperationCanceledError'
+    this.name = 'OperationCanceledError';
 
-    Error.captureStackTrace(this, OperationCanceledError)
+    Error.captureStackTrace(this, OperationCanceledError);
 
   }
 }

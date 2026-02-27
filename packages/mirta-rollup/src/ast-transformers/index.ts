@@ -1,1 +1,1 @@
-export { dtsAlias } from './dts-alias'
+export { dtsAlias } from './dts-alias';

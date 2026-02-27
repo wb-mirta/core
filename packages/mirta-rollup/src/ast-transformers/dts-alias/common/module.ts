@@ -1,12 +1,12 @@
-import ts from 'typescript'
-import nodePath from 'node:path'
+import ts from 'typescript';
+import nodePath from 'node:path';
 
-import { IndexType, type VisitorContext } from './types'
-import { isProjectFile, removeFileExtension, getRelativeOutputPath } from './path'
-import { assertPathIsValid } from './security'
-import { resolveSourceFile } from './file'
+import { IndexType, type VisitorContext } from './types';
+import { isProjectFile, removeFileExtension, getRelativeOutputPath } from './path';
+import { assertPathIsValid } from './security';
+import { resolveSourceFile } from './file';
 
-import { AstTransformError } from '#utils/errors'
+import { AstTransformError } from '#utils/errors';
 
 /**
  * Анализирует путь модуля и определяет его тип (явный, неявный, пакетный или обычный).
@@ -21,12 +21,12 @@ import { AstTransformError } from '#utils/errors'
  **/
 export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFull) {
 
-  const { resolvedFileName, packageId } = resolvedModule
+  const { resolvedFileName, packageId } = resolvedModule;
 
-  const implicitPackagePath = packageId?.subModuleName
+  const implicitPackagePath = packageId?.subModuleName;
 
   // Указывает, является ли модуль частью пакета (например, 'package/index').
-  const isPackage = !!implicitPackagePath
+  const isPackage = !!implicitPackagePath;
 
   // Базовые данные разрешённого файла
 
@@ -34,11 +34,11 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
     isPackage
       ? implicitPackagePath
       : resolvedFileName
-  )
+  );
 
   const resolvedBaseNameNoExtension = resolvedBaseName
     ? removeFileExtension(resolvedBaseName)
-    : undefined
+    : undefined;
 
   // const resolvedExtension = resolvedBaseName
   //   ? nodePath.extname(resolvedFileName)
@@ -48,15 +48,15 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
 
   let baseName = isPackage
     ? undefined
-    : nodePath.basename(path)
+    : nodePath.basename(path);
 
   let baseNameNoExtension = baseName
     ? removeFileExtension(baseName)
-    : undefined
+    : undefined;
 
   let extName = baseName
     ? nodePath.extname(path)
-    : undefined
+    : undefined;
 
   // Если имя оригинального модуля совпадает с разрешённым, убираем расширение.
   if (
@@ -65,35 +65,35 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
     && resolvedBaseNameNoExtension === baseName
   ) {
 
-    baseNameNoExtension = baseName
-    extName = undefined
+    baseNameNoExtension = baseName;
+    extName = undefined;
 
   }
 
-  let indexType: IndexType
+  let indexType: IndexType;
 
   if (isPackage) {
 
     // Модуль внутри пакета (например, import 'package/index').
-    indexType = IndexType.ImplicitPackage
+    indexType = IndexType.ImplicitPackage;
 
   }
   else if (baseNameNoExtension === 'index' && resolvedBaseNameNoExtension === 'index') {
 
     // Явный импорт файла index (например, import './dir/index').
-    indexType = IndexType.Explicit
+    indexType = IndexType.Explicit;
 
   }
   else if (baseNameNoExtension !== 'index' && resolvedBaseNameNoExtension === 'index') {
 
     // Неявный импорт index (например, import './dir').
-    indexType = IndexType.Implicit
+    indexType = IndexType.Implicit;
 
   }
   else {
 
     // Обычный файл, не связанный с index.
-    indexType = IndexType.NonIndex
+    indexType = IndexType.NonIndex;
 
   }
 
@@ -102,9 +102,9 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
   //
   if (indexType === IndexType.Implicit) {
 
-    baseName = undefined
-    baseNameNoExtension = undefined
-    extName = undefined
+    baseName = undefined;
+    baseNameNoExtension = undefined;
+    extName = undefined;
 
   }
 
@@ -121,7 +121,7 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
     indexType,
     // implicitPackagePath,
     // resolvedFileName,
-  }
+  };
 
 }
 
@@ -138,7 +138,7 @@ export function getPathDetails(path: string, resolvedModule: ts.ResolvedModuleFu
  **/
 export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
 
-  assertPathIsValid(oldPath)
+  assertPathIsValid(oldPath);
 
   const {
 
@@ -148,7 +148,7 @@ export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
     // Актуальная конфигурация TypeScript.
     compilerOptions,
 
-  } = context
+  } = context;
 
   // Получаем модуль импортированного файла.
   //
@@ -157,39 +157,39 @@ export function resolveNewModulePath(context: VisitorContext, oldPath: string) {
     currentSourceFile.fileName,
     compilerOptions,
     ts.sys
-  )
+  );
 
   if (!importedModule)
-    throw AstTransformError.get('moduleNotFound', oldPath, currentSourceFile.fileName)
+    throw AstTransformError.get('moduleNotFound', oldPath, currentSourceFile.fileName);
 
   if (!isProjectFile(importedModule.resolvedFileName, context.rootDir))
-    return null
+    return null;
 
   // Получает детали пути импортированного модуля.
-  const pathDetails = getPathDetails(oldPath, importedModule)
+  const pathDetails = getPathDetails(oldPath, importedModule);
 
-  const { indexType, resolvedBaseNameNoExtension, extName } = pathDetails
+  const { indexType, resolvedBaseNameNoExtension, extName } = pathDetails;
 
-  let outputBaseName = resolvedBaseNameNoExtension ?? ''
+  let outputBaseName = resolvedBaseNameNoExtension ?? '';
 
   if (indexType === IndexType.Implicit && outputBaseName.endsWith('index'))
-    outputBaseName = outputBaseName.slice(0, -5)
+    outputBaseName = outputBaseName.slice(0, -5);
 
   if (outputBaseName && extName)
-    outputBaseName = `${outputBaseName}${extName}`
+    outputBaseName = `${outputBaseName}${extName}`;
 
   // Получает исходный файл импортированного модуля.
   const importedSourceFile = resolveSourceFile(
     context,
     importedModule.resolvedFileName
-  )
+  );
 
   const newPath = getRelativeOutputPath(
     currentSourceFile.fileName,
     importedSourceFile.fileName,
     outputBaseName
-  )
+  );
 
-  return newPath
+  return newPath;
 
 }

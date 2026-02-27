@@ -3,7 +3,7 @@
 // Адаптированная версия примера
 // https://wiki.wirenboard.com/wiki/index.php?title=Rule_Examples
 
-const deviceName = 'my-virtual-device'
+const deviceName = 'my-virtual-device';
 
 // Создаем виртуальный девайс для отображения в веб-интерфейсе.
 defineVirtualDevice(deviceName, {
@@ -29,13 +29,13 @@ defineVirtualDevice(deviceName, {
         3: { 'en': 'Crash', 'ru': 'Авария' } },
     },
   },
-})
+});
 
 defineRule({
   whenChanged: deviceName + '/value',
   then: function (newValue) {
 
-    dev[`${deviceName}/state`] = newValue
+    dev[`${deviceName}/state`] = newValue;
 
   },
-})
+});

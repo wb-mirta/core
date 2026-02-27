@@ -1,7 +1,7 @@
-import nodePath from 'node:path'
-import dotenvx from '@dotenvx/dotenvx'
-import { ensureArray, ensureCompactArray } from '@mirta/basics/array'
-import { existsSync } from 'node:fs'
+import nodePath from 'node:path';
+import dotenvx from '@dotenvx/dotenvx';
+import { ensureArray, ensureCompactArray } from '@mirta/basics/array';
+import { existsSync } from 'node:fs';
 
 /**
  * Набор префиксов для переменных окружения, которые будут загружены в проект.
@@ -25,7 +25,7 @@ import { existsSync } from 'node:fs'
  * @since 0.4.0
  *
  **/
-export const DEFAULT_ENV_PREFIXES = ['MIRTA_', 'APP_'] as const
+export const DEFAULT_ENV_PREFIXES = ['MIRTA_', 'APP_'] as const;
 
 /**
  * Интерфейс для настройки параметров `dotenvx`.
@@ -39,7 +39,7 @@ export interface DotenvOptions {
    * Кодировка файла `.env`, по умолчанию `'utf-8'`
    *
    **/
-  encoding?: string
+  encoding?: string;
 
   /**
    * Перезаписывает любые существующие переменные окружения значениями из файла `.env`
@@ -47,7 +47,7 @@ export interface DotenvOptions {
    * @default false
    *
    **/
-  overload?: boolean
+  overload?: boolean;
 
   /**
    * Выбрасывает ошибку сразу при её возникновении — например, при отсутствии файла `.env`.
@@ -55,7 +55,7 @@ export interface DotenvOptions {
    * @default false
    *
    **/
-  strict?: boolean
+  strict?: boolean;
 
   /**
    * Подавляет конкретные ошибки, например `MISSING_ENV_FILE`.
@@ -63,13 +63,13 @@ export interface DotenvOptions {
    * Ключи ошибок можно найти в [исходном коде](https://github.com/dotenvx/dotenvx/blob/main/src/lib/helpers/errors.js) библиотеки `dotenvx`.
    *
    **/
-  ignore?: string[]
+  ignore?: string[];
 
   /**
    * Путь к файлу с приватными ключами `.env.keys`, полезно для монорепозиториев.
    *
    **/
-  envKeysFile?: string
+  envKeysFile?: string;
 
   /**
    * Включает логирование для диагностики причин, почему определённые ключи или значения не устанавливаются.
@@ -77,7 +77,7 @@ export interface DotenvOptions {
    * @default false
    *
    **/
-  debug?: boolean
+  debug?: boolean;
 
   /**
    * Увеличивает уровень детализации логов.
@@ -85,7 +85,7 @@ export interface DotenvOptions {
    * @default false
    *
    **/
-  verbose?: boolean
+  verbose?: boolean;
 
   /**
    * Подавляет все сообщения в консоль, даже ошибки.
@@ -93,7 +93,7 @@ export interface DotenvOptions {
    * @default false
    *
    **/
-  quiet?: boolean
+  quiet?: boolean;
 
   /**
    * Уровень логирования. Определяет, какие сообщения будут выводиться в консоль.
@@ -107,7 +107,7 @@ export interface DotenvOptions {
     | 'info'
     | 'help'
     | 'verbose'
-    | 'debug'
+    | 'debug';
 
 }
 
@@ -125,7 +125,7 @@ export interface EnvLoaderOptions {
    * По умолчанию используется значение из `process.env.NODE_ENV`.
    *
    **/
-  mode?: string
+  mode?: string;
 
   /**
    * Префиксы для фильтрации переменных окружения.
@@ -149,13 +149,13 @@ export interface EnvLoaderOptions {
    * // → включаются переменные с `MIRTA_` или `CUSTOM_`
    *
    **/
-  prefix?: string | string[]
+  prefix?: string | string[];
 
   /**
    * Текущая рабочая директория для обнаружения и загрузки файлов `.env`.
    *
    **/
-  cwd?: string
+  cwd?: string;
 
   /**
    * Корневая директория проекта.
@@ -164,13 +164,13 @@ export interface EnvLoaderOptions {
    * Если не указана или совпадает с `cwd`, поиск в корне не выполняется.
    *
    **/
-  rootDir?: string
+  rootDir?: string;
 
   /**
    * Префикс файла с переменными окружения, по умолчанию `'.env'`.
    *
    **/
-  envFile?: string | string[]
+  envFile?: string | string[];
 
   /**
    * Определяет, нужно ли включать переменную `NODE_ENV` в результат.
@@ -183,13 +183,13 @@ export interface EnvLoaderOptions {
    * утечки режима выполнения в клиентский код.
    *
    **/
-  keepNodeEnv?: boolean
+  keepNodeEnv?: boolean;
 
   /**
    * Дополнительные параметры библиотеки `dotenvx`.
    *
    **/
-  dotenv?: DotenvOptions
+  dotenv?: DotenvOptions;
 
 }
 
@@ -201,15 +201,15 @@ export interface EnvLoaderOptions {
  **/
 interface EnvResolutionOptions {
 
-  mode: string | undefined
+  mode: string | undefined;
 
-  cwd: string
+  cwd: string;
 
-  rootDir?: string
+  rootDir?: string;
 
-  envFile?: string | string[]
+  envFile?: string | string[];
 
-  quiet?: boolean
+  quiet?: boolean;
 
 }
 
@@ -232,30 +232,30 @@ function getEnvFileVariantsByMode(
 ) {
 
   if (mode === 'test' && envFile.endsWith('.local'))
-    return []
+    return [];
 
-  const envFiles: string[] = []
+  const envFiles: string[] = [];
 
   if (mode) {
 
     // 1. Формируем файлы с суффиксом .local для конкретного окружения (кроме test)
     if (mode !== 'test')
-      envFiles.push(`${envFile}.${mode}.local`)
+      envFiles.push(`${envFile}.${mode}.local`);
 
     // 2. Формируем файл для конкретного окружения без .local
-    envFiles.push(`${envFile}.${mode}`)
+    envFiles.push(`${envFile}.${mode}`);
 
   }
 
   // 3. Формируем глобальный .local-файл (кроме test)
   if (mode !== 'test')
-    envFiles.push(`${envFile}.local`)
+    envFiles.push(`${envFile}.local`);
 
   // 4. Базовый файл
-  envFiles.push(envFile)
+  envFiles.push(envFile);
 
   // Собираем список и убираем пустые элементы
-  return envFiles
+  return envFiles;
 
 }
 
@@ -269,23 +269,23 @@ function getEnvFileVariantsByMode(
  */
 export function resolveEnvFiles(options: EnvResolutionOptions) {
 
-  const { mode, cwd, rootDir, envFile = '.env', quiet } = options
+  const { mode, cwd, rootDir, envFile = '.env', quiet } = options;
 
   // Сначала — все файлы из cwd
-  const lookupDirs = [cwd]
+  const lookupDirs = [cwd];
 
   // Потом — все файлы из rootDir, если директория указана
   if (rootDir && rootDir !== cwd)
-    lookupDirs.push(rootDir)
+    lookupDirs.push(rootDir);
 
   // Преобразует envFile в массив уникальных значений:
   // удаляет дубликаты с помощью `Set`.
   //
   const envFiles = [
     ...new Set(ensureArray(envFile)),
-  ]
+  ];
 
-  const envFilesVariants = new Set<string>()
+  const envFilesVariants = new Set<string>();
 
   for (const file of envFiles) {
 
@@ -293,18 +293,18 @@ export function resolveEnvFiles(options: EnvResolutionOptions) {
 
       if (envFilesVariants.has(variant) && !quiet) {
 
-        console.warn(`[@mirta/env-loader] Redundant env file entry detected: "${file}" may be unnecessary, as it generates a file already covered by another entry.`)
-        continue
+        console.warn(`[@mirta/env-loader] Redundant env file entry detected: "${file}" may be unnecessary, as it generates a file already covered by another entry.`);
+        continue;
 
       }
 
-      envFilesVariants.add(variant)
+      envFilesVariants.add(variant);
 
     }
 
   }
 
-  const result: string[] = []
+  const result: string[] = [];
 
   // Перечисляем директории, в которых нужно выполнить поиск.
   for (const dir of lookupDirs) {
@@ -312,19 +312,19 @@ export function resolveEnvFiles(options: EnvResolutionOptions) {
     // Перемножаем на варианты .env-файлов (обычно это все вариации `.env`)
     for (const file of envFilesVariants) {
 
-      const path = nodePath.join(dir, file).replaceAll('\\', '/')
+      const path = nodePath.join(dir, file).replaceAll('\\', '/');
 
       // Самостоятельно отсеиваем несуществующие файлы,
       // чтобы предотвратить падение производительности.
       //
       if (existsSync(path))
-        result.push(path)
+        result.push(path);
 
     }
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -351,17 +351,17 @@ export function filterEnvKeys(
   // Типовой гвард для проверки ключа и значения.
   const isValidEntry = (entry: [string, string | undefined]): entry is [string, string] => {
 
-    const [key, value] = entry
+    const [key, value] = entry;
 
     if (value === undefined)
-      return false
+      return false;
 
     if (key === 'NODE_ENV')
-      return keepNodeEnv
+      return keepNodeEnv;
 
-    return prefixes.some(prefix => key.startsWith(prefix))
+    return prefixes.some(prefix => key.startsWith(prefix));
 
-  }
+  };
 
   // Фильтрация и сортировка пар "ключ-значение", гарантирует
   // детерминированный порядок ключей.
@@ -371,12 +371,12 @@ export function filterEnvKeys(
     .sort(([keyA], [keyB]) => keyA.localeCompare(keyB, 'en-US', {
       sensitivity: 'base', // Игнорирует регистр и диакритики
       numeric: true, // Числа в строках сравниваются как числа
-    }))
+    }));
 
   // Преобразует массив `[ключ, значение]` обратно в объект.
   // Гарантирует детерминированный порядок ключей.
   //
-  return Object.fromEntries(filteredEntries)
+  return Object.fromEntries(filteredEntries);
 
 }
 
@@ -402,12 +402,12 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
     keepNodeEnv = true,
     dotenv,
 
-  } = options
+  } = options;
 
   // Хранилище для загруженных переменных окружения.
-  let processEnv = { ...process.env } as Record<string, string>
+  let processEnv = { ...process.env } as Record<string, string>;
 
-  const files = resolveEnvFiles({ cwd, rootDir, mode, envFile, quiet: dotenv?.quiet })
+  const files = resolveEnvFiles({ cwd, rootDir, mode, envFile, quiet: dotenv?.quiet });
 
   if (files.length > 0)
     dotenvx.config({
@@ -424,11 +424,11 @@ export function loadEnv(options: EnvLoaderOptions = {}) {
       path: files,
       processEnv,
       convention: undefined,
-    })
+    });
 
   // Фильтрация переменных по заданным префиксам.
-  processEnv = filterEnvKeys(processEnv, ensureCompactArray(prefix), keepNodeEnv)
+  processEnv = filterEnvKeys(processEnv, ensureCompactArray(prefix), keepNodeEnv);
 
-  return processEnv
+  return processEnv;
 
 }

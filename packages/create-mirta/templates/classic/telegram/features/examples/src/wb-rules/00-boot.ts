@@ -1,4 +1,4 @@
-import { useTelegramBot } from '#wbm/bot-telegram'
+import { useTelegramBot } from '#wbm/bot-telegram';
 
 /**
  * Точка инициализации глобальных подсистем.
@@ -15,4 +15,4 @@ import { useTelegramBot } from '#wbm/bot-telegram'
  *
  **/
 
-useTelegramBot()
+useTelegramBot();

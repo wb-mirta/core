@@ -34,13 +34,13 @@ export function translit(input: string): string {
     'Э': 'E',
     'Ю': 'YU',
     'Я': 'YA',
-  }
+  };
 
-  let result = ''
+  let result = '';
 
   for (const char of input) {
 
-    result += map[char] ?? char
+    result += map[char] ?? char;
 
   }
 
@@ -49,6 +49,6 @@ export function translit(input: string): string {
     .replace(/CZI/g, 'CI')
     .replace(/CZE/g, 'CE')
     .replace(/CZY/g, 'CY')
-    .replace(/CZJ/g, 'CJ')
+    .replace(/CZJ/g, 'CJ');
 
 }

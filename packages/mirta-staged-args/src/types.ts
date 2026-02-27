@@ -1,4 +1,4 @@
-import type { Result } from './result'
+import type { Result } from './result';
 
 /**
  * Базовый интерфейс для токена опции командной строки.
@@ -17,25 +17,25 @@ interface OptionTokenBase {
    * Тип токена — опция.
    *
    **/
-  kind: 'option'
+  kind: 'option';
 
   /**
    * Индекс аргумента в исходном массиве `process.argv`.
    *
    **/
-  index: number
+  index: number;
 
   /**
    * Имя опции без префиксов (например, `config` для `--config`).
    *
    **/
-  name: string
+  name: string;
 
   /**
    * Оригинальное написание опции, включая префиксы (например, `--config`, `-c`).
    *
    **/
-  rawName: string
+  rawName: string;
 
 }
 
@@ -56,7 +56,7 @@ interface OptionTokenValue extends OptionTokenBase {
    * Значение опции в виде строки.
    *
    **/
-  value: string
+  value: string;
 
   /**
    * Флаг, указывающий, было ли значение передано "встроено" в опцию (через знак `=`).
@@ -67,7 +67,7 @@ interface OptionTokenValue extends OptionTokenBase {
    * false: `--port 3000`
    * ```
    **/
-  inlineValue: boolean
+  inlineValue: boolean;
 
 }
 
@@ -89,13 +89,13 @@ interface OptionTokenFlag extends OptionTokenBase {
    * У флагов значение отсутствует — они либо присутствуют, либо нет.
    *
    **/
-  value: undefined
+  value: undefined;
 
   /**
    * У флагов не бывает встроенного значения.
    *
    **/
-  inlineValue: undefined
+  inlineValue: undefined;
 
 }
 
@@ -110,7 +110,7 @@ interface OptionTokenFlag extends OptionTokenBase {
  * @internal
  *
  **/
-export type OptionToken = OptionTokenValue | OptionTokenFlag
+export type OptionToken = OptionTokenValue | OptionTokenFlag;
 
 /**
  * Токен позиционного аргумента.
@@ -123,13 +123,13 @@ export type OptionToken = OptionTokenValue | OptionTokenFlag
 export interface PositionalToken {
 
   /** Тип токена — позиционный аргумент. */
-  kind: 'positional'
+  kind: 'positional';
 
   /** Индекс в исходном массиве аргументов. */
-  index: number
+  index: number;
 
   /** Значение позиционного аргумента. */
-  value: string
+  value: string;
 
 }
 
@@ -145,10 +145,10 @@ export interface PositionalToken {
 export interface OptionTerminatorToken {
 
   /** Тип токена — терминатор опций. */
-  kind: 'option-terminator'
+  kind: 'option-terminator';
 
   /** Индекс в исходном массиве аргументов. */
-  index: number
+  index: number;
 
 }
 
@@ -163,15 +163,15 @@ export interface OptionTerminatorToken {
 export type Token
   = | OptionToken
     | PositionalToken // Позиционный аргумент
-    | OptionTerminatorToken // Терминатор опций
+    | OptionTerminatorToken; // Терминатор опций
 
 /**
  * Описание типа опции в схеме.
  *
  **/
 export type Option
-  = | { type: 'boolean', short?: string, default?: boolean }
-    | { type: 'string', short?: string, default?: string }
+  = | { type: 'boolean'; short?: string; default?: boolean }
+    | { type: 'string'; short?: string; default?: string };
 
 /**
  * Схема опций командной строки.
@@ -182,7 +182,7 @@ export type Option
  * @since 0.4.0
  *
  **/
-export type OptionSchema = Record<string, Option>
+export type OptionSchema = Record<string, Option>;
 
 /**
  * Выводит тип значений на основе схемы опций.
@@ -208,7 +208,7 @@ export type Values<TSchema extends OptionSchema> = {
         : boolean | undefined
       : never
 
-}
+};
 
 /**
  * Результат разбора опций на промежуточной стадии.
@@ -224,19 +224,19 @@ export interface ParsedArgs<TSchema extends OptionSchema> {
    * Значения опций, включая значения по умолчанию.
    *
    **/
-  values: Values<TSchema>
+  values: Values<TSchema>;
 
   /**
    * Позиционные аргументы, не связанные с опциями.
    *
    **/
-  positionals: string[]
+  positionals: string[];
 
   /**
    * Новый экземпляр `StagedArgs` для дальнейшего разбора.
    *
    **/
-  stagedArgs: StagedArgs
+  stagedArgs: StagedArgs;
 
 }
 
@@ -252,13 +252,13 @@ export interface ParsedArgsFinal<TSchema extends OptionSchema> {
    * Значения опций.
    *
    **/
-  values: Values<TSchema>
+  values: Values<TSchema>;
 
   /**
    * Позиционные аргументы.
    *
    **/
-  positionals: string[]
+  positionals: string[];
 
 }
 
@@ -283,7 +283,7 @@ export interface StagedArgs {
    **/
   parse<TSchema extends OptionSchema>(
     schema: TSchema,
-  ): Result<ParsedArgs<TSchema>, ParseError>
+  ): Result<ParsedArgs<TSchema>, ParseError>;
 
   /**
    * Окончательный разбор аргументов. Проверяет наличие неизвестных опций и выбрасывает ошибку.
@@ -295,7 +295,7 @@ export interface StagedArgs {
    **/
   parseFinal<TSchema extends OptionSchema>(
     schema: TSchema
-  ): Result<ParsedArgsFinal<TSchema>, ParseError>
+  ): Result<ParsedArgsFinal<TSchema>, ParseError>;
 
 }
 
@@ -311,7 +311,7 @@ export interface StagedArgs {
  * @since 0.4.0
  *
  **/
-export type SuggestFunc = (input: string, options: readonly string[]) => string | undefined
+export type SuggestFunc = (input: string, options: readonly string[]) => string | undefined;
 
 /**
  * Параметры для создания `StagedArgs`.
@@ -322,7 +322,7 @@ export type SuggestFunc = (input: string, options: readonly string[]) => string 
 export interface StagedArgsOptions {
 
   /** Функция подсказки для неизвестных опций. */
-  suggest?: SuggestFunc
+  suggest?: SuggestFunc;
 
 }
 
@@ -342,16 +342,16 @@ export interface StagedArgsOptions {
 export interface StagedArgsContext {
 
   /** Функция подсказки. */
-  suggest?: SuggestFunc
+  suggest?: SuggestFunc;
 
   /** Объединённая схема опций с предыдущих этапов. */
-  schema?: OptionSchema
+  schema?: OptionSchema;
 
   /** Имена всех известных опций (включая короткие алиасы). */
-  knownArgs?: readonly string[]
+  knownArgs?: readonly string[];
 
   /** Индексы токенов, уже обработанных на предыдущих этапах. */
-  consumedIndices?: readonly number[]
+  consumedIndices?: readonly number[];
 
 }
 
@@ -362,5 +362,5 @@ export interface StagedArgsContext {
  *
  **/
 export type ParseError
-  = | { type: 'unknown-option', option: string, suggestion?: string }
-    | { type: 'missing-value', option: string }
+  = | { type: 'unknown-option'; option: string; suggestion?: string }
+    | { type: 'missing-value'; option: string };

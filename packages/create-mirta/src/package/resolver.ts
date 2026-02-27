@@ -1,10 +1,10 @@
-import { prompts } from '#utils/prompts'
-import { t } from '#i18n'
-import { logger } from '#utils/logger'
+import { prompts } from '#utils/prompts';
+import { t } from '#i18n';
+import { logger } from '#utils/logger';
 
-const SCOPED_PACKAGE_REGEX = /^(@[^/]+)\/(.+)$/
+const SCOPED_PACKAGE_REGEX = /^(@[^/]+)\/(.+)$/;
 
-const MAX_LENGTH = 214
+const MAX_LENGTH = 214;
 
 /**
  * Информация о пакете, введённая пользователем.
@@ -22,7 +22,7 @@ export interface PackageInfo {
    * @example 'mirta-thermostat'
    *
    **/
-  name: string
+  name: string;
 
   /**
    * Полное имя пакета (с scope, если есть).
@@ -32,7 +32,7 @@ export interface PackageInfo {
    * @example '@myorg/mirta-thermostat'
    *
    **/
-  fullName: string
+  fullName: string;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface PackageInfo {
  **/
 export function hasValidLength(packageName: string) {
 
-  return packageName.length <= MAX_LENGTH
+  return packageName.length <= MAX_LENGTH;
 
 }
 
@@ -68,7 +68,7 @@ export function hasValidLength(packageName: string) {
 export function hasValidFormat(packageName: string) {
 
   return /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/
-    .test(packageName)
+    .test(packageName);
 
 }
 
@@ -100,7 +100,7 @@ export function sanitizePart(input: string): string {
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9._-]+/g, '-')
     .replace(/-+/g, '-')
-    .replace(/^[._-]+|[._-]+$/g, '')
+    .replace(/^[._-]+|[._-]+$/g, '');
 
 }
 
@@ -125,20 +125,20 @@ export function sanitizePart(input: string): string {
  **/
 export function toValidPackageName(input: string): string {
 
-  const cleanInput = input.trim()
-  const match = SCOPED_PACKAGE_REGEX.exec(cleanInput)
+  const cleanInput = input.trim();
+  const match = SCOPED_PACKAGE_REGEX.exec(cleanInput);
 
   if (!match)
-    return sanitizePart(cleanInput)
+    return sanitizePart(cleanInput);
 
-  const [, scope, name] = match
+  const [, scope, name] = match;
 
-  const cleanScope = sanitizePart(scope.slice(1)) // убираем @
-  const cleanName = sanitizePart(name)
+  const cleanScope = sanitizePart(scope.slice(1)); // убираем @
+  const cleanName = sanitizePart(name);
 
   return cleanScope.length > 0
     ? `@${cleanScope}/${cleanName}`
-    : cleanName
+    : cleanName;
 
 }
 
@@ -166,16 +166,16 @@ export async function resolvePackageInfoAsync(
   input?: string
 ): Promise<PackageInfo> {
 
-  let packageName: string | undefined
+  let packageName: string | undefined;
 
   if (input && hasValidLength(input) && hasValidFormat(input)) {
 
-    packageName = input
+    packageName = input;
 
   }
   else {
 
-    logger.step(t('package.caption'))
+    logger.step(t('package.caption'));
 
     const answer = await prompts({
       type: 'text',
@@ -187,22 +187,22 @@ export async function resolvePackageInfoAsync(
       validate: (value: string) => {
 
         if (!hasValidLength(value))
-          return t('packageName.tooLong', { maxLength: MAX_LENGTH })
+          return t('packageName.tooLong', { maxLength: MAX_LENGTH });
 
         if (!hasValidFormat(value))
-          return t(`packageName.invalidFormat`)
+          return t(`packageName.invalidFormat`);
 
-        return true
+        return true;
 
       },
 
-    }) as { packageName: string }
+    }) as { packageName: string };
 
-    packageName = answer.packageName
+    packageName = answer.packageName;
 
   }
 
-  const scopeMatch = SCOPED_PACKAGE_REGEX.exec(packageName)
+  const scopeMatch = SCOPED_PACKAGE_REGEX.exec(packageName);
 
   return {
 
@@ -212,6 +212,6 @@ export async function resolvePackageInfoAsync(
     // Полное название пакета
     fullName: packageName,
 
-  }
+  };
 
 }

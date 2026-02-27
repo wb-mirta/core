@@ -5,7 +5,7 @@
  * @since 0.4.0
  *
  **/
-export type Locale = Branded<string, 'Locale'>
+export type Locale = Branded<string, 'Locale'>;
 
 /**
  * Тип для языкового кода (например, 'en', 'ru'), выделенного из локали.
@@ -14,7 +14,7 @@ export type Locale = Branded<string, 'Locale'>
  * @since 0.4.0
  *
  **/
-export type Lang = Branded<string, 'Lang'>
+export type Lang = Branded<string, 'Lang'>;
 
 /**
  * Допустимые типы значений переменных в сообщениях локализации.
@@ -24,7 +24,7 @@ export type Lang = Branded<string, 'Lang'>
  * @private
  *
  **/
-export type MessageVariable = string | number | null | undefined
+export type MessageVariable = string | number | null | undefined;
 
 /**
  * Базовый интерфейс для описания структуры сообщений и переменных локали.
@@ -39,14 +39,14 @@ export interface GenericShape {
    * Ключ — идентификатор сообщения, значение — строка с текстом или шаблоном.
    *
    **/
-  messages: Record<string, string | undefined>
+  messages: Record<string, string | undefined>;
 
   /**
    * Опциональные типы переменных для каждого сообщения.
    * Позволяет строго типизировать переменные при вызове `t(...)`.
    *
    **/
-  variables: Record<string, Record<string, MessageVariable>>
+  variables: Record<string, Record<string, MessageVariable>>;
 
 }
 
@@ -66,11 +66,11 @@ export interface GenericShape {
  **/
 export interface LocaleAsset<TShape extends GenericShape> {
 
-  readonly locale: Locale
+  readonly locale: Locale;
 
-  readonly lang: Lang
+  readonly lang: Lang;
 
-  readonly messages: TShape['messages']
+  readonly messages: TShape['messages'];
 
 }
 
@@ -90,7 +90,7 @@ export interface LocaleAsset<TShape extends GenericShape> {
 export type VariablesOf<TShape extends GenericShape, K extends keyof TShape['messages']>
   = K extends keyof TShape['variables']
     ? TShape['variables'][K]
-    : never
+    : never;
 
 /**
  * Переводчик сообщений для текущей локали.
@@ -128,7 +128,7 @@ export interface Translator<TShape extends GenericShape> {
   <TMessageKey extends keyof TShape['messages']>(
     key: TMessageKey,
     variables?: VariablesOf<TShape, TMessageKey>
-  ): string
+  ): string;
 
   /**
    * Возвращает сообщение без интерполяции. Подходит для динамических ключей.
@@ -139,7 +139,7 @@ export interface Translator<TShape extends GenericShape> {
    * @returns Значение сообщения или `fallbackValue`
    *
    **/
-  plain: (key: string, fallbackValue?: string) => string
+  plain: (key: string, fallbackValue?: string) => string;
 
 }
 
@@ -155,7 +155,7 @@ export interface Localization<TShape extends GenericShape> {
    * Возвращает текущую активную локаль.
    *
    **/
-  getLocale: () => Locale
+  getLocale: () => Locale;
 
   /**
    * Асинхронно устанавливает новую локаль.
@@ -164,13 +164,13 @@ export interface Localization<TShape extends GenericShape> {
    * @param locale - Локаль в виде строки (например, 'ru-RU')
    *
    **/
-  setLocaleAsync: (locale: string) => Promise<void>
+  setLocaleAsync: (locale: string) => Promise<void>;
 
   /**
    * Переводчик сообщений для текущей локали.
    *
    **/
-  t: Translator<TShape>
+  t: Translator<TShape>;
 
 }
 
@@ -192,26 +192,26 @@ export interface ContextBase {
    * По умолчанию `false`.
    *
    **/
-  readonly strict: boolean
+  readonly strict: boolean;
 
   /**
    * Рабочая директория, в которой ищутся файлы локализации.
    *
    **/
-  readonly cwd: string
+  readonly cwd: string;
 
   /**
    * Текущая активная локаль.
    *
    **/
-  locale: Locale
+  locale: Locale;
 
   /**
    * Текущий язык (например, 'ru', 'en'), выделенный из активной локали.
    * Используется для определения форм множественного числа.
    *
    **/
-  lang: Lang
+  lang: Lang;
 
 }
 
@@ -228,19 +228,19 @@ export interface LocalizationContext<TShape extends GenericShape> extends Contex
    * Набор данных fallback-локали.
    *
    **/
-  readonly fallbackAsset: LocaleAsset<TShape>
+  readonly fallbackAsset: LocaleAsset<TShape>;
 
   /**
    * Набор поддерживаемых локалей.
    *
    **/
-  readonly supportedLocales: Set<Locale>
+  readonly supportedLocales: Set<Locale>;
 
   /**
    * Текущие сообщения, соответствующие активной локали.
    *
    **/
-  messages: TShape['messages']
+  messages: TShape['messages'];
 
 }
 
@@ -253,4 +253,4 @@ export interface LocalizationContext<TShape extends GenericShape> extends Contex
  * @internal
  *
  **/
-export type PluralForm = 'one' | 'few' | 'many' | 'other'
+export type PluralForm = 'one' | 'few' | 'many' | 'other';

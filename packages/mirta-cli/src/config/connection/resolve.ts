@@ -1,9 +1,9 @@
-import type { MirtaConfig, MirtaConnection } from '../types'
-import { DEFAULT_SSH_USERNAME } from '../constants'
-import { replaceEnvVars } from '#src/utils/env'
-import { isNumber, isString } from '@mirta/basics'
-import { assertConnectionIsValid } from './assert'
-import { parseConnectionString } from './parse'
+import type { MirtaConfig, MirtaConnection } from '../types';
+import { DEFAULT_SSH_USERNAME } from '../constants';
+import { replaceEnvVars } from '#src/utils/env';
+import { isNumber, isString } from '@mirta/basics';
+import { assertConnectionIsValid } from './assert';
+import { parseConnectionString } from './parse';
 
 /**
  * Разрешает имя подключения в полный объект `MirtaConnection`.
@@ -28,41 +28,41 @@ export function resolveConnection(
   input = 'default'
 ): MirtaConnection {
 
-  const inputNorm = replaceEnvVars(input)
+  const inputNorm = replaceEnvVars(input);
 
-  let connection: string | Record<string, unknown> | undefined
+  let connection: string | Record<string, unknown> | undefined;
 
   // Явная строка с протоколом
   if (/^(?:[\w]+\+)?[\w]+:\/\//.test(inputNorm)) {
 
-    connection = inputNorm
+    connection = inputNorm;
 
   }
   // Имя подключения из набора config.connections
   else if (config.connections && inputNorm in config.connections) {
 
-    connection = config.connections[inputNorm]
+    connection = config.connections[inputNorm];
 
   }
 
   if (!connection)
-    throw new Error(`Connection "${input}" not found`)
+    throw new Error(`Connection "${input}" not found`);
 
   // Если строка — парсим в объект
   if (isString(connection))
-    connection = parseConnectionString(connection)
+    connection = parseConnectionString(connection);
 
   if (connection.username === '' || connection.username === undefined)
-    connection.username = DEFAULT_SSH_USERNAME
+    connection.username = DEFAULT_SSH_USERNAME;
 
   if (connection.ttl && isNumber(connection.ttl))
-    connection.ttl = connection.ttl.toString()
+    connection.ttl = connection.ttl.toString();
 
   if (connection.port === '')
-    connection.port = undefined
+    connection.port = undefined;
 
-  assertConnectionIsValid(connection)
+  assertConnectionIsValid(connection);
 
-  return connection
+  return connection;
 
 }

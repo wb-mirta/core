@@ -1,5 +1,5 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
-import type { Locale } from '#src/types'
+import { THIS_PACKAGE_NAME } from '#src/constants';
+import type { Locale } from '#src/types';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с работой локализации.
@@ -22,7 +22,7 @@ export class SourceError extends Error {
    * Позволяет точно определить причину ошибки в обработчиках `try/catch`.
    *
    **/
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор, используемый только внутри
@@ -36,10 +36,10 @@ export class SourceError extends Error {
    **/
   private constructor(message: string, code: string, scope?: string) {
 
-    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`);
 
-    this.name = 'SourceError'
-    this.code = code
+    this.name = 'SourceError';
+    this.code = code;
 
     // Захватываем стек вызовов, исключая фабричный метод `get`,
     // чтобы улучшить читаемость трассировки.
@@ -51,7 +51,7 @@ export class SourceError extends Error {
         ? SourceError.getScoped
         // eslint-disable-next-line @typescript-eslint/unbound-method
         : SourceError.get
-      )
+      );
 
   }
 
@@ -87,17 +87,17 @@ export class SourceError extends Error {
     'parse.invalidJsonRoot': () =>
       'Invalid JSON: root must be an object, not an array or primitive value',
 
-  } as const
+  } as const;
 
   static isFileError(error: unknown): error is SourceError {
 
-    return error instanceof SourceError && error.code.startsWith('file.')
+    return error instanceof SourceError && error.code.startsWith('file.');
 
   }
 
   static isParseError(error: unknown): error is SourceError {
 
-    return error instanceof SourceError && error.code.startsWith('parse.')
+    return error instanceof SourceError && error.code.startsWith('parse.');
 
   }
 
@@ -122,11 +122,11 @@ export class SourceError extends Error {
   ): SourceError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new SourceError(message, code)
+    return new SourceError(message, code);
 
   }
 
@@ -159,11 +159,11 @@ export class SourceError extends Error {
   ): SourceError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new SourceError(message, code, scope)
+    return new SourceError(message, code, scope);
 
   }
 }

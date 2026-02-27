@@ -1,16 +1,16 @@
-import { defineTelegramBot, defineAuthorization } from '@mirta/chatbot'
+import { defineTelegramBot, defineAuthorization } from '@mirta/chatbot';
 
 // Актуальные значения переменных окружения берутся из файла .env.local
 
-const token = process.env.APP_TELEGRAM_TOKEN
+const token = process.env.APP_TELEGRAM_TOKEN;
 
 if (!token)
-  throw new Error('APP_TELEGRAM_TOKEN is required')
+  throw new Error('APP_TELEGRAM_TOKEN is required');
 
-const allowedUserId = process.env.APP_TELEGRAM_USER
+const allowedUserId = process.env.APP_TELEGRAM_USER;
 
 if (!allowedUserId)
-  throw new Error('APP_TELEGRAM_USER is required')
+  throw new Error('APP_TELEGRAM_USER is required');
 
 const auth = defineAuthorization(a => a
   // Политика: администраторы
@@ -20,7 +20,7 @@ const auth = defineAuthorization(a => a
       .userId(allowedUserId)
     )
   )
-)
+);
 
 /**
  * Функция для получения экземпляра Telegram-бота.
@@ -51,4 +51,4 @@ export const useTelegramBot = defineTelegramBot(auth, {
     counter_decrease: { policy: 'admin' },
     counter_increase: { policy: 'admin' },
   },
-})
+});

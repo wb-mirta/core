@@ -1,5 +1,5 @@
-import { deleteAsync, type Options as DelOptions } from 'del'
-import type { AsyncPluginHooks, Plugin } from 'rollup'
+import { deleteAsync, type Options as DelOptions } from 'del';
+import type { AsyncPluginHooks, Plugin } from 'rollup';
 
 export interface Options extends DelOptions {
 
@@ -7,12 +7,12 @@ export interface Options extends DelOptions {
    * Rollup hook the plugin should use.
    * @default 'buildStart'
   */
-  readonly hook?: AsyncPluginHooks
+  readonly hook?: AsyncPluginHooks;
 
   /**
    * Delete items once. Useful in watch mode.
    */
-  readonly runOnce?: boolean
+  readonly runOnce?: boolean;
 
   /**
    * Patterns of files and folders to be deleted.
@@ -30,13 +30,13 @@ export interface Options extends DelOptions {
    *
    * @default []
    */
-  readonly targets?: readonly string[] | string
+  readonly targets?: readonly string[] | string;
 
   /**
    * Outputs removed files and folders to console.
    * @default false
    */
-  readonly verbose?: boolean
+  readonly verbose?: boolean;
 }
 
 export default function del(options: Options = {}): Plugin {
@@ -46,39 +46,39 @@ export default function del(options: Options = {}): Plugin {
     runOnce = false,
     targets = [],
     verbose = false,
-  } = options
+  } = options;
 
-  let isDeleted = false
+  let isDeleted = false;
 
   return {
     name: 'del',
     [hook]: async () => {
 
       if (runOnce && isDeleted)
-        return
+        return;
 
-      const paths = await deleteAsync(targets, options)
+      const paths = await deleteAsync(targets, options);
 
       if (verbose || options.dryRun) {
 
         const message = options.dryRun
           ? `Expected files and folders to be deleted: ${paths.length.toString()}`
-          : `Deleted files and folders: ${paths.length.toString()}`
+          : `Deleted files and folders: ${paths.length.toString()}`;
 
-        console.log(message)
+        console.log(message);
 
         if (paths.length)
           paths.forEach((path) => {
 
-            console.log(path)
+            console.log(path);
 
-          })
+          });
 
       }
 
-      isDeleted = true
+      isDeleted = true;
 
     },
-  }
+  };
 
 }

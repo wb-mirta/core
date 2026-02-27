@@ -1,10 +1,10 @@
-import { ExecutionResult, OperationCanceledError, STDIO_CAPTURE_ERRORS, STDIO_CAPTURE_OUTPUT, STDIO_PIPED } from '#utils/shell'
-import { AuthContext } from '#auth/types'
-import { t } from '#i18n'
-import { logger } from '#utils/logger'
-import { prompts } from '#utils/prompts'
-import chalk from 'chalk'
-import { SSH_DIR } from '#auth/constants'
+import { ExecutionResult, OperationCanceledError, STDIO_CAPTURE_ERRORS, STDIO_CAPTURE_OUTPUT, STDIO_PIPED } from '#utils/shell';
+import { AuthContext } from '#auth/types';
+import { t } from '#i18n';
+import { logger } from '#utils/logger';
+import { prompts } from '#utils/prompts';
+import chalk from 'chalk';
+import { SSH_DIR } from '#auth/constants';
 
 /**
  * Приоритетные типы SSH-ключей, используемые при выборе ключа хоста.
@@ -19,7 +19,7 @@ const HOST_KEY_PRIORITY = [
   'ssh-ed25519',
   'ecdsa-sha2-nistp256',
   'ssh-rsa',
-] as const
+] as const;
 
 /**
  * Тип, представляющий допустимые алгоритмы публичных ключей SSH.
@@ -28,7 +28,7 @@ const HOST_KEY_PRIORITY = [
  * @since 0.4.5
  *
  **/
-type HostKeyType = typeof HOST_KEY_PRIORITY[number]
+type HostKeyType = typeof HOST_KEY_PRIORITY[number];
 
 /**
  * Интерфейс, описывающий информацию об открытом ключе удалённого SSH-хоста.
@@ -42,21 +42,21 @@ interface HostKey {
    * Алгоритм криптографического ключа.
    *
    **/
-  type: HostKeyType
+  type: HostKeyType;
 
   /**
    * Полная строка записи ключа в формате, возвращаемом `ssh-keyscan`.
    * Содержит имя хоста, тип ключа и его значение.
    *
    **/
-  entry: string
+  entry: string;
 
   /**
    * Отпечаток ключа в формате `SHA256:...`.
    * Отображается пользователю для проверки подлинности хоста.
    *
    **/
-  fingerprint: string
+  fingerprint: string;
 
 }
 
@@ -80,14 +80,14 @@ export async function hasKnownHostAsync(context: AuthContext) {
 
     const response = await context.runAsync('ssh-keygen', ['-F', context.hostname], {
       stdio: STDIO_CAPTURE_OUTPUT,
-    })
+    });
 
-    return response.stdout.length > 0
+    return response.stdout.length > 0;
 
   }
   catch {
 
-    return false
+    return false;
 
   }
 
@@ -112,7 +112,7 @@ export async function fetchHostKeyAsync(
   context: AuthContext
 ): Promise<HostKey | undefined> {
 
-  let result: ExecutionResult | undefined
+  let result: ExecutionResult | undefined;
 
   try {
 
@@ -125,52 +125,52 @@ export async function fetchHostKeyAsync(
       context.hostname,
     ], {
       stdio: STDIO_CAPTURE_OUTPUT,
-    })
+    });
 
   }
   catch {
 
-    return
+    return;
 
   }
 
-  const entries = result.stdout.trim().split('\n').filter(Boolean)
-  const keys: HostKey[] = []
+  const entries = result.stdout.trim().split('\n').filter(Boolean);
+  const keys: HostKey[] = [];
 
   for (const entry of entries) {
 
     if (entry.startsWith('#'))
-      continue
+      continue;
 
-    const [host, type, key] = entry.split(/\s+/) as [string, HostKeyType | undefined, string]
+    const [host, type, key] = entry.split(/\s+/) as [string, HostKeyType | undefined, string];
 
     if (!host || !type || !key)
-      continue
+      continue;
 
     if (!HOST_KEY_PRIORITY.includes(type))
-      continue
+      continue;
 
     const fingerprintResult = await context.runAsync(
       'ssh-keygen', ['-lf', '-'], {
         stdio: STDIO_PIPED,
         input: `${type} ${key}`,
-      })
+      });
 
     const fingerprint = fingerprintResult
-      .stdout.trim().split(/\s+/)[1] as string | undefined
+      .stdout.trim().split(/\s+/)[1] as string | undefined;
 
     if (!fingerprint?.startsWith('SHA256:'))
-      continue
+      continue;
 
-    keys.push({ type, entry, fingerprint })
+    keys.push({ type, entry, fingerprint });
 
   }
 
   keys.sort((a, b) =>
     HOST_KEY_PRIORITY.indexOf(a.type) - HOST_KEY_PRIORITY.indexOf(b.type)
-  )
+  );
 
-  return keys[0]
+  return keys[0];
 
 }
 
@@ -195,12 +195,12 @@ export async function addToKnownHostsAsync(
 
   await context.runAsync('mkdir', ['-p', SSH_DIR], {
     stdio: STDIO_CAPTURE_ERRORS,
-  })
+  });
 
   await context.runAsync('tee', ['-a', `${SSH_DIR}/known_hosts`], {
     stdio: STDIO_PIPED,
     input: `${key.entry}\n`,
-  })
+  });
 
 }
 
@@ -225,18 +225,18 @@ export async function addToKnownHostsAsync(
 export async function confirmHost(context: AuthContext) {
 
   if (await hasKnownHostAsync(context))
-    return
+    return;
 
-  const hostKey = await fetchHostKeyAsync(context)
+  const hostKey = await fetchHostKeyAsync(context);
 
   if (!hostKey)
-    throw new Error('Unable to fetch host public key')
+    throw new Error('Unable to fetch host public key');
 
   logger.warn([
     t('ssh.hostUntrusted', { hostname: context.hostname }) + '\n',
     t('ssh.keyType', { type: hostKey.type }) + '\n',
     t('ssh.fingerprint', { fingerprint: hostKey.fingerprint }),
-  ])
+  ]);
 
   const { canAddToKnown } = await prompts({
     type: 'toggle',
@@ -245,11 +245,11 @@ export async function confirmHost(context: AuthContext) {
     initial: false,
     active: t('yes'),
     inactive: t('no'),
-  }) as { canAddToKnown: boolean }
+  }) as { canAddToKnown: boolean };
 
   if (!canAddToKnown)
-    throw new OperationCanceledError()
+    throw new OperationCanceledError();
 
-  await addToKnownHostsAsync(hostKey, context)
+  await addToKnownHostsAsync(hostKey, context);
 
 }

@@ -1,16 +1,16 @@
-import p, { type Options, type PromptObject } from 'prompts'
+import p, { type Options, type PromptObject } from 'prompts';
 
 export class PromptCanceledError extends Error {
   constructor() {
 
-    super()
+    super();
 
     // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, PromptCanceledError.prototype)
+    Object.setPrototypeOf(this, PromptCanceledError.prototype);
 
-    this.name = 'PromptCanceledError'
+    this.name = 'PromptCanceledError';
 
-    Error.captureStackTrace(this, PromptCanceledError)
+    Error.captureStackTrace(this, PromptCanceledError);
 
   }
 }
@@ -24,11 +24,11 @@ export async function prompts(questions: PromptObject | PromptObject[], options?
   const po = options ?? {
     onCancel: () => {
 
-      throw new PromptCanceledError()
+      throw new PromptCanceledError();
 
     },
-  }
+  };
 
-  return await p(questions, po)
+  return await p(questions, po);
 
 }

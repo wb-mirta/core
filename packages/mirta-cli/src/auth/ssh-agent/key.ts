@@ -1,10 +1,10 @@
-import type { KeyPath } from '#config/types'
-import { expandHomeDir } from '#utils/file-system'
-import { logger } from '#utils/logger'
-import { STDIO_INTERACTIVE } from '#utils/shell'
-import { SSH_AUTH_SOCK } from '#auth/constants'
-import { hasEntryAsync } from './entry'
-import type { AuthContext } from '#auth/types'
+import type { KeyPath } from '#config/types';
+import { expandHomeDir } from '#utils/file-system';
+import { logger } from '#utils/logger';
+import { STDIO_INTERACTIVE } from '#utils/shell';
+import { SSH_AUTH_SOCK } from '#auth/constants';
+import { hasEntryAsync } from './entry';
+import type { AuthContext } from '#auth/types';
 
 /**
  * Получает отпечаток (fingerprint) приватного SSH-ключа с помощью `ssh-keygen -lf`.
@@ -27,19 +27,19 @@ export async function getFingerprintAsync(
   const response = await context.runAsync(
     'ssh-keygen',
     ['-lf', key]
-  )
+  );
 
-  const output = response.stdout.trim()
+  const output = response.stdout.trim();
 
   if (!output)
-    throw new Error('No data from ssh-keygen')
+    throw new Error('No data from ssh-keygen');
 
-  const fingerprint = output.split(' ')[1]
+  const fingerprint = output.split(' ')[1];
 
   if (!fingerprint)
-    throw new Error('No fingerprint in ssh-keygen output')
+    throw new Error('No fingerprint in ssh-keygen output');
 
-  return fingerprint
+  return fingerprint;
 
 }
 
@@ -57,9 +57,9 @@ export async function getFingerprintAsync(
  **/
 export async function hasKeyAsync(path: KeyPath, context: AuthContext): Promise<boolean> {
 
-  const fingerprint = await getFingerprintAsync(path, context)
+  const fingerprint = await getFingerprintAsync(path, context);
 
-  return await hasEntryAsync(fingerprint, context)
+  return await hasEntryAsync(fingerprint, context);
 
 }
 
@@ -78,14 +78,14 @@ export async function hasKeyAsync(path: KeyPath, context: AuthContext): Promise<
  **/
 export async function addKeyAsync(path: KeyPath, context: AuthContext): Promise<void> {
 
-  const args = ['-q']
+  const args = ['-q'];
 
   if (context.ttl)
-    args.push('-t', context.ttl)
+    args.push('-t', context.ttl);
 
   args.push(
     expandHomeDir(path)
-  )
+  );
 
   await context.runAsync(
     'ssh-add',
@@ -96,8 +96,8 @@ export async function addKeyAsync(path: KeyPath, context: AuthContext): Promise<
       },
       stdio: STDIO_INTERACTIVE,
       cancelCodes: [2, 130],
-    })
+    });
 
-  logger.debug('SSH key added to ssh-agent')
+  logger.debug('SSH key added to ssh-agent');
 
 }

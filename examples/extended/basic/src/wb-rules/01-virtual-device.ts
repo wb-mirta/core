@@ -3,7 +3,7 @@
 // Модифицированная версия примера (синтаксис Мирты)
 // https://wiki.wirenboard.com/wiki/index.php?title=Rule_Examples
 
-import { ChangePolicies, defineVirtualDevice } from 'mirta'
+import { ChangePolicies, defineVirtualDevice } from 'mirta';
 
 // Определяем структуру виртуального девайса в формате Composable.
 const useMyDevice = defineVirtualDevice({
@@ -11,9 +11,9 @@ const useMyDevice = defineVirtualDevice({
 
     value.onValueChanged((newValue) => {
 
-      state.value = newValue
+      state.value = newValue;
 
-    })
+    });
 
     // Возвращаемый объект определяет публичную структуру
     // будущего девайса.
@@ -31,10 +31,10 @@ const useMyDevice = defineVirtualDevice({
       //
       setNormal: () => {
 
-        value.value = 1
+        value.value = 1;
 
       },
-    }
+    };
 
   },
   controls: {
@@ -56,21 +56,21 @@ const useMyDevice = defineVirtualDevice({
         3: { 'en': 'Crash', 'ru': 'Авария' } },
     },
   },
-})
+});
 
 // Создаём виртуальный девайс с уникальным именем.
 // Повторный вызов с тем же именем вернёт тот же объект.
 //
-const myDevice = useMyDevice('my-virtual-device')
+const myDevice = useMyDevice('my-virtual-device');
 
 // Можно подписаться на изменения значения контрола
 // отдельно от базовой логики.
 //
 myDevice.value.onValueChanged((newValue) => {
 
-  log.debug(`Значение обновилось: ${newValue}`)
+  log.debug(`Значение обновилось: ${newValue}`);
 
-})
+});
 
 // Устанавливаем нормальное состояние при запуске.
-myDevice.setNormal()
+myDevice.setNormal();

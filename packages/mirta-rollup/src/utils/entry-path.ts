@@ -1,13 +1,13 @@
-import nodePath from 'node:path'
+import nodePath from 'node:path';
 
-const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/
+const packagesPattern = /(.*)node_modules[\\/]@?(.+)[\\/](.+)?/;
 
 const entryMatchers = {
 
   'wb-rules': /^(?:src[\\/])?((?:wb-rules[\\/])(.+)|([^/]+$))/,
   'wb-rules-modules': /^(?:src[\\/])?wb-rules-modules[\\/](.+)/,
 
-} as const
+} as const;
 
 /**
  * Парсит путь к исходному файлу и возвращает имя модуля формата `wb-rules-modules/...`.
@@ -21,29 +21,29 @@ const entryMatchers = {
  **/
 function tryGetPackageEntryPath(sourcePath: string) {
 
-  sourcePath = sourcePath.replaceAll(nodePath.sep, nodePath.posix.sep)
+  sourcePath = sourcePath.replaceAll(nodePath.sep, nodePath.posix.sep);
 
-  const pathParts: string[] = []
+  const pathParts: string[] = [];
 
   do {
 
-    const match = packagesPattern.exec(sourcePath)
+    const match = packagesPattern.exec(sourcePath);
 
     if (!match)
-      break
+      break;
 
     if (match[3])
-      pathParts.unshift(match[3])
+      pathParts.unshift(match[3]);
 
-    pathParts.unshift('packages/' + match[2].replace(/\/dist$/, ''))
+    pathParts.unshift('packages/' + match[2].replace(/\/dist$/, ''));
 
-    sourcePath = match[1]
+    sourcePath = match[1];
 
   }
-  while (sourcePath)
+  while (sourcePath);
 
   if (pathParts.length)
-    return `wb-rules-modules/${pathParts.join('/')}.js`
+    return `wb-rules-modules/${pathParts.join('/')}.js`;
 
 }
 
@@ -59,14 +59,14 @@ function tryGetPackageEntryPath(sourcePath: string) {
  **/
 function tryGetEntryPath(sourcePath: string, type: 'wb-rules' | 'wb-rules-modules') {
 
-  const match = entryMatchers[type].exec(sourcePath)
+  const match = entryMatchers[type].exec(sourcePath);
 
   if (!match)
-    return
+    return;
 
-  const value = match[1]
+  const value = match[1];
 
-  return value.startsWith(type) ? `${value}.js` : `${type}/${value}.js`
+  return value.startsWith(type) ? `${value}.js` : `${type}/${value}.js`;
 
 }
 
@@ -82,15 +82,15 @@ function tryGetEntryPath(sourcePath: string, type: 'wb-rules' | 'wb-rules-module
 export function getEntryPath(filePath: string) {
 
   if (filePath.endsWith('_rollupPluginBabelHelpers'))
-    return 'wb-rules-modules/babel/helpers.js'
+    return 'wb-rules-modules/babel/helpers.js';
 
   if (filePath.startsWith('_virtual'))
-    return filePath
+    return filePath;
 
   return tryGetPackageEntryPath(filePath)
     ?? tryGetEntryPath(filePath, 'wb-rules-modules')
     ?? tryGetEntryPath(filePath, 'wb-rules')
     // None of the above matched.
-    ?? filePath
+    ?? filePath;
 
 }

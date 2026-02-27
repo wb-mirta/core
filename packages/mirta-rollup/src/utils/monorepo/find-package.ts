@@ -1,4 +1,4 @@
-import type { MonorepoContext, PackageDefinition } from '@mirta/workspace'
+import type { MonorepoContext, PackageDefinition } from '@mirta/workspace';
 
 /**
  * Находит пакет, которому принадлежит указанный чанк.
@@ -21,7 +21,7 @@ export function findPackageByChunkName(
   for (const pkg of context.packages) {
 
     if (chunkName.startsWith(pkg.workspacePath + '/'))
-      return pkg
+      return pkg;
 
   }
 

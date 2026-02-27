@@ -11,7 +11,7 @@
  * @since 0.4.0
  *
  **/
-export type DaitchMokotoffRule = [number, number, number]
+export type DaitchMokotoffRule = [number, number, number];
 
 /**
  * Тип узла дерева правил Daitch-Mokotoff.
@@ -31,7 +31,7 @@ export type DaitchMokotoffNode
   = | DaitchMokotoffRule[]
     | { 0?: DaitchMokotoffRule }
     | { 1?: DaitchMokotoffRule }
-    | { [key: string]: DaitchMokotoffNode }
+    | { [key: string]: DaitchMokotoffNode };
 
 /**
  * Тип для фонетического кода — строка, гарантированно содержащая 6 цифр.
@@ -47,4 +47,4 @@ export type DaitchMokotoffNode
  * @since 0.4.0
  *
  **/
-export type PhoneticCode = Branded<string, 'PhoneticCode'>
+export type PhoneticCode = Branded<string, 'PhoneticCode'>;

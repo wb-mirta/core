@@ -1,4 +1,4 @@
-import { runCommand } from './utils/run-command.mjs'
+import { runCommand } from './utils/run-command.mjs';
 
 async function run() {
 
@@ -25,8 +25,8 @@ async function run() {
   ], {
     shell: true,
     stdio: 'inherit',
-  }).result
+  }).result;
 
 }
 
-await run()
+await run();

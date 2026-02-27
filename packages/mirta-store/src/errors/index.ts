@@ -1,1 +1,1 @@
-export { StoreError } from './store-error'
+export { StoreError } from './store-error';

@@ -18,15 +18,15 @@
  *
  **/
 
-import { toPosix } from '@mirta/package'
-import { definePackageConfig } from '@mirta/rollup'
+import { toPosix } from '@mirta/package';
+import { definePackageConfig } from '@mirta/rollup';
 
 /**
  * Корневая директория проекта, нормализованная к Unix-стилю (с `/`).
  * Обеспечивает кроссплатформенную совместимость путей.
  *
  **/
-const cwd = toPosix(process.cwd())
+const cwd = toPosix(process.cwd());
 
 /**
  * Генерирует Rollup-конфигурации для указанного пакета монорепозитория.
@@ -40,7 +40,7 @@ function buildPackage(workspace: string, input: string | string[] = 'src/index.t
   return definePackageConfig({
     cwd: `${cwd}/packages/${workspace}`,
     input,
-  })
+  });
 
 }
 
@@ -77,6 +77,6 @@ const configs = [
       'src/setup/global.ts',
     ]),
 
-]
+];
 
-export default configs
+export default configs;

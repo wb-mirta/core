@@ -8,8 +8,8 @@
  *
  **/
 export type Result<TData, TError>
-  = | { hasErrors: false, data: TData }
-    | { hasErrors: true, errors: TError[] }
+  = | { hasErrors: false; data: TData }
+    | { hasErrors: true; errors: TError[] };
 
 /**
  * Утилита для создания значений типа {@link Result}.
@@ -63,13 +63,13 @@ export const ResultHandler = {
   failed: <TError>(errors: TError[]): Result<never, TError> => {
 
     if (errors.length === 0)
-      throw new Error('Errors array cannot be empty')
+      throw new Error('Errors array cannot be empty');
 
     return {
       hasErrors: true,
       errors,
-    }
+    };
 
   },
 
-} as const
+} as const;

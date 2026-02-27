@@ -1,1 +1,1 @@
-export { resolveTemplateSequenceAsync } from './sequence.resolver'
+export { resolveTemplateSequenceAsync } from './sequence.resolver';

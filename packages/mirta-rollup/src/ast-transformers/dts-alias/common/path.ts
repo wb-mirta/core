@@ -1,8 +1,8 @@
-import ts from 'typescript'
-import nodePath from 'node:path'
+import ts from 'typescript';
+import nodePath from 'node:path';
 
-import type { VisitorContextBase } from './types'
-import { AstTransformError } from '#utils/errors'
+import type { VisitorContextBase } from './types';
+import { AstTransformError } from '#utils/errors';
 
 /**
  * Удаляет расширение файла `.ts`, `.d.ts` или `.js`.
@@ -14,7 +14,7 @@ import { AstTransformError } from '#utils/errors'
  *
  **/
 export const removeFileExtension = (fileName: string): string =>
-  fileName.replace(/\.(?:d\.)?(?:[cm]?[tj]s)$/i, '')
+  fileName.replace(/\.(?:d\.)?(?:[cm]?[tj]s)$/i, '');
 
 /**
  * Находит общий префикс двух путей.
@@ -28,19 +28,19 @@ export const removeFileExtension = (fileName: string): string =>
  **/
 export function getCommonPrefix(a: string, b: string): string {
 
-  const aParts = nodePath.normalize(a).split(nodePath.sep)
-  const bParts = nodePath.normalize(b).split(nodePath.sep)
+  const aParts = nodePath.normalize(a).split(nodePath.sep);
+  const bParts = nodePath.normalize(b).split(nodePath.sep);
 
-  const minLength = Math.min(aParts.length, bParts.length)
-  let i = 0
+  const minLength = Math.min(aParts.length, bParts.length);
+  let i = 0;
 
   while (i < minLength && aParts[i] === bParts[i]) {
 
-    i++
+    i++;
 
   }
 
-  return aParts.slice(0, i).join(nodePath.sep)
+  return aParts.slice(0, i).join(nodePath.sep);
 
 }
 
@@ -61,12 +61,12 @@ export function getCommonPrefix(a: string, b: string): string {
 export function isProjectFile(fileName: string, rootDir: string) {
 
   if (fileName.includes('node_modules'))
-    return false
+    return false;
 
   if (nodePath.relative(rootDir, fileName).startsWith('..'))
-    return false
+    return false;
 
-  return true
+  return true;
 
 }
 
@@ -100,25 +100,25 @@ export function getRelativeOutputPath(
 
   // Шаг 1: Получаем директорию исходного файла.
   const sourceDir = nodePath
-    .dirname(sourceFilePath)
+    .dirname(sourceFilePath);
 
   // Шаг 2: Вычисляем относительный путь от директории исходного файла до целевого файла.
   const relativeDir = nodePath
-    .dirname(nodePath.relative(sourceDir, targetFilePath))
+    .dirname(nodePath.relative(sourceDir, targetFilePath));
 
   // Шаг 3: Объединяем относительную директорию с именем выходного файла.
   let relativePath = nodePath
-    .join(relativeDir, outputFileName)
+    .join(relativeDir, outputFileName);
 
   relativePath = relativePath
     .split(nodePath.sep)
-    .join(nodePath.posix.sep)
+    .join(nodePath.posix.sep);
 
   // Шаг 4: Гарантируем, что путь является относительным.
   if (!relativePath.startsWith('.'))
-    relativePath = `./${relativePath}`
+    relativePath = `./${relativePath}`;
 
-  return relativePath
+  return relativePath;
 
 }
 
@@ -138,23 +138,23 @@ export function getRootDir(
   sourceFile: ts.SourceFile
 ) {
 
-  const { compilerOptions, program } = context
+  const { compilerOptions, program } = context;
 
   // Если rootDirs указаны — ищем, к какому корню относится файл.
 
   if (compilerOptions.rootDirs?.length) {
 
     const sortedRoots = [...compilerOptions.rootDirs]
-      .sort((a, b) => b.length - a.length)
+      .sort((a, b) => b.length - a.length);
 
-    const normalizedFile = nodePath.resolve(sourceFile.fileName)
+    const normalizedFile = nodePath.resolve(sourceFile.fileName);
 
     for (const rootDir of sortedRoots) {
 
-      const normalizedRoot = nodePath.resolve(rootDir)
+      const normalizedRoot = nodePath.resolve(rootDir);
 
       if (normalizedFile.startsWith(normalizedRoot + nodePath.sep))
-        return rootDir
+        return rootDir;
 
     }
 
@@ -163,23 +163,23 @@ export function getRootDir(
   // Если rootDir указан — используем его.
 
   if (compilerOptions.rootDir)
-    return compilerOptions.rootDir
+    return compilerOptions.rootDir;
 
   // Иначе находим общий корень для всех файлов.
 
-  const fileNames = program.getRootFileNames()
+  const fileNames = program.getRootFileNames();
 
   if (!fileNames.length)
-    throw AstTransformError.get('noRootFiles')
+    throw AstTransformError.get('noRootFiles');
 
-  let commonPrefix = nodePath.dirname(fileNames[0])
+  let commonPrefix = nodePath.dirname(fileNames[0]);
 
   for (const fileName of fileNames.slice(1)) {
 
-    commonPrefix = getCommonPrefix(commonPrefix, fileName)
+    commonPrefix = getCommonPrefix(commonPrefix, fileName);
 
   }
 
-  return commonPrefix
+  return commonPrefix;
 
 }

@@ -1,34 +1,34 @@
-import nodePath, { posix } from 'node:path'
+import nodePath, { posix } from 'node:path';
 
-import pMap from 'p-map'
+import pMap from 'p-map';
 
-import { glob, writeFile } from 'node:fs/promises'
+import { glob, writeFile } from 'node:fs/promises';
 
-import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace'
-import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package'
+import { resolveMonorepoContextAsync, type PackageDefinition } from '@mirta/workspace';
+import { PackageError, readPackageAsync, resolvePackagePath, toPosix, type Package } from '@mirta/package';
 
-import { THIS_PACKAGE_NAME } from '#src/constants'
+import { THIS_PACKAGE_NAME } from '#src/constants';
 
-import { runCommandAsync } from '#utils/shell'
+import { runCommandAsync } from '#utils/shell';
 
-import chalk from 'chalk'
-import { t } from '../i18n'
-import type { MirtaConfig } from '#src/config/types'
-import { logger } from '#utils/logger'
+import chalk from 'chalk';
+import { t } from '../i18n';
+import type { MirtaConfig } from '#src/config/types';
+import { logger } from '#utils/logger';
 
-const { yellow } = chalk
+const { yellow } = chalk;
 
-const MAX_CONCURRENT_WRITES = 5
-const MAX_CONCURRENT_REQUESTS = 5
+const MAX_CONCURRENT_WRITES = 5;
+const MAX_CONCURRENT_REQUESTS = 5;
 
-type DepType = 'dependencies' | 'devDependencies'
+type DepType = 'dependencies' | 'devDependencies';
 
-const cwd = process.cwd()
-const context = await resolveMonorepoContextAsync(cwd)
-const rootDir = context.rootDir
+const cwd = process.cwd();
+const context = await resolveMonorepoContextAsync(cwd);
+const rootDir = context.rootDir;
 
 // Список всех пакетов репозитория.
-const packages: Record<string, Pick<PackageDefinition, 'workspacePath' | 'isPrivate'>> = {}
+const packages: Record<string, Pick<PackageDefinition, 'workspacePath' | 'isPrivate'>> = {};
 
 for (const pkg of context.packages) {
 
@@ -41,77 +41,77 @@ for (const pkg of context.packages) {
     packages[pkg.name] = {
       workspacePath: pkg.workspacePath,
       isPrivate: pkg.isPrivate,
-    }
+    };
 
 }
 
-const rootPackage = await readPackageAsync(rootDir)
+const rootPackage = await readPackageAsync(rootDir);
 
 /** Возвращает текущую версию корневого проекта. */
 export function getCurrentVersion() {
 
   if (!rootPackage.version)
-    throw PackageError.getScoped(THIS_PACKAGE_NAME, 'noVersionField')
+    throw PackageError.getScoped(THIS_PACKAGE_NAME, 'noVersionField');
 
-  return rootPackage.version
+  return rootPackage.version;
 
 }
 
 export function hasScript(name: string) {
 
-  return rootPackage.scripts?.[name] !== void 0
+  return rootPackage.scripts?.[name] !== void 0;
 
 }
 
 export async function resolveTemplatePathsAsync(config: MirtaConfig): Promise<string[]> {
 
-  const templates = config.project?.templates
+  const templates = config.project?.templates;
 
   if (!Array.isArray(templates))
-    return []
+    return [];
 
-  const pathPatterns: string[] = []
+  const pathPatterns: string[] = [];
 
   for (const templatePath of templates) {
 
-    const resolvedDir = toPosix(nodePath.resolve(rootDir, templatePath))
+    const resolvedDir = toPosix(nodePath.resolve(rootDir, templatePath));
 
     if (!resolvedDir.startsWith(rootDir + posix.sep)) {
 
-      logger.warn(t('package.templateOutsideRoot', { template: templatePath }))
-      continue
+      logger.warn(t('package.templateOutsideRoot', { template: templatePath }));
+      continue;
 
     }
 
     pathPatterns.push(
       posix.join(templatePath, '**', 'package.json')
-    )
+    );
 
   }
 
-  const realPaths = new Set<string>()
+  const realPaths = new Set<string>();
 
   if (pathPatterns.length === 0)
-    return []
+    return [];
 
   for await (const pkgPath of glob(pathPatterns, {
     cwd: rootDir,
     exclude: ['node_modules/**', 'dist/**'],
   })) {
 
-    realPaths.add(toPosix(pkgPath))
+    realPaths.add(toPosix(pkgPath));
 
   }
 
-  return [...realPaths]
+  return [...realPaths];
 
 }
 
 const isWorkspacePackage = (pkgName: string) => {
 
-  return Boolean(pkgName && packages[pkgName])
+  return Boolean(pkgName && packages[pkgName]);
 
-}
+};
 
 function updateDependencies(
   pkg: Package,
@@ -119,65 +119,65 @@ function updateDependencies(
   version: string
 ) {
 
-  const deps = pkg[depType]
+  const deps = pkg[depType];
 
   if (!deps)
-    return
+    return;
 
   Object.keys(deps).forEach((dep) => {
 
     if (!isWorkspacePackage(dep))
-      return
+      return;
 
-    deps[dep] = version
+    deps[dep] = version;
 
-    logger.step(`- ${dep}`)
+    logger.step(`- ${dep}`);
 
-  })
+  });
 
 }
 
 async function updateTemplateDependencies(pkgPath: string, version: string) {
 
-  logger.step(pkgPath)
+  logger.step(pkgPath);
 
-  const pkg = await readPackageAsync(pkgPath)
+  const pkg = await readPackageAsync(pkgPath);
 
-  updateDependencies(pkg, 'dependencies', version)
-  updateDependencies(pkg, 'devDependencies', version)
+  updateDependencies(pkg, 'dependencies', version);
+  updateDependencies(pkg, 'devDependencies', version);
 
-  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
 }
 
 async function updatePackageVersion(pkgRoot: string, version: string) {
 
-  const pkgPath = resolvePackagePath(pkgRoot)
-  const pkg = await readPackageAsync(pkgPath)
+  const pkgPath = resolvePackagePath(pkgRoot);
+  const pkg = await readPackageAsync(pkgPath);
 
   logger.step(
     pkgRoot === rootDir
       ? '- <root>'
       : `- ${pkg.name ?? nodePath.basename(pkgRoot)}`
-  )
+  );
 
-  pkg.version = version
+  pkg.version = version;
 
-  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
 }
 
 export async function updateVersion(version: string, config: MirtaConfig) {
 
-  logger.log(`Patching all packages to version ${version}`)
+  logger.log(`Patching all packages to version ${version}`);
 
   // Обновляет корневой пакет.
   await updatePackageVersion(
     rootDir,
     version
-  )
+  );
 
-  rootPackage.version = version
+  rootPackage.version = version;
 
   // Обновляет все остальные пакеты репозитория.
   await pMap(
@@ -187,21 +187,21 @@ export async function updateVersion(version: string, config: MirtaConfig) {
       version
     ),
     { concurrency: MAX_CONCURRENT_WRITES }
-  )
+  );
 
   // Повторное сканирование FS на каждое обновление - для безопасности.
-  const templatePaths = await resolveTemplatePathsAsync(config)
+  const templatePaths = await resolveTemplatePathsAsync(config);
 
   // Обновляет пакеты, используемые в шаблонах.
   if (templatePaths.length > 0) {
 
-    logger.log(`Patching template packages`)
+    logger.log(`Patching template packages`);
 
     await pMap(
       templatePaths,
       path => updateTemplateDependencies(path, version),
       { concurrency: MAX_CONCURRENT_WRITES }
-    )
+    );
 
   }
 
@@ -212,13 +212,13 @@ export async function buildPackagesAsync(skipBuild: boolean) {
 
   if (!skipBuild) {
 
-    logger.log('Building packages...')
-    await runCommandAsync('pnpm', ['run', 'build'])
+    logger.log('Building packages...');
+    await runCommandAsync('pnpm', ['run', 'build']);
 
   }
   else {
 
-    logger.log(`${yellow('Skip')} building packages`)
+    logger.log(`${yellow('Skip')} building packages`);
 
   }
 
@@ -238,23 +238,23 @@ export async function checkPackageExistsAsync(pkgName: string): Promise<boolean>
 
     await runCommandAsync('npm', ['view', pkgName, 'version'], {
       stdio: 'pipe',
-    })
+    });
 
-    return true
+    return true;
 
   }
   catch (e: unknown) {
 
     if (e instanceof Error) {
 
-      const message = e.message
+      const message = e.message;
 
       if (message.includes('404'))
-        return false
+        return false;
 
     }
 
-    throw e
+    throw e;
 
   }
 
@@ -267,25 +267,25 @@ async function publishSinglePackageAsync(
   flags: string[]
 ) {
 
-  let releaseTag: string | undefined = void 0
+  let releaseTag: string | undefined = void 0;
 
   if (version.includes('alpha')) {
 
-    releaseTag = 'alpha'
+    releaseTag = 'alpha';
 
   }
   else if (version.includes('beta')) {
 
-    releaseTag = 'beta'
+    releaseTag = 'beta';
 
   }
   else if (version.includes('rc')) {
 
-    releaseTag = 'rc'
+    releaseTag = 'rc';
 
   }
 
-  logger.step(t('publish.packagePublishing', { name: pkgName }))
+  logger.step(t('publish.packagePublishing', { name: pkgName }));
 
   try {
 
@@ -302,21 +302,21 @@ async function publishSinglePackageAsync(
         cwd: pkgPath,
         stdio: 'pipe',
       }
-    )
+    );
 
-    logger.success(t('publish.packagePublished', { name: `${pkgName}@${version}` }))
+    logger.success(t('publish.packagePublished', { name: `${pkgName}@${version}` }));
 
   }
   catch (e: unknown) {
 
     if (e instanceof Error && /previously published/.exec(e.message)) {
 
-      logger.warn(t('publish.skippingPublished', { name: pkgName }))
+      logger.warn(t('publish.skippingPublished', { name: pkgName }));
 
     }
     else {
 
-      throw e
+      throw e;
 
     }
 
@@ -331,10 +331,10 @@ export async function publishPackagesAsync(
   isDryRun: boolean
 ) {
 
-  logger.log(t('publish.begin'))
+  logger.log(t('publish.begin'));
 
   const packagesToPublish = Object.entries(packages)
-    .filter(([, pkg]) => !pkg.isPrivate)
+    .filter(([, pkg]) => !pkg.isPrivate);
 
   if (!isDryRun) {
 
@@ -345,44 +345,44 @@ export async function publishPackagesAsync(
         isExists: await checkPackageExistsAsync(pkgName),
       }),
       { concurrency: MAX_CONCURRENT_REQUESTS, stopOnError: true }
-    )
+    );
 
     const unpublishedPackages = existenceChecks
       .filter(({ isExists }) => !isExists)
-      .map(({ name }) => name)
+      .map(({ name }) => name);
 
     if (unpublishedPackages.length > 0) {
 
       logger.error(t('publish.newPackages', {
         packages: unpublishedPackages.join(', '),
-      }))
+      }));
 
-      logger.error(t('publish.initialPublishRequired'))
+      logger.error(t('publish.initialPublishRequired'));
 
-      throw new Error('Packages not found in NPM registry')
+      throw new Error('Packages not found in NPM registry');
 
     }
 
   }
 
-  const flags: string[] = []
+  const flags: string[] = [];
 
   if (isDryRun)
-    flags.push('--dry-run')
+    flags.push('--dry-run');
 
   if (isDryRun || skipGitChecks || process.env.CI)
-    flags.push('--no-git-checks')
+    flags.push('--no-git-checks');
 
   if (process.env.CI)
-    flags.push('--provenance')
+    flags.push('--provenance');
 
   for (const [pkgName, pkg] of packagesToPublish) {
 
     // Приватные пакеты не публикуются.
     if (pkg.isPrivate) {
 
-      logger.step(t('publish.skippingPrivate', { name: pkgName }))
-      continue
+      logger.step(t('publish.skippingPrivate', { name: pkgName }));
+      continue;
 
     }
 
@@ -391,7 +391,7 @@ export async function publishPackagesAsync(
       posix.join(rootDir, pkg.workspacePath),
       version,
       flags
-    )
+    );
 
   }
 

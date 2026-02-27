@@ -12,7 +12,7 @@ export type DeepPartial<TTarget> = TTarget extends (infer TItem)[]
     ? {
         [K in keyof TTarget]?: DeepPartial<TTarget[K]>
       }
-    : TTarget
+    : TTarget;
 
 /**
  * Тип, представляющий дерево состояния хранилища.
@@ -30,7 +30,7 @@ export type DeepPartial<TTarget> = TTarget extends (infer TItem)[]
  * @since 0.0.2
  *
  **/
-export type StateTree = Record<PropertyKey, unknown>
+export type StateTree = Record<PropertyKey, unknown>;
 
 /**
  * Тип, представляющий дерево геттеров хранилища.
@@ -57,7 +57,7 @@ export type _GettersTree<TState extends StateTree> = Record<
   string,
   | ((state: TState) => unknown)
   | (() => unknown)
->
+>;
 
 /**
  * Тип, представляющий дерево действий (actions) хранилища.
@@ -78,7 +78,7 @@ export type _GettersTree<TState extends StateTree> = Record<
  * @internal
  *
  **/
-export type _ActionsTree = Record<string, (...args: unknown[]) => unknown>
+export type _ActionsTree = Record<string, (...args: unknown[]) => unknown>;
 
 /**
  * Интерфейс, добавляющий к хранилищу методы управления состоянием.
@@ -102,13 +102,13 @@ export interface _StoreWithState<TState extends StateTree> {
    * Формируется как `typeId` или `typeId/id` для именованных экземпляров.
    *
    **/
-  readonly $id: string
+  readonly $id: string;
 
   /**
    * Ссылка на полное состояние хранилища.
    *
    **/
-  readonly $state: TState
+  readonly $state: TState;
 
   /**
    * Обновляет состояние путём слияния с переданным объектом.
@@ -122,7 +122,7 @@ export interface _StoreWithState<TState extends StateTree> {
    * ```
    *
    **/
-  $patch(state: DeepPartial<TState>): void
+  $patch(state: DeepPartial<TState>): void;
 
   /**
    * Обновляет состояние с помощью функции-мутатора.
@@ -139,7 +139,7 @@ export interface _StoreWithState<TState extends StateTree> {
    * ```
    *
    **/
-  $patch(stateMutator: (state: TState) => void): void
+  $patch(stateMutator: (state: TState) => void): void;
 
   /**
    * Сбрасывает состояние хранилища до начального.
@@ -150,7 +150,7 @@ export interface _StoreWithState<TState extends StateTree> {
    * ```
    *
    **/
-  $reset(): void
+  $reset(): void;
 }
 
 /**
@@ -166,7 +166,7 @@ export interface _StoreWithState<TState extends StateTree> {
  *
  **/
 export type _PatchFunc<TState extends StateTree>
-  = _StoreWithState<TState>['$patch']
+  = _StoreWithState<TState>['$patch'];
 
 /**
  * Тип аргументов, принимаемых методом `$patch`.
@@ -182,7 +182,7 @@ export type _PatchFunc<TState extends StateTree>
  **/
 export type _PatchArgs<TState extends StateTree>
   = | DeepPartial<TState>
-    | ((state: TState) => void)
+    | ((state: TState) => void);
 
 /**
  * Тип, представляющий геттеры как свойства хранилища.
@@ -205,7 +205,7 @@ export type _PatchArgs<TState extends StateTree>
  **/
 export type _StoreWithGetters<TGetters> = {
   readonly [K in keyof TGetters]: TGetters[K] extends (...args: unknown[]) => infer R ? R : never
-}
+};
 
 /**
  * Тип, представляющий действия как методы хранилища.
@@ -219,7 +219,7 @@ export type _StoreWithGetters<TGetters> = {
  **/
 export type _StoreWithActions<TActions> = {
   readonly [K in keyof TActions]: TActions[K]
-}
+};
 
 /**
  * Полный тип хранилища - итоговый тип, возвращаемый `defineStore`.
@@ -240,7 +240,7 @@ export type Store<
 > = _StoreWithState<TState>
   & TState
   & _StoreWithGetters<TGetters>
-  & _StoreWithActions<TActions>
+  & _StoreWithActions<TActions>;
 
 /**
  * Универсальный тип хранилища, используемый для кэширования и внутренних операций.
@@ -254,7 +254,7 @@ export type Store<
  * @since 0.0.2
  *
  **/
-export type StoreGeneric = Store<StateTree, unknown, _ActionsTree>
+export type StoreGeneric = Store<StateTree, unknown, _ActionsTree>;
 
 /**
  * Опции, передаваемые в функцию `defineStore` для создания хранилища.
@@ -290,7 +290,7 @@ export interface DefineStoreOptions<
    * })
    *
    **/
-  state?: () => TState
+  state?: () => TState;
 
   /**
    * Объект с геттерами (вычисляемыми свойствами).
@@ -310,7 +310,7 @@ export interface DefineStoreOptions<
    * @since 0.4.0
    *
    **/
-  getters?: TGetters & ThisType<TState & _StoreWithGetters<TGetters>>
+  getters?: TGetters & ThisType<TState & _StoreWithGetters<TGetters>>;
 
   /**
    * Объект с действиями (методами изменения состояния).
@@ -332,7 +332,7 @@ export interface DefineStoreOptions<
    * @since 0.4.0
    *
    **/
-  actions?: TActions & ThisType<TState & _StoreWithGetters<TGetters> & _StoreWithActions<TActions> & _StoreWithState<TState>>
+  actions?: TActions & ThisType<TState & _StoreWithGetters<TGetters> & _StoreWithActions<TActions> & _StoreWithState<TState>>;
 
 }
 
@@ -366,7 +366,7 @@ export interface StoreDefinition<
    * @since 0.4.0
    *
    **/
-  readonly $typeId: string
+  readonly $typeId: string;
 
   /**
    * Функция для получения экземпляра хранилища.
@@ -386,5 +386,5 @@ export interface StoreDefinition<
    * @since 0.0.2
    *
    **/
-  (scope?: string): Store<TState, TGetters, TActions>
+  (scope?: string): Store<TState, TGetters, TActions>;
 }

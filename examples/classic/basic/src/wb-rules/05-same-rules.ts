@@ -23,7 +23,7 @@ function makeMotionDetector(
   relay_control: string
 ) {
 
-  let motion_timer_id: NodeJS.Timeout | undefined
+  let motion_timer_id: NodeJS.Timeout | undefined;
 
   defineRule(name, {
     whenChanged: `wb-gpio/${detector_control}`,
@@ -31,28 +31,28 @@ function makeMotionDetector(
 
       if (!newValue) {
 
-        dev[`wb-gpio/${relay_control}`] = true
+        dev[`wb-gpio/${relay_control}`] = true;
 
         if (motion_timer_id) {
 
-          clearTimeout(motion_timer_id)
+          clearTimeout(motion_timer_id);
 
         }
 
         motion_timer_id = setTimeout(function () {
 
-          dev['wb-gpio/relay_control'] = false
-          motion_timer_id = void 0
+          dev['wb-gpio/relay_control'] = false;
+          motion_timer_id = void 0;
 
-        }, timeout_ms)
+        }, timeout_ms);
 
       }
 
     },
-  })
+  });
 
 }
 
-makeMotionDetector('motion_detector_1', 20000, 'EXT1_DR1', 'EXT2_R3A1')
-makeMotionDetector('motion_detector_2', 10000, 'EXT1_DR2', 'EXT2_R3A2')
-makeMotionDetector('motion_detector_3', 10000, 'EXT1_DR3', 'EXT2_R3A3')
+makeMotionDetector('motion_detector_1', 20000, 'EXT1_DR1', 'EXT2_R3A1');
+makeMotionDetector('motion_detector_2', 10000, 'EXT1_DR2', 'EXT2_R3A2');
+makeMotionDetector('motion_detector_3', 10000, 'EXT1_DR3', 'EXT2_R3A3');

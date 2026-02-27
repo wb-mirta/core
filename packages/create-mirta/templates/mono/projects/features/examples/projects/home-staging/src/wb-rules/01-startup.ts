@@ -1,1 +1,1 @@
-log('This is fine staging.')
+log('This is fine staging.');

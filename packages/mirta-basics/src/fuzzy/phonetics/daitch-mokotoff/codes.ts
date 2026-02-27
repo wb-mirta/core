@@ -1,4 +1,4 @@
-import type { DaitchMokotoffNode } from './types'
+import type { DaitchMokotoffNode } from './types';
 
 /**
  * Дерево правил Daitch-Mokotoff.
@@ -125,4 +125,4 @@ export const codes: DaitchMokotoffNode = Object.freeze({
     H: { 0: [4, 4, 4], D: { 0: [2, 43, 43], Z: { H: [[2, 4, 4]] } } },
     S: { 0: [4, 4, 4], H: [[4, 4, 4]], C: { H: [[4, 4, 4]] } },
   },
-} as const satisfies DaitchMokotoffNode)
+} as const satisfies DaitchMokotoffNode);

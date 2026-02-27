@@ -6,7 +6,7 @@
  * @since 0.4.0
  *
  **/
-export type ExportsPath = string | null | undefined
+export type ExportsPath = string | null | undefined;
 
 /**
  * Объект с `types` и `default` внутри поля `exports`.
@@ -30,10 +30,10 @@ export type ExportsPath = string | null | undefined
 export interface ExportsObject {
 
   /** Путь к файлу типов (`.d.mts`). */
-  types?: ExportsPath
+  types?: ExportsPath;
 
   /** Основной путь экспорта. */
-  default?: ExportsPath
+  default?: ExportsPath;
 
 }
 
@@ -83,7 +83,7 @@ export interface ExportsConditional {
    * Условие `import` — единственный поддерживаемый вариант в Мирте.
    *
    **/
-  import: ExportsPath | ExportsObject
+  import: ExportsPath | ExportsObject;
 }
 
 /**
@@ -93,7 +93,7 @@ export interface ExportsConditional {
  * @since 0.4.0
  *
  **/
-export type ExportsEntry = ExportsPath | ExportsConditional | ExportsObject
+export type ExportsEntry = ExportsPath | ExportsConditional | ExportsObject;
 
 /**
  * Упрощённая форма поля `exports` из package.json, поддерживаемая фреймворком Мирта.
@@ -117,7 +117,7 @@ export type ExportsEntry = ExportsPath | ExportsConditional | ExportsObject
  * @since 0.4.0
  *
  **/
-export type PackageExports = ExportsPath | ExportsConditional | Record<string, ExportsEntry>
+export type PackageExports = ExportsPath | ExportsConditional | Record<string, ExportsEntry>;
 
 /**
  * Минимальный контракт `package.json`, необходимый для работы фреймворка Мирта.
@@ -131,7 +131,7 @@ export interface Package {
    * Имя пакета (например, `"@mirta/package"`).
    *
    **/
-  name?: string
+  name?: string;
 
   /**
    * Семантическая версия пакета (SemVer).
@@ -153,7 +153,7 @@ export interface Package {
    * "1.0.0-alpha.1"
    *
    **/
-  version?: string
+  version?: string;
 
   /**
    * Признак того, что пакет не предназначен для публикации.
@@ -162,13 +162,13 @@ export interface Package {
    * Используется для защиты от случайной публикации внутренних или служебных пакетов.
    *
    **/
-  private?: boolean
+  private?: boolean;
 
   /**
    * Именованные команды для автоматизации задач (сборка, тесты, форматирование и т.п.).
    *
    **/
-  scripts?: Record<string, string>
+  scripts?: Record<string, string>;
 
   /**
    * Конфигурация экспорта модуля.
@@ -176,14 +176,14 @@ export interface Package {
    * Поддерживается упрощённый формат с условием `import`.
    *
    **/
-  exports?: PackageExports
+  exports?: PackageExports;
 
   /**
    * Список шаблонов рабочих пространств (workspaces).
    * Используется для определения структуры монорепозитория.
    *
    **/
-  workspaces?: string[]
+  workspaces?: string[];
 
   /**
    * Зависимости, необходимые для работы пакета.
@@ -193,7 +193,7 @@ export interface Package {
    * @since 0.4.0
    *
    **/
-  dependencies?: Record<string, string>
+  dependencies?: Record<string, string>;
 
   /**
    * Зависимости, необходимые при разработке пакета.
@@ -201,7 +201,7 @@ export interface Package {
    * Не устанавливаются вместе с пакетом при его добавлении в проект.
    *
    **/
-  devDependencies?: Record<string, string>
+  devDependencies?: Record<string, string>;
 
   /**
    * Зависимости, которые ожидаются в основном проекте.
@@ -210,7 +210,7 @@ export interface Package {
    * Позволяют избежать дублирования пакетов.
    *
    **/
-  peerDependencies?: Record<string, string>
+  peerDependencies?: Record<string, string>;
 
   /**
    * Опциональные зависимости, которые устанавливаются, если возможно.
@@ -220,6 +220,6 @@ export interface Package {
    * - Пакет может предоставить fallback-реализацию или работать с ограниченной функциональностью.
    *
    **/
-  optionalDependencies?: Record<string, string>
+  optionalDependencies?: Record<string, string>;
 
 }

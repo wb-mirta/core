@@ -12,19 +12,19 @@
  *
  **/
 
-import ts from '@rollup/plugin-typescript'
+import ts from '@rollup/plugin-typescript';
 
-import nodeResolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
-import replace from '@rollup/plugin-replace'
-import copy from 'rollup-plugin-copy'
+import nodeResolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
+import copy from 'rollup-plugin-copy';
 
-import dts from 'rollup-plugin-dts'
-import del from '#plugins/del'
+import dts from 'rollup-plugin-dts';
+import del from '#plugins/del';
 
-import { dtsAlias } from '#ast'
+import { dtsAlias } from '#ast';
 
-import nodePath, { basename, dirname } from 'node:path'
+import nodePath, { basename, dirname } from 'node:path';
 
 import type {
   RollupOptions,
@@ -33,7 +33,7 @@ import type {
   ImportAttributesKey,
   Plugin,
   PreRenderedChunk
-} from 'rollup'
+} from 'rollup';
 
 import {
 
@@ -44,10 +44,10 @@ import {
   type ExportsPath,
   type PackageExports
 
-} from '@mirta/package'
+} from '@mirta/package';
 
-import { NpmBuildError } from '../utils/errors'
-import { createExternalFilter } from '../utils/external-filter'
+import { NpmBuildError } from '../utils/errors';
+import { createExternalFilter } from '../utils/external-filter';
 
 /**
  * Опции конфигурации Rollup.
@@ -58,13 +58,13 @@ import { createExternalFilter } from '../utils/external-filter'
 interface RollupConfigOptions {
 
   /** Текущая рабочая директория. */
-  cwd?: string
+  cwd?: string;
 
-  input?: string | string[] | Record<string, string>
+  input?: string | string[] | Record<string, string>;
 
-  external?: ExternalOption
+  external?: ExternalOption;
 
-  plugins?: Plugin[]
+  plugins?: Plugin[];
 
   /**
    * Игнорирует отсутствие или некорректность секции `exports`,
@@ -77,7 +77,7 @@ interface RollupConfigOptions {
    * @since 0.3.5
    *
    **/
-  skipExports?: boolean
+  skipExports?: boolean;
 
 }
 
@@ -88,22 +88,22 @@ interface RollupConfigOptions {
  *
  **/
 interface BuildOptions {
-  cwd: string
-  input: string | string[] | Record<string, string>
-  emitDeclarations: boolean
-  external?: ExternalOption
-  plugins?: Plugin[]
-  outPath: string
-  outPathDts: string
+  cwd: string;
+  input: string | string[] | Record<string, string>;
+  emitDeclarations: boolean;
+  external?: ExternalOption;
+  plugins?: Plugin[];
+  outPath: string;
+  outPathDts: string;
   output: {
-    dir: string
-    format: ModuleFormat
-    importAttributesKey: ImportAttributesKey
-    entryFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined
-    chunkFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined
-    sourcemap?: boolean
-    externalLiveBindings?: boolean
-  }
+    dir: string;
+    format: ModuleFormat;
+    importAttributesKey: ImportAttributesKey;
+    entryFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined;
+    chunkFileNames: string | ((chunkInfo: PreRenderedChunk) => string) | undefined;
+    sourcemap?: boolean;
+    externalLiveBindings?: boolean;
+  };
 }
 
 /**
@@ -113,7 +113,7 @@ interface BuildOptions {
  *
  **/
 interface ExportDescriptor {
-  dtsOutputFile?: string
+  dtsOutputFile?: string;
 }
 
 /**
@@ -123,13 +123,13 @@ interface ExportDescriptor {
  *
  **/
 interface InputBinding {
-  readonly outputFile: string
-  readonly dtsSourceFile: string
-  readonly dtsOutputFile?: string
+  readonly outputFile: string;
+  readonly dtsSourceFile: string;
+  readonly dtsOutputFile?: string;
 }
 
-const outDir = 'dist'
-const outDirDts = `${outDir}/dts`
+const outDir = 'dist';
+const outDirDts = `${outDir}/dts`;
 
 /**
  * Удаляет префикс каталога вывода (`./${outDir}/`) из пути.
@@ -141,11 +141,11 @@ const outDirDts = `${outDir}/dts`
  **/
 function sliceDistPrefix(path: string) {
 
-  const prefix = `./${outDir}/`
+  const prefix = `./${outDir}/`;
 
   return path.startsWith(prefix)
     ? path.slice(prefix.length)
-    : path
+    : path;
 
 }
 
@@ -161,28 +161,28 @@ function sliceDistPrefix(path: string) {
  **/
 function normalizeInput(input: string | string[] | Record<string, string>) {
 
-  const inputs: string[] = []
+  const inputs: string[] = [];
 
   if (typeof input === 'string') {
 
-    inputs.push(input)
+    inputs.push(input);
 
   }
   else if (Array.isArray(input)) {
 
-    inputs.push(...input)
+    inputs.push(...input);
 
   }
   else if (typeof input === 'object') {
 
-    inputs.push(...Object.values(input))
+    inputs.push(...Object.values(input));
 
   }
 
   if (inputs.length === 0)
-    throw NpmBuildError.get('inputEmpty')
+    throw NpmBuildError.get('inputEmpty');
 
-  return inputs
+  return inputs;
 
 }
 
@@ -197,7 +197,7 @@ function normalizeInput(input: string | string[] | Record<string, string>) {
  **/
 function isConditionalEntry(source: object): source is ExportsConditional {
 
-  return 'import' in source
+  return 'import' in source;
 
 }
 
@@ -214,29 +214,29 @@ function processConditionalEntry(source: ExportsConditional) {
 
   const result: {
 
-    entry?: ExportsPath
-    types?: ExportsPath
+    entry?: ExportsPath;
+    types?: ExportsPath;
 
-  } = {}
+  } = {};
 
   if (source.import) {
 
     if (typeof source.import === 'string') {
 
       // Путь точки входа определён, типизация отсутствует.
-      result.entry = source.import
+      result.entry = source.import;
 
     }
     else {
 
-      result.entry = source.import.default
-      result.types = source.import.types
+      result.entry = source.import.default;
+      result.types = source.import.types;
 
     }
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -253,7 +253,7 @@ function processConditionalEntry(source: ExportsConditional) {
 function assertTypesHaveEntry(entry: ExportsPath, types: ExportsPath) {
 
   if (types && !entry)
-    throw NpmBuildError.get('exportTypesOnly', types)
+    throw NpmBuildError.get('exportTypesOnly', types);
 
 }
 
@@ -270,76 +270,76 @@ function assertTypesHaveEntry(entry: ExportsPath, types: ExportsPath) {
 export function normalizeExports(exportsField: PackageExports) {
 
   if (!exportsField)
-    throw NpmBuildError.get('exportEmpty')
+    throw NpmBuildError.get('exportEmpty');
 
   if (Array.isArray(exportsField))
-    throw NpmBuildError.get('exportDisallowArrayType')
+    throw NpmBuildError.get('exportDisallowArrayType');
 
-  const result: Record<string, ExportDescriptor> = {}
+  const result: Record<string, ExportDescriptor> = {};
 
   if (typeof exportsField === 'string') {
 
-    result[exportsField] = {}
+    result[exportsField] = {};
 
-    return result
+    return result;
 
   }
 
   if (isConditionalEntry(exportsField)) {
 
-    const { entry, types } = processConditionalEntry(exportsField)
+    const { entry, types } = processConditionalEntry(exportsField);
 
-    assertTypesHaveEntry(entry, types)
+    assertTypesHaveEntry(entry, types);
 
     if (entry)
       result[entry] = types
         ? { dtsOutputFile: types }
-        : {}
+        : {};
 
-    return result
+    return result;
 
   }
 
   for (const [key, value] of Object.entries<ExportsEntry>(exportsField)) {
 
     if (!value)
-      continue
+      continue;
 
     if (!key.startsWith('.'))
-      throw NpmBuildError.get('exportMustStartWithDot', key)
+      throw NpmBuildError.get('exportMustStartWithDot', key);
 
     let
       entry: ExportsPath,
-      types: ExportsPath
+      types: ExportsPath;
 
     if (typeof value === 'string') {
 
       // Путь точки входа определён, типизация отсутствует.
-      entry = value
+      entry = value;
 
     }
     else if (isConditionalEntry(value)) {
 
-      ({ entry, types } = processConditionalEntry(value))
+      ({ entry, types } = processConditionalEntry(value));
 
     }
     else {
 
-      entry = value.default
-      types = value.types
+      entry = value.default;
+      types = value.types;
 
     }
 
-    assertTypesHaveEntry(entry, types)
+    assertTypesHaveEntry(entry, types);
 
     if (entry)
       result[entry] = types
         ? { dtsOutputFile: types }
-        : {}
+        : {};
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -368,45 +368,45 @@ export function createInputBindings(
 ) {
 
   // Извлекает относительный путь после префикса `src/` (без расширения).
-  const filePattern = /^(?:.*\/)?src\/(.*)\.[jt]s$/
+  const filePattern = /^(?:.*\/)?src\/(.*)\.[jt]s$/;
 
-  const result: Record<string, InputBinding | undefined> = {}
+  const result: Record<string, InputBinding | undefined> = {};
 
-  const usedExports = new Set<string>()
-  const producingOutputs = new Set<string>()
+  const usedExports = new Set<string>();
+  const producingOutputs = new Set<string>();
 
   for (const input of inputs) {
 
     if (!input.startsWith('src/'))
-      throw NpmBuildError.get('inputPathRequiresPrefix', input, 'src/')
+      throw NpmBuildError.get('inputPathRequiresPrefix', input, 'src/');
 
-    const match = filePattern.exec(input)
+    const match = filePattern.exec(input);
 
     if (!match)
-      throw NpmBuildError.get('inputFileExtensionNotSupported', input)
+      throw NpmBuildError.get('inputFileExtensionNotSupported', input);
 
-    const outputFile = `${match[1]}.mjs`
+    const outputFile = `${match[1]}.mjs`;
 
     if (producingOutputs.has(outputFile))
-      throw NpmBuildError.get('inputGeneratesDuplicateOutput', outputFile)
+      throw NpmBuildError.get('inputGeneratesDuplicateOutput', outputFile);
 
-    producingOutputs.add(outputFile)
+    producingOutputs.add(outputFile);
 
-    const exportEntry = `./${outDir}/${outputFile}`
+    const exportEntry = `./${outDir}/${outputFile}`;
 
-    usedExports.add(exportEntry)
+    usedExports.add(exportEntry);
 
-    const descriptor = normalizedExports[exportEntry]
+    const descriptor = normalizedExports[exportEntry];
 
     // Проверяет наличие ключа в словаре экспорта (при необходимости).
     if (!descriptor && !skipExports)
-      throw NpmBuildError.get('inputHasNoExport', input, exportEntry)
+      throw NpmBuildError.get('inputHasNoExport', input, exportEntry);
 
     result[input] = {
       outputFile,
       dtsSourceFile: `${outDirDts}/${match[1]}.d.ts`,
       dtsOutputFile: descriptor?.dtsOutputFile,
-    }
+    };
 
   }
 
@@ -414,11 +414,11 @@ export function createInputBindings(
 
     // Выявляет незадействованные ключи в словаре экспорта (обратная проверка).
     if (!usedExports.has(key))
-      throw NpmBuildError.get('exportHasNoInput', key)
+      throw NpmBuildError.get('exportHasNoInput', key);
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -445,16 +445,16 @@ export function createInputBindings(
  **/
 export function createDtsMappings(inputBindings: Record<string, InputBinding | undefined>) {
 
-  const mappings: Record<string, string> = {}
+  const mappings: Record<string, string> = {};
 
   for (const binding of Object.values(inputBindings)) {
 
     if (binding?.dtsOutputFile)
-      mappings[binding.dtsSourceFile] = sliceDistPrefix(binding.dtsOutputFile)
+      mappings[binding.dtsSourceFile] = sliceDistPrefix(binding.dtsOutputFile);
 
   }
 
-  return mappings
+  return mappings;
 
 }
 
@@ -481,16 +481,16 @@ export function createDtsMappings(inputBindings: Record<string, InputBinding | u
  **/
 function getPackagePrefix(cwdRoot: string, cwdPackage: string) {
 
-  const packagePrefix = toPosix(nodePath.relative(cwdRoot, cwdPackage))
+  const packagePrefix = toPosix(nodePath.relative(cwdRoot, cwdPackage));
 
   return packagePrefix
     ? `${packagePrefix}/`
-    : ''
+    : '';
 
 }
 
 // Проверка TypeScript выполняется только для первой конфигурации.
-let hasTsChecked = false
+let hasTsChecked = false;
 
 /**
  * Создаёт конфигурации Rollup для пакета на основе его `package.json`.
@@ -519,7 +519,7 @@ let hasTsChecked = false
 export function definePackageConfig(options: RollupConfigOptions = {}) {
 
   // Реальная директория запуска может отличаться от директории пакета `cwd`.
-  const cwdRoot = process.cwd()
+  const cwdRoot = process.cwd();
 
   const {
     cwd = cwdRoot,
@@ -527,14 +527,14 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
     external = [],
     plugins,
     skipExports = false,
-  } = options
+  } = options;
 
-  const packagePrefix = getPackagePrefix(cwdRoot, cwd)
+  const packagePrefix = getPackagePrefix(cwdRoot, cwd);
 
-  const outDirPath = nodePath.join(cwd, outDir)
-  const outDirDtsPath = nodePath.join(cwd, outDirDts)
+  const outDirPath = nodePath.join(cwd, outDir);
+  const outDirDtsPath = nodePath.join(cwd, outDirDts);
 
-  const pkgPath = nodePath.resolve(cwd, 'package.json')
+  const pkgPath = nodePath.resolve(cwd, 'package.json');
 
   const externalFilter = createExternalFilter(
     cwd,
@@ -543,26 +543,26 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
       pkgPath, // Для предотвращения встраивания `package.json` в бандл
     ],
     external
-  )
+  );
 
-  const normalizedInput = normalizeInput(input)
+  const normalizedInput = normalizeInput(input);
 
-  const { exports = {} } = readPackage(pkgPath)
+  const { exports = {} } = readPackage(pkgPath);
 
   const normalizedExports = !skipExports
     ? normalizeExports(exports)
-    : {}
+    : {};
 
   const inputBindings = createInputBindings(
     normalizedInput,
     normalizedExports,
     skipExports
-  )
+  );
 
-  const dtsMappings = createDtsMappings(inputBindings)
+  const dtsMappings = createDtsMappings(inputBindings);
 
   const dtsInputs = Object.keys(dtsMappings)
-    .map(item => `${packagePrefix}${item}`)
+    .map(item => `${packagePrefix}${item}`);
 
   const rollupConfigs = [
     createBuildConfig('mjs', {
@@ -583,16 +583,16 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
 
             const localPath = nodePath
               .relative(cwd, chunk.facadeModuleId)
-              .replaceAll(nodePath.sep, nodePath.posix.sep)
+              .replaceAll(nodePath.sep, nodePath.posix.sep);
 
-            const binding = inputBindings[localPath]
+            const binding = inputBindings[localPath];
 
             if (binding)
-              return binding.outputFile
+              return binding.outputFile;
 
           }
 
-          return `${chunk.name}.mjs`
+          return `${chunk.name}.mjs`;
 
         },
         chunkFileNames(chunk) {
@@ -601,14 +601,14 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
           // вместо порядкового номера (`index.mjs`, `index2.mjs`, `index3.mjs`)
           //
           if (chunk.name === 'index' && chunk.facadeModuleId)
-            return `${basename(dirname(chunk.facadeModuleId))}.mjs`
+            return `${basename(dirname(chunk.facadeModuleId))}.mjs`;
 
-          return `${chunk.name}.mjs`
+          return `${chunk.name}.mjs`;
 
         },
       },
     }),
-  ]
+  ];
 
   if (dtsInputs.length > 0) {
 
@@ -633,22 +633,22 @@ export function definePackageConfig(options: RollupConfigOptions = {}) {
 
             const localPath = nodePath
               .relative(cwd, chunk.facadeModuleId)
-              .replaceAll(nodePath.sep, nodePath.posix.sep)
+              .replaceAll(nodePath.sep, nodePath.posix.sep);
 
             if (dtsMappings[localPath])
-              return dtsMappings[localPath]
+              return dtsMappings[localPath];
 
           }
 
-          return `${chunk.name}.mts`
+          return `${chunk.name}.mts`;
 
         },
       },
-    })
+    });
 
   }
 
-  return rollupConfigs
+  return rollupConfigs;
 
 }
 
@@ -667,16 +667,16 @@ function createBuildConfig(
   options: BuildOptions
 ): RollupOptions {
 
-  const { cwd, external, input, emitDeclarations, plugins = [], outPath, outPathDts, output } = options
+  const { cwd, external, input, emitDeclarations, plugins = [], outPath, outPathDts, output } = options;
 
-  output.sourcemap = !!process.env.SOURCE_MAP
-  output.externalLiveBindings = false
+  output.sourcemap = !!process.env.SOURCE_MAP;
+  output.externalLiveBindings = false;
 
-  const isProductionBuild = process.env.NODE_ENV === 'production'
+  const isProductionBuild = process.env.NODE_ENV === 'production';
   // Конечный билд для запуска в окружении Node.
-  const isNodeBuild = buildName === 'cjs'
+  const isNodeBuild = buildName === 'cjs';
   // Билд для дальнейшей сборки с использованием бандлеров.
-  const isBundlerEsmBuild = buildName === 'mjs'
+  const isBundlerEsmBuild = buildName === 'mjs';
 
   const tsPlugin = ts({
     tsconfig: nodePath.resolve(cwd, './tsconfig.build.json'),
@@ -694,13 +694,13 @@ function createBuildConfig(
         dtsAlias(),
       ],
     },
-  })
+  });
 
   // При запуске команды build, проверки TS и генерация определений
   // выполняются единожды - для первой конфигурации.
-  hasTsChecked = true
+  hasTsChecked = true;
 
-  const assetsSrc = toPosix(nodePath.join(cwd, 'public/*'))
+  const assetsSrc = toPosix(nodePath.join(cwd, 'public/*'));
 
   return {
     input,
@@ -726,7 +726,7 @@ function createBuildConfig(
       }),
     ],
     output,
-  }
+  };
 
 }
 
@@ -759,21 +759,21 @@ function createReplacePlugin(
       ? `(process.env.NODE_ENV === 'test')`
       : 'false',
 
-  }
+  };
 
   // Allow inline overrides like
   // __DEV__=true pnpm build
   Object.keys(replacements).forEach((key) => {
 
     if (key in process.env)
-      replacements[key] = process.env[key]
+      replacements[key] = process.env[key];
 
-  })
+  });
 
   return replace({
     preventAssignment: true,
     values: replacements,
     delimiters: ['\\b', '\\b(?![\\.\\:])'],
-  })
+  });
 
 }

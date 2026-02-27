@@ -1,9 +1,9 @@
-import { FEATURE_ORIGIN_CLI } from '#constants'
-import { t } from '#i18n'
-import type { ProjectContext } from '#project-context/types'
-import { logger } from '#utils/logger'
-import { extractFeatures, type ExtractedFeature } from './extractor'
-import { selectFeaturesAsync } from './selector'
+import { FEATURE_ORIGIN_CLI } from '#constants';
+import { t } from '#i18n';
+import type { ProjectContext } from '#project-context/types';
+import { logger } from '#utils/logger';
+import { extractFeatures, type ExtractedFeature } from './extractor';
+import { selectFeaturesAsync } from './selector';
 
 function overrideState(
   key: string,
@@ -11,37 +11,37 @@ function overrideState(
   features: Record<string, ExtractedFeature | undefined>
 ) {
 
-  const feature = features[key]
+  const feature = features[key];
 
   if (!feature) {
 
     if (isEnabled)
-      logger.warn(t('feature.skipped', { feature: key }))
+      logger.warn(t('feature.skipped', { feature: key }));
 
-    return false
+    return false;
 
   }
 
   if (isEnabled) {
 
     if (feature.state === 'blocked')
-      throw new Error(`Feature ${key} blocked by ${feature.origin}`)
+      throw new Error(`Feature ${key} blocked by ${feature.origin}`);
 
-    feature.state = 'required'
-    feature.origin = FEATURE_ORIGIN_CLI
+    feature.state = 'required';
+    feature.origin = FEATURE_ORIGIN_CLI;
 
   }
   else {
 
     if (feature.state === 'required')
-      throw new Error(`Feature ${key} required by ${feature.origin}`)
+      throw new Error(`Feature ${key} required by ${feature.origin}`);
 
-    feature.state = 'blocked'
-    feature.origin = FEATURE_ORIGIN_CLI
+    feature.state = 'blocked';
+    feature.origin = FEATURE_ORIGIN_CLI;
 
   }
 
-  return true
+  return true;
 
 }
 
@@ -52,17 +52,17 @@ export async function resolveFeaturesAsync(
 
 ) {
 
-  const features = extractFeatures(context.templates)
+  const features = extractFeatures(context.templates);
 
   for (const [key, value] of Object.entries(overrides)) {
 
     if (value === undefined)
-      continue
+      continue;
 
-    overrideState(key, !!value, features)
+    overrideState(key, !!value, features);
 
   }
 
-  return await selectFeaturesAsync(features)
+  return await selectFeaturesAsync(features);
 
 }

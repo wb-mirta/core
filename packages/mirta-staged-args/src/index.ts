@@ -9,7 +9,7 @@
  *
  **/
 
-export { createStagedArgs } from './args'
+export { createStagedArgs } from './args';
 
 export type {
   StagedArgs,
@@ -19,8 +19,8 @@ export type {
   OptionSchema,
   SuggestFunc,
   ParseError
-} from './types'
+} from './types';
 
-export type { Result } from './result'
+export type { Result } from './result';
 
-export { SchemaError } from './errors/schema'
+export { SchemaError } from './errors/schema';

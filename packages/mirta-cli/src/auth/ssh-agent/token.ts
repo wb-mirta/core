@@ -1,9 +1,9 @@
-import type { Pkcs11Path } from '#src/config/types'
-import { logger } from '#utils/logger'
-import { STDIO_INTERACTIVE } from '#src/utils/shell'
-import { SSH_AUTH_SOCK } from '#auth/constants'
-import { hasEntryAsync } from './entry'
-import type { AuthContext } from '#auth/types'
+import type { Pkcs11Path } from '#src/config/types';
+import { logger } from '#utils/logger';
+import { STDIO_INTERACTIVE } from '#src/utils/shell';
+import { SSH_AUTH_SOCK } from '#auth/constants';
+import { hasEntryAsync } from './entry';
+import type { AuthContext } from '#auth/types';
 
 /**
  * Удаляет PKCS#11 токен из SSH-агента.
@@ -32,14 +32,14 @@ export async function removeTokenAsync(
         },
         stdio: 'ignore',
       }
-    )
+    );
 
-    return true
+    return true;
 
   }
   catch {
 
-    return false
+    return false;
 
   }
 
@@ -65,7 +65,7 @@ export async function hasTokenAsync(
   // Для PKCS#11 токенов ssh-add -l выводит путь к библиотеке,
   // поэтому можем проверить наличие через простой поиск строки
 
-  return await hasEntryAsync(path, context)
+  return await hasEntryAsync(path, context);
 
 }
 
@@ -87,12 +87,12 @@ export async function addTokenAsync(
   context: AuthContext
 ): Promise<void> {
 
-  const args = ['-q']
+  const args = ['-q'];
 
   if (context.ttl)
-    args.push('-t', context.ttl)
+    args.push('-t', context.ttl);
 
-  args.push('-s', path)
+  args.push('-s', path);
 
   await context.runAsync(
     'ssh-add',
@@ -103,8 +103,8 @@ export async function addTokenAsync(
       },
       stdio: STDIO_INTERACTIVE,
       cancelCodes: [2, 130],
-    })
+    });
 
-  logger.debug('PKCS#11 token added to ssh-agent')
+  logger.debug('PKCS#11 token added to ssh-agent');
 
 }

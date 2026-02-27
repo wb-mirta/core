@@ -5,19 +5,19 @@ if (typeof Object.assign != 'function') {
   Object.defineProperty(Object, 'assign', {
     value: function assign<T extends object>(target?: T) { // .length of function is 2
 
-      'use strict'
+      'use strict';
       if (target == null) { // TypeError if undefined or null
 
-        throw new TypeError('Cannot convert undefined or null to object')
+        throw new TypeError('Cannot convert undefined or null to object');
 
       }
 
-      const to = Object(target) as T
+      const to = Object(target) as T;
 
       for (let index = 1; index < arguments.length; index++) {
 
         // eslint-disable-next-line prefer-rest-params
-        const nextSource = arguments[index] as unknown
+        const nextSource = arguments[index] as unknown;
 
         if (nextSource != null) { // Skip over if undefined or null
 
@@ -27,7 +27,7 @@ if (typeof Object.assign != 'function') {
             if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
 
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              to[nextKey] = nextSource[nextKey]
+              to[nextKey] = nextSource[nextKey];
 
             }
 
@@ -36,11 +36,11 @@ if (typeof Object.assign != 'function') {
         }
 
       }
-      return to
+      return to;
 
     },
     writable: true,
     configurable: true,
-  })
+  });
 
 }

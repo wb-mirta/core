@@ -1,5 +1,5 @@
-import type { StagedArgs } from '@mirta/staged-args'
-import { assertNoParseErrors } from '#assertions'
+import type { StagedArgs } from '@mirta/staged-args';
+import { assertNoParseErrors } from '#assertions';
 
 // Опции режима сборки mono
 const options = {
@@ -17,7 +17,7 @@ const options = {
     type: 'boolean',
   },
 
-} as const
+} as const;
 
 /**
  * Парсит аргументы командной строки для сборки в режиме `mono`.
@@ -32,16 +32,16 @@ export function parseArgs(
   args: StagedArgs
 ) {
 
-  const parseResult = args.parseFinal(options)
-  assertNoParseErrors(parseResult)
+  const parseResult = args.parseFinal(options);
+  assertNoParseErrors(parseResult);
 
-  const { values, positionals } = parseResult.data
+  const { values, positionals } = parseResult.data;
 
   return {
 
     values,
     positionals,
 
-  }
+  };
 
 }

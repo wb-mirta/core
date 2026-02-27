@@ -1,7 +1,7 @@
-import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from '#auth/constants'
-import type { AuthContext } from '#auth/types'
-import { logger } from '#utils/logger'
-import { STDIO_CAPTURE_ERRORS } from '#utils/shell'
+import { DEFAULT_SSH_KEY_TTL, SSH_AUTH_SOCK, SSH_DIR } from '#auth/constants';
+import type { AuthContext } from '#auth/types';
+import { logger } from '#utils/logger';
+import { STDIO_CAPTURE_ERRORS } from '#utils/shell';
 
 /**
  * Обеспечивает запуск изолированного SSH-агента для текущей сессии CLI.
@@ -32,12 +32,12 @@ export async function ensureAgentIsRunningAsync(context: AuthContext): Promise<v
         stdio: STDIO_CAPTURE_ERRORS,
         doneCodes: [0, 1],
       }
-    )
+    );
 
     if (result.code === 0 || result.code === 1) {
 
-      logger.debug('SSH agent is running')
-      return
+      logger.debug('SSH agent is running');
+      return;
 
     }
 
@@ -51,35 +51,35 @@ export async function ensureAgentIsRunningAsync(context: AuthContext): Promise<v
   try {
 
     // Удаляем старый сокет, если существует
-    await context.runAsync('rm', ['-f', SSH_AUTH_SOCK], { stdio: STDIO_CAPTURE_ERRORS })
+    await context.runAsync('rm', ['-f', SSH_AUTH_SOCK], { stdio: STDIO_CAPTURE_ERRORS });
 
   }
   catch (e: unknown) {
 
-    logger.warn(`Could not remove stale socket: ${e instanceof Error ? e.message : String(e)}`)
+    logger.warn(`Could not remove stale socket: ${e instanceof Error ? e.message : String(e)}`);
 
   }
 
   try {
 
     // Создаём директорию ~/.ssh, если не существует
-    await context.runAsync('mkdir', ['-p', SSH_DIR], { stdio: STDIO_CAPTURE_ERRORS })
+    await context.runAsync('mkdir', ['-p', SSH_DIR], { stdio: STDIO_CAPTURE_ERRORS });
 
   }
   catch (e: unknown) {
 
     logger.warn(
       `Could not create SSH directory: ${e instanceof Error ? e.message : String(e)}`
-    )
+    );
 
   }
 
   // Аргументы для запуска ssh-agent
-  const args = ['-a', SSH_AUTH_SOCK, '-t', DEFAULT_SSH_KEY_TTL]
+  const args = ['-a', SSH_AUTH_SOCK, '-t', DEFAULT_SSH_KEY_TTL];
 
   // Если используется PKCS#11, указываем путь к модулю
   if (context.pkcs11)
-    args.push('-P', context.pkcs11)
+    args.push('-P', context.pkcs11);
 
   try {
 
@@ -89,14 +89,14 @@ export async function ensureAgentIsRunningAsync(context: AuthContext): Promise<v
       {
         stdio: STDIO_CAPTURE_ERRORS,
       }
-    )
+    );
 
-    logger.debug('SSH agent started')
+    logger.debug('SSH agent started');
 
   }
   catch (e) {
 
-    throw new Error(`Failed to start ssh-agent: ${e instanceof Error ? e.message : String(e)}`)
+    throw new Error(`Failed to start ssh-agent: ${e instanceof Error ? e.message : String(e)}`);
 
   }
 

@@ -1,2 +1,2 @@
-export { definePackageConfig } from '#configs/package'
-export { defineRuntimeConfig as defineConfig } from '#configs/runtime'
+export { definePackageConfig } from '#configs/package';
+export { defineRuntimeConfig as defineConfig } from '#configs/runtime';

@@ -6,16 +6,16 @@
 export interface Counter {
 
   /** Позволяет прочесть значение счётчика. */
-  count: number
+  count: number;
 
   /** Увеличивает значение счётчика на единицу. */
-  increment(): void
+  increment(): void;
 
   /** Уменьшает значение счётчика на единицу. */
-  decrement(): void
+  decrement(): void;
 
   /** Сбрасывает счётчик к исходному значению. */
-  reset(): void
+  reset(): void;
 
 }
 
@@ -27,7 +27,7 @@ export interface Counter {
  **/
 export function useCounter(): Counter {
 
-  const initialCount = 0
+  const initialCount = 0;
 
   return {
 
@@ -36,22 +36,22 @@ export function useCounter(): Counter {
 
     increment() {
 
-      this.count += 1
+      this.count += 1;
 
     },
 
     decrement() {
 
-      this.count -= 1
+      this.count -= 1;
 
     },
 
     reset() {
 
-      this.count = initialCount
+      this.count = initialCount;
 
     },
 
-  }
+  };
 
 }

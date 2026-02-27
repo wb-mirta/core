@@ -1,5 +1,5 @@
-import { THIS_PACKAGE_NAME } from '#constants'
-import { t } from '#i18n'
+import { THIS_PACKAGE_NAME } from '#constants';
+import { t } from '#i18n';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с работой локализации.
@@ -22,7 +22,7 @@ export class CreationError extends Error {
    * Позволяет точно определить причину ошибки в обработчиках `try/catch`.
    *
    **/
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор, используемый только внутри
@@ -36,17 +36,17 @@ export class CreationError extends Error {
    **/
   private constructor(message: string, code: string) {
 
-    super(`[${THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${THIS_PACKAGE_NAME}] ${message}`);
 
-    this.name = 'CreationError'
-    this.code = code
+    this.name = 'CreationError';
+    this.code = code;
 
     // Захватываем стек вызовов, исключая фабричный метод `get`,
     // чтобы улучшить читаемость трассировки.
     //
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, CreationError.get)
+      Error.captureStackTrace(this, CreationError.get);
 
   }
 
@@ -71,7 +71,7 @@ export class CreationError extends Error {
     'project.denyOverwrite': () =>
       t('project.denyOverwrite'),
 
-  } as const
+  } as const;
 
   /**
    * Фабричный метод для создания экземпляра ошибки по её коду.
@@ -90,11 +90,11 @@ export class CreationError extends Error {
   ): CreationError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new CreationError(message, code)
+    return new CreationError(message, code);
 
   }
 }

@@ -1,11 +1,11 @@
 export class PromptCanceledError extends Error {
   constructor() {
 
-    super()
+    super();
 
-    this.name = 'PromptCanceledError'
+    this.name = 'PromptCanceledError';
 
-    Error.captureStackTrace(this, PromptCanceledError)
+    Error.captureStackTrace(this, PromptCanceledError);
 
   }
 }

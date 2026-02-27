@@ -1,10 +1,10 @@
-import type { DeployMapping, MirtaConnection } from '#config/types'
-import { logger } from '#utils/logger'
-import { t } from '#i18n'
-import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell'
-import { SSH_AUTH_SOCK } from '#auth/constants'
-import { KNOWN_SSH_PORT } from '#config/constants'
-import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
+import type { DeployMapping, MirtaConnection } from '#config/types';
+import { logger } from '#utils/logger';
+import { t } from '#i18n';
+import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell';
+import { SSH_AUTH_SOCK } from '#auth/constants';
+import { KNOWN_SSH_PORT } from '#config/constants';
+import { isExistsAsync, resolveSubpath } from '#src/utils/file-system';
 
 /**
  * Параметры для выполнения команды rsync.
@@ -18,31 +18,31 @@ export interface RunRsyncOptions {
    * Подключение к целевому серверу.
    *
    **/
-  connection: MirtaConnection
+  connection: MirtaConnection;
 
   /**
    * Правило копирования: исходный и целевой пути, фильтры.
    *
    **/
-  mapping: DeployMapping
+  mapping: DeployMapping;
 
   /**
    * Целевая группа на контроллере, для установки прав доступа.
    *
    **/
-  toGroup?: string
+  toGroup?: string;
 
   /**
    * Рабочая директория (обычно корень проекта).
    *
    **/
-  cwd: string
+  cwd: string;
 
   /**
    * Режим симуляции — команда не применяется, только показываются изменения.
    *
    **/
-  isDryRun?: boolean
+  isDryRun?: boolean;
 
 }
 
@@ -66,31 +66,31 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
     toGroup,
     cwd,
     isDryRun,
-  } = options
+  } = options;
 
-  const fromDirectory = resolveSubpath(cwd, mapping.from)
+  const fromDirectory = resolveSubpath(cwd, mapping.from);
 
   if (!await isExistsAsync(fromDirectory)) {
 
     logger.step(t('deploy.sourceNotExists', {
       source: fromDirectory,
-    }))
+    }));
 
     // Файлы могут отсутствовать, это допустимо.
 
-    return
+    return;
 
   }
 
-  const args: string[] = []
+  const args: string[] = [];
 
-  const sshParts: string[] = []
+  const sshParts: string[] = [];
 
   if (connection.port && connection.port !== KNOWN_SSH_PORT)
-    sshParts.push(`-p ${connection.port}`)
+    sshParts.push(`-p ${connection.port}`);
 
   if (sshParts.length > 0)
-    args.push('-e', `'ssh ${sshParts.join(' ')}'`)
+    args.push('-e', `'ssh ${sshParts.join(' ')}'`);
 
   // Флаги rsync:
   // -r: рекурсивно
@@ -101,40 +101,40 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
 
   args.push(
     '-rtzgO'
-  )
+  );
 
   if (isDryRun)
-    args.push('--dry-run', '--itemize-changes')
+    args.push('--dry-run', '--itemize-changes');
 
   if (mapping.cleanup)
-    args.push('--delete')
+    args.push('--delete');
 
   mapping.exclude?.forEach((pattern) => {
 
-    args.push('--exclude', pattern)
+    args.push('--exclude', pattern);
 
-  })
+  });
 
   mapping.protect?.forEach((pattern) => {
 
-    args.push('--filter', `P ${pattern}`)
+    args.push('--filter', `P ${pattern}`);
 
-  })
+  });
 
   if (toGroup)
-    args.push('--groupmap', `*:${toGroup}`)
+    args.push('--groupmap', `*:${toGroup}`);
 
-  const to = `${connection.username}@${connection.hostname}:${mapping.to}`
+  const to = `${connection.username}@${connection.hostname}:${mapping.to}`;
 
   args.push(
     mapping.from,
     to
-  )
+  );
 
   logger.step(t('deploy.transmitting', {
     from: mapping.from,
     to: mapping.to,
-  }))
+  }));
 
   await runCommandAsync.inUnixShell(connection.wsl)('rsync', [...args], {
     env: {
@@ -143,6 +143,6 @@ export async function runRsyncAsync(options: RunRsyncOptions): Promise<void> {
     cwd,
     stdio: STDIO_INTERACTIVE,
     shell: false,
-  })
+  });
 
 }

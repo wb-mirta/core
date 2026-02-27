@@ -1,15 +1,15 @@
-import type { TemplateSequence } from '#template/types'
+import type { TemplateSequence } from '#template/types';
 
 export interface ProjectContext {
 
-  name: string
-  rootDir: string
+  name: string;
+  rootDir: string;
 
-  shouldOverwrite: boolean
-  shouldCreate: boolean
+  shouldOverwrite: boolean;
+  shouldCreate: boolean;
 
-  templates: TemplateSequence
+  templates: TemplateSequence;
 
-  barebone: boolean | undefined
+  barebone: boolean | undefined;
 
 }

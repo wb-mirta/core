@@ -1,6 +1,6 @@
-import { assertNoParseErrors } from '#src/utils/assertions'
-import { logger } from '#utils/logger'
-import type { OptionSchema, StagedArgs } from '@mirta/staged-args'
+import { assertNoParseErrors } from '#src/utils/assertions';
+import { logger } from '#utils/logger';
+import type { OptionSchema, StagedArgs } from '@mirta/staged-args';
 
 const options = ({
   'config': {
@@ -31,35 +31,35 @@ const options = ({
   'dry': {
     type: 'boolean',
   },
-}) satisfies OptionSchema
+}) satisfies OptionSchema;
 
 export function parseArgs(
   args: StagedArgs
 ) {
 
-  const parseResult = args.parseFinal(options)
-  assertNoParseErrors(parseResult)
+  const parseResult = args.parseFinal(options);
+  assertNoParseErrors(parseResult);
 
-  const { values, positionals } = parseResult.data
+  const { values, positionals } = parseResult.data;
 
   if (values.dry) {
 
-    logger.warn('Deprecated flag "--dry" used. Please use "--dry-run" instead')
-    values['dry-run'] = values['dry-run'] !== false
+    logger.warn('Deprecated flag "--dry" used. Please use "--dry-run" instead');
+    values['dry-run'] = values['dry-run'] !== false;
 
   }
 
   if (values.skipGit) {
 
-    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead')
-    values['skip-git'] = values['skip-git'] !== false
+    logger.warn('Deprecated flag "--skipGit" used. Please use "--skip-git" instead');
+    values['skip-git'] = values['skip-git'] !== false;
 
   }
 
   if (values.skipPrompts) {
 
-    logger.warn('Deprecated flag "--skipPrompts" used. Please use "--skip-prompts" instead')
-    values['skip-prompts'] = values['skip-prompts'] !== false
+    logger.warn('Deprecated flag "--skipPrompts" used. Please use "--skip-prompts" instead');
+    values['skip-prompts'] = values['skip-prompts'] !== false;
 
   }
 
@@ -68,6 +68,6 @@ export function parseArgs(
     values,
     positionals,
 
-  }
+  };
 
 }

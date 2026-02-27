@@ -13,7 +13,7 @@
  *
  **/
 export const isString = (value: unknown): value is string =>
-  typeof value === 'string'
+  typeof value === 'string';
 
 /**
  * Проверяет, является ли переданное значение числовым примитивом (`number`), не равным `NaN`.
@@ -31,7 +31,7 @@ export const isString = (value: unknown): value is string =>
  *
  **/
 export const isNumber = (value: unknown): value is number =>
-  typeof value === 'number' && !isNaN(value)
+  typeof value === 'number' && !isNaN(value);
 
 /**
  * Проверяет, является ли переданное значение булевым примитивом (`boolean`).
@@ -56,7 +56,7 @@ export const isNumber = (value: unknown): value is number =>
  **/
 export function isBoolean(value: unknown): value is boolean {
 
-  return typeof value === 'boolean'
+  return typeof value === 'boolean';
 
 }
 
@@ -79,7 +79,7 @@ export function isBoolean(value: unknown): value is boolean {
  *
  **/
 export const isFunction = (value: unknown): value is ((...args: unknown[]) => unknown) =>
-  typeof value === 'function'
+  typeof value === 'function';
 
 /**
  * Проверяет, является ли значение объектом —
@@ -105,7 +105,7 @@ export const isFunction = (value: unknown): value is ((...args: unknown[]) => un
  * @since 0.4.0
  */
 export const isObject = (value: unknown): value is object =>
-  value !== null && typeof value === 'object'
+  value !== null && typeof value === 'object';
 
 /**
  * Проверяет, является ли значение "обычным объектом" —
@@ -137,10 +137,10 @@ export const isObject = (value: unknown): value is object =>
 export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
 
   if (!isObject(value))
-    return false
+    return false;
 
-  const proto = Object.getPrototypeOf(value) as unknown
+  const proto = Object.getPrototypeOf(value) as unknown;
 
-  return proto === null || proto === Object.prototype
+  return proto === null || proto === Object.prototype;
 
-}
+};

@@ -1,10 +1,10 @@
-import { LocalizationError } from '#src/errors'
-import { getSystemLocale, setLocaleAsync, resolveLocale, loadAssetAsync, resolveSupportedLocalesAsync } from './locale'
-import { createTranslator } from './translator'
-import type { Localization, LocalizationContext, GenericShape } from './types'
+import { LocalizationError } from '#src/errors';
+import { getSystemLocale, setLocaleAsync, resolveLocale, loadAssetAsync, resolveSupportedLocalesAsync } from './locale';
+import { createTranslator } from './translator';
+import type { Localization, LocalizationContext, GenericShape } from './types';
 
-import { DEFAULT_FALLBACK_LOCALE } from './constants'
-import { join } from 'node:path'
+import { DEFAULT_FALLBACK_LOCALE } from './constants';
+import { join } from 'node:path';
 
 /**
  * Опции для инициализации системы локализации.
@@ -19,7 +19,7 @@ export interface LocalizationOptions {
    * По умолчанию `process.cwd()`
    *
    **/
-  cwd?: string
+  cwd?: string;
 
   /**
    * Локаль по умолчанию, если системная недоступна или не поддерживается.
@@ -27,7 +27,7 @@ export interface LocalizationOptions {
    * По умолчанию `'en-US'`
    *
    **/
-  fallbackLocale?: string
+  fallbackLocale?: string;
 
   /**
    * Определяет реакцию на ошибки при локализации.
@@ -38,7 +38,7 @@ export interface LocalizationOptions {
    * По умолчанию `false`.
    *
    **/
-  strict?: boolean
+  strict?: boolean;
 }
 
 /**
@@ -80,30 +80,30 @@ export async function initLocalizationAsync<
   TShape extends GenericShape = GenericShape
 >(options: LocalizationOptions = {}): Promise<Localization<TShape>> {
 
-  const cwd = options.cwd ?? process.cwd()
+  const cwd = options.cwd ?? process.cwd();
 
   const fallbackLocale = resolveLocale(
     options.fallbackLocale,
     DEFAULT_FALLBACK_LOCALE
-  )
+  );
 
   const fallbackAsset = await loadAssetAsync<TShape>(
     fallbackLocale,
     cwd
-  )
+  );
 
   if (!fallbackAsset)
-    throw LocalizationError.get('fallback.loadFailed', fallbackLocale)
+    throw LocalizationError.get('fallback.loadFailed', fallbackLocale);
 
-  const systemLocale = resolveLocale(getSystemLocale(), fallbackLocale)
+  const systemLocale = resolveLocale(getSystemLocale(), fallbackLocale);
 
   const effectiveAsset = await loadAssetAsync<TShape>(
     systemLocale,
     cwd
-  ) ?? fallbackAsset
+  ) ?? fallbackAsset;
 
-  const localesDir = join(cwd, 'locales')
-  const supportedLocales = await resolveSupportedLocalesAsync(localesDir)
+  const localesDir = join(cwd, 'locales');
+  const supportedLocales = await resolveSupportedLocalesAsync(localesDir);
 
   const context: LocalizationContext<TShape> = {
 
@@ -117,7 +117,7 @@ export async function initLocalizationAsync<
     locale: effectiveAsset.locale,
     messages: effectiveAsset.messages,
 
-  }
+  };
 
   return {
 
@@ -125,12 +125,12 @@ export async function initLocalizationAsync<
 
     setLocaleAsync: async (locale: string): Promise<void> => {
 
-      await setLocaleAsync(locale, context)
+      await setLocaleAsync(locale, context);
 
     },
 
     t: createTranslator(context),
 
-  }
+  };
 
 }

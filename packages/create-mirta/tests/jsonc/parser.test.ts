@@ -1,63 +1,63 @@
-import { JsoncContainer } from '#jsonc/index'
-import { parseJsonc } from '#jsonc/parser'
-import deepMerge from '#utils/deep-merge'
+import { JsoncContainer } from '#jsonc/index';
+import { parseJsonc } from '#jsonc/parser';
+import deepMerge from '#utils/deep-merge';
 
 describe('parseJsonc', () => {
 
   it('should parse empty object', () => {
 
-    const result = parseJsonc('{}')
-    expect(result).toEqual({})
+    const result = parseJsonc('{}');
+    expect(result).toEqual({});
 
-  })
+  });
 
   it('should parse object with string property', () => {
 
-    const result = parseJsonc('{"name": "John"}')
+    const result = parseJsonc('{"name": "John"}');
     expect(result).toEqual({
       name: {
         value: 'John',
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse object with numeric property', () => {
 
-    const result = parseJsonc('{"age": 30}')
+    const result = parseJsonc('{"age": 30}');
     expect(result).toEqual({
       age: {
         value: 30,
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse object with boolean property', () => {
 
-    const result = parseJsonc('{"active": true}')
+    const result = parseJsonc('{"active": true}');
     expect(result).toEqual({
       active: {
         value: true,
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse object with null property', () => {
 
-    const result = parseJsonc('{"value": null}')
+    const result = parseJsonc('{"value": null}');
     expect(result).toEqual({
       value: {
         value: null,
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse nested objects', () => {
 
-    const result = parseJsonc('{"user": {"name": "John", "age": 30}}')
+    const result = parseJsonc('{"user": {"name": "John", "age": 30}}');
     expect(result).toEqual({
       user: {
         value: {
@@ -65,13 +65,13 @@ describe('parseJsonc', () => {
           age: { value: 30 },
         },
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse arrays', () => {
 
-    const result = parseJsonc('{"list": [1, "two", true]}')
+    const result = parseJsonc('{"list": [1, "two", true]}');
 
     expect(result).toEqual({
       list: {
@@ -81,13 +81,13 @@ describe('parseJsonc', () => {
           { value: true },
         ],
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse array of objects', () => {
 
-    const result = parseJsonc('{"items": [{"a": 1}, {"b": 2}]}')
+    const result = parseJsonc('{"items": [{"a": 1}, {"b": 2}]}');
     expect(result).toEqual({
       items: {
         value: [
@@ -95,24 +95,24 @@ describe('parseJsonc', () => {
           { value: { b: { value: 2 } } },
         ],
       },
-    })
+    });
 
-  })
+  });
 
   it('should ignore single-line comments', () => {
 
     const text = `
 // This is a comment
 { "name": "John" }
-`
-    const result = parseJsonc(text)
+`;
+    const result = parseJsonc(text);
     expect(result).toEqual({
       name: {
         value: 'John',
       },
-    })
+    });
 
-  })
+  });
 
   it('should ignore block comments', () => {
 
@@ -120,47 +120,47 @@ describe('parseJsonc', () => {
 /* Comment
    on multiple lines */
 { "value": 42 }
-`
-    const result = parseJsonc(text)
+`;
+    const result = parseJsonc(text);
     expect(result).toEqual({
       value: {
         value: 42,
       },
-    })
+    });
 
-  })
+  });
 
   it('should attach comments to the next property', () => {
 
     const text = `
 // Comment for name
 "name": "Alice"
-`
-    const result = parseJsonc(`{ ${text} }`)
+`;
+    const result = parseJsonc(`{ ${text} }`);
     expect(result).toEqual({
       name: {
         value: 'Alice',
         comments: ['// Comment for name'],
       },
-    })
+    });
 
-  })
+  });
 
   it('should attach block comment to the next property', () => {
 
     const text = `
 /* Block comment */
 "age": 25
-`
-    const result = parseJsonc(`{ ${text} }`)
+`;
+    const result = parseJsonc(`{ ${text} }`);
     expect(result).toEqual({
       age: {
         value: 25,
         comments: ['/* Block comment */'],
       },
-    })
+    });
 
-  })
+  });
 
   it('should handle multiple comments before a property', () => {
 
@@ -168,24 +168,24 @@ describe('parseJsonc', () => {
 // First comment
 // Second comment
 "value": true
-`
-    const result = parseJsonc(`{ ${text} }`)
+`;
+    const result = parseJsonc(`{ ${text} }`);
     expect(result).toEqual({
       value: {
         value: true,
         comments: ['// First comment', '// Second comment'],
       },
-    })
+    });
 
-  })
+  });
 
   it('should not attach comments to array items incorrectly', () => {
 
     const text = `{
 // Comment for array
 "list": [1, 2, 3]
-}`
-    const result = parseJsonc(text)
+}`;
+    const result = parseJsonc(text);
 
     expect(result).toEqual({
       list: {
@@ -196,9 +196,9 @@ describe('parseJsonc', () => {
         ],
         comments: ['// Comment for array'],
       },
-    })
+    });
 
-  })
+  });
 
   it('should parse complex structure with comments and nested types', () => {
 
@@ -218,8 +218,8 @@ describe('parseJsonc', () => {
     "gaming"
   ]
 }
-`
-    const result = parseJsonc(text)
+`;
+    const result = parseJsonc(text);
     expect(result).toEqual({
       name: {
         value: 'Bob',
@@ -240,24 +240,24 @@ describe('parseJsonc', () => {
           { value: 'gaming', comments: ['// Favorite hobby'] },
         ],
       },
-    })
+    });
 
-  })
+  });
 
   it('should handle empty array', () => {
 
-    const result = parseJsonc('{"empty": []}')
+    const result = parseJsonc('{"empty": []}');
     expect(result).toEqual({
       empty: {
         value: [],
       },
-    })
+    });
 
-  })
+  });
 
   it('should handle empty object in array', () => {
 
-    const result = parseJsonc('{"items": [{}]}')
+    const result = parseJsonc('{"items": [{}]}');
 
     expect(result).toEqual({
       items: {
@@ -265,23 +265,23 @@ describe('parseJsonc', () => {
           { value: {} },
         ],
       },
-    })
+    });
 
-  })
+  });
 
   it('should throw on invalid JSON', () => {
 
-    expect(() => parseJsonc('{ invalid }')).toThrow()
+    expect(() => parseJsonc('{ invalid }')).toThrow();
 
-  })
+  });
 
   it('should throw when root is not an object', () => {
 
-    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object')
+    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object');
 
-  })
+  });
 
-})
+});
 
 describe('deepMerge - JsoncNode structure handling', () => {
 
@@ -292,31 +292,31 @@ describe('deepMerge - JsoncNode structure handling', () => {
   "name": "old-name",
   // Version comment
   "version": "1.0.0"
-}`
+}`;
 
     const sourceText = `{
   "name": "new-name"
-}`
+}`;
 
-    const targetObject = parseJsonc(targetText)
-    const sourceObject = parseJsonc(sourceText)
+    const targetObject = parseJsonc(targetText);
+    const sourceObject = parseJsonc(sourceText);
 
     const mergedObject = deepMerge(
       targetObject,
       sourceObject
-    ) as JsoncContainer
+    ) as JsoncContainer;
 
     // Check if name value was updated
-    expect(mergedObject.name.value).toBe('new-name')
+    expect(mergedObject.name.value).toBe('new-name');
 
     // Check if comment is preserved
-    expect(mergedObject.name.comments).toEqual(['// Existing comment'])
+    expect(mergedObject.name.comments).toEqual(['// Existing comment']);
 
     // Check if untouched field keeps its comment
-    expect(mergedObject.version.comments).toEqual(['// Version comment'])
-    expect(mergedObject.version.value).toBe('1.0.0')
+    expect(mergedObject.version.comments).toEqual(['// Version comment']);
+    expect(mergedObject.version.value).toBe('1.0.0');
 
-  })
+  });
 
   it('should preserve comments in nested objects', () => {
 
@@ -328,77 +328,77 @@ describe('deepMerge - JsoncNode structure handling', () => {
     // Host comment
     "host": "localhost"
   }
-}`
+}`;
 
     const sourceText = `{
   "config": {
     "port": 8080
   }
-}`
+}`;
 
-    const targetObject = parseJsonc(targetText)
-    const sourceObject = parseJsonc(sourceText)
+    const targetObject = parseJsonc(targetText);
+    const sourceObject = parseJsonc(sourceText);
 
     const mergedObject = deepMerge(
       targetObject,
       sourceObject
-    ) as JsoncContainer
+    ) as JsoncContainer;
 
     // Check top-level comment
-    expect(mergedObject.config.comments).toEqual(['// Config section'])
+    expect(mergedObject.config.comments).toEqual(['// Config section']);
 
     // Check nested structure
-    const configValue = mergedObject.config.value as JsoncContainer
-    expect(configValue.port.value).toBe(8080)
-    expect(configValue.port.comments).toEqual(['// Port comment'])
+    const configValue = mergedObject.config.value as JsoncContainer;
+    expect(configValue.port.value).toBe(8080);
+    expect(configValue.port.comments).toEqual(['// Port comment']);
 
-    expect(configValue.host.value).toBe('localhost')
-    expect(configValue.host.comments).toEqual(['// Host comment'])
+    expect(configValue.host.value).toBe('localhost');
+    expect(configValue.host.comments).toEqual(['// Host comment']);
 
-  })
+  });
 
   it('should handle adding new fields without losing existing comments', () => {
 
     const targetText = `{
   // Name comment
   "name": "test"
-}`
+}`;
 
     const sourceText = `{
   "description": "new field"
-}`
+}`;
 
-    const targetObject = parseJsonc(targetText)
-    const sourceObject = parseJsonc(sourceText)
+    const targetObject = parseJsonc(targetText);
+    const sourceObject = parseJsonc(sourceText);
 
     const mergedObject = deepMerge(
       targetObject,
       sourceObject
-    ) as JsoncContainer
+    ) as JsoncContainer;
 
     // Existing field should keep its comment
-    expect(mergedObject.name.comments).toEqual(['// Name comment'])
-    expect(mergedObject.name.value).toBe('test')
+    expect(mergedObject.name.comments).toEqual(['// Name comment']);
+    expect(mergedObject.name.value).toBe('test');
 
     // New field should be added
-    expect(mergedObject.description.value).toBe('new field')
+    expect(mergedObject.description.value).toBe('new field');
 
-  })
+  });
 
   it('should handle trailing commas in objects', () => {
 
-    const result = parseJsonc('{"name": "John", "age": 30,}')
+    const result = parseJsonc('{"name": "John", "age": 30,}');
 
     expect(result).toEqual({
       name: { value: 'John' },
       age: { value: 30 },
-    })
+    });
 
-  })
+  });
 
   it('should handle trailing commas in arrays', () => {
 
-    const result = parseJsonc('{"list": [1, 2, 3,]}')
+    const result = parseJsonc('{"list": [1, 2, 3,]}');
 
     expect(result).toEqual({
       list: {
@@ -408,20 +408,20 @@ describe('deepMerge - JsoncNode structure handling', () => {
           { value: 3 },
         ],
       },
-    })
+    });
 
-  })
+  });
 
   it('should provide clear error message for invalid JSON', () => {
 
-    expect(() => parseJsonc('{ invalid }')).toThrow(/Expected|position/)
+    expect(() => parseJsonc('{ invalid }')).toThrow(/Expected|position/);
 
-  })
+  });
 
   it('should provide clear error message when root is not an object', () => {
 
-    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object')
+    expect(() => parseJsonc('[1, 2, 3]')).toThrow('Root must be object');
 
-  })
+  });
 
-})
+});

@@ -1,65 +1,65 @@
-import { type SimulatorInstance } from './types'
-import { mock } from 'vitest-mock-extended'
+import { type SimulatorInstance } from './types';
+import { mock } from 'vitest-mock-extended';
 
 /** Интерфейс имитатора конструкции `getControl`. */
 export interface GetControlSimulator extends SimulatorInstance {
 
   /** Устанавливает значение для указанного контрола. */
-  defineValue(deviceId: string, controlId: string, value: WbRules.MqttValue): void
+  defineValue(deviceId: string, controlId: string, value: WbRules.MqttValue): void;
 
   /** Устанавливает набор значений для различных контролов. */
-  defineValues(presets: { deviceId: string, controlId: string, value: WbRules.MqttValue }[]): void
+  defineValues(presets: { deviceId: string; controlId: string; value: WbRules.MqttValue }[]): void;
 }
 
 function createInstance(): GetControlSimulator {
 
-  let values: Record<string, WbRules.MqttValue> = {}
+  let values: Record<string, WbRules.MqttValue> = {};
 
   function reset() {
 
-    values = {}
+    values = {};
 
     global.getControl = (devicePath: string) => {
 
       return mock<WbRules.Control>({
         getValue: () => values[devicePath],
-      })
+      });
 
-    }
+    };
 
   }
 
   function defineValue(deviceId: string, controlId: string, value: WbRules.MqttValue) {
 
-    values[`${deviceId}/${controlId}`] = value
+    values[`${deviceId}/${controlId}`] = value;
 
   }
 
-  function defineValues(presets: { deviceId: string, controlId: string, value: WbRules.MqttValue }[]) {
+  function defineValues(presets: { deviceId: string; controlId: string; value: WbRules.MqttValue }[]) {
 
     presets.forEach((preset) => {
 
-      values[`${preset.deviceId}/${preset.controlId}`] = preset.value
+      values[`${preset.deviceId}/${preset.controlId}`] = preset.value;
 
-    })
+    });
 
   }
 
-  reset()
+  reset();
 
   return {
     reset,
     defineValue,
     defineValues,
-  }
+  };
 
 }
 
-let instance: GetControlSimulator | undefined
+let instance: GetControlSimulator | undefined;
 
 /** Имитатор конструкции `getControl`. */
 export function useGetControl() {
 
-  return instance ??= createInstance()
+  return instance ??= createInstance();
 
 }

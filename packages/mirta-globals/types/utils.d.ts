@@ -18,7 +18,7 @@
  * @since 0.0.4
  *
  **/
-declare type Expand<T> = { [K in keyof T]: T[K] } & {}
+declare type Expand<T> = { [K in keyof T]: T[K] } & {};
 
 /**
  * Разрешает частичное заполнение полей объекта, но требует наличия хотя бы одного поля.
@@ -41,7 +41,7 @@ declare type Expand<T> = { [K in keyof T]: T[K] } & {}
  * @since 0.3.3
  *
  **/
-declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U]
+declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
 
 /**
  * Утилита для создания "брендированных типов" (branded types).
@@ -66,4 +66,4 @@ declare type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[
  *
  **/
 declare type Branded<TValue, TBrand extends string | symbol>
-  = TValue & { readonly __brand: TBrand }
+  = TValue & { readonly __brand: TBrand };

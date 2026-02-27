@@ -1,26 +1,26 @@
-import { assertIsSyncedWithRemoteAsync, assertWorkflowResultAsync, getRepositoryDetails } from '#src/utils/github'
-import { logger } from '#utils/logger'
-import chalk from 'chalk'
-import type { ReleaseContext } from './types'
+import { assertIsSyncedWithRemoteAsync, assertWorkflowResultAsync, getRepositoryDetails } from '#src/utils/github';
+import { logger } from '#utils/logger';
+import chalk from 'chalk';
+import type { ReleaseContext } from './types';
 
-const { yellow } = chalk
+const { yellow } = chalk;
 
 export async function runGitChecksAsync(
   context: Pick<ReleaseContext, 'inWorkTree' | 'skipGit'>
 ): Promise<Pick<ReleaseContext, 'repository' | 'connectionType'>> {
 
   if (!context.inWorkTree || context.skipGit)
-    return {}
+    return {};
 
-  const repoDetails = await getRepositoryDetails()
-  const { name: repository, connectionType } = repoDetails
+  const repoDetails = await getRepositoryDetails();
+  const { name: repository, connectionType } = repoDetails;
 
-  logger.log(`Repository: ${yellow(repository)}`)
-  await assertIsSyncedWithRemoteAsync(repository)
+  logger.log(`Repository: ${yellow(repository)}`);
+  await assertIsSyncedWithRemoteAsync(repository);
 
-  logger.step('Ensuring CI status for HEAD...')
-  await assertWorkflowResultAsync(repository, 'build')
+  logger.step('Ensuring CI status for HEAD...');
+  await assertWorkflowResultAsync(repository, 'build');
 
-  return { repository, connectionType }
+  return { repository, connectionType };
 
 }

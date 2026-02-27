@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+import { spawn } from 'node:child_process';
 
 /**
  * Запускает команду в дочернем процессе с поддержкой таймаута, отмены и обработки ошибок.
@@ -31,29 +31,29 @@ export function runCommand(command, args, options = {}) {
     env: options.env ?? process.env,
     stdio: options.stdio ?? 'pipe',
     shell: options.shell ?? false,
-  })
+  });
 
   const result = new Promise((resolve, reject) => {
 
-    let timeoutId
-    let abortHandler
+    let timeoutId;
+    let abortHandler;
 
     const cleanup = () => {
 
       if (timeoutId != null) {
 
-        clearTimeout(timeoutId)
-        timeoutId = undefined
+        clearTimeout(timeoutId);
+        timeoutId = undefined;
 
       }
 
       if (!abortHandler || !options.signal)
-        return
+        return;
 
-      options.signal.removeEventListener('abort', abortHandler)
-      abortHandler = undefined
+      options.signal.removeEventListener('abort', abortHandler);
+      abortHandler = undefined;
 
-    }
+    };
 
     // Обработка сигнала отмены
     if (options.signal) {
@@ -61,24 +61,24 @@ export function runCommand(command, args, options = {}) {
       // Проверка немедленной отмены
       if (options.signal.aborted) {
 
-        cleanup()
-        child.kill('SIGTERM')
+        cleanup();
+        child.kill('SIGTERM');
 
-        reject(new Error('Operation aborted'))
-        return
+        reject(new Error('Operation aborted'));
+        return;
 
       }
 
       abortHandler = () => {
 
-        cleanup()
+        cleanup();
 
-        child.kill('SIGTERM')
-        reject(new Error('Operation aborted'))
+        child.kill('SIGTERM');
+        reject(new Error('Operation aborted'));
 
-      }
+      };
 
-      options.signal.addEventListener('abort', abortHandler, { once: true })
+      options.signal.addEventListener('abort', abortHandler, { once: true });
 
     }
 
@@ -87,43 +87,43 @@ export function runCommand(command, args, options = {}) {
 
       timeoutId = setTimeout(() => {
 
-        cleanup()
-        child.kill('SIGTERM')
-        reject(new Error(`Process timed out after ${options.timeout}ms`))
+        cleanup();
+        child.kill('SIGTERM');
+        reject(new Error(`Process timed out after ${options.timeout}ms`));
 
-      }, options.timeout)
+      }, options.timeout);
 
     }
 
     // Ошибка запуска процесса
     child.on('error', (err) => {
 
-      cleanup()
-      reject(err)
+      cleanup();
+      reject(err);
 
-    })
+    });
 
     // Завершение процесса
     child.on('close', (code, signal) => {
 
-      cleanup()
+      cleanup();
 
       if (code === 0) {
 
-        resolve()
+        resolve();
 
       }
       else {
 
-        const reason = code != null ? `code ${code}` : `signal ${signal}`
-        reject(new Error(`Process "${command}" failed with ${reason}`))
+        const reason = code != null ? `code ${code}` : `signal ${signal}`;
+        reject(new Error(`Process "${command}" failed with ${reason}`));
 
       }
 
-    })
+    });
 
-  })
+  });
 
-  return { child, result }
+  return { child, result };
 
 }

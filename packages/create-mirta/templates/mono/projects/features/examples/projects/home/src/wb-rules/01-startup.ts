@@ -1,1 +1,1 @@
-log('This is fine.')
+log('This is fine.');

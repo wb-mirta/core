@@ -4,7 +4,7 @@
  * @since 0.4.0
  *
  **/
-export const DEFAULT_CONFIG_FILE = 'mirta.config.json'
+export const DEFAULT_CONFIG_FILE = 'mirta.config.json';
 
 /**
  * Имя пользователя по умолчанию для SSH-подключения.
@@ -14,7 +14,7 @@ export const DEFAULT_CONFIG_FILE = 'mirta.config.json'
  * @since 0.4.0
  *
  **/
-export const DEFAULT_SSH_USERNAME = 'root'
+export const DEFAULT_SSH_USERNAME = 'root';
 
 /**
  * Адрес хоста по умолчанию для подключения к контроллеру.
@@ -24,7 +24,7 @@ export const DEFAULT_SSH_USERNAME = 'root'
  * @since 0.4.0
  *
  **/
-export const DEFAULT_SSH_HOSTNAME = '192.168.42.1'
+export const DEFAULT_SSH_HOSTNAME = '192.168.42.1';
 
 /**
  * Стандартный порт SSH.
@@ -32,4 +32,4 @@ export const DEFAULT_SSH_HOSTNAME = '192.168.42.1'
  * @since 0.4.0
  *
  **/
-export const KNOWN_SSH_PORT = 22
+export const KNOWN_SSH_PORT = 22;

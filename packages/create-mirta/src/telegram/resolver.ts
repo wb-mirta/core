@@ -1,11 +1,11 @@
-import { t } from '#i18n/index'
-import { logger } from '#utils/logger'
-import { prompts } from '#utils/prompts'
-import type { PromptObject } from 'prompts'
+import { t } from '#i18n/index';
+import { logger } from '#utils/logger';
+import { prompts } from '#utils/prompts';
+import type { PromptObject } from 'prompts';
 
 export async function resolveTelegramInfoAsync() {
 
-  logger.step(t('telegram.caption'))
+  logger.step(t('telegram.caption'));
 
   const questions: PromptObject[] = [
     {
@@ -15,9 +15,9 @@ export async function resolveTelegramInfoAsync() {
       validate: (value: string) => {
 
         if (value.trim().length === 0)
-          return t('validation.required')
+          return t('validation.required');
         else
-          return true
+          return true;
 
       },
     },
@@ -27,25 +27,25 @@ export async function resolveTelegramInfoAsync() {
       message: t('telegram.user'),
       validate: (value: string) => {
 
-        const trimmedValue = value.trim()
+        const trimmedValue = value.trim();
 
         if (trimmedValue.length === 0)
-          return t('validation.required')
+          return t('validation.required');
 
         if (/^[0-9]+$/.test(trimmedValue))
-          return true
+          return true;
 
-        return t('validation.digitsOnly')
+        return t('validation.digitsOnly');
 
       },
     },
-  ]
+  ];
 
-  const { token, user } = await prompts(questions) as { token: string, user: string }
+  const { token, user } = await prompts(questions) as { token: string; user: string };
 
   return {
     token: token.trim(),
     user: user.trim(),
-  }
+  };
 
 }

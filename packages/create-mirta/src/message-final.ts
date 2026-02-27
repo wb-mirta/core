@@ -1,5 +1,5 @@
-import { getLocale } from '#i18n'
-import chalk from 'chalk'
+import { getLocale } from '#i18n';
+import chalk from 'chalk';
 
 const finalMessageEn = `\
 ${chalk.green('Welcome to your new wb-rules project!')} 🎉
@@ -21,7 +21,7 @@ https://pay.cloudtips.ru/p/58512cca
 https://github.com/wb-mirta/core
 
 Thank you for using Mirta!
-`
+`;
 const finalMessageRu = `\
 ${chalk.green('Добро пожаловать в ваш новый проект wb-rules!')} 🎉
 Откройте его в VSCode или другом редакторе и начинайте разработку.
@@ -42,14 +42,14 @@ https://pay.cloudtips.ru/p/58512cca
 https://github.com/wb-mirta/core
 
 Спасибо, что выбрали Мирту!
-`
+`;
 
 export function getFinalMessage() {
 
-  const locale = getLocale()
+  const locale = getLocale();
 
   return locale === 'ru-RU'
     ? finalMessageRu
-    : finalMessageEn
+    : finalMessageEn;
 
 }

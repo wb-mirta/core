@@ -1,7 +1,7 @@
-import chalk from 'chalk'
-import { getLocale } from '#i18n'
+import chalk from 'chalk';
+import { getLocale } from '#i18n';
 
-const { dim, yellow } = chalk
+const { dim, yellow } = chalk;
 
 const helpMessageEn = `\
 Creates a new wb-rules project with the Mirta Framework
@@ -35,7 +35,7 @@ ${yellow('Options:')}
     ${dim('Create a barebone project without any code')}
   -h, --help
     ${dim('Display this help message')}
-`
+`;
 
 const helpMessageRu = `\
 Создаёт новый проект wb-rules с использованием Mirta Framework
@@ -69,14 +69,14 @@ ${yellow('Опции:')}
     ${dim('Создать проект-заготовку, без кода примеров')}
   -h, --help
     ${dim('Отобразить данное сообщение')}
-`
+`;
 
 export function getHelpMessage() {
 
-  const locale = getLocale()
+  const locale = getLocale();
 
   return locale === 'ru-RU'
     ? helpMessageRu
-    : helpMessageEn
+    : helpMessageEn;
 
 }

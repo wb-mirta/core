@@ -1,1 +1,1 @@
-export { WorkspaceError } from './workspace-error'
+export { WorkspaceError } from './workspace-error';
