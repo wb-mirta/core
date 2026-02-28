@@ -69,7 +69,6 @@
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.1",
     "magic-string": "^0.30.21",
-    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dts": "^6.3.0",
     "find-up": "^8.0.0"
   },

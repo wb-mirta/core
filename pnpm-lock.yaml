@@ -367,9 +367,6 @@ importers:
       magic-string:
         specifier: ^0.30.21
         version: 0.30.21
-      rollup-plugin-copy:
-        specifier: ^3.5.0
-        version: 3.5.0
       rollup-plugin-dts:
         specifier: ^6.3.0
         version: 6.3.0(rollup@4.59.0)(typescript@5.9.2)
