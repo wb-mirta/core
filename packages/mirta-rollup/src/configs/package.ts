@@ -17,7 +17,6 @@ import ts from '@rollup/plugin-typescript';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
-import copy from 'rollup-plugin-copy';
 
 import dts from 'rollup-plugin-dts';
 import del from '#plugins/del';
@@ -700,8 +699,6 @@ function createBuildConfig(
   // выполняются единожды - для первой конфигурации.
   hasTsChecked = true;
 
-  const assetsSrc = toPosix(nodePath.join(cwd, 'public/*'));
-
   return {
     input,
     external,
@@ -719,11 +716,6 @@ function createBuildConfig(
       nodeResolve(),
       commonjs(),
       ...plugins,
-      copy({
-        targets: [
-          { src: assetsSrc, dest: outPath },
-        ],
-      }),
     ],
     output,
   };
