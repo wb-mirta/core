@@ -1,13 +1,13 @@
-export const urlRegex = /^(?:(?<username>[a-z][-a-z0-9_.]*)@)?(?:(?<hostname>[^:@\s]+))?(?::(?<port>\d+))?$/
+export const urlRegex = /^(?:(?<username>[a-z][-a-z0-9_.]*)@)?(?:(?<hostname>[^:@\s]+))?(?::(?<port>\d+))?$/;
 
-export const usernameRegex = /^[a-z][-a-z0-9_.]*$/
-export const hostnameRegex = /^[^:@\s]+$/
+export const usernameRegex = /^[a-z][-a-z0-9_.]*$/;
+export const hostnameRegex = /^[^:@\s]+$/;
 
 interface ParsedUrl {
 
-  username?: string
-  hostname?: string
-  port?: string
+  username?: string;
+  hostname?: string;
+  port?: string;
 
 }
 
@@ -18,8 +18,8 @@ export function parseUrl(
 ): ParsedUrl {
 
   if (!input)
-    return {}
+    return {};
 
-  return (urlRegex.exec(input))?.groups ?? {}
+  return (urlRegex.exec(input))?.groups ?? {};
 
 }

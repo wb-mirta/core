@@ -1,4 +1,4 @@
-import { expandHomeDir } from '#utils/file-system'
+import { expandHomeDir } from '#utils/file-system';
 
 /**
  * Базовая директория для SSH-файлов в зависимости от платформы.
@@ -11,7 +11,7 @@ import { expandHomeDir } from '#utils/file-system'
  * @since 0.4.0
  *
  **/
-export const SSH_DIR = expandHomeDir('~/.ssh')
+export const SSH_DIR = expandHomeDir('~/.ssh');
 
 /**
  * Путь к сокету изолированного ssh-agent.
@@ -19,7 +19,7 @@ export const SSH_DIR = expandHomeDir('~/.ssh')
  * @since 0.4.0
  *
  **/
-export const SSH_AUTH_SOCK = SSH_DIR + '/mirta-agent.sock'
+export const SSH_AUTH_SOCK = SSH_DIR + '/mirta-agent.sock';
 
 /**
  * Время жизни ключа, используемое в ssh-agent по умолчанию.
@@ -27,4 +27,4 @@ export const SSH_AUTH_SOCK = SSH_DIR + '/mirta-agent.sock'
  * @since 0.4.0
  *
  **/
-export const DEFAULT_SSH_KEY_TTL = '15m'
+export const DEFAULT_SSH_KEY_TTL = '15m';

@@ -1,12 +1,12 @@
-import fs from 'node:fs/promises'
-import type { FilePath, JsonObject } from '#types'
-import deepMerge from '#utils/deep-merge'
+import fs from 'node:fs/promises';
+import type { FilePath, JsonObject } from '#types';
+import deepMerge from '#utils/deep-merge';
 
 export function parse(content: string) {
 
   // TODO: Добавить валидацию.
 
-  return JSON.parse(content) as JsonObject
+  return JSON.parse(content) as JsonObject;
 
 }
 
@@ -18,24 +18,24 @@ export async function renderAsync(
 ) {
 
   const targetContent
-    = await fs.readFile(toPath, 'utf-8')
+    = await fs.readFile(toPath, 'utf-8');
 
   const targetObject
-    = parse(targetContent)
+    = parse(targetContent);
 
   const sourceObject
     = content !== undefined
       ? parse(content)
-      : parse(await fs.readFile(fromPath, 'utf-8'))
+      : parse(await fs.readFile(fromPath, 'utf-8'));
 
   let mergedObject = deepMerge(
     targetObject,
     sourceObject
-  ) as JsonObject
+  ) as JsonObject;
 
   if (resultHandler)
-    mergedObject = resultHandler(mergedObject)
+    mergedObject = resultHandler(mergedObject);
 
-  await fs.writeFile(toPath, JSON.stringify(mergedObject, null, 2) + '\n')
+  await fs.writeFile(toPath, JSON.stringify(mergedObject, null, 2) + '\n');
 
 }

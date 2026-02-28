@@ -6,9 +6,9 @@ declare global {
     //
     interface ProcessEnv {
       /** Пример зарегистрированной переменной. */
-      APP_NAME?: string
+      APP_NAME?: string;
     }
   }
 }
 
-export { }
+export { };

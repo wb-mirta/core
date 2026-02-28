@@ -12,22 +12,22 @@ defineVirtualDevice('my-invert-buzzer', {
       value: !dev['buzzer/enabled'],
     },
   },
-})
+});
 
 defineRule({
   whenChanged: ['buzzer/enabled'],
   then: function (newValue) {
 
-    dev['my-invert-buzzer/Disabled'] = !newValue
+    dev['my-invert-buzzer/Disabled'] = !newValue;
 
   },
-})
+});
 
 defineRule({
   whenChanged: ['my-invert-buzzer/Disabled'],
   then: function (newValue) {
 
-    dev['buzzer/enabled'] = !newValue
+    dev['buzzer/enabled'] = !newValue;
 
   },
-})
+});

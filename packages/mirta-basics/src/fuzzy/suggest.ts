@@ -1,8 +1,8 @@
-import { damerauLevenshtein } from './distance/damerau-levenshtein'
-import { daitchMokotoffLite } from './phonetics/daitch-mokotoff'
-import { trigramSimilarity } from './similarity'
-import { translit } from '#src/fuzzy/translit'
-import { buildTrigrams } from './similarity/trigrams/build'
+import { damerauLevenshtein } from './distance/damerau-levenshtein';
+import { daitchMokotoffLite } from './phonetics/daitch-mokotoff';
+import { trigramSimilarity } from './similarity';
+import { translit } from '#src/fuzzy/translit';
+import { buildTrigrams } from './similarity/trigrams/build';
 
 /**
  * Параметры для работы с функцией {@link suggestClosest} — нечёткого поиска
@@ -22,34 +22,34 @@ export interface SuggestOptions {
    * Чем меньше значение, тем строже сравнение.
    *
    **/
-  maxDistance?: number
+  maxDistance?: number;
 
   /**
    * Веса для комбинированного ранжира.
    * Сумма не обязана быть 1 — нормализуется внутри.
    */
   weights?: {
-    phonetic?: number
-    trigram?: number
-    levenshtein?: number
-  }
+    phonetic?: number;
+    trigram?: number;
+    levenshtein?: number;
+  };
 
 }
 
 interface Candidate {
 
-  value: string
-  valueNorm: string
-  phonetic: string
-  triScore: number
+  value: string;
+  valueNorm: string;
+  phonetic: string;
+  triScore: number;
 
 }
 
-const normalize = (input: string) => translit(input.toUpperCase())
+const normalize = (input: string) => translit(input.toUpperCase());
 
 function sumWeights(weights: SuggestOptions['weights'] = {}) {
 
-  return (weights.phonetic ?? 0) + (weights.trigram ?? 0) + (weights.levenshtein ?? 0)
+  return (weights.phonetic ?? 0) + (weights.trigram ?? 0) + (weights.levenshtein ?? 0);
 
 }
 
@@ -82,65 +82,65 @@ export function suggestClosest(
   const {
     maxDistance = 2,
     weights = { phonetic: 0.5, trigram: 0.3, levenshtein: 0.2 },
-  } = options
+  } = options;
 
-  const inputNorm = normalize(input)
+  const inputNorm = normalize(input);
 
-  let candidates: Candidate[] = []
+  let candidates: Candidate[] = [];
 
   if (!inputNorm)
-    return undefined
+    return undefined;
 
   for (const value of targetValues) {
 
     // Ранний выход - прямое соответствие.
     if (input === value)
-      return value
+      return value;
 
-    const valueNorm = normalize(value)
+    const valueNorm = normalize(value);
 
     // Ранний выход - прямое соответствие.
     if (inputNorm === valueNorm)
-      return value
+      return value;
 
     candidates.push({
       value: value,
       valueNorm: valueNorm,
       phonetic: daitchMokotoffLite(value),
       triScore: 0,
-    })
+    });
 
   }
 
   // Предвычисляем фонетический код и триграммы для ввода
-  const inputPhonetic = daitchMokotoffLite(input)
-  const inputTrigrams = buildTrigrams(inputNorm)
+  const inputPhonetic = daitchMokotoffLite(input);
+  const inputTrigrams = buildTrigrams(inputNorm);
 
-  const phoneticCandidates = candidates.filter(c => c.phonetic === inputPhonetic)
+  const phoneticCandidates = candidates.filter(c => c.phonetic === inputPhonetic);
 
   // Замена кандидатов на фонетические, если есть прямые совпадения
   // Если нет фонетических совпадений — используем все
   //
   if (phoneticCandidates.length > 0)
-    candidates = phoneticCandidates
+    candidates = phoneticCandidates;
 
   candidates = candidates.map((c) => {
 
-    c.triScore = trigramSimilarity(inputTrigrams, c.valueNorm)
+    c.triScore = trigramSimilarity(inputTrigrams, c.valueNorm);
 
-    return c
+    return c;
 
-  })
+  });
 
   const top10 = candidates
     .sort((a, b) => b.triScore - a.triScore)
-    .slice(0, 10)
+    .slice(0, 10);
 
-  const totalWeight = sumWeights(weights)
-  const normWeight = (weight: number | undefined) => (totalWeight === 0 ? 0 : (weight ?? 0) / totalWeight)
+  const totalWeight = sumWeights(weights);
+  const normWeight = (weight: number | undefined) => (totalWeight === 0 ? 0 : (weight ?? 0) / totalWeight);
 
-  let bestScore = -1
-  let bestValue: string | undefined
+  let bestScore = -1;
+  let bestValue: string | undefined;
 
   for (const candidate of top10) {
 
@@ -148,27 +148,27 @@ export function suggestClosest(
       inputNorm,
       candidate.valueNorm,
       maxDistance
-    )
+    );
 
     if (levScore <= 0)
-      continue // Пропускаем, если расстояние слишком большое.
+      continue; // Пропускаем, если расстояние слишком большое.
 
-    const phoneticScore = candidate.phonetic === inputPhonetic ? 1 : 0
+    const phoneticScore = candidate.phonetic === inputPhonetic ? 1 : 0;
 
     const score
       = phoneticScore * normWeight(weights.phonetic)
         + candidate.triScore * normWeight(weights.trigram)
-        + levScore * normWeight(weights.levenshtein)
+        + levScore * normWeight(weights.levenshtein);
 
     if (score > bestScore) {
 
-      bestScore = score
-      bestValue = candidate.value
+      bestScore = score;
+      bestValue = candidate.value;
 
     }
 
   }
 
-  return bestValue
+  return bestValue;
 
 }

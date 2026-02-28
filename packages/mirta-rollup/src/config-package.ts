@@ -1,4 +1,4 @@
-import { definePackageConfig } from '#configs/package'
+import { definePackageConfig } from '#configs/package';
 
 /**
  * Конфигурация Rollup по умолчанию, предназначенная
@@ -16,10 +16,10 @@ import { definePackageConfig } from '#configs/package'
 export default function resolveConfig(args: Record<string, unknown>) {
 
   // Пропуск проверки секции экспорта.
-  const skipExports = args['config-skip-exports'] === true
+  const skipExports = args['config-skip-exports'] === true;
 
   return definePackageConfig({
     skipExports,
-  })
+  });
 
 }

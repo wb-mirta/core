@@ -1,4 +1,4 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
+import { THIS_PACKAGE_NAME } from '#src/constants';
 
 /**
  * Шаблоны сообщений об ошибках в схеме.
@@ -27,7 +27,7 @@ const errorMessages = {
    **/
   'missingValue': (name: string) => `Missing value for option "${name}"`,
 
-} as const
+} as const;
 
 /**
  * Коды ошибок, которые могут возникнуть при проверке схемы.
@@ -35,7 +35,7 @@ const errorMessages = {
  * @since 0.4.0
  *
  **/
-type ErrorCode = keyof typeof errorMessages
+type ErrorCode = keyof typeof errorMessages;
 
 /**
  * Ошибки этапа разработки, связанные с валидацией схемы.
@@ -50,7 +50,7 @@ export class SchemaError extends Error {
    *
    * Используется для точной идентификации причины.
    */
-  readonly code: ErrorCode
+  readonly code: ErrorCode;
 
   /**
    * Создаёт экземпляр ошибки схемы.
@@ -64,14 +64,14 @@ export class SchemaError extends Error {
     code: ErrorCode
   ) {
 
-    super(`[${THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${THIS_PACKAGE_NAME}] ${message}`);
 
-    Object.setPrototypeOf(this, SchemaError.prototype)
+    Object.setPrototypeOf(this, SchemaError.prototype);
 
-    this.name = 'SchemaError'
-    this.code = code
+    this.name = 'SchemaError';
+    this.code = code;
 
-    Error.captureStackTrace(this, SchemaError)
+    Error.captureStackTrace(this, SchemaError);
 
   }
 
@@ -94,11 +94,11 @@ export class SchemaError extends Error {
   ): SchemaError {
 
     const messageFn
-      = errorMessages[code] as (...args: unknown[]) => string
+      = errorMessages[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new SchemaError(message, code)
+    return new SchemaError(message, code);
 
   }
 

@@ -1,5 +1,5 @@
-import { LocalizationError } from './errors'
-import type { LocalizationContext, GenericShape, PluralForm, VariablesOf, Lang, MessageVariable, ContextBase } from './types'
+import { LocalizationError } from './errors';
+import type { LocalizationContext, GenericShape, PluralForm, VariablesOf, Lang, MessageVariable, ContextBase } from './types';
 
 /**
  * Определяет форму множественного числа для заданного языка и числа.
@@ -22,24 +22,24 @@ export function getPluralForm(lang: Lang, count: number): PluralForm {
 
     // Если дробное — всегда 'few' (родительный падеж ед. числа)
     if (!Number.isInteger(count))
-      return 'few'
+      return 'few';
 
-    const absCount = Math.floor(Math.abs(count))
+    const absCount = Math.floor(Math.abs(count));
 
-    const mod10 = absCount % 10
-    const mod100 = absCount % 100
+    const mod10 = absCount % 10;
+    const mod100 = absCount % 100;
 
     if (mod10 === 1 && mod100 !== 11)
-      return 'one'
+      return 'one';
 
     if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
-      return 'few'
+      return 'few';
 
-    return 'many'
+    return 'many';
 
   }
 
-  return count === 1 ? 'one' : 'other'
+  return count === 1 ? 'one' : 'other';
 
 }
 
@@ -64,33 +64,33 @@ export function getPluralForm(lang: Lang, count: number): PluralForm {
  * @since 0.4.0
  *
  **/
-export function extractBalanced(message: string, index: number, limit: number): { content: string, end: number } | null {
+export function extractBalanced(message: string, index: number, limit: number): { content: string; end: number } | null {
 
   if (message[index] !== '{')
-    return null
+    return null;
 
-  let depth = 1
+  let depth = 1;
 
-  let i = index + 1
+  let i = index + 1;
 
   while (i < limit && depth > 0) {
 
     if (message[i] === '{')
-      depth++
+      depth++;
     else if (message[i] === '}')
-      depth--
+      depth--;
 
-    i++
+    i++;
 
   }
 
   if (depth !== 0)
-    return null
+    return null;
 
   return {
     end: i,
     content: message.slice(index + 1, i - 1),
-  }
+  };
 
 }
 
@@ -113,47 +113,47 @@ export function extractBalanced(message: string, index: number, limit: number): 
  **/
 export function interpolate(text: string, variables: Record<string, MessageVariable> | undefined): string {
 
-  let result = ''
-  let pos = 0
-  let start = 0
-  const len = text.length
+  let result = '';
+  let pos = 0;
+  let start = 0;
+  const len = text.length;
 
   while (pos < len) {
 
     if (text[pos] === '{') {
 
-      result += text.slice(start, pos)
+      result += text.slice(start, pos);
 
-      const block = extractBalanced(text, pos, len)
+      const block = extractBalanced(text, pos, len);
 
       if (!block) {
 
-        result += '{'
-        pos++
-        start = pos
+        result += '{';
+        pos++;
+        start = pos;
 
-        continue
+        continue;
 
       }
 
-      const { content, end } = block
-      const value = variables?.[content]
+      const { content, end } = block;
+      const value = variables?.[content];
 
-      result += value != null ? String(value) : `{${content}}`
-      pos = end
-      start = pos
+      result += value != null ? String(value) : `{${content}}`;
+      pos = end;
+      start = pos;
 
     }
     else {
 
-      pos++
+      pos++;
 
     }
 
   }
 
-  result += text.slice(start)
-  return result
+  result += text.slice(start);
+  return result;
 
 }
 
@@ -175,75 +175,75 @@ export function interpolate(text: string, variables: Record<string, MessageVaria
  **/
 function parseFormsPart(formsPart: string) {
 
-  const exactForms: Record<number, string> = {}
-  const commonForms: Record<string, string | undefined> = {}
+  const exactForms: Record<number, string> = {};
+  const commonForms: Record<string, string | undefined> = {};
 
-  let pos = 0
-  let keyBuffer = '' // будем набирать ключ
+  let pos = 0;
+  let keyBuffer = ''; // будем набирать ключ
 
-  const len = formsPart.length
+  const len = formsPart.length;
 
   while (pos < len) {
 
-    const char = formsPart[pos]
+    const char = formsPart[pos];
 
     if (char === '{') {
 
       // Встретили `{` → текущий буфер — это ключ
-      const key = keyBuffer.trim()
+      const key = keyBuffer.trim();
 
-      keyBuffer = ''
+      keyBuffer = '';
 
       if (!key) {
 
         // Пустой ключ — пропускаем
-        pos++
-        continue
+        pos++;
+        continue;
 
       }
 
       // Извлекаем сбалансированное тело
-      const block = extractBalanced(formsPart, pos, len)
+      const block = extractBalanced(formsPart, pos, len);
 
       if (!block) {
 
-        pos++
-        continue
+        pos++;
+        continue;
 
       }
 
       // Сохраняем
       if (key.startsWith('=')) {
 
-        const num = parseInt(key.slice(1), 10)
+        const num = parseInt(key.slice(1), 10);
 
-        exactForms[num] = block.content
+        exactForms[num] = block.content;
 
       }
       else {
 
         // ICU: 'two' → treat as 'few'
-        const formKey = key === 'two' ? 'few' : key
+        const formKey = key === 'two' ? 'few' : key;
 
-        commonForms[formKey] = block.content
+        commonForms[formKey] = block.content;
 
       }
 
       // Продолжаем после блока
-      pos = block.end
+      pos = block.end;
 
     }
     else {
 
       // Накапливаем символы в буфере
-      keyBuffer += char
-      pos++
+      keyBuffer += char;
+      pos++;
 
     }
 
   }
 
-  return { exactForms, commonForms }
+  return { exactForms, commonForms };
 
 }
 
@@ -262,47 +262,47 @@ function parseFormsPart(formsPart: string) {
 export function parsePlural(content: string, variables: Record<string, MessageVariable> | undefined, context: ContextBase): string {
 
   // Парсим: {count, plural, offset:1, one{...} other{...}}
-  const match = /([^}]+),\s*plural,\s*(?:offset:(\d+)\s*)?(.+)/g.exec(content)
+  const match = /([^}]+),\s*plural,\s*(?:offset:(\d+)\s*)?(.+)/g.exec(content);
 
   if (!match) {
 
     if (context.strict)
-      throw new Error('Invalid plural format')
+      throw new Error('Invalid plural format');
 
-    return ''
+    return '';
 
   }
 
-  const [, variable, offsetPart, formsPart] = match
+  const [, variable, offsetPart, formsPart] = match;
 
-  const offset = offsetPart ? parseInt(offsetPart, 10) : 0
+  const offset = offsetPart ? parseInt(offsetPart, 10) : 0;
 
-  const originalValue = Number(variables?.[variable])
+  const originalValue = Number(variables?.[variable]);
 
   if (isNaN(originalValue)) {
 
     if (context.strict)
-      throw LocalizationError.get('strict.invalidPluralValue', variable, variables?.[variable])
+      throw LocalizationError.get('strict.invalidPluralValue', variable, variables?.[variable]);
 
-    return 'NaN'
+    return 'NaN';
 
   }
 
-  const value = originalValue - offset
+  const value = originalValue - offset;
 
-  const { exactForms, commonForms } = parseFormsPart(formsPart)
+  const { exactForms, commonForms } = parseFormsPart(formsPart);
 
   // Обрабатываем =0{...}, =1{...}
 
   if (value in exactForms)
-    return exactForms[value].replace(/#/g, String(value))
+    return exactForms[value].replace(/#/g, String(value));
 
   // Обрабатываем one{...}, few{...}, other{...}
 
-  const form = getPluralForm(context.lang, value)
-  const formText = commonForms[form] ?? commonForms.other ?? ''
+  const form = getPluralForm(context.lang, value);
+  const formText = commonForms[form] ?? commonForms.other ?? '';
 
-  return formText.replace(/#/g, String(value))
+  return formText.replace(/#/g, String(value));
 
 }
 
@@ -330,15 +330,15 @@ export function createTranslator<TShape extends GenericShape>(context: Localizat
     variables?: VariablesOf<TShape, K>
   ) => {
 
-    const message = context.messages[key] ?? context.fallbackAsset.messages[key]
+    const message = context.messages[key] ?? context.fallbackAsset.messages[key];
 
     if (!message)
-      return `{{${key}}}`
+      return `{{${key}}}`;
 
-    let result = ''
-    let pos = 0
-    let start = 0
-    const len = message.length
+    let result = '';
+    let pos = 0;
+    let start = 0;
+    const len = message.length;
 
     // Основной цикл
     while (pos < len) {
@@ -346,56 +346,56 @@ export function createTranslator<TShape extends GenericShape>(context: Localizat
       if (message[pos] === '{') {
 
         // Добавить текст до {
-        result += message.slice(start, pos)
+        result += message.slice(start, pos);
 
-        const block = extractBalanced(message, pos, len)
+        const block = extractBalanced(message, pos, len);
 
         if (!block) {
 
-          result += '{'
-          pos++
-          start = pos
-          continue
+          result += '{';
+          pos++;
+          start = pos;
+          continue;
 
         }
 
-        const { content, end } = block
+        const { content, end } = block;
 
         if (/^\s*[a-zA-Z0-9_.-]+\s*,\s*plural\b/.test(content)) {
 
           result += interpolate(
             parsePlural(content, variables, context),
             variables
-          )
+          );
 
         }
         else {
 
           // Простая переменная: {name}
-          const value = variables?.[content]
+          const value = variables?.[content];
 
-          result += value != null ? String(value) : `{${content}}`
+          result += value != null ? String(value) : `{${content}}`;
 
         }
 
-        pos = end
-        start = pos
+        pos = end;
+        start = pos;
 
       }
       else {
 
-        pos++
+        pos++;
 
       }
 
     }
 
     // Добавить остаток
-    result += message.slice(start)
+    result += message.slice(start);
 
-    return result
+    return result;
 
-  }
+  };
 
   translate.plain = (
     key: string,
@@ -405,12 +405,12 @@ export function createTranslator<TShape extends GenericShape>(context: Localizat
     const message = context.messages[key]
       ?? context.fallbackAsset.messages[key]
       ?? fallbackValue
-      ?? `{{${key}}}`
+      ?? `{{${key}}}`;
 
-    return message
+    return message;
 
-  }
+  };
 
-  return translate
+  return translate;
 
 }

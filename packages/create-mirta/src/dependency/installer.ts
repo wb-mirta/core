@@ -1,20 +1,20 @@
-import { t } from '#i18n'
-import { prompts } from '#utils/prompts'
-import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell'
+import { t } from '#i18n';
+import { prompts } from '#utils/prompts';
+import { runCommandAsync, STDIO_INTERACTIVE } from '#utils/shell';
 
 function getCurrentPackageManager() {
 
-  const userAgent = process.env.npm_config_user_agent
+  const userAgent = process.env.npm_config_user_agent;
 
   if (!userAgent)
-    return
+    return;
 
-  const [name, version] = userAgent.split(' ')[0].split('/')
+  const [name, version] = userAgent.split(' ')[0].split('/');
 
   return {
     name,
     version,
-  }
+  };
 
 }
 
@@ -25,13 +25,13 @@ function toAnswers(...managers: string[]) {
     title: t('dependencies.answer.yesUsing', { manager }),
     value: manager,
 
-  }))
+  }));
 
 }
 
 export async function promptInstallDependenciesAsync(cwd: string) {
 
-  const currentManager = getCurrentPackageManager()
+  const currentManager = getCurrentPackageManager();
 
   const { manager } = await prompts({
 
@@ -58,15 +58,15 @@ export async function promptInstallDependenciesAsync(cwd: string) {
           },
         ],
 
-  }) as { manager: string | undefined }
+  }) as { manager: string | undefined };
 
   if (!manager)
-    return
+    return;
 
   await runCommandAsync(manager, ['install'], {
     cwd,
     shell: true,
     stdio: STDIO_INTERACTIVE,
-  })
+  });
 
 }

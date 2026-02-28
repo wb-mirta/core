@@ -1,35 +1,35 @@
-import type { ExternalOption, Plugin, RollupOptions } from 'rollup'
+import type { ExternalOption, Plugin, RollupOptions } from 'rollup';
 
-import fs from 'node:fs/promises'
-import multi from '@rollup/plugin-multi-entry'
-import resolve from '@rollup/plugin-node-resolve'
-import ts from '@rollup/plugin-typescript'
-import replace from '@rollup/plugin-replace'
-import { babel } from '@rollup/plugin-babel'
-import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader'
-import { resolveMonorepoContextAsync } from '@mirta/workspace'
+import fs from 'node:fs/promises';
+import multi from '@rollup/plugin-multi-entry';
+import resolve from '@rollup/plugin-node-resolve';
+import ts from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace';
+import { babel } from '@rollup/plugin-babel';
+import { loadEnvReplacements, type EnvLoaderOptions } from '@mirta/env-loader';
+import { resolveMonorepoContextAsync } from '@mirta/workspace';
 
-import del from '#plugins/del'
-import wbRulesImports from '#plugins/wb-rules-imports'
+import del from '#plugins/del';
+import wbRulesImports from '#plugins/wb-rules-imports';
 
-import nodePath from 'node:path'
+import nodePath from 'node:path';
 
 import {
 
   findPackageByChunkName,
   toVirtualModulePath
 
-} from '#utils/monorepo'
+} from '#utils/monorepo';
 
-import { getEntryPath } from '#utils/entry-path'
+import { getEntryPath } from '#utils/entry-path';
 
-const mode = process.env.NODE_ENV ?? 'development'
-const isProduction = mode === 'production'
+const mode = process.env.NODE_ENV ?? 'development';
+const isProduction = mode === 'production';
 
-const outDir = 'dist/es5'
+const outDir = 'dist/es5';
 
-const tsConfigFile = 'tsconfig.json'
-const tsConfigBuildFile = 'tsconfig.build.json'
+const tsConfigFile = 'tsconfig.json';
+const tsConfigBuildFile = 'tsconfig.build.json';
 
 /**
  * Опции конфигурации сборки.
@@ -38,7 +38,7 @@ const tsConfigBuildFile = 'tsconfig.build.json'
 export interface RuntimeConfigOptions {
 
   /** Корневая директория проекта. */
-  cwd?: string
+  cwd?: string;
 
   /**
    * Имя файла `tsconfig.json` для плагина TypeScript.
@@ -48,16 +48,16 @@ export interface RuntimeConfigOptions {
    * - Иначе — `tsconfig.json`
    *
    **/
-  tsconfig?: string
+  tsconfig?: string;
 
   /** Внешние зависимости, исключённые из сборки. */
-  external?: ExternalOption
+  external?: ExternalOption;
 
   /** Конфигурация загрузчика `.env`-файлов `dotenvx`, {@link EnvLoaderOptions}. */
-  envLoader?: Omit<EnvLoaderOptions, 'mode' | 'cwd' | 'rootDir'>
+  envLoader?: Omit<EnvLoaderOptions, 'mode' | 'cwd' | 'rootDir'>;
 
   /** Дополнительные плагины. */
-  plugins?: Plugin[]
+  plugins?: Plugin[];
 
 }
 
@@ -77,24 +77,24 @@ async function resolveTsConfigAsync(
   ignoreMissing?: boolean
 ): Promise<string | false | undefined> {
 
-  const tsconfig = nodePath.resolve(cwd, filePath)
+  const tsconfig = nodePath.resolve(cwd, filePath);
 
   try {
 
-    await fs.access(tsconfig)
-    return tsconfig
+    await fs.access(tsconfig);
+    return tsconfig;
 
   }
   catch {
 
     if (ignoreMissing)
-      return false
+      return false;
 
     if (nodePath.resolve(cwd) === process.cwd())
-      return undefined
+      return undefined;
 
     // Fallback на явный путь для изоляции
-    return resolveTsConfigAsync(cwd, tsConfigFile, true)
+    return resolveTsConfigAsync(cwd, tsConfigFile, true);
 
   }
 
@@ -117,13 +117,13 @@ export async function defineRuntimeConfig(
     envLoader: envLoaderOptions,
     plugins = [],
 
-  } = options
+  } = options;
 
-  const monorepoContext = await resolveMonorepoContextAsync(cwd)
+  const monorepoContext = await resolveMonorepoContextAsync(cwd);
 
   const tsconfig = options.tsconfig
     ? nodePath.resolve(cwd, options.tsconfig)
-    : await resolveTsConfigAsync(cwd, tsConfigBuildFile)
+    : await resolveTsConfigAsync(cwd, tsConfigBuildFile);
 
   const defaultPlugins = [
 
@@ -199,7 +199,7 @@ export async function defineRuntimeConfig(
       targets: `${outDir}/_virtual`,
       hook: 'closeBundle',
     }),
-  ]
+  ];
 
   return {
 
@@ -223,43 +223,43 @@ export async function defineRuntimeConfig(
       entryFileNames(chunk) {
 
         // Относительный путь от корня репозитория.
-        let chunkName = chunk.name
+        let chunkName = chunk.name;
 
         // Адаптация путей при сборке в монорепозитории.
         if (monorepoContext.packages.length !== 0) {
 
-          const { rootDir } = monorepoContext
+          const { rootDir } = monorepoContext;
 
           // Преобразуем chunkName (относительный путь от корня монорепозитория)
           // в абсолютный путь для корректного сравнения с cwd (абсолютным путём
           // к текущему пакету).
           //
-          const absolutePath = nodePath.resolve(rootDir, chunkName)
+          const absolutePath = nodePath.resolve(rootDir, chunkName);
 
           if (absolutePath.startsWith(cwd)) {
 
             // Путь в текущем проекте, не требует встраивания отдельным пакетом.
             chunkName = nodePath
               .relative(cwd, absolutePath)
-              .replaceAll(nodePath.sep, nodePath.posix.sep)
+              .replaceAll(nodePath.sep, nodePath.posix.sep);
 
           }
           else {
 
             // Ищем пакет монорепозитория, в котором находится указанный путь.
-            const pkgDefinition = findPackageByChunkName(monorepoContext, chunkName)
+            const pkgDefinition = findPackageByChunkName(monorepoContext, chunkName);
 
             if (pkgDefinition)
-              chunkName = toVirtualModulePath(chunkName, pkgDefinition)
+              chunkName = toVirtualModulePath(chunkName, pkgDefinition);
 
           }
 
         }
 
-        return getEntryPath(chunkName)
+        return getEntryPath(chunkName);
 
       },
     },
-  }
+  };
 
 }

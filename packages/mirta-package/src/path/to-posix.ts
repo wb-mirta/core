@@ -1,4 +1,4 @@
-import nodePath from 'node:path'
+import nodePath from 'node:path';
 
 /**
  * Преобразует путь из формата Windows в формат POSIX.
@@ -24,16 +24,16 @@ import nodePath from 'node:path'
  * @since 0.4.0
  *
  **/
-export function toPosix(path: string): string
-export function toPosix(path: string | undefined): string | undefined
+export function toPosix(path: string): string;
+export function toPosix(path: string | undefined): string | undefined;
 export function toPosix(path: string | undefined): string | undefined {
 
   if (path === '' || path === undefined)
-    return path
+    return path;
 
   return path.replaceAll(
     nodePath.win32.sep,
     nodePath.posix.sep
-  )
+  );
 
 }

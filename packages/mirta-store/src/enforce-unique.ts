@@ -1,5 +1,5 @@
-import { getSessionId } from './session'
-import { StoreError } from './errors'
+import { getSessionId } from './session';
+import { StoreError } from './errors';
 
 /**
  * Метаданные определения хранилища для реестра.
@@ -16,7 +16,7 @@ export interface DefinitionMetadata {
    * Путь к модулю, в котором впервые был вызван `defineStore` данного типа.
    *
    **/
-  callerPath: string
+  callerPath: string;
 
   /**
    * Словарь, отслеживающий, в каких сессиях и скриптах `wb-rules` производилась регистрация данного типа.
@@ -24,7 +24,7 @@ export interface DefinitionMetadata {
    * Ключ — абсолютный путь к корневому файлу (`__filename`), значение — идентификатор сессии.
    *
    **/
-  sessions: Record<string, string>
+  sessions: Record<string, string>;
 }
 
 /**
@@ -35,7 +35,7 @@ export interface DefinitionMetadata {
  *
  **/
 export type DefinitionsRegistry
-  = Record<string, DefinitionMetadata>
+  = Record<string, DefinitionMetadata>;
 
 /**
  * Пытается определить путь к файлу, вызвавшему `defineStore`, через анализ стека вызовов.
@@ -50,22 +50,22 @@ export type DefinitionsRegistry
  **/
 export function tryGetCallerPath() {
 
-  const errorStack = new Error().stack
+  const errorStack = new Error().stack;
 
   if (!errorStack)
-    return
+    return;
 
-  const stackLines = errorStack.split('\n')
+  const stackLines = errorStack.split('\n');
 
-  let foundDefineStore = false
+  let foundDefineStore = false;
 
   for (const line of stackLines) {
 
     // Ищем первую строку, содержащую "defineStore".
     if (!foundDefineStore && line.includes('defineStore')) {
 
-      foundDefineStore = true
-      continue
+      foundDefineStore = true;
+      continue;
 
     }
 
@@ -74,10 +74,10 @@ export function tryGetCallerPath() {
 
       // Извлекаем путь к файлу: ищем шаблон " /путь/к/файлу:строка"
       //
-      const fileMatch = /\s([^\s]+?):\d+/.exec(line)
+      const fileMatch = /\s([^\s]+?):\d+/.exec(line);
 
       if (fileMatch)
-        return fileMatch[1]
+        return fileMatch[1];
 
     }
 
@@ -98,7 +98,7 @@ export function tryGetCallerPath() {
  **/
 export function getDefinitionsRegistry() {
 
-  return (module.static.definitions ??= {}) as DefinitionsRegistry
+  return (module.static.definitions ??= {}) as DefinitionsRegistry;
 
 }
 
@@ -122,12 +122,12 @@ export function enforceDefinitionIsUnique(
   typeId: string
 ) {
 
-  const currentCallerPath = tryGetCallerPath()
+  const currentCallerPath = tryGetCallerPath();
 
   if (!currentCallerPath)
-    return
+    return;
 
-  const registry = getDefinitionsRegistry()
+  const registry = getDefinitionsRegistry();
 
   // Если указанный тип хранилища ещё не зарегистрирован,
   // вносим его в реестр.
@@ -136,22 +136,22 @@ export function enforceDefinitionIsUnique(
     registry[typeId] = {
       callerPath: currentCallerPath,
       sessions: { },
-    }
+    };
 
-  const entry = registry[typeId]
+  const entry = registry[typeId];
 
   // Проверка 1: тип не определён в другом модуле.
   if (currentCallerPath !== entry.callerPath)
-    throw StoreError.get('alreadyDefinedOutside', typeId, entry.callerPath)
+    throw StoreError.get('alreadyDefinedOutside', typeId, entry.callerPath);
 
-  const sessionId = getSessionId()
+  const sessionId = getSessionId();
 
   // Проверка 2: тип не зарегистрирован в текущей сессии.
   if (entry.sessions[__filename] === sessionId)
-    throw StoreError.get('alreadyDefined', typeId)
+    throw StoreError.get('alreadyDefined', typeId);
 
   // Регистрируем вызов в текущей сессии.
-  entry.sessions[__filename] = sessionId
+  entry.sessions[__filename] = sessionId;
 
 }
 
@@ -168,11 +168,11 @@ export function enforceDefinitionIsUnique(
 export function __resetInternalState() {
 
   if (!__TEST__)
-    return
+    return;
 
   module.static = {
     definitions: {},
-  }
+  };
 
 }
 
@@ -180,4 +180,4 @@ export function __resetInternalState() {
 // в режиме тестирования.
 //
 if (__TEST__)
-  __resetInternalState()
+  __resetInternalState();

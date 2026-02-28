@@ -1,21 +1,21 @@
-import type { DotenvConfigOptions } from '@dotenvx/dotenvx'
-import type { Mock } from 'vitest'
+import type { DotenvConfigOptions } from '@dotenvx/dotenvx';
+import type { Mock } from 'vitest';
 
 vi.mock('node:fs', () => ({
   existsSync: vi.fn(),
-}))
+}));
 
 vi.mock('@dotenvx/dotenvx', () => ({
   default: {
     config: vi.fn(),
   },
-}))
+}));
 
-const existsSync = (await import('node:fs')).existsSync
-export const mockExistsSync = vi.mocked(existsSync)
+const existsSync = (await import('node:fs')).existsSync;
+export const mockExistsSync = vi.mocked(existsSync);
 
-const dotenvx = await import('@dotenvx/dotenvx')
-export const mockDotenvxConfig = vi.mocked(dotenvx.default.config)
+const dotenvx = await import('@dotenvx/dotenvx');
+export const mockDotenvxConfig = vi.mocked(dotenvx.default.config);
 
 /**
  * Устанавливает мок для `dotenvx.config`, который при вызове объединяет указанные пары ключ‑значение в переданный объект `processEnv`.
@@ -33,7 +33,7 @@ export function mockConfigWithEnv(env: Record<string, string> = {}) {
       throw new Error(
         '[Test Setup] dotenvx.config was called without "processEnv". '
         + 'Check if loadEnv passes { processEnv } to dotenvx.config().'
-      )
+      );
 
     }
 
@@ -42,14 +42,14 @@ export function mockConfigWithEnv(env: Record<string, string> = {}) {
       throw new Error(
         '[Test Setup] dotenvx.config received processEnv: undefined or null. '
         + 'It must be an object.'
-      )
+      );
 
     }
 
-    Object.assign(config.processEnv, env)
-    return {}
+    Object.assign(config.processEnv, env);
+    return {};
 
-  })
+  });
 
 }
 
@@ -64,29 +64,29 @@ export function expectConfigCalledWith(
   matcher: (config: DotenvConfigOptions) => void
 ) {
 
-  const lastCall = mockDotenvxConfig.mock.lastCall
+  const lastCall = mockDotenvxConfig.mock.lastCall;
 
-  expect(lastCall).toBeDefined()
+  expect(lastCall).toBeDefined();
 
   if (!lastCall)
-    return
+    return;
 
-  const [config] = lastCall
+  const [config] = lastCall;
 
-  expect(config).toBeDefined()
+  expect(config).toBeDefined();
 
   if (!config)
-    return
+    return;
 
-  matcher(config)
+  matcher(config);
 
 }
 
 // --- Глобальные утилиты для тестов ---
 
-const originalEnv = process.env
+const originalEnv = process.env;
 
-let cwdSpy: Mock<() => string> | undefined
+let cwdSpy: Mock<() => string> | undefined;
 
 /**
  * Инициализирует контролируемое тестовое окружение и сбрасывает все мок-объекты.
@@ -96,17 +96,17 @@ let cwdSpy: Mock<() => string> | undefined
  */
 export function resetTestEnv() {
 
-  vi.resetAllMocks()
+  vi.resetAllMocks();
 
   // ⚠️ БЕЗОПАСНОСТЬ: Полностью заменяем process.env на контролируемый набор
   // Это предотвращает утечку системных переменных в логи при падении тестов
   //
   process.env = {
     NODE_ENV: 'development', // только необходимый минимум.
-  }
+  };
 
-  cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/test/project')
-  mockExistsSync.mockReturnValue(true)
+  cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/test/project');
+  mockExistsSync.mockReturnValue(true);
 
 }
 
@@ -117,9 +117,9 @@ export function resetTestEnv() {
  */
 export function restoreTestEnv() {
 
-  process.env = originalEnv
+  process.env = originalEnv;
 
-  cwdSpy?.mockRestore()
-  cwdSpy = undefined
+  cwdSpy?.mockRestore();
+  cwdSpy = undefined;
 
 }

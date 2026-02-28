@@ -1,6 +1,6 @@
-import { SchemaError } from './errors/schema'
-import { ResultHandler } from './result'
-import type { OptionSchema, Option, Token, ParseError } from './types'
+import { SchemaError } from './errors/schema';
+import { ResultHandler } from './result';
+import type { OptionSchema, Option, Token, ParseError } from './types';
 
 /**
  * Расширяет схему, добавляя ссылки на исходный ключ и проверяя дубликаты.
@@ -14,31 +14,31 @@ import type { OptionSchema, Option, Token, ParseError } from './types'
  **/
 function expandSchema(schema: OptionSchema) {
 
-  const result: Record<string, Option & { key: string }> = {}
+  const result: Record<string, Option & { key: string }> = {};
 
   for (const key of Object.keys(schema)) {
 
     // Может задвоиться через short, когда длина 1 символ
     if (key in result)
-      throw SchemaError.get('duplicateName', key, result[key].key)
+      throw SchemaError.get('duplicateName', key, result[key].key);
 
-    const option = { ...schema[key], key }
+    const option = { ...schema[key], key };
 
-    result[key] = option
+    result[key] = option;
 
     if (option.short) {
 
       // Может повториться в разных опциях
       if (option.short in result)
-        throw SchemaError.get('duplicateName', option.short, result[option.short].key)
+        throw SchemaError.get('duplicateName', option.short, result[option.short].key);
 
-      result[option.short] = option
+      result[option.short] = option;
 
     }
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -60,66 +60,66 @@ export function mapToSchema(
   consumedIndices: readonly number[] = []
 ) {
 
-  const values: Record<string, string | boolean> = {}
-  const positionals: string[] = []
-  const errors: ParseError[] = []
+  const values: Record<string, string | boolean> = {};
+  const positionals: string[] = [];
+  const errors: ParseError[] = [];
 
-  const expandedSchema = expandSchema(schema)
-  const localConsumedIndices = new Set(consumedIndices)
+  const expandedSchema = expandSchema(schema);
+  const localConsumedIndices = new Set(consumedIndices);
 
-  const foundKeys = new Set<string>()
-  let nextIndex = 0
+  const foundKeys = new Set<string>();
+  let nextIndex = 0;
 
   for (let i = 0; i < tokens.length; i++) {
 
-    const token = tokens[i]
-    nextIndex = i + 1
+    const token = tokens[i];
+    nextIndex = i + 1;
 
     if (token.kind === 'positional') {
 
       if (localConsumedIndices.has(i))
-        continue
+        continue;
 
-      positionals.push(token.value)
+      positionals.push(token.value);
 
     }
 
     if (token.kind !== 'option' || !token.name || !(token.name in expandedSchema))
-      continue
+      continue;
 
-    const option = expandedSchema[token.name]
+    const option = expandedSchema[token.name];
 
-    foundKeys.add(option.key)
+    foundKeys.add(option.key);
 
     if (option.type === 'boolean') {
 
-      values[option.key] = token.value !== 'false'
+      values[option.key] = token.value !== 'false';
 
     }
     else {
 
-      let value: string | undefined
+      let value: string | undefined;
 
       if (token.value !== undefined) {
 
-        value = token.value
+        value = token.value;
 
       }
       else if (nextIndex < tokens.length) {
 
-        const nextToken = tokens[nextIndex]
+        const nextToken = tokens[nextIndex];
 
         if (nextToken.kind === 'positional') {
 
-          value = nextToken.value
-          localConsumedIndices.add(nextIndex)
+          value = nextToken.value;
+          localConsumedIndices.add(nextIndex);
 
         }
 
       }
 
       if (value !== undefined)
-        values[option.key] = value
+        values[option.key] = value;
 
     }
 
@@ -129,21 +129,21 @@ export function mapToSchema(
 
     // Пропускаем явно установленные значения.
     if (key in values)
-      continue
+      continue;
 
     // Строковые опции можно указывать только вместе со значениями.
     if (foundKeys.has(key) && schema[key].type === 'string') {
 
-      errors.push({ type: 'missing-value', option: key })
-      continue
+      errors.push({ type: 'missing-value', option: key });
+      continue;
 
     }
 
-    const defaultValue = schema[key].default
+    const defaultValue = schema[key].default;
 
     // Для отсутствующих ключей применяем значения по умолчанию.
     if (defaultValue !== undefined)
-      values[key] = defaultValue
+      values[key] = defaultValue;
 
   }
 
@@ -153,6 +153,6 @@ export function mapToSchema(
         values,
         positionals,
         consumedIndices: [...localConsumedIndices],
-      })
+      });
 
 }

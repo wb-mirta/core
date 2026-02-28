@@ -37,7 +37,7 @@ export interface DistanceResult {
    * "релиз" → "релзи" = 2 (удаление + вставка)
    * ```
    **/
-  readonly steps: number
+  readonly steps: number;
 
   /**
    * Относительное расстояние — нормализованная метрика, рассчитываемая как отношение
@@ -53,7 +53,7 @@ export interface DistanceResult {
    * relative = 1 / max(5, 4) = 1 / 5 = 0.2
    * ```
    **/
-  readonly relative: number
+  readonly relative: number;
 
   /**
    * Степень схожести строк — величина, обратная относительному расстоянию.
@@ -69,6 +69,6 @@ export interface DistanceResult {
    * relative = 0.2 → similarity = 0.8
    * ```
    **/
-  readonly similarity: number
+  readonly similarity: number;
 
 }

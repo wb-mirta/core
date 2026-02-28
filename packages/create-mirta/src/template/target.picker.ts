@@ -1,7 +1,7 @@
-import { CreationError } from '#errors/create'
-import { t } from '#i18n'
-import { prompts } from '#utils/prompts'
-import type { Template } from './types'
+import { CreationError } from '#errors/create';
+import { t } from '#i18n';
+import { prompts } from '#utils/prompts';
+import type { Template } from './types';
 
 export async function pickTargetAsync(
 
@@ -12,17 +12,17 @@ export async function pickTargetAsync(
 
   if (templateName) {
 
-    const template = templates.get(templateName)
+    const template = templates.get(templateName);
 
     if (!template)
-      throw CreationError.get('template.notFound', templateName)
+      throw CreationError.get('template.notFound', templateName);
 
-    return template
+    return template;
 
   }
 
   if (templates.size === 1)
-    return templates.values().next().value as Template
+    return templates.values().next().value as Template;
 
   const response = await prompts({
     type: 'select',
@@ -37,13 +37,13 @@ export async function pickTargetAsync(
         description: t.plain(`templates.${x.name}.description`, x.description),
         value: x.name,
       })),
-  }) as Record<string, string>
+  }) as Record<string, string>;
 
-  const template = templates.get(response.templateName)
+  const template = templates.get(response.templateName);
 
   if (!template)
-    throw CreationError.get('template.notFound', response.templateName)
+    throw CreationError.get('template.notFound', response.templateName);
 
-  return template
+  return template;
 
 }

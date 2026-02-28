@@ -1,4 +1,4 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
+import { THIS_PACKAGE_NAME } from '#src/constants';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с разбором JSONC.
@@ -18,11 +18,11 @@ export class JsoncSyntaxError extends Error {
    **/
   constructor(message: string, offset: number, length: number) {
 
-    super(`[${THIS_PACKAGE_NAME}] ${message} at offset ${offset}, length ${length}`)
+    super(`[${THIS_PACKAGE_NAME}] ${message} at offset ${offset}, length ${length}`);
 
-    this.name = 'JsoncSyntaxError'
+    this.name = 'JsoncSyntaxError';
 
-    Error.captureStackTrace(this, this.constructor)
+    Error.captureStackTrace(this, this.constructor);
 
   }
 

@@ -13,4 +13,4 @@
  * @since 0.4.0
  *
  **/
-export const RECOMMENDED_GROUP = 'developers'
+export const RECOMMENDED_GROUP = 'developers';

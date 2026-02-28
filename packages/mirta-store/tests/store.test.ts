@@ -1,11 +1,11 @@
-import { StoreError } from '#src/errors/store-error'
-import { defineStore, __resetInternalState } from '#src/store'
+import { StoreError } from '#src/errors/store-error';
+import { defineStore, __resetInternalState } from '#src/store';
 
 beforeEach(() => {
 
-  __resetInternalState()
+  __resetInternalState();
 
-})
+});
 
 describe('defineStore', () => {
 
@@ -23,32 +23,32 @@ describe('defineStore', () => {
       actions: {
         increment() {
 
-          this.count++
+          this.count++;
 
         },
         setCount(value: number) {
 
-          this.count = value
+          this.count = value;
 
         },
       },
-    })
+    });
 
-    const store = useCounter()
+    const store = useCounter();
 
-    expect(store.count).toBe(0)
-    expect(store.double).toBe(0)
-    expect(store.labeled).toBe('Test: 0')
+    expect(store.count).toBe(0);
+    expect(store.double).toBe(0);
+    expect(store.labeled).toBe('Test: 0');
 
-    store.increment()
-    expect(store.count).toBe(1)
-    expect(store.double).toBe(2)
+    store.increment();
+    expect(store.count).toBe(1);
+    expect(store.double).toBe(2);
 
-    store.setCount(5)
-    expect(store.count).toBe(5)
-    expect(store.labeled).toBe('Test: 5')
+    store.setCount(5);
+    expect(store.count).toBe(5);
+    expect(store.labeled).toBe('Test: 5');
 
-  })
+  });
 
   it('should support this in getters', () => {
 
@@ -60,36 +60,36 @@ describe('defineStore', () => {
       getters: {
         priceWithTax(): number {
 
-          return this.price * (1 + this.tax / 100)
+          return this.price * (1 + this.tax / 100);
 
         },
         total(): number {
 
-          return this.priceWithTax + 10
+          return this.priceWithTax + 10;
 
         },
       },
       actions: {
         applyDiscount(percent: number) {
 
-          this.price = this.price * (1 - percent / 100)
+          this.price = this.price * (1 - percent / 100);
 
         },
       },
-    })
+    });
 
-    const store = useProduct()
+    const store = useProduct();
 
-    expect(store.priceWithTax).toBe(120)
-    expect(store.total).toBe(130)
+    expect(store.priceWithTax).toBe(120);
+    expect(store.total).toBe(130);
 
-    store.applyDiscount(10)
+    store.applyDiscount(10);
 
-    expect(store.price).toBe(90)
-    expect(store.priceWithTax).toBeCloseTo(108)
-    expect(store.total).toBeCloseTo(118)
+    expect(store.price).toBe(90);
+    expect(store.priceWithTax).toBeCloseTo(108);
+    expect(store.total).toBeCloseTo(118);
 
-  })
+  });
 
   it('should support $patch with partial state', () => {
 
@@ -105,40 +105,40 @@ describe('defineStore', () => {
       actions: {
         rename(name: string) {
 
-          this.name = name
+          this.name = name;
 
         },
       },
-    })
+    });
 
-    const store = useUser()
+    const store = useUser();
 
-    store.$patch({ name: 'Bob', age: 30 })
+    store.$patch({ name: 'Bob', age: 30 });
 
-    expect(store.name).toBe('Bob')
-    expect(store.age).toBe(30)
-    expect(store.intro).toBe('Bob, 30')
+    expect(store.name).toBe('Bob');
+    expect(store.age).toBe(30);
+    expect(store.intro).toBe('Bob, 30');
 
-  })
+  });
 
   it('should support $patch with state mutator function', () => {
 
     const useCounter = defineStore('counterPatch', {
       state: () => ({ count: 0 }),
-    })
+    });
 
-    const store = useCounter()
+    const store = useCounter();
 
     store.$patch((state) => {
 
-      state.count += 5
-      state.count *= 2
+      state.count += 5;
+      state.count *= 2;
 
-    })
+    });
 
-    expect(store.count).toBe(10)
+    expect(store.count).toBe(10);
 
-  })
+  });
 
   it('should perform deep merge with $patch', () => {
 
@@ -159,9 +159,9 @@ describe('defineStore', () => {
           push: false,
         },
       }),
-    })
+    });
 
-    const store = useSettings()
+    const store = useSettings();
 
     // Deep patch should merge nested objects, not replace them
     store.$patch({
@@ -170,22 +170,22 @@ describe('defineStore', () => {
           age: 26,
         },
       },
-    })
+    });
 
-    expect(store.user.profile.name).toBe('Alice') // Preserved
-    expect(store.user.profile.age).toBe(26) // Updated
-    expect(store.user.preferences.theme).toBe('dark') // Preserved
+    expect(store.user.profile.name).toBe('Alice'); // Preserved
+    expect(store.user.profile.age).toBe(26); // Updated
+    expect(store.user.preferences.theme).toBe('dark'); // Preserved
 
     store.$patch({
       notifications: {
         push: true,
       },
-    })
+    });
 
-    expect(store.notifications.email).toBe(true) // Preserved
-    expect(store.notifications.push).toBe(true) // Updated
+    expect(store.notifications.email).toBe(true); // Preserved
+    expect(store.notifications.push).toBe(true); // Updated
 
-  })
+  });
 
   it('should support $reset to initial state', () => {
 
@@ -198,29 +198,29 @@ describe('defineStore', () => {
       actions: {
         toggleMute() {
 
-          this.mute = !this.mute
+          this.mute = !this.mute;
 
         },
       },
-    })
+    });
 
-    const store = useSettings()
+    const store = useSettings();
 
-    store.volume = 80
-    store.mute = true
-    store.theme = 'light'
+    store.volume = 80;
+    store.mute = true;
+    store.theme = 'light';
 
-    expect(store.volume).toBe(80)
-    expect(store.mute).toBe(true)
-    expect(store.theme).toBe('light')
+    expect(store.volume).toBe(80);
+    expect(store.mute).toBe(true);
+    expect(store.theme).toBe('light');
 
-    store.$reset()
+    store.$reset();
 
-    expect(store.volume).toBe(50)
-    expect(store.mute).toBe(false)
-    expect(store.theme).toBe('dark')
+    expect(store.volume).toBe(50);
+    expect(store.mute).toBe(false);
+    expect(store.theme).toBe('dark');
 
-  })
+  });
 
   it('should share state between instances via module.static', () => {
 
@@ -229,24 +229,24 @@ describe('defineStore', () => {
       actions: {
         increment() {
 
-          this.value++
+          this.value++;
 
         },
       },
-    })
+    });
 
-    const storeA = useShared()
-    const storeB = useShared()
+    const storeA = useShared();
+    const storeB = useShared();
 
-    expect(storeA.value).toBe(0)
-    expect(storeB.value).toBe(0)
+    expect(storeA.value).toBe(0);
+    expect(storeB.value).toBe(0);
 
-    storeA.increment()
+    storeA.increment();
 
-    expect(storeA.value).toBe(1)
-    expect(storeB.value).toBe(1) // Shared state
+    expect(storeA.value).toBe(1);
+    expect(storeB.value).toBe(1); // Shared state
 
-  })
+  });
 
   it('should support named instances (useStore(id))', () => {
 
@@ -255,52 +255,52 @@ describe('defineStore', () => {
       actions: {
         set(temp: number) {
 
-          this.temperature = temp
+          this.temperature = temp;
 
         },
       },
-    })
+    });
 
-    const sensor1 = useSensor('living-room')
-    const sensor2 = useSensor('kitchen')
+    const sensor1 = useSensor('living-room');
+    const sensor2 = useSensor('kitchen');
 
-    sensor1.set(22)
-    sensor2.set(25)
+    sensor1.set(22);
+    sensor2.set(25);
 
-    expect(sensor1.temperature).toBe(22)
-    expect(sensor2.temperature).toBe(25)
+    expect(sensor1.temperature).toBe(22);
+    expect(sensor2.temperature).toBe(25);
 
     // Check isolation
-    const sensor1b = useSensor('living-room')
-    expect(sensor1b.temperature).toBe(22)
+    const sensor1b = useSensor('living-room');
+    expect(sensor1b.temperature).toBe(22);
 
-  })
+  });
 
   it('should throw on duplicate typeId', () => {
 
     defineStore('unique', {
       state: () => ({}),
-    })
+    });
 
     expect(() => {
 
       defineStore('unique', {
         state: () => ({}),
-      })
+      });
 
-    }).toThrow(StoreError.get('alreadyDefined', 'unique'))
+    }).toThrow(StoreError.get('alreadyDefined', 'unique'));
 
-  })
+  });
 
   it('should expose $typeId on useStore', () => {
 
     const useTest = defineStore('testName', {
       state: () => ({}),
-    })
+    });
 
-    expect(useTest.$typeId).toBe('testName')
+    expect(useTest.$typeId).toBe('testName');
 
-  })
+  });
 
   // New tests below
 
@@ -311,23 +311,23 @@ describe('defineStore', () => {
         port: undefined as number | undefined,
         host: undefined as string | undefined,
       }),
-    })
+    });
 
-    const store = useConfig()
+    const store = useConfig();
 
     // Test nullish coalescing operator
-    const port = store.port ?? 3000
-    const host = store.host ?? 'localhost'
+    const port = store.port ?? 3000;
+    const host = store.host ?? 'localhost';
 
-    expect(port).toBe(3000)
-    expect(host).toBe('localhost')
+    expect(port).toBe(3000);
+    expect(host).toBe('localhost');
 
     // Update and retest
-    store.port = 8080
+    store.port = 8080;
 
-    expect(store.port).toBe(8080)
+    expect(store.port).toBe(8080);
 
-  })
+  });
 
   it('should support nullish coalescing with null state properties', () => {
 
@@ -336,23 +336,23 @@ describe('defineStore', () => {
         value: null as number | null,
         label: null as string | null,
       }),
-    })
+    });
 
-    const store = useData()
+    const store = useData();
 
-    expect(store.value ?? 42).toBe(42)
-    expect(store.label ?? 'default').toBe('default')
+    expect(store.value ?? 42).toBe(42);
+    expect(store.label ?? 'default').toBe('default');
 
-    store.value = 100 as number | null
-    store.label = 'custom' as string | null
+    store.value = 100 as number | null;
+    store.label = 'custom' as string | null;
 
-    expect(store.value ?? 42).toBe(100)
-    expect(store.label ?? 'default').toBe('custom')
+    expect(store.value ?? 42).toBe(100);
+    expect(store.label ?? 'default').toBe('custom');
 
-    store.value = null as number | null
-    expect(store.value ?? 42).toBe(42)
+    store.value = null as number | null;
+    expect(store.value ?? 42).toBe(42);
 
-  })
+  });
 
   it('should handle nullish coalescing with getters', () => {
 
@@ -364,24 +364,24 @@ describe('defineStore', () => {
       getters: {
         fullName(): string {
 
-          const first = this.firstName ?? 'John'
-          return `${first} ${this.lastName}`
+          const first = this.firstName ?? 'John';
+          return `${first} ${this.lastName}`;
 
         },
       },
-    })
+    });
 
-    const store = useOptional()
+    const store = useOptional();
 
-    expect(store.fullName).toBe('John Doe')
+    expect(store.fullName).toBe('John Doe');
 
-    store.firstName = 'Jane'
-    expect(store.fullName).toBe('Jane Doe')
+    store.firstName = 'Jane';
+    expect(store.fullName).toBe('Jane Doe');
 
-    store.firstName = undefined
-    expect(store.fullName).toBe('John Doe')
+    store.firstName = undefined;
+    expect(store.fullName).toBe('John Doe');
 
-  })
+  });
 
   it('should allow direct access to $state', () => {
 
@@ -393,20 +393,20 @@ describe('defineStore', () => {
       getters: {
         double: state => state.count * 2,
       },
-    })
+    });
 
-    const store = useData()
+    const store = useData();
 
-    expect(store.$state).toEqual({ count: 0, name: 'Test' })
+    expect(store.$state).toEqual({ count: 0, name: 'Test' });
 
-    store.count = 5
-    expect(store.$state.count).toBe(5)
+    store.count = 5;
+    expect(store.$state.count).toBe(5);
 
     // Mutating $state directly should work
-    store.$state.name = 'Updated'
-    expect(store.name).toBe('Updated')
+    store.$state.name = 'Updated';
+    expect(store.name).toBe('Updated');
 
-  })
+  });
 
   it('should serialize state using JSON.stringify($state)', () => {
 
@@ -422,26 +422,26 @@ describe('defineStore', () => {
       actions: {
         addTag(tag: string) {
 
-          this.tags.push(tag)
+          this.tags.push(tag);
 
         },
       },
-    })
+    });
 
-    const store = useSerializable()
+    const store = useSerializable();
 
     // Serialize only $state, not the proxy with functions
-    const json = JSON.stringify(store.$state)
+    const json = JSON.stringify(store.$state);
 
-    const parsed = JSON.parse(json) as typeof store.$state
+    const parsed = JSON.parse(json) as typeof store.$state;
 
     expect(parsed).toEqual({
       id: 123,
       tags: ['active', 'verified'],
       meta: { created: '2025-11-20' },
-    })
+    });
 
-  })
+  });
 
   it('should prevent assignment to readonly properties', () => {
 
@@ -453,39 +453,39 @@ describe('defineStore', () => {
       actions: {
         increment() {
 
-          this.value++
+          this.value++;
 
         },
       },
-    })
+    });
 
-    const store = useReadonly()
+    const store = useReadonly();
 
     // Attempting to assign to getters, actions, or $ properties should throw
     expect(() => {
 
       // @ts-expect-error - testing runtime behavior
-      store.doubled = 100
+      store.doubled = 100;
 
-    }).toThrow(StoreError.get('readonlyProperty', 'doubled'))
+    }).toThrow(StoreError.get('readonlyProperty', 'doubled'));
 
     expect(() => {
 
       // @ts-expect-error - testing runtime behavior
       store.increment = () => {
         // No-op
-      }
+      };
 
-    }).toThrow(StoreError.get('readonlyProperty', 'increment'))
+    }).toThrow(StoreError.get('readonlyProperty', 'increment'));
 
     expect(() => {
 
       // @ts-expect-error - testing runtime behavior
-      store.$id = 'new-id'
+      store.$id = 'new-id';
 
-    }).toThrow(StoreError.get('readonlyProperty', '$id'))
+    }).toThrow(StoreError.get('readonlyProperty', '$id'));
 
-  })
+  });
 
   it('should support store with only state (no getters or actions)', () => {
 
@@ -494,22 +494,22 @@ describe('defineStore', () => {
         flag: true,
         counter: 0,
       }),
-    })
+    });
 
-    const store = usePlainState()
+    const store = usePlainState();
 
-    expect(store.flag).toBe(true)
-    expect(store.counter).toBe(0)
+    expect(store.flag).toBe(true);
+    expect(store.counter).toBe(0);
 
-    store.flag = false
-    store.counter = 42
+    store.flag = false;
+    store.counter = 42;
 
-    expect(store.flag).toBe(false)
-    expect(store.counter).toBe(42)
+    expect(store.flag).toBe(false);
+    expect(store.counter).toBe(42);
 
-    expect(store.$state).toEqual({ flag: false, counter: 42 })
+    expect(store.$state).toEqual({ flag: false, counter: 42 });
 
-  })
+  });
 
   it('should support store with only getters (no actions)', () => {
 
@@ -522,18 +522,18 @@ describe('defineStore', () => {
         area: state => state.width * state.height,
         perimeter: state => 2 * (state.width + state.height),
       },
-    })
+    });
 
-    const store = useComputed()
+    const store = useComputed();
 
-    expect(store.area).toBe(50)
-    expect(store.perimeter).toBe(30)
+    expect(store.area).toBe(50);
+    expect(store.perimeter).toBe(30);
 
-    store.width = 20
-    expect(store.area).toBe(100)
-    expect(store.perimeter).toBe(50)
+    store.width = 20;
+    expect(store.area).toBe(100);
+    expect(store.perimeter).toBe(50);
 
-  })
+  });
 
   it('should support store with only actions (no getters)', () => {
 
@@ -544,44 +544,44 @@ describe('defineStore', () => {
       actions: {
         add(item: string) {
 
-          this.items.push(item)
+          this.items.push(item);
 
         },
         clear() {
 
-          this.items = []
+          this.items = [];
 
         },
       },
-    })
+    });
 
-    const store = useActions()
+    const store = useActions();
 
-    expect(store.items).toEqual([])
+    expect(store.items).toEqual([]);
 
-    store.add('apple')
-    store.add('banana')
-    expect(store.items).toEqual(['apple', 'banana'])
+    store.add('apple');
+    store.add('banana');
+    expect(store.items).toEqual(['apple', 'banana']);
 
-    store.clear()
-    expect(store.items).toEqual([])
+    store.clear();
+    expect(store.items).toEqual([]);
 
-  })
+  });
 
   it('should support completely empty store', () => {
 
     const useEmpty = defineStore('empty', {
       state: () => ({}),
-    })
+    });
 
-    const store = useEmpty()
+    const store = useEmpty();
 
-    expect(store.$id).toBe('empty')
-    expect(store.$state).toEqual({})
-    expect(typeof store.$patch).toBe('function')
-    expect(typeof store.$reset).toBe('function')
+    expect(store.$id).toBe('empty');
+    expect(store.$state).toEqual({});
+    expect(typeof store.$patch).toBe('function');
+    expect(typeof store.$reset).toBe('function');
 
-  })
+  });
 
   it('should allow actions to call other actions', () => {
 
@@ -593,35 +593,35 @@ describe('defineStore', () => {
       actions: {
         addLog(message: string) {
 
-          this.log.push(message)
+          this.log.push(message);
 
         },
         increment() {
 
-          this.value++
-          this.addLog(`incremented to ${this.value}`)
+          this.value++;
+          this.addLog(`incremented to ${this.value}`);
 
         },
         decrement() {
 
-          this.value--
-          this.addLog(`decremented to ${this.value}`)
+          this.value--;
+          this.addLog(`decremented to ${this.value}`);
 
         },
       },
-    })
+    });
 
-    const store = useChained()
+    const store = useChained();
 
-    store.increment()
-    expect(store.value).toBe(1)
-    expect(store.log).toEqual(['incremented to 1'])
+    store.increment();
+    expect(store.value).toBe(1);
+    expect(store.log).toEqual(['incremented to 1']);
 
-    store.decrement()
-    expect(store.value).toBe(0)
-    expect(store.log).toEqual(['incremented to 1', 'decremented to 0'])
+    store.decrement();
+    expect(store.value).toBe(0);
+    expect(store.log).toEqual(['incremented to 1', 'decremented to 0']);
 
-  })
+  });
 
   it('should allow getters to access other getters', () => {
 
@@ -633,32 +633,32 @@ describe('defineStore', () => {
       getters: {
         fullName(): string {
 
-          return `${this.firstName} ${this.lastName}`
+          return `${this.firstName} ${this.lastName}`;
 
         },
         greeting(): string {
 
-          return `Hello, ${this.fullName}!`
+          return `Hello, ${this.fullName}!`;
 
         },
         uppercased(): string {
 
-          return this.greeting.toUpperCase()
+          return this.greeting.toUpperCase();
 
         },
       },
-    })
+    });
 
-    const store = useNested()
+    const store = useNested();
 
-    expect(store.fullName).toBe('John Doe')
-    expect(store.greeting).toBe('Hello, John Doe!')
-    expect(store.uppercased).toBe('HELLO, JOHN DOE!')
+    expect(store.fullName).toBe('John Doe');
+    expect(store.greeting).toBe('Hello, John Doe!');
+    expect(store.uppercased).toBe('HELLO, JOHN DOE!');
 
-    store.firstName = 'Jane'
-    expect(store.uppercased).toBe('HELLO, JANE DOE!')
+    store.firstName = 'Jane';
+    expect(store.uppercased).toBe('HELLO, JANE DOE!');
 
-  })
+  });
 
   it('should handle arrays in state correctly', () => {
 
@@ -673,43 +673,43 @@ describe('defineStore', () => {
       actions: {
         addItem(item: number) {
 
-          this.items.push(item)
+          this.items.push(item);
 
         },
       },
-    })
+    });
 
-    const store = useList()
+    const store = useList();
 
-    expect(store.items).toEqual([1, 2, 3])
-    expect(store.total).toBe(6)
+    expect(store.items).toEqual([1, 2, 3]);
+    expect(store.total).toBe(6);
 
-    store.addItem(4)
-    expect(store.items).toEqual([1, 2, 3, 4])
-    expect(store.total).toBe(10)
+    store.addItem(4);
+    expect(store.items).toEqual([1, 2, 3, 4]);
+    expect(store.total).toBe(10);
 
-    store.$patch({ tags: ['c', 'd', 'e'] })
-    expect(store.tags).toEqual(['c', 'd', 'e'])
+    store.$patch({ tags: ['c', 'd', 'e'] });
+    expect(store.tags).toEqual(['c', 'd', 'e']);
 
-  })
+  });
 
   it('should preserve $id in scoped instances', () => {
 
     const useScopedId = defineStore('scopedId', {
       state: () => ({ value: 0 }),
-    })
+    });
 
-    const storeA = useScopedId('instance-a')
-    const storeB = useScopedId('instance-b')
+    const storeA = useScopedId('instance-a');
+    const storeB = useScopedId('instance-b');
 
-    expect(storeA.$id).toBe('scopedId/instance-a')
-    expect(storeB.$id).toBe('scopedId/instance-b')
+    expect(storeA.$id).toBe('scopedId/instance-a');
+    expect(storeB.$id).toBe('scopedId/instance-b');
 
     // Default instance
-    const storeDefault = useScopedId()
-    expect(storeDefault.$id).toBe('scopedId')
+    const storeDefault = useScopedId();
+    expect(storeDefault.$id).toBe('scopedId');
 
-  })
+  });
 
   it('should handle boolean state correctly with nullish coalescing', () => {
 
@@ -719,19 +719,19 @@ describe('defineStore', () => {
         active: false as boolean | undefined,
         visible: true as boolean | undefined,
       }),
-    })
+    });
 
-    const store = useFlags()
+    const store = useFlags();
 
     // Be careful with booleans and ?? operator
-    expect(store.enabled ?? true).toBe(true)
-    expect(store.active ?? true).toBe(false) // false is not nullish
-    expect(store.visible ?? false).toBe(true)
+    expect(store.enabled ?? true).toBe(true);
+    expect(store.active ?? true).toBe(false); // false is not nullish
+    expect(store.visible ?? false).toBe(true);
 
-    store.enabled = false as boolean | undefined
-    expect(store.enabled ?? true).toBe(false) // false is not nullish
+    store.enabled = false as boolean | undefined;
+    expect(store.enabled ?? true).toBe(false); // false is not nullish
 
-  })
+  });
 
   it('should handle zero and empty string with nullish coalescing', () => {
 
@@ -741,15 +741,15 @@ describe('defineStore', () => {
         text: '' as string | null,
         nullable: null as number | null,
       }),
-    })
+    });
 
-    const store = useFalsy()
+    const store = useFalsy();
 
     // Nullish coalescing only checks null/undefined, not falsy
-    expect(store.count ?? 10).toBe(0) // 0 is not nullish
-    expect(store.text ?? 'default').toBe('') // '' is not nullish
-    expect(store.nullable ?? 42).toBe(42) // null is nullish
+    expect(store.count ?? 10).toBe(0); // 0 is not nullish
+    expect(store.text ?? 'default').toBe(''); // '' is not nullish
+    expect(store.nullable ?? 42).toBe(42); // null is nullish
 
-  })
+  });
 
-})
+});

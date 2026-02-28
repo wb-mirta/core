@@ -1,5 +1,5 @@
-import chalk, { type ChalkInstance } from 'chalk'
-import { t } from '#src/i18n'
+import chalk, { type ChalkInstance } from 'chalk';
+import { t } from '#src/i18n';
 
 /**
  * Базовые уровни логирования.
@@ -7,7 +7,7 @@ import { t } from '#src/i18n'
  * @since 0.4.0
  *
  **/
-type LogLevel = | 'info' | 'warn' | 'error' | 'debug'
+type LogLevel = | 'info' | 'warn' | 'error' | 'debug';
 
 /**
  * Расширенные уровни логирования, включая дополнительные статусы.
@@ -15,7 +15,7 @@ type LogLevel = | 'info' | 'warn' | 'error' | 'debug'
  * @since 0.4.0
  *
  **/
-type LogLevelExtended = LogLevel | 'success' | 'cancel' | 'step' | 'note'
+type LogLevelExtended = LogLevel | 'success' | 'cancel' | 'step' | 'note';
 
 /**
  * Символ-разделитель, используемый в префиксе логов.
@@ -23,7 +23,7 @@ type LogLevelExtended = LogLevel | 'success' | 'cancel' | 'step' | 'note'
  * @since 0.3.0
  *
  **/
-const dot = '•'
+const dot = '•';
 
 /**
  * Баннер, отображаемый в начале логов по умолчанию.
@@ -31,7 +31,7 @@ const dot = '•'
  * @since 0.3.0
  *
  **/
-const banner = `Mirta ${dot}`
+const banner = `Mirta ${dot}`;
 
 /**
  * Цвета текста для каждого уровня логирования.
@@ -51,7 +51,7 @@ const colors: Record<LogLevelExtended, ChalkInstance> = {
   step: chalk.dim,
   note: chalk.yellowBright,
 
-}
+};
 
 /**
  * Цвета фона для "pill" (подсветки метки уровня).
@@ -69,7 +69,7 @@ const bgColors: Partial<Record<LogLevelExtended, ChalkInstance>> = {
   success: chalk.bgGreen.black,
   cancel: chalk.bgRed,
 
-}
+};
 
 /**
  * Приоритет уровней логирования. Определяет, какие сообщения будут отображаться
@@ -87,7 +87,7 @@ const levelPriority: LogLevelExtended[] = [
   'cancel',
   'step',
   'note',
-]
+];
 
 /**
  * Целевой уровень логирования. Сообщения с уровнем ниже указанного — игнорируются.
@@ -95,7 +95,7 @@ const levelPriority: LogLevelExtended[] = [
  * @since 0.4.0
  *
  **/
-let targetLevel = 1
+let targetLevel = 1;
 
 /**
  * Проверяет, должно ли сообщение быть залогировано, исходя из текущего уровня.
@@ -108,9 +108,9 @@ let targetLevel = 1
  **/
 function shouldLog(level: LogLevelExtended): boolean {
 
-  const currentLevel = levelPriority.indexOf(level)
+  const currentLevel = levelPriority.indexOf(level);
 
-  return currentLevel === -1 || currentLevel >= targetLevel
+  return currentLevel === -1 || currentLevel >= targetLevel;
 
 }
 
@@ -125,20 +125,20 @@ function shouldLog(level: LogLevelExtended): boolean {
  **/
 function createPill(level: LogLevelExtended) {
 
-  const bgColor = bgColors[level] ?? ((text: string) => text)
+  const bgColor = bgColors[level] ?? ((text: string) => text);
 
   return (...text: (string | undefined)[]) => {
 
     const filteredText = text
       .filter(x => x !== undefined)
-      .join(' ')
+      .join(' ');
 
     if (filteredText.length === 0)
-      return ''
+      return '';
 
-    return bgColor(` ${filteredText} `) + ` ${dot} `
+    return bgColor(` ${filteredText} `) + ` ${dot} `;
 
-  }
+  };
 
 }
 
@@ -148,7 +148,7 @@ function createPill(level: LogLevelExtended) {
  * @since 0.4.0
  *
  **/
-type ColorScope = 'all' | 'first-line' | 'prefix' | 'none'
+type ColorScope = 'all' | 'first-line' | 'prefix' | 'none';
 
 /**
  * Опции форматирования сообщения.
@@ -159,16 +159,16 @@ type ColorScope = 'all' | 'first-line' | 'prefix' | 'none'
 interface FormattingOptions {
 
   /** Количество пробелов для отступа всего сообщения. */
-  indent?: number
+  indent?: number;
 
   /** Включать ли префикс "Mirta • [метка]". По умолчанию `true`. */
-  includePrefix?: boolean
+  includePrefix?: boolean;
 
   /** Где применять цвет. По умолчанию `'first-line'`. */
-  colorScope?: ColorScope
+  colorScope?: ColorScope;
 
   /** Переопределение цвета без смены уровня логирования. */
-  colorOverride?: LogLevelExtended
+  colorOverride?: LogLevelExtended;
 
 }
 
@@ -185,12 +185,12 @@ interface FormattingOptions {
 function shouldColorLine(colorScope: ColorScope, lineIndex: number): boolean {
 
   if (colorScope === 'all')
-    return true
+    return true;
 
   if (colorScope === 'first-line')
-    return lineIndex === 0
+    return lineIndex === 0;
 
-  return false
+  return false;
 
 }
 
@@ -213,18 +213,18 @@ function formatMessage(
   options?: FormattingOptions
 ): string {
 
-  let label: string | undefined
-  let finalOptions: FormattingOptions
+  let label: string | undefined;
+  let finalOptions: FormattingOptions;
 
   if (typeof labelOrOptions === 'string') {
 
-    label = labelOrOptions
-    finalOptions = options ?? {}
+    label = labelOrOptions;
+    finalOptions = options ?? {};
 
   }
   else {
 
-    finalOptions = labelOrOptions ?? {}
+    finalOptions = labelOrOptions ?? {};
 
   }
 
@@ -233,49 +233,49 @@ function formatMessage(
     includePrefix = true,
     colorScope = 'first-line',
     colorOverride,
-  } = finalOptions
+  } = finalOptions;
 
-  const actualLevel = colorOverride ?? level
+  const actualLevel = colorOverride ?? level;
 
-  const color = colors[actualLevel]
-  const pill = createPill(actualLevel)
+  const color = colors[actualLevel];
+  const pill = createPill(actualLevel);
 
-  let text = ''
+  let text = '';
 
   if (Array.isArray(message)) {
 
-    text = message.map(x => String(x)).join(' ')
+    text = message.map(x => String(x)).join(' ');
 
   }
   else {
 
-    text = String(message)
+    text = String(message);
 
   }
 
-  const lineIndent = ' '.repeat(indent)
+  const lineIndent = ' '.repeat(indent);
 
-  const lines = text.split('\n')
+  const lines = text.split('\n');
 
-  let prefix = includePrefix ? `${banner} ${pill(label)}` : ''
+  let prefix = includePrefix ? `${banner} ${pill(label)}` : '';
 
   if (prefix && colorScope !== 'none')
-    prefix = color(prefix)
+    prefix = color(prefix);
 
   return lines
     .map((line, lineIndex) => {
 
-      line = line.trim()
+      line = line.trim();
 
       if (shouldColorLine(colorScope, lineIndex))
-        line = color(line)
+        line = color(line);
 
       return lineIndex === 0
         ? lineIndent + prefix + line
-        : lineIndent + `${' '.repeat(2)}${line}`
+        : lineIndent + `${' '.repeat(2)}${line}`;
 
     })
-    .join('\n')
+    .join('\n');
 
 }
 
@@ -295,7 +295,7 @@ function log(
   value: unknown,
   label?: string,
   options?: FormattingOptions
-): void
+): void;
 
 /**
  * Логирует сообщения с настройкой форматирования.
@@ -311,7 +311,7 @@ function log(
   level: LogLevelExtended,
   value: unknown,
   options?: FormattingOptions
-): void
+): void;
 
 /**
  * Основная функция логирования. Проверяет уровень и выводит сообщение.
@@ -332,11 +332,11 @@ function log(
 ): void {
 
   if (!shouldLog(level))
-    return
+    return;
 
   console.log(
     formatMessage(level, value, labelOrOptions, options)
-  )
+  );
 
 }
 
@@ -348,7 +348,7 @@ interface StepOptions {
    * Количество пробелов для отступа вложенности.
    * @default 0
    */
-  indent?: number
+  indent?: number;
 }
 
 /**
@@ -359,13 +359,13 @@ interface NoteOptions {
    * Количество пробелов для отступа.
    * @default 0
    */
-  indent?: number
+  indent?: number;
 
   /**
    * Включать ли префикс "Mirta • [note]".
    * @default true
    */
-  includePrefix?: boolean
+  includePrefix?: boolean;
 }
 
 /**
@@ -391,7 +391,7 @@ export const logger = {
    **/
   setLevel: (level: LogLevel) => {
 
-    targetLevel = levelPriority.indexOf(level)
+    targetLevel = levelPriority.indexOf(level);
 
   },
 
@@ -405,7 +405,7 @@ export const logger = {
     log('info', value, {
       colorScope: 'prefix',
       colorOverride: 'success',
-    })
+    });
 
   },
 
@@ -418,7 +418,7 @@ export const logger = {
    **/
   debug: (value: unknown, label = t('label.debug')) => {
 
-    log('debug', value, label)
+    log('debug', value, label);
 
   },
 
@@ -431,7 +431,7 @@ export const logger = {
    **/
   info: (value: unknown, label = t('label.info')) => {
 
-    log('info', value, label)
+    log('info', value, label);
 
   },
 
@@ -444,7 +444,7 @@ export const logger = {
    **/
   warn: (value: unknown, label = t('label.warning')) => {
 
-    log('warn', value, label)
+    log('warn', value, label);
 
   },
 
@@ -457,7 +457,7 @@ export const logger = {
    **/
   error: (value: unknown, label = t('label.error')) => {
 
-    log('error', value, label)
+    log('error', value, label);
 
   },
 
@@ -470,7 +470,7 @@ export const logger = {
    **/
   success: (value: unknown, label = t('label.success')) => {
 
-    log('success', value, label)
+    log('success', value, label);
 
   },
 
@@ -483,7 +483,7 @@ export const logger = {
    **/
   cancel: (value: unknown, label = t('label.canceled')) => {
 
-    log('cancel', value, label)
+    log('cancel', value, label);
 
   },
 
@@ -500,7 +500,7 @@ export const logger = {
       includePrefix: false,
       colorScope: 'all',
       indent: options.indent,
-    })
+    });
 
   },
 
@@ -517,8 +517,8 @@ export const logger = {
       includePrefix: options.includePrefix,
       colorScope: 'prefix',
       indent: options.indent,
-    })
+    });
 
   },
 
-} as const
+} as const;

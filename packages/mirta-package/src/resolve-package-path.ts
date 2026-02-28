@@ -1,6 +1,6 @@
-import { basename, posix } from 'node:path'
-import { PackageError } from './errors/package-error'
-import { toPosix } from './path'
+import { basename, posix } from 'node:path';
+import { PackageError } from './errors/package-error';
+import { toPosix } from './path';
 
 /**
  * Резолвит путь к `package.json` на основе входного пути.
@@ -34,17 +34,17 @@ import { toPosix } from './path'
  **/
 export function resolvePackagePath(path: string): string {
 
-  const normalizedPath = toPosix(path)
+  const normalizedPath = toPosix(path);
 
   if (normalizedPath.endsWith('package.json'))
-    return normalizedPath
+    return normalizedPath;
 
-  const base = basename(normalizedPath)
+  const base = basename(normalizedPath);
 
   // Проверяем последний фрагмент пути, не допуская файлы.
   if (base !== '.' && base !== '..' && base.includes('.'))
-    throw PackageError.get('invalidPath', normalizedPath)
+    throw PackageError.get('invalidPath', normalizedPath);
 
-  return posix.join(normalizedPath, 'package.json')
+  return posix.join(normalizedPath, 'package.json');
 
 }

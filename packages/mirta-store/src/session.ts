@@ -5,7 +5,7 @@
  * был ли вызван `defineStore` с определённым именем в рамках одной сессии.
  *
  **/
-let sessionId: string | undefined
+let sessionId: string | undefined;
 
 /**
  * Возвращает уникальный идентификатор сессии.
@@ -24,6 +24,6 @@ let sessionId: string | undefined
  **/
 export function getSessionId() {
 
-  return sessionId ??= Math.random().toString(36).slice(2)
+  return sessionId ??= Math.random().toString(36).slice(2);
 
 }

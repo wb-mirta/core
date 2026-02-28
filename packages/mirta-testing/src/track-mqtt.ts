@@ -1,47 +1,47 @@
-import { useEvent, type EventRaiser } from 'mirta'
-import { type MqttMessageEventHandler, type SimulatorInstance } from './types'
+import { useEvent, type EventRaiser } from 'mirta';
+import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
 
 interface WithDevice {
-  publish(controlId: string, value: WbRules.MqttValue): WithDevice
+  publish(controlId: string, value: WbRules.MqttValue): WithDevice;
 }
 
 export interface TrackMqttSimulator extends SimulatorInstance {
   /** Отправляет одно или несколько сообщений. */
-  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void
-  withDevice(deviceId: string): WithDevice
+  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void;
+  withDevice(deviceId: string): WithDevice;
 }
 
 function createInstance(): TrackMqttSimulator {
 
-  let mqttEvent: EventRaiser<MqttMessageEventHandler>
+  let mqttEvent: EventRaiser<MqttMessageEventHandler>;
 
   function reset() {
 
-    mqttEvent = useEvent<MqttMessageEventHandler>()
+    mqttEvent = useEvent<MqttMessageEventHandler>();
 
     global.trackMqtt = (topic: string, callback: (message: WbRules.MqttMessage) => void) => {
 
       mqttEvent.on((message) => {
 
         if (topic == message.topic)
-          callback(message)
+          callback(message);
 
-      })
+      });
 
-    }
+    };
 
   }
 
   function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void {
 
     if (!Array.isArray(payload))
-      mqttEvent.raise(payload)
+      mqttEvent.raise(payload);
     else
       payload.forEach((item) => {
 
-        mqttEvent.raise(item)
+        mqttEvent.raise(item);
 
-      })
+      });
 
   }
 
@@ -53,30 +53,30 @@ function createInstance(): TrackMqttSimulator {
         mqttEvent.raise({
           topic: `/devices/${deviceId}/controls/${controlId}`,
           value,
-        })
+        });
 
-        return this
+        return this;
 
       },
-    }
+    };
 
   }
 
-  reset()
+  reset();
 
   return {
     reset,
     publish,
     withDevice,
-  }
+  };
 
 }
 
-let instance: TrackMqttSimulator | undefined
+let instance: TrackMqttSimulator | undefined;
 
 /** Имитатор конструкции trackMqtt. */
 export function useTrackMqtt() {
 
-  return instance ??= createInstance()
+  return instance ??= createInstance();
 
 }

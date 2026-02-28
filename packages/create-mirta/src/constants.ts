@@ -6,7 +6,7 @@
  * @internal
  *
  **/
-export const THIS_PACKAGE_NAME = 'create-mirta'
+export const THIS_PACKAGE_NAME = 'create-mirta';
 
 /**
  * Источник фичи - CLI.
@@ -14,4 +14,4 @@ export const THIS_PACKAGE_NAME = 'create-mirta'
  * @since 0.4.0
  *
  **/
-export const FEATURE_ORIGIN_CLI = 'cli'
+export const FEATURE_ORIGIN_CLI = 'cli';

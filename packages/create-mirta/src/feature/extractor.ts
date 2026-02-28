@@ -1,11 +1,11 @@
-import type { TemplateSequence, TemplateName } from '#template/types'
-import type { FeatureState } from './types'
+import type { TemplateSequence, TemplateName } from '#template/types';
+import type { FeatureState } from './types';
 
 export interface ExtractedFeature {
 
-  state: FeatureState
+  state: FeatureState;
 
-  origin: 'cli' | TemplateName
+  origin: 'cli' | TemplateName;
 
 }
 
@@ -16,26 +16,26 @@ const featurePriority = {
   'required': 2,
   'blocked': 3,
 
-} satisfies Record<FeatureState, number>
+} satisfies Record<FeatureState, number>;
 
 export function assertIsFeatureEntry(entry: unknown[]): asserts entry is [string, FeatureState] {
 
-  const [feature, state] = entry
+  const [feature, state] = entry;
 
   if (typeof feature !== 'string')
     throw new Error(
       `Invalid feature name: expected string, got ${typeof feature}`
-    )
+    );
 
   if (typeof state !== 'string')
     throw new Error(
       `Invalid feature state: expected string, got ${typeof state}`
-    )
+    );
 
   if ((!(state in featurePriority)))
     throw new Error(
       `Unknown feature state "${state}", supported values: ${Object.keys(featurePriority).join(', ')}`
-    )
+    );
 
 }
 
@@ -45,38 +45,38 @@ export function extractFeatures(
 
 ): Record<string, ExtractedFeature> {
 
-  const result: Record<string, ExtractedFeature> = {}
+  const result: Record<string, ExtractedFeature> = {};
 
   for (const template of sequence) {
 
     if (!template.features?.global)
-      continue
+      continue;
 
     for (const entry of Object.entries(template.features.global)) {
 
-      assertIsFeatureEntry(entry)
+      assertIsFeatureEntry(entry);
 
-      const [featureName, state] = entry
+      const [featureName, state] = entry;
 
       if (!(featureName in result)) {
 
-        result[featureName] = { state, origin: template.name }
+        result[featureName] = { state, origin: template.name };
 
-        continue
+        continue;
 
       }
 
-      const { state: oldState, origin } = result[featureName]
+      const { state: oldState, origin } = result[featureName];
 
       if (state === 'required' && oldState === 'blocked')
-        throw new Error(`Unable to require feature "${featureName}": blocked by "${origin}"`)
+        throw new Error(`Unable to require feature "${featureName}": blocked by "${origin}"`);
 
       if (state === 'blocked' && oldState === 'required')
-        throw new Error(`Unable to block feature "${featureName}": required by "${origin}"`)
+        throw new Error(`Unable to block feature "${featureName}": required by "${origin}"`);
 
       if (featurePriority[state] > featurePriority[oldState]) {
 
-        result[featureName] = { state, origin: template.name }
+        result[featureName] = { state, origin: template.name };
 
       }
 
@@ -84,6 +84,6 @@ export function extractFeatures(
 
   }
 
-  return result
+  return result;
 
 }

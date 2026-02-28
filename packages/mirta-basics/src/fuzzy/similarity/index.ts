@@ -1,1 +1,1 @@
-export { trigramSimilarity } from './trigrams'
+export { trigramSimilarity } from './trigrams';

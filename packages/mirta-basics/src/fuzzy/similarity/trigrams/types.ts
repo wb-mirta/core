@@ -4,4 +4,4 @@
  * @internal
  *
  **/
-export type TrigramChunk = Branded<string, 'TrigramChunk'>
+export type TrigramChunk = Branded<string, 'TrigramChunk'>;

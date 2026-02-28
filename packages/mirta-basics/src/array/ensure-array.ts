@@ -25,6 +25,6 @@
  **/
 export function ensureArray<TItem>(input: TItem | TItem[]): TItem[] {
 
-  return Array.isArray(input) ? [...input] : [input]
+  return Array.isArray(input) ? [...input] : [input];
 
 }

@@ -1,5 +1,5 @@
-import { buildTrigrams } from './build'
-import type { TrigramChunk } from './types'
+import { buildTrigrams } from './build';
+import type { TrigramChunk } from './types';
 
 /**
  * Вычисляет коэффициент подобия Жаккара между двумя наборами триграмм.
@@ -17,52 +17,52 @@ import type { TrigramChunk } from './types'
  **/
 export function trigramSimilarity(from: string | Record<TrigramChunk, boolean>, to: string): number {
 
-  let fromTrigrams: Record<TrigramChunk, boolean> = { }
+  let fromTrigrams: Record<TrigramChunk, boolean> = { };
 
   if (typeof from === 'string') {
 
     if (from.length === 0 || to.length === 0)
-      return 0
+      return 0;
 
     if (from === to)
-      return 1
+      return 1;
 
-    fromTrigrams = buildTrigrams(from)
+    fromTrigrams = buildTrigrams(from);
 
   }
   else {
 
     if (to.length === 0)
-      return 0
+      return 0;
 
-    fromTrigrams = from
+    fromTrigrams = from;
 
   }
 
-  const toTrigrams = buildTrigrams(to)
+  const toTrigrams = buildTrigrams(to);
 
-  let unionScore = 0
-  let intersectionScore = 0
+  let unionScore = 0;
+  let intersectionScore = 0;
 
   for (const trigram in fromTrigrams) {
 
     if (toTrigrams[trigram])
-      intersectionScore++
+      intersectionScore++;
 
-    unionScore++
+    unionScore++;
 
   }
 
   for (const trigram in toTrigrams) {
 
     if (!fromTrigrams[trigram])
-      unionScore++
+      unionScore++;
 
   }
 
   if (!unionScore)
-    return 0
+    return 0;
 
-  return intersectionScore / unionScore
+  return intersectionScore / unionScore;
 
 }

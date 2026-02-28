@@ -1,8 +1,8 @@
-import { homedir } from 'node:os'
-import { SourceError } from '#src/errors/source-error'
-import { toPosix } from '@mirta/package'
-import { access } from 'node:fs/promises'
-import { resolve, sep, relative } from 'node:path'
+import { homedir } from 'node:os';
+import { SourceError } from '#src/errors/source-error';
+import { toPosix } from '@mirta/package';
+import { access } from 'node:fs/promises';
+import { resolve, sep, relative } from 'node:path';
 
 /**
  * Асинхронно проверяет, существует ли файл или директория по указанному пути.
@@ -19,17 +19,17 @@ export async function isExistsAsync(path: string): Promise<boolean> {
 
   try {
 
-    await access(path)
+    await access(path);
 
-    return true
+    return true;
 
   }
   catch (e: unknown) {
 
     if (e && typeof e === 'object' && 'code' in e && e.code === 'ENOENT')
-      return false
+      return false;
 
-    throw e
+    throw e;
 
   }
 
@@ -51,15 +51,15 @@ export async function isExistsAsync(path: string): Promise<boolean> {
  **/
 export function resolveSubpath(rootDir: string, targetPath: string) {
 
-  const resolvedRoot = resolve(rootDir)
-  const resolvedTarget = resolve(resolvedRoot, targetPath)
+  const resolvedRoot = resolve(rootDir);
+  const resolvedTarget = resolve(resolvedRoot, targetPath);
 
-  const relativePath = relative(resolvedRoot, resolvedTarget)
+  const relativePath = relative(resolvedRoot, resolvedTarget);
 
   if (relativePath.startsWith('..') || relativePath.includes(`${sep}..`))
-    throw SourceError.get('path.outsideRoot', targetPath)
+    throw SourceError.get('path.outsideRoot', targetPath);
 
-  return toPosix(relativePath)
+  return toPosix(relativePath);
 
 }
 
@@ -88,8 +88,8 @@ export function resolveSubpath(rootDir: string, targetPath: string) {
 export function expandHomeDir(path: string): string {
 
   if (!path.startsWith('~') || process.platform === 'win32')
-    return path
+    return path;
 
-  return path.replace(/^~($|\/|\\)/, homedir() + '$1')
+  return path.replace(/^~($|\/|\\)/, homedir() + '$1');
 
 }

@@ -1,6 +1,6 @@
-import { t } from '#src/i18n'
-import { replaceEnvVars } from '#src/utils/env'
-import { logger } from '#utils/logger'
+import { t } from '#src/i18n';
+import { replaceEnvVars } from '#src/utils/env';
+import { logger } from '#utils/logger';
 
 /**
  * Разделяет строку по первому вхождению указанного разделителя.
@@ -17,12 +17,12 @@ function splitByFirstOccurrence(
   separator: string
 ): [string, ...(string | undefined)[]] {
 
-  const index = input.indexOf(separator)
+  const index = input.indexOf(separator);
 
   if (index === -1)
-    return [input]
+    return [input];
 
-  return [input.slice(0, index), input.slice(index + separator.length)]
+  return [input.slice(0, index), input.slice(index + separator.length)];
 
 }
 
@@ -49,73 +49,73 @@ function splitByFirstOccurrence(
  **/
 export function parseConnectionString(input: string): Record<string, unknown> {
 
-  const source = replaceEnvVars(input).trim()
+  const source = replaceEnvVars(input).trim();
 
   if (source === '')
-    throw new Error('Empty connection string')
+    throw new Error('Empty connection string');
 
-  const parts = source.split(';')
+  const parts = source.split(';');
 
   // === 1. Основные параметры ===
 
-  let url: URL
+  let url: URL;
 
   try {
 
-    url = new URL(parts[0])
+    url = new URL(parts[0]);
 
   }
   catch {
 
-    throw new Error(`Invalid connection URL: "${parts[0]}"`)
+    throw new Error(`Invalid connection URL: "${parts[0]}"`);
 
   }
 
-  const protocol = url.protocol.replace(':', '')
+  const protocol = url.protocol.replace(':', '');
 
   const result: Record<string, unknown> = {
     type: protocol,
     username: decodeURIComponent(url.username),
     hostname: url.hostname,
-  }
+  };
 
   if (url.port !== '')
-    result.port = url.port
+    result.port = url.port;
 
   // === 2. Вспомогательные опции ===
 
   const params = parts.slice(1).reduce<Record<string, string | undefined>>((items, nextItem) => {
 
-    const [key, value] = splitByFirstOccurrence(nextItem, '=')
+    const [key, value] = splitByFirstOccurrence(nextItem, '=');
 
     if (key) {
 
       if (value !== undefined) {
 
-        items[key] = value
+        items[key] = value;
 
       }
       else {
 
-        logger.warn(t('connection.emptyParameterSkipped', { key }))
+        logger.warn(t('connection.emptyParameterSkipped', { key }));
 
       }
 
     }
 
-    return items
+    return items;
 
-  }, {})
+  }, {});
 
-  result.pkcs11 = params.pkcs11
-  result.key = params.key
-  result.ttl = params.ttl
+  result.pkcs11 = params.pkcs11;
+  result.key = params.key;
+  result.ttl = params.ttl;
 
   if (result.ttl && !result.pkcs11 && !result.key)
-    logger.warn(t('connection.ttlSkipped'))
+    logger.warn(t('connection.ttlSkipped'));
 
-  result.wsl = params.wsl
+  result.wsl = params.wsl;
 
-  return result
+  return result;
 
 }

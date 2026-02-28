@@ -1,1 +1,1 @@
-export { toPosix } from './to-posix'
+export { toPosix } from './to-posix';

@@ -1,2 +1,2 @@
-import './object-assign'
-import './object-values'
+import './object-assign';
+import './object-values';

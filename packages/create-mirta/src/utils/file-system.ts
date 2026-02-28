@@ -1,5 +1,5 @@
-import { resolve } from 'node:path'
-import fs from 'node:fs/promises'
+import { resolve } from 'node:path';
+import fs from 'node:fs/promises';
 
 /**
  * Асинхронно проверяет, существует ли файл или директория по указанному пути.
@@ -16,17 +16,17 @@ export async function isExistsAsync(path: string): Promise<boolean> {
 
   try {
 
-    await fs.access(path)
+    await fs.access(path);
 
-    return true
+    return true;
 
   }
   catch (e: unknown) {
 
     if (e && typeof e === 'object' && 'code' in e && e.code === 'ENOENT')
-      return false
+      return false;
 
-    throw e
+    throw e;
 
   }
 
@@ -34,9 +34,9 @@ export async function isExistsAsync(path: string): Promise<boolean> {
 
 export async function isDirEmptyAsync(targetDir: string): Promise<boolean> {
 
-  const files = await fs.readdir(targetDir)
+  const files = await fs.readdir(targetDir);
 
-  return !files.length || (files.length === 1 && files[0] === '.git')
+  return !files.length || (files.length === 1 && files[0] === '.git');
 
 }
 
@@ -45,12 +45,12 @@ export async function clearDirAsync(targetDir: string): Promise<void> {
   for (const filename of await fs.readdir(targetDir)) {
 
     if (filename === '.git')
-      continue
+      continue;
 
     await fs.rm(resolve(targetDir, filename), {
       recursive: true,
       force: true,
-    })
+    });
 
   }
 

@@ -1,9 +1,9 @@
-import ts from 'typescript'
+import ts from 'typescript';
 
-import type { VisitorContext } from '../common/types'
-import { resolveNewModulePath } from '../common/module'
+import type { VisitorContext } from '../common/types';
+import { resolveNewModulePath } from '../common/module';
 
-const aliasPattern = /^[@#]/
+const aliasPattern = /^[@#]/;
 
 /**
  * Обновляет спецификатор модуля в узле импорта или экспорта.
@@ -30,7 +30,7 @@ export function updateModuleSpecifier(
       node.importClause,
       factory.createStringLiteral(newModuleSpecifier),
       node.attributes
-    )
+    );
 
   }
   else if (ts.isExportDeclaration(node)) {
@@ -42,11 +42,11 @@ export function updateModuleSpecifier(
       node.exportClause,
       factory.createStringLiteral(newModuleSpecifier),
       node.attributes
-    )
+    );
 
   }
 
-  return node
+  return node;
 
 }
 
@@ -55,7 +55,7 @@ export function updateModuleSpecifier(
  */
 export function visitChildren(context: VisitorContext, node: ts.Node) {
 
-  return ts.visitEachChild(node, context.getVisitor(), context.transformationContext)
+  return ts.visitEachChild(node, context.getVisitor(), context.transformationContext);
 
 }
 
@@ -83,37 +83,37 @@ export function visitChildren(context: VisitorContext, node: ts.Node) {
 export function nodeVisitor(this: VisitorContext, node: ts.Node): ts.Node | undefined {
 
   if (!ts.isImportDeclaration(node) && !ts.isExportDeclaration(node))
-    return visitChildren(this, node)
+    return visitChildren(this, node);
 
-  const moduleSpecifier = node.moduleSpecifier
+  const moduleSpecifier = node.moduleSpecifier;
 
   if (!moduleSpecifier || !ts.isStringLiteral(moduleSpecifier))
-    return visitChildren(this, node)
+    return visitChildren(this, node);
 
   // Извлекаем путь импорта/экспорта (указывается в кавычках после from).
-  const { text: oldPath } = moduleSpecifier
+  const { text: oldPath } = moduleSpecifier;
 
   // Проверяем, относится ли спецификатор к алиасу проекта (`#`) или кастомному алиасу (`@`).
   // Такие спецификаторы требуют пересчета в относительный путь.
   //
   if (!aliasPattern.test(oldPath))
-    return visitChildren(this, node)
+    return visitChildren(this, node);
 
-  const cachedNewPath = this.pathsCache.get(oldPath)
+  const cachedNewPath = this.pathsCache.get(oldPath);
 
   const newPath = cachedNewPath === undefined
     ? resolveNewModulePath(this, oldPath)
-    : cachedNewPath
+    : cachedNewPath;
 
   if (cachedNewPath === undefined)
-    this.pathsCache.set(oldPath, newPath)
+    this.pathsCache.set(oldPath, newPath);
 
   if (!newPath)
-    return node
+    return node;
 
   // Обновляем узел импорта новым значением пути.
   // Если путь не удалось преобразовать, возвращаем исходный узел.
   //
-  return updateModuleSpecifier(this.factory, node, newPath)
+  return updateModuleSpecifier(this.factory, node, newPath);
 
 }

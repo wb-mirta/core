@@ -1,4 +1,4 @@
-import ts from 'typescript'
+import ts from 'typescript';
 
 /**
  * Перечисление типов индексных файлов.
@@ -29,7 +29,7 @@ export enum IndexType {
  * @since 0.3.5
  *
  **/
-export type VisitorFunc = (node: ts.Node) => ts.VisitResult<ts.Node>
+export type VisitorFunc = (node: ts.Node) => ts.VisitResult<ts.Node>;
 
 /**
  * Базовый контекст для работы с AST-трансформером.
@@ -41,16 +41,16 @@ export type VisitorFunc = (node: ts.Node) => ts.VisitResult<ts.Node>
 export interface VisitorContextBase {
 
   /** Экземпляр программы TypeScript. */
-  readonly program: ts.Program
+  readonly program: ts.Program;
 
   /** Фабрика для создания/обновления узлов AST. */
-  readonly factory: ts.NodeFactory
+  readonly factory: ts.NodeFactory;
 
   /** Конфигурация компилятора TypeScript. */
-  readonly compilerOptions: ts.CompilerOptions
+  readonly compilerOptions: ts.CompilerOptions;
 
   /** Контекст трансформации AST. */
-  readonly transformationContext: ts.TransformationContext
+  readonly transformationContext: ts.TransformationContext;
 
 }
 
@@ -64,18 +64,18 @@ export interface VisitorContextBase {
 export interface VisitorContext extends VisitorContextBase {
 
   /** Текущий обрабатываемый файл. */
-  readonly sourceFile: ts.SourceFile
+  readonly sourceFile: ts.SourceFile;
 
   /** Корневая директория проекта. */
-  readonly rootDir: string
+  readonly rootDir: string;
 
   /** Кэш путей импорта/экспорта. */
-  readonly pathsCache: Map<string, string | null>
+  readonly pathsCache: Map<string, string | null>;
 
   /** Кэш файлов по имени без расширения. */
-  sourceFilesCache?: Map<string, ts.SourceFile>
+  sourceFilesCache?: Map<string, ts.SourceFile>;
 
   /** Возвращает функцию-визитор для обработки AST. */
-  getVisitor(this: VisitorContext): VisitorFunc
+  getVisitor(this: VisitorContext): VisitorFunc;
 
 }

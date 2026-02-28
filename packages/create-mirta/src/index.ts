@@ -1,16 +1,16 @@
-import cliPackage from '../package.json' with { type: 'json' }
+import cliPackage from '../package.json' with { type: 'json' };
 
-import { createStagedArgs } from '@mirta/staged-args'
-import { assertNoParseErrors } from '#assertions'
-import { setLocaleAsync, t } from '#i18n'
-import { logger } from '#utils/logger'
-import { CreationError, OperationCanceledError, PromptCanceledError } from '#errors'
-import { resolveRunnerAsync } from '#runners'
-import { banner } from '#banner'
-import { getFinalMessage } from '#message-final'
-import { getHelpMessage } from '#message-help'
-import { pickProjectAsync } from '#project/picker'
-import { resolveProjectContextAsync } from '#project-context/resolver'
+import { createStagedArgs } from '@mirta/staged-args';
+import { assertNoParseErrors } from '#assertions';
+import { setLocaleAsync, t } from '#i18n';
+import { logger } from '#utils/logger';
+import { CreationError, OperationCanceledError, PromptCanceledError } from '#errors';
+import { resolveRunnerAsync } from '#runners';
+import { banner } from '#banner';
+import { getFinalMessage } from '#message-final';
+import { getHelpMessage } from '#message-help';
+import { pickProjectAsync } from '#project/picker';
+import { resolveProjectContextAsync } from '#project-context/resolver';
 
 const initialSchema = ({
 
@@ -37,55 +37,55 @@ const initialSchema = ({
     type: 'boolean',
   },
 
-}) as const
+}) as const;
 
 async function run() {
 
   const args = createStagedArgs(
     process.argv.slice(2)
-  )
+  );
 
-  const parseResult = args.parse(initialSchema)
-  assertNoParseErrors(parseResult)
+  const parseResult = args.parse(initialSchema);
+  assertNoParseErrors(parseResult);
 
-  const { values: argv, positionals, stagedArgs: runnerArgs } = parseResult.data
+  const { values: argv, positionals, stagedArgs: runnerArgs } = parseResult.data;
 
   if (argv.locale)
-    await setLocaleAsync(argv.locale)
+    await setLocaleAsync(argv.locale);
 
   if (argv.version) {
 
-    console.log(`${cliPackage.name} v${cliPackage.version}`)
-    return
+    console.log(`${cliPackage.name} v${cliPackage.version}`);
+    return;
 
   }
 
   if (argv.help) {
 
-    console.log(getHelpMessage())
-    return
+    console.log(getHelpMessage());
+    return;
 
   }
 
-  console.log(banner)
-  console.log(t('title'))
-  console.log()
+  console.log(banner);
+  console.log(t('title'));
+  console.log();
 
   // Определяем тип шаблона - по аргументам или через вопрос пользователю.
-  const selection = await pickProjectAsync(argv.template?.toLowerCase())
+  const selection = await pickProjectAsync(argv.template?.toLowerCase());
 
-  const runner = await resolveRunnerAsync(selection.type)
+  const runner = await resolveRunnerAsync(selection.type);
 
   const context = await resolveProjectContextAsync(selection, {
     projectFolder: positionals[0],
     forceOverwrite: argv.force,
     barebone: argv.bare,
-  })
+  });
 
-  await runner.runAsync(runnerArgs, context)
+  await runner.runAsync(runnerArgs, context);
 
-  console.log()
-  console.log(getFinalMessage())
+  console.log();
+  console.log(getFinalMessage());
 
 }
 
@@ -93,26 +93,26 @@ run().catch((e: unknown) => {
 
   if (e instanceof PromptCanceledError || e instanceof OperationCanceledError) {
 
-    logger.cancel(t('step.canceled'))
+    logger.cancel(t('step.canceled'));
 
   }
   else if (e instanceof CreationError) {
 
-    logger.error(e.message)
+    logger.error(e.message);
 
   }
   else if (e instanceof Error) {
 
     // Unexpected internal error - rethrow to preserve stack trace
-    throw e
+    throw e;
 
   }
   else if (typeof e === 'string') {
 
-    logger.error(e)
+    logger.error(e);
 
   }
 
-  process.exit(1)
+  process.exit(1);
 
-})
+});

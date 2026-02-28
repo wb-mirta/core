@@ -1,7 +1,7 @@
-import nodePath from 'node:path'
-import { findUp } from 'find-up'
-import { readPackageAsync, toPosix } from '@mirta/package'
-import { WorkspaceError } from '../errors'
+import nodePath from 'node:path';
+import { findUp } from 'find-up';
+import { readPackageAsync, toPosix } from '@mirta/package';
+import { WorkspaceError } from '../errors';
 
 /**
  * Тип пакетного менеджера.
@@ -9,7 +9,7 @@ import { WorkspaceError } from '../errors'
  * @since 0.4.0
  *
  **/
-export type PackageManager = 'pnpm' | 'yarn' | 'bun' | 'npm'
+export type PackageManager = 'pnpm' | 'yarn' | 'bun' | 'npm';
 
 /**
  * Описывает контекст рабочей области (workspace).
@@ -26,12 +26,12 @@ export interface WorkspaceContext {
    * Абсолютный путь к корневой директории репозитория в формате POSIX.
    *
    **/
-  readonly rootDir: string
+  readonly rootDir: string;
 
   /**
    * Определённый пакетный менеджер, используемый в проекте.
    **/
-  readonly manager: PackageManager
+  readonly manager: PackageManager;
 
   /**
    * Необязательный массив glob-паттернов, определяющих пути к пакетам в монорепозитории.
@@ -40,7 +40,7 @@ export interface WorkspaceContext {
    * Должен быть массивом строк, например: `["packages/*"]`.
    *
    **/
-  readonly workspaces?: readonly string[]
+  readonly workspaces?: readonly string[];
 
 }
 
@@ -57,7 +57,7 @@ const lockFileMappings = {
   'bun.lock': 'bun',
   'package-lock.json': 'npm',
 
-} as const satisfies Record<string, PackageManager>
+} as const satisfies Record<string, PackageManager>;
 
 /**
  * Проверяет, что поле `workspaces` в `package.json` имеет корректный формат.
@@ -74,12 +74,12 @@ const lockFileMappings = {
 function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asserts workspaces is string[] | undefined {
 
   if (workspaces === null || workspaces === undefined)
-    return
+    return;
 
   if (Array.isArray(workspaces) && workspaces.every(item => typeof item === 'string'))
-    return
+    return;
 
-  throw WorkspaceError.get('invalidWorkspaces', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep))
+  throw WorkspaceError.get('invalidWorkspaces', pkgPath.replaceAll(nodePath.win32.sep, nodePath.posix.sep));
 
 }
 
@@ -103,28 +103,28 @@ function assertWorkspacesFieldFormat(workspaces: unknown, pkgPath: string): asse
  **/
 export async function resolveWorkspaceContextAsync(cwd: string): Promise<WorkspaceContext> {
 
-  const lockFiles = Object.keys(lockFileMappings)
+  const lockFiles = Object.keys(lockFileMappings);
 
   const lockFilePath = toPosix(
     await findUp(lockFiles, { cwd })
-  )
+  );
 
   if (!lockFilePath)
-    throw WorkspaceError.get('noLockfile')
+    throw WorkspaceError.get('noLockfile');
 
-  const rootDir = nodePath.dirname(lockFilePath)
+  const rootDir = nodePath.dirname(lockFilePath);
 
-  const pkgPath = `${rootDir}/package.json`
-  const pkg = await readPackageAsync(pkgPath)
+  const pkgPath = `${rootDir}/package.json`;
+  const pkg = await readPackageAsync(pkgPath);
 
-  assertWorkspacesFieldFormat(pkg.workspaces, pkgPath)
+  assertWorkspacesFieldFormat(pkg.workspaces, pkgPath);
 
-  const fileName = nodePath.basename(lockFilePath) as keyof typeof lockFileMappings
+  const fileName = nodePath.basename(lockFilePath) as keyof typeof lockFileMappings;
 
   return {
     rootDir,
     manager: lockFileMappings[fileName],
     workspaces: pkg.workspaces,
-  }
+  };
 
 }

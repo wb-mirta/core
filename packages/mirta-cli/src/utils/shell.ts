@@ -1,6 +1,6 @@
-import { spawn, type IOType, type SpawnOptions } from 'node:child_process'
-import type { WslDistroName } from '#src/config/types'
-import { logger } from '#utils/logger'
+import { spawn, type IOType, type SpawnOptions } from 'node:child_process';
+import type { WslDistroName } from '#src/config/types';
+import { logger } from '#utils/logger';
 
 /**
  * Режим `stdio`: ввод и вывод перенаправляются в `stdin`, `stdout` и `stderr` соответственно.
@@ -8,7 +8,7 @@ import { logger } from '#utils/logger'
  * @since 0.4.5
  *
  **/
-export const STDIO_PIPED: IOType[] = ['pipe', 'pipe', 'pipe']
+export const STDIO_PIPED: IOType[] = ['pipe', 'pipe', 'pipe'];
 
 /**
  * Режим `stdio`: ввод и вывод наследуются от родительского процесса (терминал), `stderr` перехватывается.
@@ -18,7 +18,7 @@ export const STDIO_PIPED: IOType[] = ['pipe', 'pipe', 'pipe']
  * @since 0.4.0
  *
  **/
-export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe']
+export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe'];
 
 /**
  * Режим `stdio`: ввод игнорируется, `stdout` и `stderr` перехватываются.
@@ -28,7 +28,7 @@ export const STDIO_INTERACTIVE: IOType[] = ['inherit', 'inherit', 'pipe']
  * @since 0.4.0
  *
  **/
-export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
+export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe'];
 
 /**
  * Режим `stdio`: ввод и `stdout` игнорируются, `stderr` перехватывается.
@@ -37,7 +37,7 @@ export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe']
  * @since 0.4.0
  *
  **/
-export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
+export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe'];
 
 /**
  * Ошибка выполнения команды в shell.
@@ -48,15 +48,15 @@ export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe']
 export class ShellError extends Error {
   constructor(message: string) {
 
-    super(message)
+    super(message);
 
     // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, ShellError.prototype)
+    Object.setPrototypeOf(this, ShellError.prototype);
 
-    this.name = 'ShellError'
-    this.message = message
+    this.name = 'ShellError';
+    this.message = message;
 
-    Error.captureStackTrace(this, ShellError)
+    Error.captureStackTrace(this, ShellError);
 
   }
 }
@@ -72,14 +72,14 @@ export class ShellError extends Error {
 export class OperationCanceledError extends Error {
   constructor() {
 
-    super()
+    super();
 
     // Убедимся, что экземпляр имеет правильный прототип
-    Object.setPrototypeOf(this, OperationCanceledError.prototype)
+    Object.setPrototypeOf(this, OperationCanceledError.prototype);
 
-    this.name = 'OperationCanceledError'
+    this.name = 'OperationCanceledError';
 
-    Error.captureStackTrace(this, OperationCanceledError)
+    Error.captureStackTrace(this, OperationCanceledError);
 
   }
 }
@@ -94,25 +94,25 @@ export interface ExecutionResult {
    * Успешно завершена ли команда (код в `doneCodes`).
    *
    **/
-  isDone: boolean
+  isDone: boolean;
 
   /**
    * Код завершения процесса.
    *
    **/
-  code: number
+  code: number;
 
   /**
    * Перехваченный стандартный вывод.
    *
    **/
-  stdout: string
+  stdout: string;
 
   /**
    * Перехваченный стандартный поток ошибок.
    *
    **/
-  stderr: string
+  stderr: string;
 }
 
 /**
@@ -127,13 +127,13 @@ interface RunOptions extends SpawnOptions {
    * Коды завершения, считающиеся успешными (по умолчанию: `[0]`).
    *
    **/
-  doneCodes?: number[]
+  doneCodes?: number[];
 
   /**
    * Коды завершения, интерпретируемые как отмена (по умолчанию: `[130]` — SIGINT).
    *
    **/
-  cancelCodes?: number[]
+  cancelCodes?: number[];
 
   /**
    * Ввод для команды (требует pipe для stdin).
@@ -141,7 +141,7 @@ interface RunOptions extends SpawnOptions {
    * @since 0.4.5
    *
    **/
-  input?: string
+  input?: string;
 
 }
 
@@ -167,13 +167,13 @@ export async function execAsync(
 
   return new Promise((resolve, reject) => {
 
-    const { doneCodes = [0], cancelCodes = [130], input, ...spawnOptions } = options
+    const { doneCodes = [0], cancelCodes = [130], input, ...spawnOptions } = options;
 
-    spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT
-    spawnOptions.shell ??= false
+    spawnOptions.stdio ??= STDIO_CAPTURE_OUTPUT;
+    spawnOptions.shell ??= false;
 
-    const stdio = spawnOptions.stdio
-    const stdinMode = Array.isArray(stdio) ? stdio[0] : stdio
+    const stdio = spawnOptions.stdio;
+    const stdinMode = Array.isArray(stdio) ? stdio[0] : stdio;
 
     if (input !== undefined && stdinMode !== 'pipe') {
 
@@ -181,55 +181,55 @@ export async function execAsync(
         new ShellError(
           'Input can only be piped to stdin when stdio[0] is set to "pipe"'
         )
-      )
+      );
 
-      return
+      return;
 
     }
 
-    const runner = spawn(command, args, spawnOptions)
+    const runner = spawn(command, args, spawnOptions);
 
-    const stdoutChunks: Buffer[] = []
-    const stderrChunks: Buffer[] = []
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
 
     runner.stdout?.on('data', (chunk: Buffer) => {
 
-      stdoutChunks.push(chunk)
+      stdoutChunks.push(chunk);
 
-    })
+    });
 
     runner.stderr?.on('data', (chunk: Buffer) => {
 
-      stderrChunks.push(chunk)
+      stderrChunks.push(chunk);
 
-    })
+    });
 
     if (input !== undefined) {
 
-      runner.stdin?.on('error', reject)
+      runner.stdin?.on('error', reject);
 
-      runner.stdin?.write(input)
-      runner.stdin?.end()
+      runner.stdin?.write(input);
+      runner.stdin?.end();
 
     }
 
-    runner.on('error', reject)
+    runner.on('error', reject);
 
     runner.on('exit', (code) => {
 
-      const isDone = code !== null && doneCodes.includes(code)
+      const isDone = code !== null && doneCodes.includes(code);
 
-      const stdout = Buffer.concat(stdoutChunks).toString().trim()
-      const stderr = Buffer.concat(stderrChunks).toString().trim()
+      const stdout = Buffer.concat(stdoutChunks).toString().trim();
+      const stderr = Buffer.concat(stderrChunks).toString().trim();
 
       if (isDone) {
 
-        resolve({ isDone, code, stdout, stderr })
+        resolve({ isDone, code, stdout, stderr });
 
       }
       else {
 
-        const isCanceled = code !== null && cancelCodes.includes(code)
+        const isCanceled = code !== null && cancelCodes.includes(code);
 
         reject(
           isCanceled
@@ -237,13 +237,13 @@ export async function execAsync(
             : new ShellError(
                 `Failed to execute command ${command} ${args.join(' ')}: ${stderr}`
               )
-        )
+        );
 
       }
 
-    })
+    });
 
-  })
+  });
 
 }
 
@@ -253,7 +253,7 @@ export async function execAsync(
  * @since 0.4.0
  *
  **/
-export type RunAsync = (command: string, args?: string[], options?: RunOptions) => Promise<ExecutionResult>
+export type RunAsync = (command: string, args?: string[], options?: RunOptions) => Promise<ExecutionResult>;
 
 /**
  * Интерфейс для универсального запуска команд с дополнительными режимами.
@@ -274,7 +274,7 @@ interface RunCommandAsync extends RunAsync {
    * @returns Функция `RunAsync`, выполняющая команды в нужной среде.
    *
    **/
-  inUnixShell: (wsl?: WslDistroName) => RunAsync
+  inUnixShell: (wsl?: WslDistroName) => RunAsync;
 
   /**
    * Возвращает функцию запуска в режиме симуляции.
@@ -285,7 +285,7 @@ interface RunCommandAsync extends RunAsync {
    * @returns Функция `RunAsync`, имитирующая выполнение.
    *
    **/
-  dry: (isDryRun: boolean) => RunAsync
+  dry: (isDryRun: boolean) => RunAsync;
 
 }
 
@@ -301,7 +301,7 @@ const runCommandAsync: RunCommandAsync = async (
   command: string,
   args?: string[],
   options: RunOptions = {}
-) => await execAsync(command, args, { ...options })
+) => await execAsync(command, args, { ...options });
 
 runCommandAsync.inUnixShell = (wsl?: WslDistroName): RunAsync => (
   command,
@@ -309,60 +309,60 @@ runCommandAsync.inUnixShell = (wsl?: WslDistroName): RunAsync => (
   options = {}
 ) => {
 
-  let cmd: string
-  let fullArgs: string[] = []
+  let cmd: string;
+  let fullArgs: string[] = [];
 
   if (process.platform === 'win32') {
 
-    cmd = 'wsl'
+    cmd = 'wsl';
 
     if (wsl)
-      fullArgs.push('-d', wsl)
+      fullArgs.push('-d', wsl);
 
     if (options.env) {
 
       for (const [key, value] of Object.entries(options.env)) {
 
-        fullArgs.push(`${key}=${value}`)
+        fullArgs.push(`${key}=${value}`);
 
       }
 
     }
 
-    fullArgs.push(command, ...args)
+    fullArgs.push(command, ...args);
 
   }
   else {
 
-    cmd = command
-    fullArgs = args
+    cmd = command;
+    fullArgs = args;
 
   }
 
-  return execAsync(cmd, fullArgs, { ...options })
+  return execAsync(cmd, fullArgs, { ...options });
 
-}
+};
 
 runCommandAsync.dry = (isDryRun?: boolean): RunAsync => {
 
   if (isDryRun === false)
-    return runCommandAsync
+    return runCommandAsync;
 
   return (command, args = []): Promise<ExecutionResult> => {
 
-    logger.info(`${command} ${args.join(' ')}`.trimEnd() + ' (DRY RUN)')
+    logger.info(`${command} ${args.join(' ')}`.trimEnd() + ' (DRY RUN)');
 
     return Promise.resolve({
       isDone: true,
       code: 0,
       stdout: '',
       stderr: '',
-    })
+    });
 
-  }
+  };
 
-}
+};
 
 export {
   runCommandAsync
-}
+};

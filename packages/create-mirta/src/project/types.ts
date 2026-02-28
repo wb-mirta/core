@@ -4,12 +4,12 @@
  * @since 0.4.0
  *
  **/
-export type ProjectType = 'classic' | 'mono'
+export type ProjectType = 'classic' | 'mono';
 
 export interface ProjectSelection {
 
-  type: ProjectType
+  type: ProjectType;
 
-  templateName?: string
+  templateName?: string;
 
 }

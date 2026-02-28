@@ -22,6 +22,6 @@
 export function hasOwn(target: object, key: PropertyKey) {
 
   return Object.prototype.hasOwnProperty
-    .call(target, key) as boolean
+    .call(target, key) as boolean;
 
 }

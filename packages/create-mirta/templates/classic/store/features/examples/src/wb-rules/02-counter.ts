@@ -1,19 +1,19 @@
-import { useCounter } from '#wbm/counter'
-import { useCounterStore } from '#wbm/counter-store'
+import { useCounter } from '#wbm/counter';
+import { useCounterStore } from '#wbm/counter-store';
 
-log('Script: {}', __filename)
+log('Script: {}', __filename);
 
 // Использует счетчик из модуля counter
-const counter = useCounter()
+const counter = useCounter();
 
 // Увеличивает значение счетчика на 2
-counter.increment()
-counter.increment()
+counter.increment();
+counter.increment();
 
 // Выводит в лог текущее значение счетчика
-log('Counter Value: {}', counter.count)
+log('Counter Value: {}', counter.count);
 
-const store = useCounterStore()
+const store = useCounterStore();
 
 // Выводит в лог значение напрямую из store
-log('Value from store: {}, double from getter: {}', store.count, store.double)
+log('Value from store: {}, double from getter: {}', store.count, store.double);

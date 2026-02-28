@@ -1,4 +1,4 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
+import { THIS_PACKAGE_NAME } from '#src/constants';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с чтением и парсингом файла `package.json`.
@@ -21,7 +21,7 @@ export class PackageError extends Error {
    * Позволяет точно определить причину ошибки в обработчиках `try/catch`.
    *
    **/
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор, используемый только внутри
@@ -35,10 +35,10 @@ export class PackageError extends Error {
    **/
   private constructor(message: string, code: string, scope?: string) {
 
-    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`);
 
-    this.name = 'PackageError'
-    this.code = code
+    this.name = 'PackageError';
+    this.code = code;
 
     // Захватываем стек вызовов, исключая фабричный метод `get`,
     // чтобы улучшить читаемость трассировки.
@@ -50,7 +50,7 @@ export class PackageError extends Error {
         ? PackageError.getScoped
         // eslint-disable-next-line @typescript-eslint/unbound-method
         : PackageError.get
-      )
+      );
 
   }
 
@@ -119,7 +119,7 @@ export class PackageError extends Error {
     noVersionField: () =>
       'No version field found in package.json',
 
-  } as const
+  } as const;
 
   /**
    * Фабричный метод для создания экземпляра ошибки по её коду.
@@ -142,11 +142,11 @@ export class PackageError extends Error {
   ): PackageError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new PackageError(message, code)
+    return new PackageError(message, code);
 
   }
 
@@ -179,11 +179,11 @@ export class PackageError extends Error {
   ): PackageError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new PackageError(message, code, scope)
+    return new PackageError(message, code, scope);
 
   }
 }

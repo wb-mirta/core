@@ -1,5 +1,5 @@
-import { t } from '#i18n'
-import { prompts } from '#utils/prompts'
+import { t } from '#i18n';
+import { prompts } from '#utils/prompts';
 
 export async function promptProjectFolderAsync(
   defaultValue: string
@@ -14,11 +14,11 @@ export async function promptProjectFolderAsync(
 
       return value.trim().length === 0
         ? t('validation.required')
-        : true
+        : true;
 
     },
-  }) as { projectFolder: string }
+  }) as { projectFolder: string };
 
-  return projectFolder.trim()
+  return projectFolder.trim();
 
 }

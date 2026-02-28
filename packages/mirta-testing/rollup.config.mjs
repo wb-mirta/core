@@ -1,4 +1,4 @@
-import { definePackageConfig } from '@mirta/rollup'
+import { definePackageConfig } from '@mirta/rollup';
 
 export default definePackageConfig({
   input: [
@@ -6,4 +6,4 @@ export default definePackageConfig({
     'src/config/index.ts',
     'src/setup/global.ts',
   ],
-})
+});

@@ -1,10 +1,10 @@
-export type EventHandler = (...args: unknown[]) => void
+export type EventHandler = (...args: unknown[]) => void;
 
 export type OnEvent<THandler extends EventHandler>
-  = (handler: THandler) => { off: () => void }
+  = (handler: THandler) => { off: () => void };
 
 export type OnceEvent<THandler extends EventHandler>
-  = (handler: THandler) => void
+  = (handler: THandler) => void;
 
 export interface Event<THandler extends EventHandler> {
   /**
@@ -19,7 +19,7 @@ export interface Event<THandler extends EventHandler> {
    * subscription.off()
    * ```
    **/
-  on: OnEvent<THandler>
+  on: OnEvent<THandler>;
   /**
    * Подписывает на событие, однократное выполнение.
    * @example
@@ -30,7 +30,7 @@ export interface Event<THandler extends EventHandler> {
    * stateChanged.once(() => { ... })
    * ```
    **/
-  once: OnceEvent<THandler>
+  once: OnceEvent<THandler>;
   /**
    * Отписывает указанный обработчик от прослушивания события.
    * @example
@@ -45,7 +45,7 @@ export interface Event<THandler extends EventHandler> {
    * stateChanged.off(handler)
    * ```
    **/
-  off: (handler: THandler) => void
+  off: (handler: THandler) => void;
 }
 
 export interface EventRaiser<THandler extends EventHandler> extends Event<THandler> {
@@ -60,9 +60,9 @@ export interface EventRaiser<THandler extends EventHandler> extends Event<THandl
    * stateChanged.raise()
    * ```
    **/
-  raise: (...args: Parameters<THandler>) => void
+  raise: (...args: Parameters<THandler>) => void;
 
-  withoutRaise: () => Event<THandler>
+  withoutRaise: () => Event<THandler>;
 }
 
 /**
@@ -90,29 +90,29 @@ export interface EventRaiser<THandler extends EventHandler> extends Event<THandl
  */
 export function useEvent<THandler extends EventHandler>(): EventRaiser<THandler> {
 
-  const handlers: THandler[] = []
+  const handlers: THandler[] = [];
 
   function off(handler: THandler) {
 
-    const index = handlers.indexOf(handler)
+    const index = handlers.indexOf(handler);
 
     if (index !== -1)
-      handlers.splice(index, 1)
+      handlers.splice(index, 1);
 
   }
 
   function on(handler: THandler) {
 
-    handlers.push(handler)
+    handlers.push(handler);
 
     return {
       /** Отписывает от прослушивания события. */
       off: () => {
 
-        off(handler)
+        off(handler);
 
       },
-    }
+    };
 
   }
 
@@ -120,24 +120,24 @@ export function useEvent<THandler extends EventHandler>(): EventRaiser<THandler>
 
     const wrapper = ((...args: Parameters<THandler>) => {
 
-      handler(...args)
-      off(wrapper)
+      handler(...args);
+      off(wrapper);
 
-    }) as THandler
+    }) as THandler;
 
-    handlers.push(wrapper)
+    handlers.push(wrapper);
 
   }
 
   const raise = (...args: Parameters<THandler>) => {
 
     // Защита от сдвига в массиве при выполнении once.
-    const handlersCopy = handlers.concat()
+    const handlersCopy = handlers.concat();
 
     for (let i = 0, len = handlersCopy.length; i < len; i++)
-      (handlersCopy[i])(...args)
+      (handlersCopy[i])(...args);
 
-  }
+  };
 
   return {
     on,
@@ -149,6 +149,6 @@ export function useEvent<THandler extends EventHandler>(): EventRaiser<THandler>
       once,
       off,
     }),
-  }
+  };
 
 }

@@ -1,4 +1,4 @@
-import { assertConnectionIsValid } from '#src/config/connection/assert'
+import { assertConnectionIsValid } from '#src/config/connection/assert';
 
 describe('assertConnectionIsValid', () => {
 
@@ -7,15 +7,15 @@ describe('assertConnectionIsValid', () => {
     const connection = {
       type: 'ssh',
       hostname: '192.168.42.1',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).not.toThrow()
+    }).not.toThrow();
 
-  })
+  });
 
   it('should pass validation for complete SSH connection', () => {
 
@@ -27,59 +27,59 @@ describe('assertConnectionIsValid', () => {
       key: '~/.ssh/id_ed25519',
       ttl: '15m',
       wsl: 'Ubuntu',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).not.toThrow()
+    }).not.toThrow();
 
-  })
+  });
 
   it('should throw when type is not ssh', () => {
 
     const connection = {
       type: 'ftp',
       hostname: '192.168.1.1',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('Only SSH connection type supported')
+    }).toThrow('Only SSH connection type supported');
 
-  })
+  });
 
   it('should throw when hostname is missing', () => {
 
     const connection = {
       type: 'ssh',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('hostname is required')
+    }).toThrow('hostname is required');
 
-  })
+  });
 
   it('should throw when hostname is not a string', () => {
 
     const connection = {
       type: 'ssh',
       hostname: 123 as unknown as string,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('hostname is required and must be a string')
+    }).toThrow('hostname is required and must be a string');
 
-  })
+  });
 
   it('should throw when port is not an integer', () => {
 
@@ -87,15 +87,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       port: 22.5,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('port must be integer between 1 and 65535')
+    }).toThrow('port must be integer between 1 and 65535');
 
-  })
+  });
 
   it('should throw when port is out of range (too low)', () => {
 
@@ -103,15 +103,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       port: 0,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('port must be integer between 1 and 65535')
+    }).toThrow('port must be integer between 1 and 65535');
 
-  })
+  });
 
   it('should throw when port is out of range (too high)', () => {
 
@@ -119,15 +119,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       port: 65536,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('port must be integer between 1 and 65535')
+    }).toThrow('port must be integer between 1 and 65535');
 
-  })
+  });
 
   it('should throw when username is empty string', () => {
 
@@ -135,15 +135,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       username: '   ',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('username must be a non-empty string')
+    }).toThrow('username must be a non-empty string');
 
-  })
+  });
 
   it('should throw when username is not a string', () => {
 
@@ -151,15 +151,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       username: 123,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('username must be a non-empty string')
+    }).toThrow('username must be a non-empty string');
 
-  })
+  });
 
   it('should throw when pkcs11 is not a string', () => {
 
@@ -167,15 +167,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       pkcs11: 123,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('pkcs11: path to identity must be a string')
+    }).toThrow('pkcs11: path to identity must be a string');
 
-  })
+  });
 
   it('should throw when key is not a string', () => {
 
@@ -183,15 +183,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       key: false,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('key: path to identity must be a string')
+    }).toThrow('key: path to identity must be a string');
 
-  })
+  });
 
   it('should throw when ttl is not a string', () => {
 
@@ -199,15 +199,15 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       ttl: 600,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('ttl must be a string')
+    }).toThrow('ttl must be a string');
 
-  })
+  });
 
   it('should throw when ttl format is invalid', () => {
 
@@ -215,19 +215,19 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       ttl: '1h30',
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('ttl must be in format <number>[smhd]')
+    }).toThrow('ttl must be in format <number>[smhd]');
 
-  })
+  });
 
   it('should accept valid ttl formats', () => {
 
-    const ttls = ['600', '10m', '1h', '2d', '1h30m', '10m30s']
+    const ttls = ['600', '10m', '1h', '2d', '1h30m', '10m30s'];
 
     ttls.forEach((ttl) => {
 
@@ -235,17 +235,17 @@ describe('assertConnectionIsValid', () => {
         type: 'ssh',
         hostname: '192.168.1.1',
         ttl,
-      }
+      };
 
       expect(() => {
 
-        assertConnectionIsValid(connection)
+        assertConnectionIsValid(connection);
 
-      }).not.toThrow()
+      }).not.toThrow();
 
-    })
+    });
 
-  })
+  });
 
   it('should throw when wsl is not a string', () => {
 
@@ -253,14 +253,14 @@ describe('assertConnectionIsValid', () => {
       type: 'ssh',
       hostname: '192.168.1.1',
       wsl: true,
-    }
+    };
 
     expect(() => {
 
-      assertConnectionIsValid(connection)
+      assertConnectionIsValid(connection);
 
-    }).toThrow('wsl: distro name must be a string')
+    }).toThrow('wsl: distro name must be a string');
 
-  })
+  });
 
-})
+});

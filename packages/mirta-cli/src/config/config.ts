@@ -1,10 +1,10 @@
-import { readFile } from 'node:fs/promises'
-import { isExistsAsync, resolveSubpath } from '#src/utils/file-system'
-import type { MirtaConfig } from './types'
-import { SourceError } from '#src/errors/source-error'
-import { join } from 'node:path/posix'
-import jsonc from 'jsonc-parser'
-import { JsoncSyntaxError } from '#src/errors/jsonc-error'
+import { readFile } from 'node:fs/promises';
+import { isExistsAsync, resolveSubpath } from '#src/utils/file-system';
+import type { MirtaConfig } from './types';
+import { SourceError } from '#src/errors/source-error';
+import { join } from 'node:path/posix';
+import jsonc from 'jsonc-parser';
+import { JsoncSyntaxError } from '#src/errors/jsonc-error';
 
 const errorMessages: ReadonlyMap<jsonc.ParseErrorCode, string> = new Map<jsonc.ParseErrorCode, string>([
   [jsonc.ParseErrorCode.InvalidSymbol, 'Invalid symbol encountered'],
@@ -23,11 +23,11 @@ const errorMessages: ReadonlyMap<jsonc.ParseErrorCode, string> = new Map<jsonc.P
   [jsonc.ParseErrorCode.InvalidUnicode, 'Invalid Unicode escape'],
   [jsonc.ParseErrorCode.InvalidEscapeCharacter, 'Invalid escape character'],
   [jsonc.ParseErrorCode.InvalidCharacter, 'Invalid character'],
-])
+]);
 
 function getErrorMessage(errorCode: jsonc.ParseErrorCode): string {
 
-  return errorMessages.get(errorCode) ?? 'Unknown parsing error'
+  return errorMessages.get(errorCode) ?? 'Unknown parsing error';
 
 }
 
@@ -53,7 +53,7 @@ function getErrorMessage(errorCode: jsonc.ParseErrorCode): string {
  **/
 export function defineConfig(config: MirtaConfig): MirtaConfig {
 
-  return config
+  return config;
 
 }
 
@@ -71,32 +71,32 @@ export function defineConfig(config: MirtaConfig): MirtaConfig {
  **/
 export function parseConfigJson(content: string): object {
 
-  const errors: jsonc.ParseError[] = []
+  const errors: jsonc.ParseError[] = [];
 
   const parsed = jsonc.parse(content, errors, {
     allowTrailingComma: true,
-  }) as unknown
+  }) as unknown;
 
   // Проверяем, есть ли ошибки парсинга
   if (errors.length > 0) {
 
-    const firstError = errors[0]
+    const firstError = errors[0];
 
     throw new JsoncSyntaxError(
       getErrorMessage(firstError.error),
       firstError.offset,
       firstError.length
-    )
+    );
 
   }
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
 
-    throw SourceError.get('parse.invalidJsonRoot')
+    throw SourceError.get('parse.invalidJsonRoot');
 
   }
 
-  return parsed
+  return parsed;
 
 }
 
@@ -120,36 +120,36 @@ export async function readConfigAsync(rootDir: string, pathInput: string): Promi
   const configPath = join(
     rootDir,
     resolveSubpath(rootDir, pathInput)
-  )
+  );
 
   if (!await isExistsAsync(configPath))
-    return
+    return;
 
   try {
 
-    const content = await readFile(configPath, 'utf-8')
+    const content = await readFile(configPath, 'utf-8');
 
-    return parseConfigJson(content) as MirtaConfig
+    return parseConfigJson(content) as MirtaConfig;
 
   }
   catch (e: unknown) {
 
     if (e instanceof SourceError)
-      throw e
+      throw e;
 
     if (e instanceof JsoncSyntaxError)
-      throw e
+      throw e;
 
     if (e && typeof e === 'object' && 'code' in e) {
 
       switch (e.code) {
 
         case 'ENOENT':
-          throw SourceError.get('file.notFound', configPath)
+          throw SourceError.get('file.notFound', configPath);
 
         case 'EACCES':
         case 'EPERM':
-          throw SourceError.get('file.accessDenied', configPath)
+          throw SourceError.get('file.accessDenied', configPath);
 
       }
 
@@ -157,9 +157,9 @@ export async function readConfigAsync(rootDir: string, pathInput: string): Promi
 
     const message = e instanceof Error
       ? e.message
-      : String(e)
+      : String(e);
 
-    throw SourceError.get('file.failedToRead', configPath, message)
+    throw SourceError.get('file.failedToRead', configPath, message);
 
   }
 

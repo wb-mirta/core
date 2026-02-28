@@ -3,11 +3,11 @@
 // Адаптированная версия примера
 // https://wirenboard.com/wiki/index.php?title=Rule_Examples
 
-import { isNumber, isString } from 'mirta'
+import { isNumber, isString } from 'mirta';
 
-const meterCorrection = 123120 // Корректировочное значение счетчика в литрах
-const counterCorrection = 7 // Корректировочное значение WB-MCM8 в импульсах
-const inpulseValue = 10 // Количество литров на один импульс
+const meterCorrection = 123120; // Корректировочное значение счетчика в литрах
+const counterCorrection = 7; // Корректировочное значение WB-MCM8 в импульсах
+const inpulseValue = 10; // Количество литров на один импульс
 
 // Создаем виртуальный девайс для отображения в веб интерфейсе.
 defineVirtualDevice('water_meters', {
@@ -18,7 +18,7 @@ defineVirtualDevice('water_meters', {
       value: 0,
     },
   },
-})
+});
 
 defineRule('water_meter_1', {
   whenChanged: 'wb-mcm8_29/Input 1 counter',
@@ -37,12 +37,12 @@ defineRule('water_meter_1', {
             isNumber(newValue)
               ? newValue
               : 0
-          )
+          );
 
       // Умножаем значение счетчика на количество литров/импульс и прибавляем корректировочное значение.
-      dev['water_meters/water_meter_1'] = ((intValue - counterCorrection) * inpulseValue) + meterCorrection
+      dev['water_meters/water_meter_1'] = ((intValue - counterCorrection) * inpulseValue) + meterCorrection;
 
     }
 
   },
-})
+});

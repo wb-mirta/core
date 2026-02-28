@@ -1,7 +1,7 @@
-import { KNOWN_SSH_PORT } from '../constants'
-import type { MirtaConnection } from '../types'
+import { KNOWN_SSH_PORT } from '../constants';
+import type { MirtaConnection } from '../types';
 
-export { resolveConnection } from './resolve'
+export { resolveConnection } from './resolve';
 
 /**
  * Формирует строку назначения подключения в формате `user@host[:port]`.
@@ -14,11 +14,11 @@ export { resolveConnection } from './resolve'
  **/
 export function getConnectionTarget(connection: MirtaConnection) {
 
-  let target = `${connection.username}@${connection.hostname}`
+  let target = `${connection.username}@${connection.hostname}`;
 
   if (connection.port && connection.port !== KNOWN_SSH_PORT)
-    target += `:${connection.port}`
+    target += `:${connection.port}`;
 
-  return target
+  return target;
 
 }

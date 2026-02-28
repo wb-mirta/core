@@ -1,4 +1,4 @@
-import { parseArgs } from 'node:util'
+import { parseArgs } from 'node:util';
 
 import type {
   OptionToken,
@@ -12,10 +12,10 @@ import type {
   ParsedArgs,
   ParsedArgsFinal,
   ParseError
-} from './types'
+} from './types';
 
-import { mapToSchema } from './schema'
-import { ResultHandler, type Result } from './result'
+import { mapToSchema } from './schema';
+import { ResultHandler, type Result } from './result';
 
 /**
  * Проверяет, что все опции в токенах известны. Если нет — формирует набор ошибок с подсказками.
@@ -38,14 +38,14 @@ function restrictUnknownOptions(
     (token): token is OptionToken =>
       token.kind === 'option'
       && !knownArgs.includes(token.name)
-  )
+  );
 
   if (unknownTokens.length === 0)
-    return
+    return;
 
   const errors = unknownTokens.map((token) => {
 
-    const name = token.name
+    const name = token.name;
 
     const error: ParseError = {
 
@@ -55,13 +55,13 @@ function restrictUnknownOptions(
         ? suggest(name, knownArgs)
         : undefined,
 
-    }
+    };
 
-    return error
+    return error;
 
-  })
+  });
 
-  return errors
+  return errors;
 
 }
 
@@ -77,20 +77,20 @@ function restrictUnknownOptions(
  **/
 function extendKnownArgs(knownArgs: readonly string[] | undefined, schema: OptionSchema) {
 
-  const knownSet = new Set(knownArgs ?? [])
+  const knownSet = new Set(knownArgs ?? []);
 
   for (const key of Object.keys(schema)) {
 
-    knownSet.add(key)
+    knownSet.add(key);
 
-    const short = schema[key].short
+    const short = schema[key].short;
 
     if (short)
-      knownSet.add(short)
+      knownSet.add(short);
 
   }
 
-  return [...knownSet]
+  return [...knownSet];
 
 }
 
@@ -116,7 +116,7 @@ function parseInternal<TSchema extends OptionSchema>(
 ) {
 
   // 1. Объединяем схемы для parseArgs
-  const stagedSchema = { ...context.schema, ...schema }
+  const stagedSchema = { ...context.schema, ...schema };
 
   // 2. Токенизируем с полным контекстом
   const { tokens } = parseArgs({
@@ -125,9 +125,9 @@ function parseInternal<TSchema extends OptionSchema>(
     tokens: true,
     strict: false,
     allowPositionals: true,
-  })
+  });
 
-  const knownArgs = extendKnownArgs(context.knownArgs, schema)
+  const knownArgs = extendKnownArgs(context.knownArgs, schema);
 
   // Проверяем неизвестные опции, если запрещены
   if (options.noUnknown) {
@@ -136,25 +136,25 @@ function parseInternal<TSchema extends OptionSchema>(
       tokens,
       knownArgs,
       context.suggest
-    )
+    );
 
     if (errors)
-      return ResultHandler.failed(errors)
+      return ResultHandler.failed(errors);
 
   }
 
-  const mapResult = mapToSchema(schema, tokens, context.consumedIndices)
+  const mapResult = mapToSchema(schema, tokens, context.consumedIndices);
 
   if (mapResult.hasErrors)
-    return mapResult
+    return mapResult;
 
   const {
     values,
     positionals,
     consumedIndices: localConsumedIndices,
-  } = mapResult.data
+  } = mapResult.data;
 
-  let stagedArgs: StagedArgs | undefined
+  let stagedArgs: StagedArgs | undefined;
 
   return ResultHandler.ok({
 
@@ -169,11 +169,11 @@ function parseInternal<TSchema extends OptionSchema>(
         schema: stagedSchema,
         knownArgs: knownArgs,
         consumedIndices: localConsumedIndices,
-      })
+      });
 
     },
 
-  })
+  });
 
 }
 
@@ -198,9 +198,9 @@ function createStage(
     schema: TSchema
   ): Result<ParsedArgs<TSchema>, ParseError> => {
 
-    return parseInternal(args, schema, context)
+    return parseInternal(args, schema, context);
 
-  }
+  };
 
   const parseFinal = <TSchema extends OptionSchema>(
     schema: TSchema
@@ -208,21 +208,21 @@ function createStage(
 
     const result = parseInternal(args, schema, context, {
       noUnknown: true,
-    })
+    });
 
     if (result.hasErrors)
-      return result
+      return result;
 
     return ResultHandler.ok({
 
       values: result.data.values,
       positionals: result.data.positionals,
 
-    })
+    });
 
-  }
+  };
 
-  return { parse, parseFinal }
+  return { parse, parseFinal };
 
 }
 
@@ -242,8 +242,8 @@ function createStage(
  **/
 export function createStagedArgs(args: string[], options: StagedArgsOptions = {}): StagedArgs {
 
-  const { suggest } = options
+  const { suggest } = options;
 
-  return createStage(args, { suggest })
+  return createStage(args, { suggest });
 
 }

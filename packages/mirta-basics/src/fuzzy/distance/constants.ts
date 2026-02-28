@@ -7,4 +7,4 @@
  * @since 0.4.0
  *
  **/
-export const INPUT_LENGTH_THRESHOLD = 500
+export const INPUT_LENGTH_THRESHOLD = 500;

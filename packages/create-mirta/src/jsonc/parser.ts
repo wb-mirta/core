@@ -1,52 +1,52 @@
-import { createScanner, SyntaxKind } from 'jsonc-parser'
-import { JsoncContainer, JsoncNode } from './types'
+import { createScanner, SyntaxKind } from 'jsonc-parser';
+import { JsoncContainer, JsoncNode } from './types';
 
 function getReadable(token: SyntaxKind): string {
 
   switch (token) {
 
     case SyntaxKind.StringLiteral:
-      return 'string'
+      return 'string';
 
     case SyntaxKind.NumericLiteral:
-      return 'number'
+      return 'number';
 
     case SyntaxKind.TrueKeyword:
-      return 'true'
+      return 'true';
 
     case SyntaxKind.FalseKeyword:
-      return 'false'
+      return 'false';
 
     case SyntaxKind.NullKeyword:
-      return 'null'
+      return 'null';
 
     case SyntaxKind.CloseBraceToken:
-      return '}'
+      return '}';
 
     case SyntaxKind.CloseBracketToken:
-      return ']'
+      return ']';
 
     case SyntaxKind.CommaToken:
-      return ','
+      return ',';
 
     case SyntaxKind.ColonToken:
-      return ':'
+      return ':';
 
     default:
-      return 'unknown'
+      return 'unknown';
   }
 
 }
 
 export function parseJsonc(text: string): JsoncContainer {
 
-  const scanner = createScanner(text)
-  const comments: string[] = []
-  let token = scanner.scan()
+  const scanner = createScanner(text);
+  const comments: string[] = [];
+  let token = scanner.scan();
 
   // === Вспомогательные функции ===
 
-  const advance = () => (token = scanner.scan())
+  const advance = () => (token = scanner.scan());
 
   const skipTrivia = () => {
 
@@ -62,45 +62,45 @@ export function parseJsonc(text: string): JsoncContainer {
         || token === SyntaxKind.BlockCommentTrivia
       ) {
 
-        comments.push(scanner.getTokenValue().trim())
+        comments.push(scanner.getTokenValue().trim());
 
       }
-      advance()
+      advance();
 
     }
 
-  }
+  };
 
   // Сканим и пропускаем тривиалы
   const next = () => {
 
-    advance()
-    skipTrivia()
+    advance();
+    skipTrivia();
 
-    return token
+    return token;
 
-  }
+  };
 
   const takeComments = (): string[] | undefined => {
 
     if (comments.length === 0)
-      return undefined
-    const result = [...comments]
-    comments.length = 0
-    return result
+      return undefined;
+    const result = [...comments];
+    comments.length = 0;
+    return result;
 
-  }
+  };
 
   const nodeWithComments = (node: JsoncNode = {}): JsoncNode => {
 
-    const commentsBefore = takeComments()
+    const commentsBefore = takeComments();
 
     if (commentsBefore)
-      node.comments = commentsBefore
+      node.comments = commentsBefore;
 
-    return node
+    return node;
 
-  }
+  };
 
   const consume = (
     expected: SyntaxKind,
@@ -108,123 +108,123 @@ export function parseJsonc(text: string): JsoncContainer {
   ) => {
 
     if (token === expected)
-      return next()
+      return next();
 
     if (!isOptional)
-      throw new Error(`Expected ${getReadable(expected)}, got ${scanner.getTokenValue()} at position ${scanner.getPosition()}`)
+      throw new Error(`Expected ${getReadable(expected)}, got ${scanner.getTokenValue()} at position ${scanner.getPosition()}`);
 
-  }
+  };
 
   // === Основные парсеры ===
 
   const parseValue = (): JsoncNode => {
 
-    const node = nodeWithComments({})
+    const node = nodeWithComments({});
 
     switch (token) {
       case SyntaxKind.StringLiteral:
-        node.value = scanner.getTokenValue()
-        next()
-        break
+        node.value = scanner.getTokenValue();
+        next();
+        break;
 
       case SyntaxKind.NumericLiteral:
-        node.value = Number(scanner.getTokenValue())
-        next()
-        break
+        node.value = Number(scanner.getTokenValue());
+        next();
+        break;
 
       case SyntaxKind.TrueKeyword:
-        node.value = true
-        next()
-        break
+        node.value = true;
+        next();
+        break;
 
       case SyntaxKind.FalseKeyword:
-        node.value = false
-        next()
-        break
+        node.value = false;
+        next();
+        break;
 
       case SyntaxKind.NullKeyword:
-        node.value = null
-        next()
-        break
+        node.value = null;
+        next();
+        break;
 
       case SyntaxKind.OpenBraceToken:
-        node.value = parseObject()
-        break
+        node.value = parseObject();
+        break;
 
       case SyntaxKind.OpenBracketToken:
-        node.value = parseArray()
-        break
+        node.value = parseArray();
+        break;
 
       default:
-        throw new Error(`Unexpected ${getReadable(token)} at position ${scanner.getPosition()}`)
+        throw new Error(`Unexpected ${getReadable(token)} at position ${scanner.getPosition()}`);
     }
 
-    return node
+    return node;
 
-  }
+  };
 
   const parseObject = (): JsoncContainer => {
 
-    next() // skip '{'
-    const result: JsoncContainer = {}
+    next(); // skip '{'
+    const result: JsoncContainer = {};
 
     while (token !== SyntaxKind.CloseBraceToken && token !== SyntaxKind.EOF) {
 
       // Проверяем, что текущий токен — строка
       if (token !== SyntaxKind.StringLiteral)
-        throw new Error(`Expected key at position ${scanner.getPosition()}`)
+        throw new Error(`Expected key at position ${scanner.getPosition()}`);
 
       // Сохраняем значение ДО продвижения
-      const key = scanner.getTokenValue()
+      const key = scanner.getTokenValue();
 
-      next()
-      consume(SyntaxKind.ColonToken)
+      next();
+      consume(SyntaxKind.ColonToken);
 
-      result[key] = parseValue()
+      result[key] = parseValue();
 
-      consume(SyntaxKind.CommaToken, true)
+      consume(SyntaxKind.CommaToken, true);
 
     }
 
-    consume(SyntaxKind.CloseBraceToken)
+    consume(SyntaxKind.CloseBraceToken);
 
-    return result
+    return result;
 
-  }
+  };
 
   const parseArray = (): JsoncNode[] => {
 
-    next() // skip '['
-    const result: JsoncNode[] = []
+    next(); // skip '['
+    const result: JsoncNode[] = [];
 
     while (token !== SyntaxKind.CloseBracketToken && token !== SyntaxKind.EOF) {
 
-      result.push(parseValue())
+      result.push(parseValue());
 
       if (token === SyntaxKind.CommaToken) {
 
-        next()
+        next();
 
       }
 
     }
 
-    consume(SyntaxKind.CloseBracketToken)
+    consume(SyntaxKind.CloseBracketToken);
 
-    return result
+    return result;
 
-  }
+  };
 
   // === Запуск ===
-  skipTrivia()
+  skipTrivia();
 
   if (token === SyntaxKind.OpenBraceToken) {
 
-    comments.length = 0 // сброс комментариев до корневого объекта
-    return parseObject()
+    comments.length = 0; // сброс комментариев до корневого объекта
+    return parseObject();
 
   }
 
-  throw new Error('Root must be object')
+  throw new Error('Root must be object');
 
 }

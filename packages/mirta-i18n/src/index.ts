@@ -1,4 +1,4 @@
-export { initLocalizationAsync } from './localization'
+export { initLocalizationAsync } from './localization';
 
 export type {
   Localization,
@@ -6,6 +6,6 @@ export type {
   Lang,
   MessageVariable,
   GenericShape
-} from './types'
+} from './types';
 
-export { LocalizationError, SourceError } from './errors'
+export { LocalizationError, SourceError } from './errors';

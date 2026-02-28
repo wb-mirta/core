@@ -1,9 +1,9 @@
-import { readFileSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { readFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 
-import { PackageError } from './errors/package-error'
-import { resolvePackagePath } from './resolve-package-path'
-import { parsePackageJson } from './parse-package-json'
+import { PackageError } from './errors/package-error';
+import { resolvePackagePath } from './resolve-package-path';
+import { parsePackageJson } from './parse-package-json';
 
 /**
  * Обрабатывает ошибку, возникшую при чтении или парсинге файла `package.json`,
@@ -19,29 +19,29 @@ import { parsePackageJson } from './parse-package-json'
 function handleError(e: unknown, path: string) {
 
   if (e instanceof PackageError)
-    return e
+    return e;
 
   if (e instanceof SyntaxError)
-    return PackageError.get('invalidJson', path, e.message)
+    return PackageError.get('invalidJson', path, e.message);
 
   if (e && typeof e === 'object' && 'code' in e) {
 
-    const code = e.code as string
+    const code = e.code as string;
     switch (code) {
       case 'ENOENT':
-        return PackageError.get('notFound', path)
+        return PackageError.get('notFound', path);
       case 'EACCES':
       case 'EPERM':
-        return PackageError.get('accessDenied', path)
+        return PackageError.get('accessDenied', path);
     }
 
   }
 
   const message = e instanceof Error
     ? e.message
-    : String(e)
+    : String(e);
 
-  return PackageError.get('failedToRead', path, message)
+  return PackageError.get('failedToRead', path, message);
 
 }
 
@@ -68,20 +68,20 @@ function handleError(e: unknown, path: string) {
  **/
 export function readPackage(path: string) {
 
-  const resolvedPath = resolvePackagePath(path)
+  const resolvedPath = resolvePackagePath(path);
 
-  let content: string
+  let content: string;
 
   try {
 
-    content = readFileSync(resolvedPath, 'utf-8')
+    content = readFileSync(resolvedPath, 'utf-8');
 
-    return parsePackageJson(content)
+    return parsePackageJson(content);
 
   }
   catch (e: unknown) {
 
-    throw handleError(e, resolvedPath)
+    throw handleError(e, resolvedPath);
 
   }
 
@@ -109,20 +109,20 @@ export function readPackage(path: string) {
  **/
 export async function readPackageAsync(path: string) {
 
-  const resolvedPath = resolvePackagePath(path)
+  const resolvedPath = resolvePackagePath(path);
 
-  let content: string
+  let content: string;
 
   try {
 
-    content = await readFile(resolvedPath, 'utf-8')
+    content = await readFile(resolvedPath, 'utf-8');
 
-    return parsePackageJson(content)
+    return parsePackageJson(content);
 
   }
   catch (e: unknown) {
 
-    throw handleError(e, resolvedPath)
+    throw handleError(e, resolvedPath);
 
   }
 

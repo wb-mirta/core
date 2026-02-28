@@ -1,7 +1,7 @@
-import nodePath from 'node:path'
+import nodePath from 'node:path';
 
-import type { PackageDefinition } from '@mirta/workspace'
-import { BuildError } from '../errors'
+import type { PackageDefinition } from '@mirta/workspace';
+import { BuildError } from '../errors';
 
 /**
  * Преобразует имя чанка в путь, имитирующий установленный пакет в `node_modules`.
@@ -26,7 +26,7 @@ import { BuildError } from '../errors'
  **/
 export function toVirtualModulePath(chunkName: string, pkgDefinition: PackageDefinition) {
 
-  const relativePath = nodePath.posix.relative(pkgDefinition.workspacePath, chunkName)
+  const relativePath = nodePath.posix.relative(pkgDefinition.workspacePath, chunkName);
 
   // Проверяем, что путь не выходит за пределы пакета.
   if (relativePath.startsWith('..'))
@@ -35,8 +35,8 @@ export function toVirtualModulePath(chunkName: string, pkgDefinition: PackageDef
       chunkName,
       pkgDefinition.name,
       pkgDefinition.workspacePath
-    )
+    );
 
-  return `node_modules/${pkgDefinition.name}/${relativePath}`
+  return `node_modules/${pkgDefinition.name}/${relativePath}`;
 
 }

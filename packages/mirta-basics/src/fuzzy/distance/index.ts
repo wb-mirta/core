@@ -1,2 +1,2 @@
-export { damerauLevenshtein } from './damerau-levenshtein'
-export type { DistanceResult } from './types'
+export { damerauLevenshtein } from './damerau-levenshtein';
+export type { DistanceResult } from './types';

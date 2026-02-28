@@ -1,6 +1,6 @@
-import { SSH_AUTH_SOCK } from '#auth/constants'
-import type { MirtaConnection } from '#config/types'
-import { runCommandAsync, STDIO_CAPTURE_ERRORS, STDIO_INTERACTIVE } from './shell'
+import { SSH_AUTH_SOCK } from '#auth/constants';
+import type { MirtaConnection } from '#config/types';
+import { runCommandAsync, STDIO_CAPTURE_ERRORS, STDIO_INTERACTIVE } from './shell';
 
 /**
  * Проверяет, существует ли указанная группа на удалённом контроллере Wiren Board.
@@ -21,14 +21,14 @@ export async function hasRemoteGroupAsync(
   isPasswordAuth: boolean
 ): Promise<boolean> {
 
-  const { hostname, username, port } = connection
+  const { hostname, username, port } = connection;
 
-  const args: string[] = []
+  const args: string[] = [];
 
   if (port)
-    args.push('-p', String(port))
+    args.push('-p', String(port));
 
-  args.push(`${username}@${hostname}`, `getent group ${group} > /dev/null 2>&1`)
+  args.push(`${username}@${hostname}`, `getent group ${group} > /dev/null 2>&1`);
 
   const result = await runCommandAsync.inUnixShell(connection.wsl)('ssh', args, {
     env: {
@@ -39,8 +39,8 @@ export async function hasRemoteGroupAsync(
       : STDIO_CAPTURE_ERRORS,
     doneCodes: [0, 2],
     cancelCodes: [130],
-  })
+  });
 
-  return result.code === 0
+  return result.code === 0;
 
 }

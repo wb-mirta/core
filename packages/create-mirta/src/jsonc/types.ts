@@ -4,7 +4,7 @@
  * @since 0.4.0
  *
  **/
-export type JsoncContainer = Record<string, JsoncNode>
+export type JsoncContainer = Record<string, JsoncNode>;
 
 /**
  * Узел JSONC — содержит значение и опциональные комментарии.
@@ -15,9 +15,9 @@ export type JsoncContainer = Record<string, JsoncNode>
 export interface JsoncNode {
 
   /** Комментарии, предшествующие узлу. */
-  comments?: string[]
+  comments?: string[];
 
   /** Значение узла: примитив, контейнер или массив узлов. */
-  value?: string | number | boolean | null | JsoncContainer | JsoncNode[]
+  value?: string | number | boolean | null | JsoncContainer | JsoncNode[];
 
 }

@@ -1,11 +1,11 @@
-import { runCommandAsync } from '#src/utils/shell'
-import type { MirtaConnection } from '#src/config/types'
-import type { AuthContext } from './types'
-import { ensureAgentIsRunningAsync } from './ssh-agent/agent'
-import { hasTokenAsync, addTokenAsync, removeTokenAsync } from './ssh-agent/token'
-import { hasKeyAsync, addKeyAsync } from './ssh-agent/key'
-import { logger } from '#utils/logger'
-import { confirmHost } from './ssh/host'
+import { runCommandAsync } from '#src/utils/shell';
+import type { MirtaConnection } from '#src/config/types';
+import type { AuthContext } from './types';
+import { ensureAgentIsRunningAsync } from './ssh-agent/agent';
+import { hasTokenAsync, addTokenAsync, removeTokenAsync } from './ssh-agent/token';
+import { hasKeyAsync, addKeyAsync } from './ssh-agent/key';
+import { logger } from '#utils/logger';
+import { confirmHost } from './ssh/host';
 
 /**
  * Выполняет аутентификацию подключения к контроллеру через SSH-агент.
@@ -27,7 +27,7 @@ export async function authenticateAsync(
 ): Promise<void> {
 
   if (connection.type !== 'ssh')
-    return
+    return;
 
   const context: AuthContext = {
 
@@ -38,44 +38,44 @@ export async function authenticateAsync(
 
     runAsync: runCommandAsync.inUnixShell(connection.wsl),
 
-  }
+  };
 
-  await confirmHost(context)
+  await confirmHost(context);
 
   // Ленивая инициализация агента SSH - только если это имеет смысл.
 
   if (context.pkcs11 || context.key) {
 
-    await ensureAgentIsRunningAsync(context)
+    await ensureAgentIsRunningAsync(context);
 
     // Приоритет pkcs11 над key для кросс-машинной совместимости.
     // TODO: добавить fallback на key, если токен pkcs11 не обнаружен.
     //
     if (context.pkcs11) {
 
-      const hasToken = await hasTokenAsync(context.pkcs11, context)
+      const hasToken = await hasTokenAsync(context.pkcs11, context);
 
       if (!hasToken) {
 
         // Если срок действия токена истёк —
         // выгружаем модуль, иначе повторно не добавить.
         //
-        const isRemoved = await removeTokenAsync(context.pkcs11, context)
+        const isRemoved = await removeTokenAsync(context.pkcs11, context);
 
         if (isRemoved)
-          logger.debug('Stale PKCS#11 module unloaded')
+          logger.debug('Stale PKCS#11 module unloaded');
 
-        await addTokenAsync(context.pkcs11, context)
+        await addTokenAsync(context.pkcs11, context);
 
       }
 
     }
     else if (context.key) {
 
-      const hasKey = await hasKeyAsync(context.key, context)
+      const hasKey = await hasKeyAsync(context.key, context);
 
       if (!hasKey)
-        await addKeyAsync(context.key, context)
+        await addKeyAsync(context.key, context);
 
     }
 

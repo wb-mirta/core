@@ -1,6 +1,6 @@
-import { loadEnv as _loadEnv } from '@mirta/env-loader'
+import { loadEnv as _loadEnv } from '@mirta/env-loader';
 
-let isLoaded = false
+let isLoaded = false;
 
 /**
  * Загружает переменные окружения из .env-файлов в проекте.
@@ -18,7 +18,7 @@ let isLoaded = false
 export function loadEnv(rootDir: string, cwd?: string) {
 
   if (isLoaded)
-    return
+    return;
 
   const env = _loadEnv({
 
@@ -27,12 +27,12 @@ export function loadEnv(rootDir: string, cwd?: string) {
 
     prefix: ['WB_', 'MIRTA_'],
 
-  })
+  });
 
   // Объединяем с текущим process.env
-  Object.assign(process.env, env)
+  Object.assign(process.env, env);
 
-  isLoaded = true
+  isLoaded = true;
 
 }
 
@@ -52,14 +52,14 @@ export function replaceEnvVars(input: string): string {
 
   return input.replace(/\$\{([^}]+)\}/g, (_, key: string) => {
 
-    const value = process.env[key]
+    const value = process.env[key];
 
     if (value === undefined)
-      throw new Error(`Environment variable not set: ${key}`)
+      throw new Error(`Environment variable not set: ${key}`);
 
-    return value
+    return value;
 
-  })
+  });
 
 }
 
@@ -78,8 +78,8 @@ export function replaceEnvVars(input: string): string {
 export function __resetInternalState() {
 
   if (!__TEST__)
-    return
+    return;
 
-  isLoaded = false
+  isLoaded = false;
 
 }

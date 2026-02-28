@@ -1,14 +1,14 @@
-import { t } from '#i18n/index'
-import { logger } from '#utils/logger'
-import { prompts } from '#utils/prompts'
+import { t } from '#i18n/index';
+import { logger } from '#utils/logger';
+import { prompts } from '#utils/prompts';
 
-const DEFAULT_BRANCH = 'main'
+const DEFAULT_BRANCH = 'main';
 
 interface GithubInfo {
 
-  owner: string
-  repository: string
-  branch: string
+  owner: string;
+  repository: string;
+  branch: string;
 
 }
 
@@ -16,19 +16,19 @@ export async function resolveGithubInfoAsync(
   input?: string
 ): Promise<GithubInfo> {
 
-  let owner: string | undefined
-  let repository: string | undefined
-  let branch: string | undefined
+  let owner: string | undefined;
+  let repository: string | undefined;
+  let branch: string | undefined;
 
   if (input) {
 
-    const match = /^([^/]+)\/([^/#]+)(?:#(.+))?$/.exec(input)
+    const match = /^([^/]+)\/([^/#]+)(?:#(.+))?$/.exec(input);
 
     if (match) {
 
-      owner = match[1].trim()
-      repository = match[2].trim()
-      branch = match[3]
+      owner = match[1].trim();
+      repository = match[2].trim();
+      branch = match[3];
 
     }
 
@@ -37,11 +37,11 @@ export async function resolveGithubInfoAsync(
         owner: owner,
         repository: repository,
         branch: branch?.trim() || DEFAULT_BRANCH,
-      }
+      };
 
   }
 
-  logger.step(t('github.caption'))
+  logger.step(t('github.caption'));
 
   const answer = await prompts([
     {
@@ -52,9 +52,9 @@ export async function resolveGithubInfoAsync(
       validate: (value: string) => {
 
         if (value.trim().length === 0)
-          return t('validation.required')
+          return t('validation.required');
         else
-          return true
+          return true;
 
       },
     },
@@ -66,9 +66,9 @@ export async function resolveGithubInfoAsync(
       validate: (value: string) => {
 
         if (value.trim().length === 0)
-          return t('validation.required')
+          return t('validation.required');
         else
-          return true
+          return true;
 
       },
     },
@@ -78,11 +78,11 @@ export async function resolveGithubInfoAsync(
       message: t('github.branch.prompt'),
       initial: branch || DEFAULT_BRANCH,
     },
-  ]) as { owner: string, repository: string, branch: string | undefined }
+  ]) as { owner: string; repository: string; branch: string | undefined };
 
-  owner = answer.owner.trim()
-  repository = answer.repository.trim()
-  branch = answer.branch?.trim()
+  owner = answer.owner.trim();
+  repository = answer.repository.trim();
+  branch = answer.branch?.trim();
 
   return {
 
@@ -90,6 +90,6 @@ export async function resolveGithubInfoAsync(
     repository,
     branch: branch || DEFAULT_BRANCH,
 
-  }
+  };
 
 }

@@ -1,8 +1,8 @@
-import { basename, join } from 'node:path'
-import { loadMessagesAsync } from './messages'
-import type { Locale, Lang, LocalizationContext, GenericShape, LocaleAsset } from './types'
-import { glob } from 'node:fs/promises'
-import { SourceError } from './errors'
+import { basename, join } from 'node:path';
+import { loadMessagesAsync } from './messages';
+import type { Locale, Lang, LocalizationContext, GenericShape, LocaleAsset } from './types';
+import { glob } from 'node:fs/promises';
+import { SourceError } from './errors';
 
 /**
  * Сканирует директорию `localesDir` и возвращает множество доступных локалей.
@@ -18,25 +18,25 @@ export async function resolveSupportedLocalesAsync(
   localesDir: string
 ): Promise<Set<Locale>> {
 
-  const pattern = join(localesDir, '*.json')
+  const pattern = join(localesDir, '*.json');
 
-  const locales = new Set<Locale>()
+  const locales = new Set<Locale>();
 
   try {
 
     for await (const filePath of glob(pattern)) {
 
-      const localeSource = basename(filePath, '.json')
+      const localeSource = basename(filePath, '.json');
 
-      const locale = resolveLocale(localeSource)
+      const locale = resolveLocale(localeSource);
 
       if (!locale)
-        continue
+        continue;
 
       if (locale !== localeSource)
-        throw SourceError.get('file.nonCanonicalName', filePath, locale)
+        throw SourceError.get('file.nonCanonicalName', filePath, locale);
 
-      locales.add(locale)
+      locales.add(locale);
 
     }
 
@@ -44,13 +44,13 @@ export async function resolveSupportedLocalesAsync(
   catch (e: unknown) {
 
     if (e && typeof e === 'object' && 'code' in e && e.code === 'ENOENT')
-      return locales
+      return locales;
 
-    throw e
+    throw e;
 
   }
 
-  return locales
+  return locales;
 
 }
 
@@ -65,7 +65,7 @@ export async function resolveSupportedLocalesAsync(
  **/
 export function getLang(locale: Locale): Lang {
 
-  return locale.split('-')[0] as Lang
+  return locale.split('-')[0] as Lang;
 
 }
 
@@ -91,16 +91,16 @@ export async function loadAssetAsync<TShape extends GenericShape>(
 
 ): Promise<LocaleAsset<TShape> | undefined> {
 
-  const messages = await loadMessagesAsync<TShape>(locale, cwd)
+  const messages = await loadMessagesAsync<TShape>(locale, cwd);
 
   if (!messages)
-    return
+    return;
 
   return Object.freeze({
     locale,
     lang: getLang(locale),
     messages,
-  })
+  });
 
 }
 
@@ -115,39 +115,39 @@ export async function loadAssetAsync<TShape extends GenericShape>(
  * @since 0.4.0
  *
  **/
-export function resolveLocale(input: string | undefined, defaultLocale: Locale): Locale
+export function resolveLocale(input: string | undefined, defaultLocale: Locale): Locale;
 
-export function resolveLocale(input: string | undefined, defaultLocale?: Locale): Locale | undefined
+export function resolveLocale(input: string | undefined, defaultLocale?: Locale): Locale | undefined;
 
 export function resolveLocale(input: string | undefined, defaultLocale?: Locale): Locale | undefined {
 
   if (!input || typeof input !== 'string')
-    return defaultLocale
+    return defaultLocale;
 
   // Специальный случай в Unix-подобных системах (POSIX)
   if (input === 'C')
-    return defaultLocale
+    return defaultLocale;
 
   // Приведение к нижнему регистру для сравнения.
   const normalizedInput = input
     .trim()
-    .toLowerCase()
+    .toLowerCase();
 
   if (normalizedInput === 'en' || normalizedInput.startsWith('en-'))
-    return 'en-US' as Locale
+    return 'en-US' as Locale;
 
   if (normalizedInput === 'ru' || normalizedInput.startsWith('ru-'))
-    return 'ru-RU' as Locale
+    return 'ru-RU' as Locale;
 
   try {
 
     // Защитная попытка нормализовать через Intl.
-    return Intl.getCanonicalLocales(input.trim())[0] as Locale
+    return Intl.getCanonicalLocales(input.trim())[0] as Locale;
 
   }
   catch {
 
-    return defaultLocale
+    return defaultLocale;
 
   }
 
@@ -168,20 +168,20 @@ export async function setLocaleAsync<TShape extends GenericShape>(
   context: LocalizationContext<TShape>
 ): Promise<void> {
 
-  const fallbackAsset = context.fallbackAsset
+  const fallbackAsset = context.fallbackAsset;
 
-  const targetLocale = resolveLocale(locale, fallbackAsset.locale)
+  const targetLocale = resolveLocale(locale, fallbackAsset.locale);
 
   // TODO: Добавить debug-логирование при переходе к fallbackAsset.
 
   // Защищает от попыток загрузки и кэширования несуществующих ассетов.
   const effectiveAsset = context.supportedLocales.has(targetLocale)
     ? await loadAssetAsync<TShape>(targetLocale, context.cwd) ?? fallbackAsset
-    : fallbackAsset
+    : fallbackAsset;
 
-  context.locale = effectiveAsset.locale
-  context.lang = effectiveAsset.lang
-  context.messages = effectiveAsset.messages
+  context.locale = effectiveAsset.locale;
+  context.lang = effectiveAsset.lang;
+  context.messages = effectiveAsset.messages;
 
 }
 
@@ -199,8 +199,8 @@ export function getSystemLocale(): string {
     = process.env.LC_ALL
       || process.env.LC_MESSAGES
       || process.env.LANG
-      || Intl.DateTimeFormat().resolvedOptions().locale
+      || Intl.DateTimeFormat().resolvedOptions().locale;
 
-  return rawLocale.split('.')[0].replaceAll('_', '-')
+  return rawLocale.split('.')[0].replaceAll('_', '-');
 
 }

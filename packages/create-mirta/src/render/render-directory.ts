@@ -1,11 +1,11 @@
-import sortDependencies from '#utils/sort-dependencies'
-import fs, { glob } from 'node:fs/promises'
-import { relative, basename, join } from 'node:path'
-import { isExistsAsync } from '#utils/file-system'
-import type { FilePath } from '#types'
-import { isPlainObject } from '@mirta/basics'
-import * as json from './json'
-import * as jsonc from './jsonc'
+import sortDependencies from '#utils/sort-dependencies';
+import fs, { glob } from 'node:fs/promises';
+import { relative, basename, join } from 'node:path';
+import { isExistsAsync } from '#utils/file-system';
+import type { FilePath } from '#types';
+import { isPlainObject } from '@mirta/basics';
+import * as json from './json';
+import * as jsonc from './jsonc';
 
 /** Папки и файлы, игнорируемые при обходе шаблона. */
 const IGNORED_DIRS = [
@@ -13,23 +13,23 @@ const IGNORED_DIRS = [
   '.git/**',
   'dist/**',
   '*.log',
-]
+];
 
 /** JSONC-файлы, которые мержатся с существующими при копировании. */
 const KNOWN_JSONC = [
   'tsconfig.json',
   'mirta.config.json',
-]
+];
 
 /** JSON-файлы, которые мержатся с существующими при копировании. */
 const KNOWN_JSON = [
   'extensions.json',
   'settings.json',
   'tasks.json',
-]
+];
 
 /** Файлы .env, которые дополняются (а не перезаписываются) при копировании. */
-const ENV_FILE_PATTERN = /^\.env(\.|$)/
+const ENV_FILE_PATTERN = /^\.env(\.|$)/;
 
 /**
  * Элемент файловой системы из шаблона.
@@ -40,17 +40,17 @@ const ENV_FILE_PATTERN = /^\.env(\.|$)/
 interface Dirent {
 
   /** Относительный путь от корня шаблона. */
-  readonly relativePath: string
+  readonly relativePath: string;
   /** Имя файла/директории. */
-  readonly name: string
+  readonly name: string;
   /** Является ли директорией. */
-  readonly isDirectory: boolean
+  readonly isDirectory: boolean;
 
 }
 
-type PlainValue = string | number | boolean
+type PlainValue = string | number | boolean;
 
-type TemplateData = Record<string, PlainValue>
+type TemplateData = Record<string, PlainValue>;
 
 /**
  * Асинхронно перебирает файлы директории, исключая {@link IGNORED_DIRS}.
@@ -69,41 +69,41 @@ export async function* getDirectoryEntriesAsync(rootDir: string): AsyncGenerator
     withFileTypes: true,
   })) {
 
-    const relativePath = relative(rootDir, entry.parentPath)
+    const relativePath = relative(rootDir, entry.parentPath);
 
     yield {
       relativePath,
       name: entry.name,
       isDirectory: entry.isDirectory(),
-    }
+    };
 
   }
 
 }
 
-const supportedTypes = ['string', 'number', 'boolean']
+const supportedTypes = ['string', 'number', 'boolean'];
 
 export function toTemplateData(
   source: object
 ): TemplateData {
 
-  const result: Record<string, string | number | boolean> = {}
+  const result: Record<string, string | number | boolean> = {};
 
   // Инициализация: корневые свойства
-  const stack = Object.entries(source) as [string, unknown][]
+  const stack = Object.entries(source) as [string, unknown][];
 
-  let nextItem: [string, unknown] | undefined
+  let nextItem: [string, unknown] | undefined;
 
   while (stack.length > 0 && (nextItem = stack.pop())) {
 
-    const [path, value] = nextItem // DFS
+    const [path, value] = nextItem; // DFS
 
-    const valueType = typeof value
+    const valueType = typeof value;
 
     if (supportedTypes.includes(valueType)) {
 
-      result[path] = value as PlainValue
-      continue
+      result[path] = value as PlainValue;
+      continue;
 
     }
 
@@ -112,30 +112,30 @@ export function toTemplateData(
       for (const item of value) {
 
         if (typeof item === 'string')
-          result[`${path}.${item}`] = true
+          result[`${path}.${item}`] = true;
 
       }
 
-      continue
+      continue;
 
     }
 
     if (!isPlainObject(value))
-      continue
+      continue;
 
-    const entries = Object.entries(value)
+    const entries = Object.entries(value);
 
     for (let i = entries.length - 1; i >= 0; i--) {
 
-      const [key, nextValue] = entries[i]
+      const [key, nextValue] = entries[i];
 
-      stack.push([`${path}.${key}`, nextValue])
+      stack.push([`${path}.${key}`, nextValue]);
 
     }
 
   }
 
-  return result
+  return result;
 
 }
 
@@ -155,29 +155,29 @@ export function applyTemplatedText(
 ): string {
 
   if (!content.includes('{{'))
-    return content
+    return content;
 
   // Сначала обрабатываем условные блоки: {{#if key}}...{{/if key}}
   content = content.replace(
     /{{#if\s+([a-zA-Z0-9_.]+)}}\n?([\s\S]*?)\n?{{\/if\s+\1}}/g,
     (_, key: string, blockContent: string) => {
 
-      return key in data ? applyTemplatedText(blockContent, data) : ''
+      return key in data ? applyTemplatedText(blockContent, data) : '';
 
     }
-  )
+  );
 
   // Затем подставляем переменные: {{key}}
   content = content.replace(
     /{{([a-zA-Z0-9_.]+)}}/g,
     (original, key: string) => {
 
-      return key in data ? String(data[key]) : original
+      return key in data ? String(data[key]) : original;
 
     }
-  )
+  );
 
-  return content
+  return content;
 
 }
 
@@ -198,7 +198,7 @@ export async function renderFileAsync(
   content?: string
 ): Promise<void> {
 
-  const toFileName = basename(toPath)
+  const toFileName = basename(toPath);
 
   // Мерж package.json с сортировкой зависимостей
   //
@@ -209,9 +209,9 @@ export async function renderFileAsync(
       toPath,
       content,
       json => sortDependencies(json)
-    )
+    );
 
-    return
+    return;
 
   }
 
@@ -223,9 +223,9 @@ export async function renderFileAsync(
       fromPath,
       toPath,
       content
-    )
+    );
 
-    return
+    return;
 
   }
 
@@ -237,9 +237,9 @@ export async function renderFileAsync(
       fromPath,
       toPath,
       content
-    )
+    );
 
-    return
+    return;
 
   }
 
@@ -247,13 +247,13 @@ export async function renderFileAsync(
   //
   if ((toFileName === '.gitignore' || ENV_FILE_PATTERN.test(toFileName)) && await isExistsAsync(toPath)) {
 
-    const oldContent = await fs.readFile(toPath, 'utf-8')
-    const newContent = content ?? await fs.readFile(fromPath, 'utf-8')
+    const oldContent = await fs.readFile(toPath, 'utf-8');
+    const newContent = content ?? await fs.readFile(fromPath, 'utf-8');
 
-    const separator = oldContent.endsWith('\n') ? '' : '\n'
+    const separator = oldContent.endsWith('\n') ? '' : '\n';
 
-    await fs.writeFile(toPath, oldContent + separator + newContent)
-    return
+    await fs.writeFile(toPath, oldContent + separator + newContent);
+    return;
 
   }
 
@@ -261,14 +261,14 @@ export async function renderFileAsync(
   //
   if (content) {
 
-    await fs.writeFile(toPath, content)
-    return
+    await fs.writeFile(toPath, content);
+    return;
 
   }
 
   // Для остальных файлов — простое копирование
   //
-  await fs.copyFile(fromPath, toPath)
+  await fs.copyFile(fromPath, toPath);
 
 }
 
@@ -288,20 +288,20 @@ export async function renderFileTemplatedAsync(
   data: TemplateData
 ): Promise<void> {
 
-  const content = await fs.readFile(fromPath, 'utf-8')
+  const content = await fs.readFile(fromPath, 'utf-8');
 
   await renderFileAsync(
     fromPath,
     toPath,
     applyTemplatedText(content, data)
-  )
+  );
 
 }
 
 function unescapeDot(path: string) {
 
   // Экранированные точки заменяются в любом месте пути.
-  return path.replace(/_\./g, '.')
+  return path.replace(/_\./g, '.');
 
 }
 
@@ -330,26 +330,26 @@ export async function renderDirectoryAsync(
 
       const toPath = unescapeDot(
         applyTemplatedText(join(toRoot, entry.relativePath, entry.name), data)
-      )
+      );
 
       await fs.mkdir(
         toPath,
         { recursive: true }
-      )
+      );
 
-      continue
+      continue;
 
     }
 
     // === 2. Обрабатываем файлы ===
 
     // Формируем путь к исходному файлу.
-    const fromPath = join(fromRoot, entry.relativePath, entry.name) as FilePath
+    const fromPath = join(fromRoot, entry.relativePath, entry.name) as FilePath;
 
     // Формируем путь к целевому файлу.
     const toPath = unescapeDot(
       applyTemplatedText(join(toRoot, entry.relativePath, entry.name), data)
-    ) as FilePath
+    ) as FilePath;
 
     // Если файл шаблонизирован, обрабатываем его особым образом.
     if (toPath.endsWith('.tt')) {
@@ -358,13 +358,13 @@ export async function renderDirectoryAsync(
         fromPath,
         toPath.slice(0, -3) as FilePath,
         data
-      )
+      );
 
-      continue
+      continue;
 
     }
 
-    await renderFileAsync(fromPath, toPath)
+    await renderFileAsync(fromPath, toPath);
 
   }
 

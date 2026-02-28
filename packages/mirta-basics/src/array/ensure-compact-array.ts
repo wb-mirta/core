@@ -34,8 +34,8 @@ export function ensureCompactArray<TItem>(
 ): TItem[] {
 
   if (Array.isArray(input))
-    return input.filter(Boolean) as TItem[]
+    return input.filter(Boolean) as TItem[];
 
-  return input ? [input] : []
+  return input ? [input] : [];
 
 }

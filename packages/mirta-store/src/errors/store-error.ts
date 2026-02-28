@@ -1,4 +1,4 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
+import { THIS_PACKAGE_NAME } from '#src/constants';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с работой хранилища Store.
@@ -21,7 +21,7 @@ export class StoreError extends Error {
    * Позволяет точно определить причину ошибки в обработчиках `try/catch`.
    *
    **/
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор, используемый только внутри
@@ -35,10 +35,10 @@ export class StoreError extends Error {
    **/
   private constructor(message: string, code: string, scope?: string) {
 
-    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`);
 
-    this.name = 'StoreError'
-    this.code = code
+    this.name = 'StoreError';
+    this.code = code;
 
     // Захватываем стек вызовов, исключая фабричный метод `get`,
     // чтобы улучшить читаемость трассировки.
@@ -50,7 +50,7 @@ export class StoreError extends Error {
         ? StoreError.getScoped
         // eslint-disable-next-line @typescript-eslint/unbound-method
         : StoreError.get
-      )
+      );
 
   }
 
@@ -93,7 +93,7 @@ export class StoreError extends Error {
     unknownProperty: (propertyName: string) =>
       `Unknown property "${propertyName}"`,
 
-  } as const
+  } as const;
 
   /**
    * Фабричный метод для создания экземпляра ошибки по её коду.
@@ -116,11 +116,11 @@ export class StoreError extends Error {
   ): StoreError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new StoreError(message, code)
+    return new StoreError(message, code);
 
   }
 
@@ -153,11 +153,11 @@ export class StoreError extends Error {
   ): StoreError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new StoreError(message, code, scope)
+    return new StoreError(message, code, scope);
 
   }
 }

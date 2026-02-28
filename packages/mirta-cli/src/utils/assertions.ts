@@ -1,17 +1,17 @@
-import type { ParseError, Result } from '@mirta/staged-args'
-import { t } from '#src/i18n'
-import chalk from 'chalk'
+import type { ParseError, Result } from '@mirta/staged-args';
+import { t } from '#src/i18n';
+import chalk from 'chalk';
 
 export function assertNoParseErrors<TData>(
   result: Result<TData, ParseError>
-): asserts result is { hasErrors: false, data: TData } {
+): asserts result is { hasErrors: false; data: TData } {
 
   if (!result.hasErrors)
-    return
+    return;
 
   const lines: string[] = [
     t('args.errorHeader', { count: result.errors.length }),
-  ]
+  ];
 
   for (const error of result.errors) {
 
@@ -26,7 +26,7 @@ export function assertNoParseErrors<TData>(
               option: chalk.bold(error.option),
               suggestion: chalk.bold(`--${error.suggestion}`),
             })
-          )
+          );
 
         }
         else {
@@ -35,11 +35,11 @@ export function assertNoParseErrors<TData>(
             t('args.unknownOption', {
               option: chalk.bold(error.option),
             })
-          )
+          );
 
         }
 
-        break
+        break;
 
       case 'missing-value':
 
@@ -47,14 +47,14 @@ export function assertNoParseErrors<TData>(
           t('args.missingValue', {
             option: chalk.bold(error.option),
           })
-        )
+        );
 
-        break
+        break;
 
     }
 
   }
 
-  throw new Error(lines.join('\n'))
+  throw new Error(lines.join('\n'));
 
 }

@@ -8,7 +8,7 @@
 export class WorkspaceError extends Error {
 
   /** Код ошибки для программной идентификации. */
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор для создания экземпляра ошибки.
@@ -20,14 +20,14 @@ export class WorkspaceError extends Error {
    **/
   private constructor(message: string, code: string, scope = '@mirta/workspace') {
 
-    super(`[${scope}] ${message}`)
+    super(`[${scope}] ${message}`);
 
-    this.name = 'WorkspaceError'
-    this.code = code
+    this.name = 'WorkspaceError';
+    this.code = code;
 
     if ('captureStackTrace' in Error)
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      Error.captureStackTrace(this, WorkspaceError.get)
+      Error.captureStackTrace(this, WorkspaceError.get);
 
   }
 
@@ -51,7 +51,7 @@ export class WorkspaceError extends Error {
     invalidWorkspaces: (pkgPath: string) =>
       `Invalid workspaces in "${pkgPath}": must be array of strings`,
 
-  } as const
+  } as const;
 
   /**
    * Статический метод для получения экземпляра ошибки по коду.
@@ -68,11 +68,11 @@ export class WorkspaceError extends Error {
   ): WorkspaceError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new WorkspaceError(message, code)
+    return new WorkspaceError(message, code);
 
   }
 }

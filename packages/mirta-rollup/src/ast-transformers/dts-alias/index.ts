@@ -1,6 +1,6 @@
-import { type TransformerFactory } from '@rollup/plugin-typescript'
+import { type TransformerFactory } from '@rollup/plugin-typescript';
 
-import { dtsAliasTransformerFactory } from './ast/transformer'
+import { dtsAliasTransformerFactory } from './ast/transformer';
 
 /**
  * Экспортируемый трансформер для Rollup, предназначенный для обработки файлов объявлений TypeScript (`.d.ts`).
@@ -34,4 +34,4 @@ export const dtsAlias = (): TransformerFactory<'afterDeclarations'> => ({
   type: 'program',
   factory: dtsAliasTransformerFactory,
 
-})
+});

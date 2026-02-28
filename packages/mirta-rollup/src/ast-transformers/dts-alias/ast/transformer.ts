@@ -1,8 +1,8 @@
-import ts from 'typescript'
+import ts from 'typescript';
 
-import type { VisitorContextBase, VisitorContext, VisitorFunc } from '../common/types'
-import { getRootDir } from '../common/path'
-import { nodeVisitor } from './visitor'
+import type { VisitorContextBase, VisitorContext, VisitorFunc } from '../common/types';
+import { getRootDir } from '../common/path';
+import { nodeVisitor } from './visitor';
 
 /**
  * Фабрика трансформеров для Rollup, предназначенная для обработки файлов объявлений TypeScript (`.d.ts`).
@@ -18,7 +18,7 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
 
   return (context) => {
 
-    const compilerOptions = program.getCompilerOptions()
+    const compilerOptions = program.getCompilerOptions();
 
     /**
      * Базовый контекст для работы с AST-трансформером.
@@ -30,7 +30,7 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
       program,
       factory: context.factory,
       transformationContext: context,
-    }
+    };
 
     return (sourceFile) => {
 
@@ -40,7 +40,7 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
        *
        **/
       if (!sourceFile.isDeclarationFile)
-        return sourceFile
+        return sourceFile;
 
       /**
        * Контекст визитора, расширенный информацией о текущем файле и корне проекта.
@@ -58,20 +58,20 @@ export function dtsAliasTransformerFactory(program: ts.Program): ts.TransformerF
 
         getVisitor() {
 
-          return nodeVisitor.bind(this) as VisitorFunc
+          return nodeVisitor.bind(this) as VisitorFunc;
 
         },
-      }
+      };
 
       /**
        * Рекурсивный обход AST с применением визитора.
        * Обрабатывает все узлы файла, начиная с корня.
        *
        **/
-      return ts.visitEachChild(sourceFile, visitorContext.getVisitor(), context)
+      return ts.visitEachChild(sourceFile, visitorContext.getVisitor(), context);
 
-    }
+    };
 
-  }
+  };
 
 }

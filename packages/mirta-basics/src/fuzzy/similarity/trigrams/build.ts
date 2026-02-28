@@ -1,4 +1,4 @@
-import type { TrigramChunk } from './types'
+import type { TrigramChunk } from './types';
 
 /**
  * Строит множество триграмм для строки.
@@ -14,16 +14,16 @@ import type { TrigramChunk } from './types'
  **/
 export function buildTrigrams(input: string): Record<TrigramChunk, boolean> {
 
-  const padded = `__${input.toUpperCase()}__`
+  const padded = `__${input.toUpperCase()}__`;
 
-  const chunks: Record<TrigramChunk, boolean> = { }
+  const chunks: Record<TrigramChunk, boolean> = { };
 
   for (let i = 0; i < padded.length - 2; i++) {
 
-    chunks[padded.slice(i, i + 3) as TrigramChunk] = true
+    chunks[padded.slice(i, i + 3) as TrigramChunk] = true;
 
   }
 
-  return Object.freeze(chunks)
+  return Object.freeze(chunks);
 
 }

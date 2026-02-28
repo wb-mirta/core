@@ -1,10 +1,10 @@
-import { t } from '#i18n'
-import { prompts } from '#utils/prompts'
-import { isString } from '@mirta/basics'
-import type { ProjectSelection, ProjectType } from './types'
+import { t } from '#i18n';
+import { prompts } from '#utils/prompts';
+import { isString } from '@mirta/basics';
+import type { ProjectSelection, ProjectType } from './types';
 
 // Префиксы для определения типа
-const MONO_PREFIX = /^(mono)-/
+const MONO_PREFIX = /^(mono)-/;
 
 export async function pickProjectAsync(
   templateInput: string | undefined
@@ -17,7 +17,7 @@ export async function pickProjectAsync(
       return {
         type: 'mono',
         templateName: templateInput.replace(MONO_PREFIX, ''),
-      }
+      };
 
     }
 
@@ -27,7 +27,7 @@ export async function pickProjectAsync(
     return {
       type: 'classic',
       templateName: templateInput.replace(/^classic-/, ''),
-    }
+    };
 
   }
 
@@ -46,9 +46,9 @@ export async function pickProjectAsync(
         value: 'mono',
       },
     ],
-  }) as { projectType: ProjectType }
+  }) as { projectType: ProjectType };
 
   // Шаблон будет выбран позже.
-  return { type: projectType }
+  return { type: projectType };
 
 }

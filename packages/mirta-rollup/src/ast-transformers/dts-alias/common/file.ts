@@ -1,7 +1,7 @@
-import ts from 'typescript'
+import ts from 'typescript';
 
-import type { VisitorContext } from './types'
-import { removeFileExtension } from './path'
+import type { VisitorContext } from './types';
+import { removeFileExtension } from './path';
 
 /**
  * Создает кэш файлов по имени без расширения.
@@ -19,7 +19,7 @@ function createSourceFilesCache(program: ts.Program): Map<string, ts.SourceFile>
       removeFileExtension(sourceFile.fileName),
       sourceFile,
     ])
-  )
+  );
 
 }
 
@@ -36,31 +36,31 @@ function createSourceFilesCache(program: ts.Program): Map<string, ts.SourceFile>
  **/
 export function resolveSourceFile(context: VisitorContext, fileName: string): ts.SourceFile {
 
-  const { program, compilerOptions } = context
+  const { program, compilerOptions } = context;
 
   let result: ts.SourceFile | undefined
-    = program.getSourceFile(fileName)
+    = program.getSourceFile(fileName);
 
   if (result)
-    return result
+    return result;
 
   // Если кэш уже создан, используем его. Иначе создаем новый.
   const sourceFilesCache
-    = context.sourceFilesCache ??= createSourceFilesCache(program)
+    = context.sourceFilesCache ??= createSourceFilesCache(program);
 
   const normalizedFileName
-    = removeFileExtension(fileName)
+    = removeFileExtension(fileName);
 
   // Попытка найти файл в кэше.
-  result = sourceFilesCache.get(normalizedFileName)
+  result = sourceFilesCache.get(normalizedFileName);
 
   if (!result) {
 
-    result = ts.createSourceFile(fileName, '', compilerOptions.target ?? ts.ScriptTarget.ESNext, false)
-    sourceFilesCache.set(normalizedFileName, result)
+    result = ts.createSourceFile(fileName, '', compilerOptions.target ?? ts.ScriptTarget.ESNext, false);
+    sourceFilesCache.set(normalizedFileName, result);
 
   }
 
-  return result
+  return result;
 
 }

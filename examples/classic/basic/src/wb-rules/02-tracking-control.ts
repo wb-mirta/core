@@ -7,11 +7,11 @@ defineRule({
   whenChanged: 'wb-gpio/D1_IN',
   then: function (newValue) {
 
-    dev['wb-gpio/Relay_2'] = newValue
-    dev['wb-mrm2_6/Relay 1'] = newValue
+    dev['wb-gpio/Relay_2'] = newValue;
+    dev['wb-mrm2_6/Relay 1'] = newValue;
 
   },
-})
+});
 
 // То же самое, но с виртуальным девайсом в качестве источника событий.
 
@@ -23,14 +23,14 @@ defineVirtualDevice('simple_test', {
       value: false,
     },
   },
-})
+});
 
 defineRule('simple_switch', {
   whenChanged: 'simple_test/enabled',
   then: function (newValue) {
 
-    dev['wb-gpio/Relay_2'] = newValue
-    dev['wb-mrm2_6/Relay 1'] = newValue
+    dev['wb-gpio/Relay_2'] = newValue;
+    dev['wb-mrm2_6/Relay 1'] = newValue;
 
   },
-})
+});

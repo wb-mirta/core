@@ -1,1 +1,1 @@
-export { PackageError } from './package-error'
+export { PackageError } from './package-error';

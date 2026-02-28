@@ -10,17 +10,17 @@ defineVirtualDevice('power_off', {
       type: 'pushbutton',
     },
   },
-})
+});
 
-const ps = new PersistentStorage('power-storage', { global: true })
+const ps = new PersistentStorage('power-storage', { global: true });
 
 const lights = [
   'wb-mdm3_50/K1',
   'wb-mdm3_50/K2',
   'wb-mdm3_50/K3',
-]
+];
 
-let isPowerOff = true
+let isPowerOff = true;
 
 defineRule({
   whenChanged: ['wb-gpio/A1_IN', 'power_off/power_off'],
@@ -30,23 +30,23 @@ defineRule({
 
       lights.forEach(function (light) {
 
-        ps[light] = dev[light]
-        dev[light] = false
+        ps[light] = dev[light];
+        dev[light] = false;
 
-      })
+      });
 
     }
     else {
 
       lights.forEach(function (light) {
 
-        dev[light] = ps[light] as WbRules.MqttValue
+        dev[light] = ps[light] as WbRules.MqttValue;
 
-      })
+      });
 
     }
 
-    isPowerOff = !isPowerOff
+    isPowerOff = !isPowerOff;
 
   },
-})
+});

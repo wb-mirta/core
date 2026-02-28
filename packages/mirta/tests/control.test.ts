@@ -1,15 +1,15 @@
-import { mock } from 'vitest-mock-extended'
-import { ChangePolicies, createControl } from '../src/control'
+import { mock } from 'vitest-mock-extended';
+import { ChangePolicies, createControl } from '../src/control';
 
 describe('Control tests', () => {
 
   beforeEach(() => {
 
-    global.trackMqtt = vi.fn()
-    global.getControl = vi.fn()
-    global.log = mock<WbRules.Log>()
+    global.trackMqtt = vi.fn();
+    global.getControl = vi.fn();
+    global.log = mock<WbRules.Log>();
 
-  })
+  });
 
   it('Should return 0', () => {
 
@@ -25,11 +25,11 @@ describe('Control tests', () => {
         defaultValue: 0,
         forceDefault: true,
       }
-    )
+    );
 
-    expect(control.value).toBe(0)
+    expect(control.value).toBe(0);
 
-  })
+  });
 
   it('Should handle value changes', () => {
 
@@ -45,27 +45,27 @@ describe('Control tests', () => {
         defaultValue: 0,
         forceDefault: true,
       }
-    )
+    );
 
-    expect(control.value).toBe(0)
+    expect(control.value).toBe(0);
 
     // Событие получения значения.
     control.onValueReceived((newValue) => {
 
-      expect(newValue).toBe(10)
+      expect(newValue).toBe(10);
 
-    })
+    });
 
     // Событие изменения значения.
     control.onValueChanged((newValue) => {
 
-      expect(newValue).toBe(10)
+      expect(newValue).toBe(10);
 
-    })
+    });
 
-    control.value = 10
+    control.value = 10;
 
-  })
+  });
 
   it('Should respect readonly', () => {
 
@@ -82,31 +82,31 @@ describe('Control tests', () => {
         defaultValue: 0,
         forceDefault: true,
       }
-    )
+    );
 
     // @ts-expect-error Cannot assign to 'value' because it is a read-only property.
-    control.value = 10
+    control.value = 10;
 
-    expect(control.value).toBe(0)
+    expect(control.value).toBe(0);
 
-  })
+  });
 
   it('Should convert string to boolean', () => {
 
-    let _topic = ''
+    let _topic = '';
 
     let _callback: (message: WbRules.MqttMessage) => void = function () {
 
-      throw new Error('Not implemented')
+      throw new Error('Not implemented');
 
-    }
+    };
 
     global.trackMqtt = function (topic: string, callback: (message: WbRules.MqttMessage) => void) {
 
-      _topic = topic
-      _callback = callback
+      _topic = topic;
+      _callback = callback;
 
-    }
+    };
 
     const control = createControl(
       {
@@ -121,15 +121,15 @@ describe('Control tests', () => {
         defaultValue: true,
         forceDefault: true,
       }
-    )
+    );
 
-    expect(_topic).toBe('/devices/my_device/controls/my_control')
-    expect(control.value).toBeTruthy()
+    expect(_topic).toBe('/devices/my_device/controls/my_control');
+    expect(control.value).toBeTruthy();
 
-    _callback({ topic: _topic, value: '0' })
+    _callback({ topic: _topic, value: '0' });
 
-    expect(control.value).toBeFalsy()
+    expect(control.value).toBeFalsy();
 
-  })
+  });
 
-})
+});

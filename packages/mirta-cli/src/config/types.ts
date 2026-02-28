@@ -5,7 +5,7 @@
  * @since 0.4.0
  *
  **/
-export type Pkcs11Path = Branded<string, 'Pkcs11Path'>
+export type Pkcs11Path = Branded<string, 'Pkcs11Path'>;
 
 /**
  * Путь к приватному SSH-ключу.
@@ -14,7 +14,7 @@ export type Pkcs11Path = Branded<string, 'Pkcs11Path'>
  * @since 0.4.0
  *
  **/
-export type KeyPath = Branded<string, 'KeyPath'>
+export type KeyPath = Branded<string, 'KeyPath'>;
 
 /**
  * Время жизни ключа или токена в формате OpenSSH (например, '30m', '1h', '1h30m').
@@ -23,7 +23,7 @@ export type KeyPath = Branded<string, 'KeyPath'>
  * @since 0.4.0
  *
  **/
-export type TimeToLive = Branded<string, 'TimeToLive'>
+export type TimeToLive = Branded<string, 'TimeToLive'>;
 
 /**
  * Имя дистрибутива WSL2 (например, 'Ubuntu-22.04').
@@ -32,7 +32,7 @@ export type TimeToLive = Branded<string, 'TimeToLive'>
  * @since 0.4.0
  *
  **/
-export type WslDistroName = Branded<string, 'WslDistro'>
+export type WslDistroName = Branded<string, 'WslDistro'>;
 
 /**
  * Описание подключения к удалённому хосту по SSH.
@@ -52,49 +52,49 @@ export interface MirtaConnection extends Record<string, unknown> {
    * Тип подключения. На данный момент поддерживается только 'ssh'.
    *
    **/
-  type: string
+  type: string;
 
   /**
    * Адрес хоста (IP или домен).
    *
    **/
-  hostname: string
+  hostname: string;
 
   /**
    * Порт SSH (по умолчанию 22).
    *
    **/
-  port?: number
+  port?: number;
 
   /**
    * Имя пользователя (по умолчанию 'root').
    *
    **/
-  username?: string
+  username?: string;
 
   /**
    * Путь к библиотеке PKCS#11 (например, `/usr/lib/librtpkcs11ecp.so`).
    *
    **/
-  pkcs11?: Pkcs11Path
+  pkcs11?: Pkcs11Path;
 
   /**
    * Путь к приватному SSH-ключу.
    *
    **/
-  key?: KeyPath
+  key?: KeyPath;
 
   /**
    * Время жизни ключа в ssh-agent (например, '30m', '1h', '1h30m').
    *
    **/
-  ttl?: TimeToLive
+  ttl?: TimeToLive;
 
   /**
    * Имя дистрибутива WSL2 для выполнения команд на Windows.
    *
    **/
-  wsl?: WslDistroName
+  wsl?: WslDistroName;
 
 }
 
@@ -105,7 +105,7 @@ export interface MirtaConnection extends Record<string, unknown> {
  * @since 0.4.0
  *
  **/
-export type DeployFrom = Branded<string, 'DeployFrom'>
+export type DeployFrom = Branded<string, 'DeployFrom'>;
 
 /**
  * Целевой путь на контроллере (абсолютный).
@@ -114,7 +114,7 @@ export type DeployFrom = Branded<string, 'DeployFrom'>
  * @since 0.4.0
  *
  **/
-export type DeployTo = Branded<string, 'DeployTo'>
+export type DeployTo = Branded<string, 'DeployTo'>;
 
 /**
  * Правило синхронизации файлов при деплое.
@@ -129,45 +129,45 @@ export interface DeployMapping {
    * Включено ли правило. По умолчанию — `true`.
    *
    **/
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
    * Исходный путь (относительно cwd).
    *
    **/
-  from: DeployFrom
+  from: DeployFrom;
 
   /**
    * Целевой путь на контроллере (абсолютный).
    *
    **/
-  to: DeployTo
+  to: DeployTo;
 
   /**
    * Целевая группа для установки прав доступа к файлам.
    *
    **/
-  toGroup?: string
+  toGroup?: string;
 
   /**
    * Удалять ли лишние файлы на контроллере (аналог `--delete` в `rsync`).
    *
    **/
-  cleanup?: boolean
+  cleanup?: boolean;
 
   /**
    * Список шаблонов путей, которые НЕ должны удаляться при `cleanup: true`.
    * Передаётся как `--filter 'P pattern'`.
    *
    **/
-  protect?: string[]
+  protect?: string[];
 
   /**
    * Список шаблонов для исключения из синхронизации.
    * Передаётся как `--exclude`.
    *
    **/
-  exclude?: string[]
+  exclude?: string[];
 }
 
 /**
@@ -179,19 +179,19 @@ export interface DeployProfile {
    * Имя подключения (из `connections`) или строка подключения.
    *
    **/
-  connection?: string
+  connection?: string;
 
   /**
    * Список имён маппингов (из `deploy.mappings`), которые нужно применить.
    *
    **/
-  mappings?: string[]
+  mappings?: string[];
 
   /**
    * Группа по умолчанию для файлов, если не указана в маппинге.
    *
    **/
-  toGroup?: string
+  toGroup?: string;
 
 }
 
@@ -208,13 +208,13 @@ export interface DeployConfig {
    * Ключ — имя маппинга, значение — массив правил.
    *
    **/
-  mappings?: Record<string, DeployMapping[]>
+  mappings?: Record<string, DeployMapping[]>;
 
   /**
    * Профили деплоя — предустановленные конфигурации для разных окружений.
    *
    **/
-  profiles?: Record<string, DeployProfile>
+  profiles?: Record<string, DeployProfile>;
 
 }
 
@@ -232,7 +232,7 @@ export interface ProjectConfig {
    * Используется при создании новых проектов.
    *
    **/
-  templates?: string[]
+  templates?: string[];
 
 }
 
@@ -251,18 +251,18 @@ export interface MirtaConfig {
    * Ключ — имя, значение — строка или объект подключения.
    *
    **/
-  connections?: Record<string, string | Record<string, unknown>>
+  connections?: Record<string, string | Record<string, unknown>>;
 
   /**
    * Настройки деплоя: маппинги, профили.
    *
    **/
-  deploy?: DeployConfig
+  deploy?: DeployConfig;
 
   /**
    * Настройки проекта: шаблоны и т.д.
    *
    **/
-  project?: ProjectConfig
+  project?: ProjectConfig;
 
 }

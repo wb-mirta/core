@@ -1,4 +1,4 @@
-import { AstTransformError } from '#utils/errors'
+import { AstTransformError } from '#utils/errors';
 
 /**
  * Проверяет безопасность пути модуля, блокируя подозрительные символы.
@@ -23,6 +23,6 @@ import { AstTransformError } from '#utils/errors'
 export function assertPathIsValid(path: string) {
 
   if (path.includes(':') || path.includes('~'))
-    throw AstTransformError.get('invalidChars', path)
+    throw AstTransformError.get('invalidChars', path);
 
 }

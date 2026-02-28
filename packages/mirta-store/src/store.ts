@@ -1,6 +1,6 @@
-import '@mirta/polyfills'
-import { deepMerge, hasOwn } from '@mirta/basics/object'
-import { StoreError } from './errors'
+import '@mirta/polyfills';
+import { deepMerge, hasOwn } from '@mirta/basics/object';
+import { StoreError } from './errors';
 import type {
   StateTree,
   _StoreWithState,
@@ -12,13 +12,13 @@ import type {
   DefineStoreOptions,
   _GettersTree,
   _ActionsTree
-} from './types'
+} from './types';
 import {
   enforceDefinitionIsUnique,
   __resetInternalState as __resetStoreDefinitions
-} from './enforce-unique'
+} from './enforce-unique';
 
-const { assign } = Object
+const { assign } = Object;
 
 /**
  * Кэш созданных экземпляров хранилищ.
@@ -30,11 +30,11 @@ const { assign } = Object
  * @internal
  *
  **/
-let stores: Record<string, StoreGeneric> = {}
+let stores: Record<string, StoreGeneric> = {};
 
 // Первичная инициализация для тестов.
 if (__TEST__)
-  __resetInternalState()
+  __resetInternalState();
 
 /**
  * Получает или создаёт статическое состояние хранилища в `module.static`.
@@ -53,9 +53,9 @@ if (__TEST__)
  **/
 function getStaticState(storeId: string, createState: () => StateTree): StateTree {
 
-  const states = (module.static.states ??= {}) as Record<string, StateTree>
+  const states = (module.static.states ??= {}) as Record<string, StateTree>;
 
-  return states[storeId] ??= createState()
+  return states[storeId] ??= createState();
 
 }
 
@@ -86,27 +86,27 @@ function createStore<
 ): Store<TState, TGetters, TActions> {
 
   // Функция для создания начального состояния
-  const createState = () => options.state ? options.state() : {}
+  const createState = () => options.state ? options.state() : {};
 
   // 1. Получение или создание общего состояния в module.static
-  const staticState = getStaticState(storeId, createState)
+  const staticState = getStaticState(storeId, createState);
 
   // 2. Инициализация геттеров как функций, возвращающих вычисленное значение
-  const getters: Record<string, () => unknown> = {}
+  const getters: Record<string, () => unknown> = {};
 
   if (options.getters) {
 
     for (const key in options.getters) {
 
       if (!hasOwn(options.getters, key))
-        continue
+        continue;
 
-      const getter = options.getters[key]
+      const getter = options.getters[key];
 
       // Поддержка геттеров вида (state) => value и () => value
       getters[key] = typeof getter === 'function' && getter.length > 0
         ? () => getter.call(null, staticState) as unknown
-        : () => getter.call(proxy) as unknown
+        : () => getter.call(proxy) as unknown;
 
     }
 
@@ -117,28 +117,28 @@ function createStore<
 
     if (typeof mutator === 'function') {
 
-      mutator(staticState as TState)
+      mutator(staticState as TState);
 
     }
     else {
 
-      const merged = deepMerge(staticState, mutator)
+      const merged = deepMerge(staticState, mutator);
 
       for (const key in merged)
-        staticState[key] = merged[key]
+        staticState[key] = merged[key];
 
     }
 
-  }
+  };
 
   // Метод для сброса состояния до начального
   const $reset = () => {
 
-    const newState = createState()
+    const newState = createState();
 
-    $patch(state => assign(state, newState))
+    $patch(state => assign(state, newState));
 
-  }
+  };
 
   // Создание контекста `this` для действий
   // Обеспечивает доступ к $state, $patch, геттерам и текущему состоянию
@@ -155,48 +155,48 @@ function createStore<
 
         // Состояние
         if (key in staticState)
-          return staticState[key]
+          return staticState[key];
 
         // Геттеры
         if (key in getters)
-          return getters[key]()
+          return getters[key]();
 
         if (key in actions)
-          return actions[key]
+          return actions[key];
 
         // Служебные свойства
         if (key in target)
-          return target[key as keyof typeof target]
+          return target[key as keyof typeof target];
 
-        throw StoreError.get('unknownProperty', key)
+        throw StoreError.get('unknownProperty', key);
 
       },
       set(target, key: string, value: unknown) {
 
         if (key in target)
-          throw StoreError.get('readonlyProperty', key)
+          throw StoreError.get('readonlyProperty', key);
 
         if (!(key in staticState))
-          throw StoreError.get('unknownProperty', key)
+          throw StoreError.get('unknownProperty', key);
 
-        staticState[key] = value
+        staticState[key] = value;
 
-        return true
+        return true;
 
       },
-    })
+    });
 
   // Привязка действий к контексту `actionThis`
-  const actions: Record<string, unknown> = {}
+  const actions: Record<string, unknown> = {};
 
   if (options.actions) {
 
     for (const key in options.actions) {
 
       if (!hasOwn(options.actions, key))
-        continue
+        continue;
 
-      actions[key] = options.actions[key].bind(actionThis)
+      actions[key] = options.actions[key].bind(actionThis);
 
     }
 
@@ -210,7 +210,7 @@ function createStore<
     $patch: () => $patch,
     $reset: () => $reset,
 
-  }
+  };
 
   // Финальный прокси-объект хранилища
   const proxy = new Proxy(staticState, {
@@ -219,34 +219,34 @@ function createStore<
 
       // Состояние
       if (key in target)
-        return target[key]
+        return target[key];
 
       // Геттеры
       if (key in getters)
-        return getters[key]()
+        return getters[key]();
 
       // Действия
       if (key in actions)
-        return actions[key]
+        return actions[key];
 
       // Служебные свойства
       if (key in internals)
-        return internals[key as keyof typeof internals]()
+        return internals[key as keyof typeof internals]();
 
-      throw StoreError.get('unknownProperty', key)
+      throw StoreError.get('unknownProperty', key);
 
     },
 
     set(target, key: string, value: unknown): boolean {
 
       if (key in internals || key in getters || key in actions)
-        throw StoreError.get('readonlyProperty', key)
+        throw StoreError.get('readonlyProperty', key);
 
       if (!(key in target))
-        throw StoreError.get('unknownProperty', key)
+        throw StoreError.get('unknownProperty', key);
 
-      target[key] = value
-      return true
+      target[key] = value;
+      return true;
 
     },
 
@@ -257,13 +257,13 @@ function createStore<
         || key in getters
         || key in actions
         || key in target
-      )
+      );
 
     },
 
-  }) as Store<TState, TGetters, TActions>
+  }) as Store<TState, TGetters, TActions>;
 
-  return proxy
+  return proxy;
 
 }
 
@@ -305,7 +305,7 @@ export function defineStore<
   options: DefineStoreOptions<TState, TGetters, TActions>
 ): StoreDefinition<TState, TGetters, TActions> {
 
-  enforceDefinitionIsUnique(typeId)
+  enforceDefinitionIsUnique(typeId);
 
   /**
    * Возвращает экземпляр хранилища.
@@ -324,19 +324,19 @@ export function defineStore<
    **/
   function useStore(scope?: string): Store<TState, TGetters, TActions> {
 
-    const storeId = scope ? `${typeId}/${scope}` : typeId
+    const storeId = scope ? `${typeId}/${scope}` : typeId;
 
     return (
 
       stores[storeId] ??= createStore(storeId, options)
 
-    ) as Store<TState, TGetters, TActions>
+    ) as Store<TState, TGetters, TActions>;
 
   }
 
-  useStore.$typeId = typeId
+  useStore.$typeId = typeId;
 
-  return useStore
+  return useStore;
 
 }
 
@@ -351,14 +351,14 @@ export function defineStore<
 export function __resetInternalState() {
 
   if (!__TEST__)
-    return
+    return;
 
   module.static = {
     states: {},
-  }
+  };
 
-  stores = {}
+  stores = {};
 
-  __resetStoreDefinitions()
+  __resetStoreDefinitions();
 
 }

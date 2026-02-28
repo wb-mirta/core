@@ -17,10 +17,10 @@ declare namespace WbRules {
     interface SmsRecipient {
 
       /** Конфигурация отправки SMS. */
-      type: 'sms'
+      type: 'sms';
 
       /** Номер телефона получателя SMS. */
-      to: string
+      to: string;
 
       /**
        * Команда для отправки SMS. Поле можно оставить пустым, чтобы использовать gammu.
@@ -38,7 +38,7 @@ declare namespace WbRules {
        * /path/to/sender.py --number {} --text "{}"
        * ```
        **/
-      command?: string
+      command?: string;
     }
 
     /**
@@ -50,10 +50,10 @@ declare namespace WbRules {
     interface EmailRecipient {
 
       /** Конфигурация отправки на адрес электронной почты. */
-      type: 'email'
+      type: 'email';
 
       /** Адрес электронной почты получателя. */
-      to: string
+      to: string;
 
       /**
        * Тема письма (необязательное поле).
@@ -65,7 +65,7 @@ declare namespace WbRules {
        * Alarm: {}
        * ```
        **/
-      subject?: string
+      subject?: string;
     }
 
     /**
@@ -77,13 +77,13 @@ declare namespace WbRules {
     interface TelegramRecipient {
 
       /** Конфигурация отправки в Telegram. */
-      type: 'telegram'
+      type: 'telegram';
 
       /** Токен вашего бота Telegram. */
-      token: string
+      token: string;
 
       /** Уникальный идентификатор целевого чата или username целевого канала (в формате `@channelusername`). */
-      chatId: string
+      chatId: string;
     }
 
     /**
@@ -95,7 +95,7 @@ declare namespace WbRules {
      * @since 0.3.3
      *
      **/
-    type Recipient = SmsRecipient | EmailRecipient | TelegramRecipient
+    type Recipient = SmsRecipient | EmailRecipient | TelegramRecipient;
 
     /**
      * Базовый компонент аларма - содержит общие свойства.
@@ -108,10 +108,10 @@ declare namespace WbRules {
     interface AlarmBase {
 
       /** Название аларма. */
-      name: string
+      name: string;
 
       /** Наблюдаемые устройство и контрол в формате `deviceId/controlId`. */
-      cell: string
+      cell: string;
 
       /**
        * Сообщение, отправляемое при срабатывании аларма.
@@ -122,7 +122,7 @@ declare namespace WbRules {
        * текущего значения контрола.
        *
        **/
-      alarmMessage?: string
+      alarmMessage?: string;
 
       /**
        * Сообщение, отправляемое при деактивации аларма.
@@ -133,7 +133,7 @@ declare namespace WbRules {
        * текущего значения контрола.
        *
        **/
-      noAlarmMessage?: string
+      noAlarmMessage?: string;
 
       /**
        * Интервал (в секундах) повторной отправки сообщения во время активности аларма.
@@ -142,7 +142,7 @@ declare namespace WbRules {
        * только при срабатывании, а также при деактивации аларма.
        *
        **/
-      interval?: number
+      interval?: number;
 
       /**
        * Задержка срабатывания аларма (в миллисекундах).
@@ -151,7 +151,7 @@ declare namespace WbRules {
        * будет непрерывно выполняться в течение заданного интервала.
        *
        **/
-      alarmDelayMs?: number
+      alarmDelayMs?: number;
 
       /**
        * Задержка деактивации аларма (в миллисекундах).
@@ -160,7 +160,7 @@ declare namespace WbRules {
        * прекратит непрерывно выполняться в течение заданного интервала.
        *
        **/
-      noAlarmDelayMs?: number
+      noAlarmDelayMs?: number;
 
       /**
        * Максимальное количество отправленных сообщений.
@@ -169,7 +169,7 @@ declare namespace WbRules {
        * отправляется не больше заданного количества сообщений.
        *
        **/
-      maxCount?: number
+      maxCount?: number;
     }
 
     /**
@@ -191,7 +191,7 @@ declare namespace WbRules {
        * аларм деактивируется.
        *
        **/
-      expectedValue: MqttValue
+      expectedValue: MqttValue;
     }
 
     /**
@@ -211,7 +211,7 @@ declare namespace WbRules {
        * Предотвращает смешивание с {@link ValueAlarm} внутри обобщённого типа {@link Alarm}.
        *
        **/
-      expectedValue: never
+      expectedValue: never;
 
       /**
        * Минимально допустимое значение.
@@ -219,7 +219,7 @@ declare namespace WbRules {
        * Если отслеживаемое значение контрола опускается ниже minValue, происходит срабатывание аларма.
        *
        **/
-      minValue: number
+      minValue: number;
 
       /**
        * Максимально допустимое значение.
@@ -227,7 +227,7 @@ declare namespace WbRules {
        * Если отслеживаемое значение контрола поднимается выше maxValue, происходит срабатывание аларма.
        *
        **/
-      maxValue: number
+      maxValue: number;
     }
 
     /**
@@ -236,7 +236,7 @@ declare namespace WbRules {
      * @since 0.3.3
      *
      **/
-    type Alarm = AlarmBase & (ValueAlarm | AtLeastOne<RangeAlarm>)
+    type Alarm = AlarmBase & (ValueAlarm | AtLeastOne<RangeAlarm>);
 
     /**
      * Конфигурация блока алармов.
@@ -247,16 +247,16 @@ declare namespace WbRules {
     interface Config {
 
       /** Название MQTT-устройства блока алармов. */
-      deviceName: string
+      deviceName: string;
 
       /** Отображаемое название устройства блока алармов. */
-      deviceTitle: string
+      deviceTitle: string;
 
       /** Список получателей. */
-      recipients: Recipient[]
+      recipients: Recipient[];
 
       /** Список алармов. */
-      alarms: Alarm[]
+      alarms: Alarm[];
     }
   }
 
@@ -271,6 +271,6 @@ declare namespace WbRules {
      *
      * @param config Объект конфигурации или путь к файлу конфигурации в формате JSON.
      */
-    load(config: string | Alarms.Config): void
+    load(config: string | Alarms.Config): void;
   }
 }

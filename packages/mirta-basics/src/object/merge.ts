@@ -9,7 +9,7 @@
  **/
 type IsObject<TValue> = TValue extends object
   ? (TValue extends null ? never : TValue)
-  : never
+  : never;
 
 /**
  * Заменяет свойства из `TBase` на свойства из `TPatch` по ключам.
@@ -23,7 +23,7 @@ type IsObject<TValue> = TValue extends object
  * @since 0.4.0
  *
  **/
-type Overwrite<TBase, TPatch> = Expand<Omit<TBase, keyof TPatch> & TPatch>
+type Overwrite<TBase, TPatch> = Expand<Omit<TBase, keyof TPatch> & TPatch>;
 
 /**
  * Рекурсивно вычисляет тип результата слияния кортежа объектов слева направо.
@@ -40,7 +40,7 @@ type MergeList<TList>
     ? Head extends IsObject<Head>
       ? Expand<Overwrite<MergeList<Tail>, Head>>
       : MergeList<Tail>
-    : {}
+    : {};
 
 /**
  * Тип результата `merge`: объединение списка объектов с приоритетом правых полей.
@@ -58,7 +58,7 @@ type MergeList<TList>
  * @since 0.4.0
  *
  **/
-export type Merged<TList> = Expand<MergeList<TList>>
+export type Merged<TList> = Expand<MergeList<TList>>;
 
 /**
  * Поверхностно копирует значения всех собственных перечисляемых свойств
@@ -102,16 +102,16 @@ export type Merged<TList> = Expand<MergeList<TList>>
  **/
 export function merge<TList extends readonly (object | null | undefined)[]>(
   ...objects: TList
-): Merged<TList>
+): Merged<TList>;
 
 export function merge(...objects: readonly (object | null | undefined)[]): object {
 
   if (objects.length === 0)
-    return {}
+    return {};
 
   return objects.reduce<Record<string, unknown>>(
     (base, patch) => (patch ? { ...base, ...patch } : base),
     {}
-  )
+  );
 
 }

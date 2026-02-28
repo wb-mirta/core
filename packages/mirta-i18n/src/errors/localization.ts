@@ -1,5 +1,5 @@
-import { THIS_PACKAGE_NAME } from '#src/constants'
-import type { MessageVariable } from '#src/types'
+import { THIS_PACKAGE_NAME } from '#src/constants';
+import type { MessageVariable } from '#src/types';
 
 /**
  * Специализированный класс для обработки ошибок, связанных с работой локализации.
@@ -22,7 +22,7 @@ export class LocalizationError extends Error {
    * Позволяет точно определить причину ошибки в обработчиках `try/catch`.
    *
    **/
-  readonly code: string
+  readonly code: string;
 
   /**
    * Приватный конструктор, используемый только внутри
@@ -36,10 +36,10 @@ export class LocalizationError extends Error {
    **/
   private constructor(message: string, code: string, scope?: string) {
 
-    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`)
+    super(`[${scope ?? THIS_PACKAGE_NAME}] ${message}`);
 
-    this.name = 'LocalizationError'
-    this.code = code
+    this.name = 'LocalizationError';
+    this.code = code;
 
     // Захватываем стек вызовов, исключая фабричный метод `get`,
     // чтобы улучшить читаемость трассировки.
@@ -51,7 +51,7 @@ export class LocalizationError extends Error {
         ? LocalizationError.getScoped
         // eslint-disable-next-line @typescript-eslint/unbound-method
         : LocalizationError.get
-      )
+      );
 
   }
 
@@ -64,7 +64,7 @@ export class LocalizationError extends Error {
     'fallback.loadFailed': (locale: string) =>
       `Failed to load fallback locale "${locale}"`,
 
-  } as const
+  } as const;
 
   /**
    * Фабричный метод для создания экземпляра ошибки по её коду.
@@ -87,11 +87,11 @@ export class LocalizationError extends Error {
   ): LocalizationError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new LocalizationError(message, code)
+    return new LocalizationError(message, code);
 
   }
 
@@ -124,11 +124,11 @@ export class LocalizationError extends Error {
   ): LocalizationError {
 
     const messageFn
-      = this.codeMappings[code] as (...args: unknown[]) => string
+      = this.codeMappings[code] as (...args: unknown[]) => string;
 
-    const message = messageFn(...args)
+    const message = messageFn(...args);
 
-    return new LocalizationError(message, code, scope)
+    return new LocalizationError(message, code, scope);
 
   }
 }

@@ -1,6 +1,6 @@
-import { STDIO_CAPTURE_OUTPUT } from '#utils/shell'
-import { SSH_AUTH_SOCK } from '#auth/constants'
-import type { AuthContext } from '#auth/types'
+import { STDIO_CAPTURE_OUTPUT } from '#utils/shell';
+import { SSH_AUTH_SOCK } from '#auth/constants';
+import type { AuthContext } from '#auth/types';
 
 /**
  * Проверяет, содержится ли указанный отпечаток (или путь к токену) в списке добавленных сущностей в SSH-агенте.
@@ -29,11 +29,11 @@ export async function hasEntryAsync(
       stdio: STDIO_CAPTURE_OUTPUT,
       doneCodes: [0, 1], // 0 = есть ключи, 1 = нет ключей
     }
-  )
+  );
 
   if (response.code === 1)
-    return false
+    return false;
 
-  return response.stdout.includes(fingerprint)
+  return response.stdout.includes(fingerprint);
 
 }

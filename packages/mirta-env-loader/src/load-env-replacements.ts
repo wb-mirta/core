@@ -1,4 +1,4 @@
-import { loadEnv, type EnvLoaderOptions } from './load-env'
+import { loadEnv, type EnvLoaderOptions } from './load-env';
 
 /**
  * Загружает и фильтрует переменные окружения из dotenv-файлов.
@@ -13,19 +13,19 @@ import { loadEnv, type EnvLoaderOptions } from './load-env'
  **/
 export function loadEnvReplacements(options: EnvLoaderOptions = {}) {
 
-  const env = loadEnv(options)
+  const env = loadEnv(options);
 
-  const result: Record<string, string> = {}
+  const result: Record<string, string> = {};
 
   for (const [key, rawValue] of Object.entries(env)) {
 
-    const value = JSON.stringify(rawValue)
+    const value = JSON.stringify(rawValue);
 
-    result[`process.env.${key}`] = value
-    result[`import.meta.env.${key}`] = value
+    result[`process.env.${key}`] = value;
+    result[`import.meta.env.${key}`] = value;
 
   }
 
-  return result
+  return result;
 
 }

@@ -5,7 +5,7 @@
 declare namespace WbRules {
 
   /** Расширение для поддержки module.static */
-  type ModuleStatic = Record<string, unknown>
+  type ModuleStatic = Record<string, unknown>;
 
   /**
    * Набор методов для логирования.
@@ -27,14 +27,14 @@ declare namespace WbRules {
      * log.info('Свет в комнате включён на {} мин.', 30)
      * ```
      **/
-    info(format: string, ...args: unknown[]): void
+    info(format: string, ...args: unknown[]): void;
 
     /**
      * Запись в лог произвольного значения, полезного в долгосрочной перспективе.
      * @param value Значение для записи в лог.
      *
      **/
-    info(value: unknown): void
+    info(value: unknown): void;
 
     /**
      * Запись в лог сообщения, полезного при отладке и не имеющего долгосрочной ценности.
@@ -46,7 +46,7 @@ declare namespace WbRules {
      * ```ts
      * log.debug('Значение сенсора "{}": температура {} °C, влажность {} %', 'bathroom', 25, 40)
      **/
-    debug(format: string, ...args: unknown[]): void
+    debug(format: string, ...args: unknown[]): void;
 
     /**
      * Запись в лог произвольного значения, полезного при отладке и не имеющего долгосрочной ценности.
@@ -58,7 +58,7 @@ declare namespace WbRules {
      * log.debug(JSON.stringify({ location: 'bathroom', temperature: 25, humidity: 40 }))
      * ```
      **/
-    debug(value: unknown): void
+    debug(value: unknown): void;
 
     /**
      * Запись в лог предупреждения о ненормальном или неожиданном событии,
@@ -74,7 +74,7 @@ declare namespace WbRules {
      * log.warning('Движение в охраняемой зоне: {}', 'hallway_sensor_1')
      * ```
      **/
-    warning(format: string, ...args: unknown[]): void
+    warning(format: string, ...args: unknown[]): void;
 
     /**
      * Запись в лог предупреждения о ненормальном или неожиданном значении,
@@ -83,7 +83,7 @@ declare namespace WbRules {
      * @param value Значение для записи в лог.
      *
      **/
-    warning(value: unknown): void
+    warning(value: unknown): void;
 
     /**
      * Запись в лог критического события, приведшего к сбою и остановке выполнения.
@@ -97,7 +97,7 @@ declare namespace WbRules {
      * log.error('Перегев тёплого пола: {} °C, выключение', 30)
      * ```
      **/
-    error(format: string, ...args: unknown[]): void
+    error(format: string, ...args: unknown[]): void;
 
     /**
      * Запись в лог критического значения, приведшего к сбою и остановке выполнения.
@@ -105,36 +105,36 @@ declare namespace WbRules {
      * @param value Значение для записи в лог.
      *
      **/
-    error(value: unknown): void
+    error(value: unknown): void;
   }
 
   /** @deprecated since version 0.3.2 */
-  type LogFunc = (format: string, ...args: unknown[]) => void
+  type LogFunc = (format: string, ...args: unknown[]) => void;
 
-  type Log = LogMethods['info'] & LogMethods
+  type Log = LogMethods['info'] & LogMethods;
 
-  type Debug = LogMethods['debug']
+  type Debug = LogMethods['debug'];
 
   interface CronEntry {
-    spec: string
+    spec: string;
   }
 
   interface Timer {
-    firing: boolean
+    firing: boolean;
 
-    stop(): void
+    stop(): void;
   }
 
-  type TimerCollection = Record<string, Timer>
+  type TimerCollection = Record<string, Timer>;
 
   /** Тип значения топика MQTT. */
-  type MqttValue = string | number | boolean
+  type MqttValue = string | number | boolean;
 
-  type Dev = Record<string, MqttValue | Record<string, MqttValue>>
+  type Dev = Record<string, MqttValue | Record<string, MqttValue>>;
 
   interface MqttMessage {
-    topic: string
-    value: MqttValue
+    topic: string;
+    value: MqttValue;
   }
 
   /**
@@ -144,12 +144,12 @@ declare namespace WbRules {
     /**
      * Поле или список полей, которые необходимо отслеживать
      */
-    whenChanged?: string[] | string
+    whenChanged?: string[] | string;
 
     /**
      * Правило срабатывает, когда значение, возвращаемое функцией, меняется с false на true.
      */
-    asSoonAs?(): boolean
+    asSoonAs?(): boolean;
 
     /**
      * Функция или экземпляр {@link CronEntry}, возвращаемый функцией {@link cron}.
@@ -157,7 +157,7 @@ declare namespace WbRules {
      * Сигнализирует, когда правило должно отработать.
      *
      **/
-    when?: CronEntry | (() => number | boolean)
+    when?: CronEntry | (() => number | boolean);
 
     /**
      * Функция, которая вызывается при срабатывании правила
@@ -169,7 +169,7 @@ declare namespace WbRules {
       newValue: MqttValue,
       deviceId?: string,
       controlId?: string
-    ): void
+    ): void;
   }
 
   /**
@@ -195,7 +195,7 @@ declare namespace WbRules {
    * @since 0.4.0
    *
    **/
-  type RuleHandle = Branded<number, 'WbRules.RuleHandle'>
+  type RuleHandle = Branded<number, 'WbRules.RuleHandle'>;
 
   /**
    * Соответствие типа контрола его типу значения.
@@ -204,22 +204,22 @@ declare namespace WbRules {
    **/
   interface TypeMappings {
     /** A control that displays a value as text. */
-    'text': string
+    'text': string;
     /** A control for a arbitrary value. */
-    'value': number
+    'value': number;
     /** A control that toggles it's value when pressed by the user. */
-    'switch': boolean
+    'switch': boolean;
     /** A stateless push button. */
-    'pushbutton': boolean
+    'pushbutton': boolean;
     /** A control for color in `'R;G;B'` format */
-    'rgb': string
+    'rgb': string;
     /** A range slider that takes integer values between 0 and any other integer that is greater 1. */
-    'range': number
+    'range': number;
     /** A control that indicates whether an alarm is active. */
-    'alarm': boolean
+    'alarm': boolean;
   }
 
-  type ControlType = Expand<keyof TypeMappings>
+  type ControlType = Expand<keyof TypeMappings>;
 
   /**
    * Объект настроек передаваемого в контрол значения.
@@ -228,17 +228,17 @@ declare namespace WbRules {
     /**
      * Значение контрола
      */
-    value: string | number | boolean
+    value: string | number | boolean;
 
     /**
      * Уведомить правила об изменении значения,
      * по умолчанию - `true`.
      */
-    notify?: boolean
+    notify?: boolean;
   }
 
-  type Title = string | TitleLocalized
-  type TitleLocalized = Record<string, string>
+  type Title = string | TitleLocalized;
+  type TitleLocalized = Record<string, string>;
 
   /**
    * Контрол устройства
@@ -248,30 +248,30 @@ declare namespace WbRules {
      * Устанавливает заголовок.
      * @param title
      */
-    setTitle(title: Title): void
+    setTitle(title: Title): void;
 
     /**
      * Устанавливает описание.
      * @param description
      */
-    setDescription(description: string): void
+    setDescription(description: string): void;
 
     /**
      * Устанавливает тип значения.
      * @param type Тип значения.
      * @see ControlType
      */
-    setType(type: ControlType): void
+    setType(type: ControlType): void;
 
-    setUnits(units: string): void
+    setUnits(units: string): void;
 
-    setReadonly(isReadonly: boolean): void
+    setReadonly(isReadonly: boolean): void;
 
-    setMax(max: number): void
+    setMax(max: number): void;
 
-    setMin(min: number): void
+    setMin(min: number): void;
 
-    setPrecision(precision: number): void
+    setPrecision(precision: number): void;
 
     /**
      * Позволяет указать на наличие ошибки уровня контрола.
@@ -280,44 +280,44 @@ declare namespace WbRules {
      * @param message Текст ошибки.
      *
      **/
-    setError(message: string): void
+    setError(message: string): void;
 
-    setOrder(order: number): void
+    setOrder(order: number): void;
 
-    setValue(value: MqttValue | ControlValueOptions): void
+    setValue(value: MqttValue | ControlValueOptions): void;
 
-    getId(): string
+    getId(): string;
 
     /**
      * Возвращает заголовок контрола.
      * @param lang Язык заголовка, "en" по умолчанию.
      */
-    getTitle(lang?: string): string
+    getTitle(lang?: string): string;
 
-    getDescription(): string
+    getDescription(): string;
 
-    getType(): string
+    getType(): string;
 
-    getUnits(): string
+    getUnits(): string;
 
-    getReadonly(): boolean
+    getReadonly(): boolean;
 
-    getMax(): number
+    getMax(): number;
 
-    getMin(): number
+    getMin(): number;
 
-    getPrecision(): number
+    getPrecision(): number;
 
     /**
      * Возвращает текст ошибки,
      * а при её отсутствии - пустую строку.
      *
      **/
-    getError(): string
+    getError(): string;
 
-    getOrder(): number
+    getOrder(): number;
 
-    getValue(): string | number | boolean
+    getValue(): string | number | boolean;
   }
 
   /**
@@ -327,9 +327,9 @@ declare namespace WbRules {
    **/
   interface BaseControlType<TControl, TValue> {
     /** Тип контрола, публикуемый в MQTT-топике. */
-    type: TControl
+    type: TControl;
     /** Значение по умолчанию. */
-    value?: TValue
+    value?: TValue;
   }
 
   /**
@@ -346,7 +346,7 @@ declare namespace WbRules {
      * ограничено - например, при перечислении дней недели.
      *
      **/
-    enum?: Record<string, Title>
+    enum?: Record<string, Title>;
   }
 
   /**
@@ -363,18 +363,18 @@ declare namespace WbRules {
      * ограничено - например, при перечислении дней недели.
      *
      **/
-    enum?: Record<number, WbRules.Title>
+    enum?: Record<number, WbRules.Title>;
 
     /** Задаёт минимально допустимое значение. */
-    min?: number
+    min?: number;
 
     /** Задаёт максимально допустимое значение. */
-    max?: number
+    max?: number;
 
     /** Определяет количество знаков после запятой. */
-    precision?: number
+    precision?: number;
 
-    units?: string
+    units?: string;
   }
 
   /**
@@ -385,13 +385,13 @@ declare namespace WbRules {
   interface __RangeControlTypeExtension {
 
     /** Задаёт минимально допустимое значение. */
-    min?: number
+    min?: number;
 
     /** Задаёт максимально допустимое значение. */
-    max?: number
+    max?: number;
 
     /** Определяет количество знаков после запятой. */
-    precision?: number
+    precision?: number;
   }
 
   /**
@@ -406,14 +406,14 @@ declare namespace WbRules {
         ? __ValueControlTypeExtension
         : TControl extends 'range'
           ? __RangeControlTypeExtension
-          : {}
+          : {};
 
   type __MappedControlTypes<
     K extends keyof TypeMappings = keyof TypeMappings
   >
     = K extends infer TControl
       ? BaseControlType<TControl, TypeMappings[K]> & ControlTypeExtension<TControl>
-      : never
+      : never;
 
   /**
    * Параметры контрола.
@@ -425,20 +425,20 @@ declare namespace WbRules {
      * Заголовок, публикуемый в MQTT-топике (meta/title)
      *
      **/
-    title?: Title
+    title?: Title;
 
     /**
      * Когда задано истинное значение, при запуске контроллера параметр всегда устанавливается в значение по умолчанию.
      * Иначе он будет установлен в последнее сохранённое значение.
      *
      **/
-    forceDefault?: boolean
+    forceDefault?: boolean;
 
     /**
      * Когда задано истинное значение, параметр становится доступным только для чтения.
      *
      **/
-    readonly?: boolean
+    readonly?: boolean;
 
     /**
      * Когда задано истинное значение, при описании контрола в коде фактическое создание его в MQTT происходить
@@ -449,14 +449,14 @@ declare namespace WbRules {
      * dev[deviceID][controlID] = "string"
      * ```
      **/
-    lazyInit?: boolean
+    lazyInit?: boolean;
 
     /**
      * Порядок следования полей.
      *
      **/
-    order?: number
-  }>
+    order?: number;
+  }>;
 
   /**
    * Опции контрола типа `text`.
@@ -464,7 +464,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type TextControlOptions = Extract<ControlOptions, { type: 'text' }>
+  type TextControlOptions = Extract<ControlOptions, { type: 'text' }>;
 
   /**
    * Опции контрола типа `value`.
@@ -472,7 +472,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type ValueControlOptions = Extract<ControlOptions, { type: 'value' }>
+  type ValueControlOptions = Extract<ControlOptions, { type: 'value' }>;
 
   /**
    * Опции контрола типа `range`.
@@ -480,7 +480,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type RangeControlOptions = Extract<ControlOptions, { type: 'range' }>
+  type RangeControlOptions = Extract<ControlOptions, { type: 'range' }>;
 
   /**
    * Опции контрола типа `switch`.
@@ -488,7 +488,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type SwitchControlOptions = Extract<ControlOptions, { type: 'switch' }>
+  type SwitchControlOptions = Extract<ControlOptions, { type: 'switch' }>;
 
   /**
    * Опции контрола типа `pushbutton`.
@@ -496,7 +496,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type PushButtonControlOptions = Extract<ControlOptions, { type: 'pushbutton' }>
+  type PushButtonControlOptions = Extract<ControlOptions, { type: 'pushbutton' }>;
 
   /**
    * Опции контрола типа `rgb`.
@@ -504,7 +504,7 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type RgbControlOptions = Extract<ControlOptions, { type: 'rgb' }>
+  type RgbControlOptions = Extract<ControlOptions, { type: 'rgb' }>;
 
   /**
    * Опции контрола типа `alarm`.
@@ -512,27 +512,27 @@ declare namespace WbRules {
    * @since 0.3.2
    *
    **/
-  type AlarmControlOptions = Extract<ControlOptions, { type: 'alarm' }>
+  type AlarmControlOptions = Extract<ControlOptions, { type: 'alarm' }>;
 
   /**
    * Интерфейс устройства
    */
   interface Device {
-    getId(): string
+    getId(): string;
 
-    getCellId(cellName: string): string
+    getCellId(cellName: string): string;
 
-    addControl(cellName: string, description: ControlOptions): void
+    addControl(cellName: string, description: ControlOptions): void;
 
-    removeControl(cellName: string): void
+    removeControl(cellName: string): void;
 
-    getControl(cellName: string): Control
+    getControl(cellName: string): Control;
 
-    isControlExists(cellName: string): boolean
+    isControlExists(cellName: string): boolean;
 
-    controlsList(): Control[]
+    controlsList(): Control[];
 
-    isVirtual(): boolean
+    isVirtual(): boolean;
 
     /**
      * Позволяет указать на наличие ошибки уровня устройства.
@@ -541,21 +541,21 @@ declare namespace WbRules {
      * @param message Текст ошибки.
      *
      **/
-    setError(message: string): void
+    setError(message: string): void;
 
     /**
      * Возвращает текст ошибки,
      * а при её отсутствии - пустую строку.
      *
      **/
-    getError(): string
+    getError(): string;
   }
 
-  type ControlOptionsTree = Record<string, ControlOptions>
+  type ControlOptionsTree = Record<string, ControlOptions>;
 
   interface DeviceOptions {
-    title: Title
-    cells: ControlOptionsTree
+    title: Title;
+    cells: ControlOptionsTree;
   }
 
   /**
@@ -569,7 +569,7 @@ declare namespace WbRules {
     exitCode: number,
     capturedOutput?: string,
     capturedErrorOutput?: string
-  ) => void
+  ) => void;
 
   interface SpawnOptions {
 
@@ -577,34 +577,34 @@ declare namespace WbRules {
      * Если true, захватить stdout процесса и передать его в виде строки в {@link exitCallback}
      *
      **/
-    captureOutput?: boolean
+    captureOutput?: boolean;
 
     /**
      * Если true, захватить stderr процесса и передать его в виде строки в {@link exitCallback}.
      * Если данный параметр не задан, то stderr дочернего процесса направляется в stderr процесса wb-rules
      *
      **/
-    captureErrorOutput?: boolean
+    captureErrorOutput?: boolean;
 
     /**
      * Строка, которую следует использовать в качестве содержимого stdin процесса.
      *
      **/
-    input?: string
+    input?: string;
 
     /**
      * Функция, вызываемая при завершении процесса.
      *
      **/
-    exitCallback?: ExitCallback
+    exitCallback?: ExitCallback;
   }
 
   interface ReadConfigOptions {
-    logErrorOnNoFile: boolean
+    logErrorOnNoFile: boolean;
   }
 
   interface StorageOptions {
-    global: boolean
+    global: boolean;
   }
 
   interface Notify {
@@ -616,7 +616,7 @@ declare namespace WbRules {
      * @param text Текст письма.
      *
      **/
-    sendEmail(to: string, subject: string, text: string): void
+    sendEmail(to: string, subject: string, text: string): void;
 
     /**
      * Отправляет SMS на указанный номер
@@ -627,7 +627,7 @@ declare namespace WbRules {
      * @param command Используя команду.
      *
      **/
-    sendSMS(to: string, text: string, command?: string): void
+    sendSMS(to: string, text: string, command?: string): void;
 
     /**
      * Отправляет сообщение в указанный чат или канал Telegram.
@@ -639,14 +639,14 @@ declare namespace WbRules {
      * @since 0.3.2
      *
      **/
-    sendTelegramMessage(token: string, chatId: string, text: string): void
+    sendTelegramMessage(token: string, chatId: string, text: string): void;
   }
 }
 
 declare namespace NodeJS {
   interface Module {
     /** Хранит данные, общие для всех экземпляров данного модуля. */
-    static: WbRules.ModuleStatic
+    static: WbRules.ModuleStatic;
   }
 }
 
@@ -655,10 +655,10 @@ declare namespace NodeJS {
  * Пример строки: `/etc/wb-rules/my-script.js`
  *
  **/
-declare var __filename: string
+declare var __filename: string;
 
 /** Используется для вывода сообщений в журнал контроллера и отладочную консоль. */
-declare var log: WbRules.Log
+declare var log: WbRules.Log;
 
 /**
  * Используется для вывода отладочных сообщений в журнал контроллера и отладочную консоль.
@@ -666,13 +666,13 @@ declare var log: WbRules.Log
  * @since 0.3.2
  *
  **/
-declare var debug: WbRules.Debug
+declare var debug: WbRules.Debug;
 
 /** Объект доступа к MQTT-топикам устройства. */
-declare var dev: WbRules.Dev
+declare var dev: WbRules.Dev;
 
 /** Объект доступа к именованным таймера. */
-declare var timers: WbRules.TimerCollection
+declare var timers: WbRules.TimerCollection;
 
 /**
  * Используется для ввода спецификации cron-правила.
@@ -689,7 +689,7 @@ declare var timers: WbRules.TimerCollection
  * })
  * ```
  **/
-declare function cron(spec: string): WbRules.CronEntry
+declare function cron(spec: string): WbRules.CronEntry;
 
 /**
  * Создаёт правило обработки.
@@ -697,14 +697,14 @@ declare function cron(spec: string): WbRules.CronEntry
  * @param options Конфигурация правила.
  *
  **/
-declare function defineRule(name: string, options: WbRules.RuleOptions): WbRules.RuleHandle
+declare function defineRule(name: string, options: WbRules.RuleOptions): WbRules.RuleHandle;
 
 /**
  * Создаёт анонимное правило обработки.
  * @param options Конфигурация правила.
  *
  **/
-declare function defineRule(options: WbRules.RuleOptions): WbRules.RuleHandle
+declare function defineRule(options: WbRules.RuleOptions): WbRules.RuleHandle;
 
 /**
  * Отключает правило. Оно перестаёт реагировать на события.
@@ -720,7 +720,7 @@ declare function defineRule(options: WbRules.RuleOptions): WbRules.RuleHandle
  * @since 0.4.0
  *
  **/
-declare function disableRule(rule: WbRules.RuleHandle): void
+declare function disableRule(rule: WbRules.RuleHandle): void;
 
 /**
  * Включает ранее отключённое правило.
@@ -734,7 +734,7 @@ declare function disableRule(rule: WbRules.RuleHandle): void
  * @since 0.4.0
  *
  **/
-declare function enableRule(rule: WbRules.RuleHandle): void
+declare function enableRule(rule: WbRules.RuleHandle): void;
 
 /**
  * Запускает правило по его дескриптору.
@@ -753,7 +753,7 @@ declare function enableRule(rule: WbRules.RuleHandle): void
  * @since 0.4.0
  *
  **/
-declare function runRule(rule: WbRules.RuleHandle): void
+declare function runRule(rule: WbRules.RuleHandle): void;
 
 /**
  * Создаёт виртуальное устройство.
@@ -764,21 +764,21 @@ declare function runRule(rule: WbRules.RuleHandle): void
 declare function defineVirtualDevice(
   deviceId: string,
   options: WbRules.DeviceOptions
-): WbRules.Device
+): WbRules.Device;
 
 /**
  * Позволяет получить объект для работы с указанным устройством.
  * @param deviceId Идентификатор устройства.
  *
  **/
-declare function getDevice(deviceId: string): WbRules.Device | undefined
+declare function getDevice(deviceId: string): WbRules.Device | undefined;
 
 /**
  * Позволяет получить объект для работы с указанным контролом устройства.
  * @param controlPath Строка в формате "deviceId/controlId"
  *
  **/
-declare function getControl(controlPath: string): WbRules.Control | undefined
+declare function getControl(controlPath: string): WbRules.Control | undefined;
 
 /**
  * Запускает периодический таймер с указанным интервалом.
@@ -788,7 +788,7 @@ declare function getControl(controlPath: string): WbRules.Control | undefined
  * @param delay Интервал срабатывания, в миллисекундах
  *
  **/
-declare function startTicker(name: string, interval: number): void
+declare function startTicker(name: string, interval: number): void;
 
 /**
  * Запускает однократный таймер с указанным именем,
@@ -821,7 +821,7 @@ declare function startTicker(name: string, interval: number): void
  *
  * ```
  */
-declare function startTimer(name: string, delay: number): void
+declare function startTimer(name: string, delay: number): void;
 
 /**
  * Запуск внешних процессов.
@@ -834,17 +834,17 @@ declare function spawn(
   cmd: string,
   args: string[],
   options: WbRules.SpawnOptions | WbRules.ExitCallback
-): void
+): void;
 
 declare function runShellCommand(
   command: string,
   options?: WbRules.SpawnOptions | WbRules.ExitCallback
-): void
+): void;
 
 declare function readConfig(
   fileName: string,
   options?: WbRules.ReadConfigOptions
-): object
+): object;
 
 /**
  *
@@ -856,7 +856,7 @@ declare function readConfig(
  * defineAlias('heaterOn', 'Relays/Relay 1')
  * ```
  */
-declare function defineAlias(alias: string, controlPath: string): void
+declare function defineAlias(alias: string, controlPath: string): void;
 
 interface String {
   /**
@@ -864,7 +864,7 @@ interface String {
    * на строковые представления своих аргументов и возвращает результирующую строку.
    * @param args
    */
-  format(...args: (string | number | boolean)[]): string
+  format(...args: (string | number | boolean)[]): string;
 
   /**
    * Осуществляет последовательную замену подстрок `{}` в указанной строке
@@ -872,7 +872,7 @@ interface String {
    *
    * @warning В отличие от {@link format}, выполняет код внутри строки! Не использовать для обработки значений, вводимых пользователем.
    */
-  xformat(...args: (string | number | boolean)[]): string
+  xformat(...args: (string | number | boolean)[]): string;
 }
 
 /**
@@ -883,7 +883,7 @@ interface String {
 declare function trackMqtt(
   topic: string,
   callback: (message: WbRules.MqttMessage) => void
-): void
+): void;
 
 /**
  * Публикация сообщений в MQTT.
@@ -899,7 +899,7 @@ declare function publish(
   value: WbRules.MqttValue,
   qos?: number,
   retain?: boolean
-): void
+): void;
 
 /**
  * Проксирует исходный объект, обеспечивая автоматическую синхронизацию
@@ -945,10 +945,10 @@ declare function publish(
  *
  * ```
  */
-declare function StorableObject<TObject>(source: TObject): TObject
+declare function StorableObject<TObject>(source: TObject): TObject;
 
 declare class PersistentStorage {
-  constructor(name: string, options: WbRules.StorageOptions)
+  constructor(name: string, options: WbRules.StorageOptions);
 }
 
 /**
@@ -956,7 +956,7 @@ declare class PersistentStorage {
  * сообщений по разным каналам коммуникации (почта, SMS, Telegram).
  *
  **/
-declare var Notify: WbRules.Notify
+declare var Notify: WbRules.Notify;
 
 /**
  * Сервис оповещений Alarms — инструмент для автоматической отправки
@@ -982,4 +982,4 @@ declare var Notify: WbRules.Notify
  * @since 0.3.3
  *
  **/
-declare var Alarms: WbRules.Alarms
+declare var Alarms: WbRules.Alarms;

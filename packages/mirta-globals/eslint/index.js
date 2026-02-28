@@ -25,4 +25,4 @@ export default {
   'PersistentStorage': 'readonly',
   'Notify': 'readonly',
   'Alarms': 'readonly',
-}
+};

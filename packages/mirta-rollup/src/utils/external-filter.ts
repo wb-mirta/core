@@ -1,6 +1,6 @@
-import nodePath from 'node:path'
-import type { ExternalOption } from 'rollup'
-import { ensureCompactArray } from '@mirta/basics/array'
+import nodePath from 'node:path';
+import type { ExternalOption } from 'rollup';
+import { ensureCompactArray } from '@mirta/basics/array';
 
 /**
  * Создаёт предикат для проверки, следует ли считать модуль внешним по набору правил.
@@ -27,7 +27,7 @@ export function createExternalFilter(cwd: string, ...externals: ExternalOption[]
       if (typeof external === 'function') {
 
         if (external(target, importer, isResolved))
-          return true
+          return true;
 
       }
       else {
@@ -36,14 +36,14 @@ export function createExternalFilter(cwd: string, ...externals: ExternalOption[]
         const isExternal = ensureCompactArray(external).some((item) => {
 
           if (item instanceof RegExp)
-            return item.test(target)
+            return item.test(target);
 
-          return item === target
+          return item === target;
 
-        })
+        });
 
         if (isExternal)
-          return true
+          return true;
 
       }
 
@@ -52,20 +52,20 @@ export function createExternalFilter(cwd: string, ...externals: ExternalOption[]
     // Шаг 3: Путь вне cwd (только для обнаруженных модулей)
     if (isResolved && cwd && nodePath.isAbsolute(target)) {
 
-      const relativePath = nodePath.relative(cwd, target)
+      const relativePath = nodePath.relative(cwd, target);
 
       // Если путь вне cwd, отмечаем его как внешний
       if (relativePath.startsWith('..') || nodePath.isAbsolute(relativePath)) {
 
-        return true
+        return true;
 
       }
 
     }
 
     // Шаг 4: По умолчанию — внутренний
-    return false
+    return false;
 
-  }
+  };
 
 }
