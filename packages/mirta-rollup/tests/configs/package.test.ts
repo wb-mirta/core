@@ -28,10 +28,6 @@ vi.mock('@rollup/plugin-replace', () => ({
   default: vi.fn(() => ({ name: 'replace' })),
 }));
 
-vi.mock('rollup-plugin-copy', () => ({
-  default: vi.fn(() => ({ name: 'copy' })),
-}));
-
 vi.mock('rollup-plugin-dts', () => ({
   default: vi.fn(() => ({ name: 'dts' })),
 }));
