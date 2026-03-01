@@ -40,7 +40,7 @@ jobs:
 
       - name: Build
         run: pnpm build
-{{#if templates.packages}}
+{{#if templates.package}}
       - name: Continuous Release
         # Prevents this step from running on pull requests.
         # Runs only when commit message starts with 'fix' or 'feat'.
@@ -51,6 +51,5 @@ jobs:
           )
         # NOTE: --compact is temporarily removed
         # because some packages in ./packages/* are not yet published to npm.
-        # It will be re-enabled once all packages are published or we add filtering.
         run: pnpx pkg-pr-new publish --pnpm './packages/*' --template './projects/*'
-{{/if templates.packages}}
+{{/if templates.package}}
