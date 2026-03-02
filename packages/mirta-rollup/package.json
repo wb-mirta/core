@@ -73,7 +73,7 @@
     "find-up": "^8.0.0"
   },
   "devDependencies": {
-    "rollup": "^4.57.1",
+    "rollup": "^4.59.0",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
