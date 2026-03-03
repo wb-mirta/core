@@ -1,11 +1,10 @@
 import { useEvent, type EventRaiser } from 'mirta';
 import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
+import { setValueSilent } from './dev';
 
 interface RunOptions {
 
   force?: boolean;
-
-  updateDev?: boolean;
 
 }
 
@@ -49,7 +48,7 @@ function createInstance(): DefineRuleSimulator {
   /** Отправляет одно или несколько сообщений */
   function run(payload: WbRules.MqttMessage | WbRules.MqttMessage[], options: RunOptions = {}): void {
 
-    const { force = false, updateDev = true } = options;
+    const { force = false } = options;
 
     payload = Array.isArray(payload) ? payload : [payload];
 
@@ -62,12 +61,8 @@ function createInstance(): DefineRuleSimulator {
 
       }
 
-      if (updateDev) {
-
-        // Устанавливаем значение во внутреннее состояние.
-        dev[item.topic] = item.value;
-
-      }
+      // Устанавливаем значение во внутреннее состояние.
+      setValueSilent(item.topic, item.value);
 
       // Инициируем событие. Ивент не проверяет изменения, он просто вызывает коллбек.
       mqttEvent.raise(item);

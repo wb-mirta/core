@@ -1,9 +1,6 @@
 import { useEvent, type EventRaiser } from 'mirta';
 import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
-
-interface PublishOptions {
-  updateDev?: boolean;
-}
+import { setValueSilent } from './dev';
 
 interface WithDevice {
   publish(controlId: string, value: WbRules.MqttValue): WithDevice;
@@ -11,8 +8,27 @@ interface WithDevice {
 
 export interface TrackMqttSimulator extends SimulatorInstance {
   /** Отправляет одно или несколько сообщений. */
-  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[], options?: PublishOptions): void;
+  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void;
   withDevice(deviceId: string): WithDevice;
+}
+
+function parseDeviceTopic(topic: string): { deviceName: string; controlName: string } | undefined {
+
+  if (!topic.startsWith('/devices/'))
+    return;
+
+  const match = /^\/devices\/([^/]+)\/controls\/([^/]+)$/.exec(topic);
+
+  if (!match)
+    return;
+
+  return {
+
+    deviceName: match[1],
+    controlName: match[2],
+
+  };
+
 }
 
 function createInstance(): TrackMqttSimulator {
@@ -36,18 +52,18 @@ function createInstance(): TrackMqttSimulator {
 
   }
 
-  function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[], options: PublishOptions = {}): void {
-
-    const { updateDev = true } = options;
+  function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void {
 
     payload = Array.isArray(payload) ? payload : [payload];
 
     payload.forEach((item) => {
 
-      if (updateDev) {
+      const parts = parseDeviceTopic(item.topic);
 
-        // Устанавливаем значение напрямую во внутреннее состояние.
-        dev[item.topic] = item.value;
+      if (parts) {
+
+        // Устанавливаем значение во внутреннее состояние.
+        setValueSilent(`${parts.deviceName}/${parts.controlName}`, item.value);
 
       }
 

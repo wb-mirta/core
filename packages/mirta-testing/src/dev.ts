@@ -19,6 +19,15 @@ class DevSetValueError extends Error {
   }
 }
 
+// Используем простой объект в качестве базового хранилища.
+let state: Record<string, WbRules.MqttValue>;
+
+export function setValueSilent(controlPath: string, value: WbRules.MqttValue) {
+
+  state[controlPath] = value;
+
+}
+
 /**
  * Создаёт прокси для объекта `dev`, который автоматически реагирует
  * на изменения значений, запуская соответствующие симуляторы.
@@ -26,9 +35,6 @@ class DevSetValueError extends Error {
  * @param options Объект с зависимостями симуляторов.
  */
 export function createDev({ trackMqtt, defineRule }: DevOptions): SimulatorInstance {
-
-  // Используем простой объект в качестве базового хранилища.
-  let state: Record<string, WbRules.MqttValue>;
 
   const handler: ProxyHandler<Record<string, WbRules.MqttValue>> = {
 
@@ -56,8 +62,6 @@ export function createDev({ trackMqtt, defineRule }: DevOptions): SimulatorInsta
       trackMqtt.publish({
         topic: `/devices/${deviceName}/controls/${controlName}`,
         value,
-      }, {
-        updateDev: false,
       });
 
       // Отправляем только изменённое значение.
@@ -66,7 +70,6 @@ export function createDev({ trackMqtt, defineRule }: DevOptions): SimulatorInsta
           topic: prop,
           value,
         }, {
-          updateDev: false,
           force: true,
         });
 
