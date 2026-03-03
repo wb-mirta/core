@@ -1,5 +1,6 @@
 import { useEvent, type EventRaiser } from 'mirta';
 import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
+import { setValueSilent } from './dev';
 
 interface WithDevice {
   publish(controlId: string, value: WbRules.MqttValue): WithDevice;
@@ -9,6 +10,25 @@ export interface TrackMqttSimulator extends SimulatorInstance {
   /** Отправляет одно или несколько сообщений. */
   publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void;
   withDevice(deviceId: string): WithDevice;
+}
+
+function parseDeviceTopic(topic: string): { deviceName: string; controlName: string } | undefined {
+
+  if (!topic.startsWith('/devices/'))
+    return;
+
+  const match = /^\/devices\/([^/]+)\/controls\/([^/]+)$/.exec(topic);
+
+  if (!match)
+    return;
+
+  return {
+
+    deviceName: match[1],
+    controlName: match[2],
+
+  };
+
 }
 
 function createInstance(): TrackMqttSimulator {
@@ -34,14 +54,23 @@ function createInstance(): TrackMqttSimulator {
 
   function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void {
 
-    if (!Array.isArray(payload))
-      mqttEvent.raise(payload);
-    else
-      payload.forEach((item) => {
+    payload = Array.isArray(payload) ? payload : [payload];
 
-        mqttEvent.raise(item);
+    payload.forEach((item) => {
 
-      });
+      const parts = parseDeviceTopic(item.topic);
+
+      if (parts) {
+
+        // Устанавливаем значение во внутреннее состояние.
+        setValueSilent(`${parts.deviceName}/${parts.controlName}`, item.value);
+
+      }
+
+      // Инициируем событие. Ивент не проверяет изменения, он просто вызывает коллбек.
+      mqttEvent.raise(item);
+
+    });
 
   }
 
@@ -50,7 +79,8 @@ function createInstance(): TrackMqttSimulator {
     return {
       publish(controlId: string, value: WbRules.MqttValue) {
 
-        mqttEvent.raise({
+        // Устанавливаем значение через publish, чтобы не дублировать логику.
+        publish({
           topic: `/devices/${deviceId}/controls/${controlId}`,
           value,
         });

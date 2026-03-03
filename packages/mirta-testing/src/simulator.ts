@@ -1,9 +1,10 @@
-import { useDefineRule, type DefineRuleSimulator, type DefineRuleOptions } from './define-rule';
+import { useDefineRule, type DefineRuleSimulator } from './define-rule';
 import { useTrackMqtt, type TrackMqttSimulator } from './track-mqtt';
 import { useGetDevice, type GetDeviceSimulator } from './get-device';
 import { useGetControl, type GetControlSimulator } from './get-control';
 import { defineZigbeeDevice, type ZigbeeDevice } from './define-device';
 import { type SimulatorInstance } from './types';
+import { useDev } from './dev';
 
 interface CoreSimulator extends SimulatorInstance {
   get getDevice(): GetDeviceSimulator;
@@ -13,12 +14,7 @@ interface CoreSimulator extends SimulatorInstance {
   defineZigbeeDevice(deviceId: string): ZigbeeDevice;
 }
 
-interface CoreSimulatorOptions {
-  /** Параметры имитатора `defineRule`. */
-  defineRule?: DefineRuleOptions;
-}
-
-function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
+function createSimulator(): CoreSimulator {
 
   const simulators: Record<string, SimulatorInstance | undefined> = {};
 
@@ -38,12 +34,16 @@ function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
   ) as GetControlSimulator;
 
   const defineRule = (
-    simulators.defineRule ??= useDefineRule(options.defineRule)
+    simulators.defineRule ??= useDefineRule()
   ) as DefineRuleSimulator;
 
   const trackMqtt = (
     simulators.trackMqtt ??= useTrackMqtt()
   ) as TrackMqttSimulator;
+
+  // Создаем и устанавливаем прокси на dev, передавая ему зависимости.
+  // Это должно быть сделано ПОСЛЕ инициализации defineRule и trackMqtt.
+  simulators.dev ??= useDev({ defineRule, trackMqtt });
 
   return {
     reset,
@@ -59,8 +59,8 @@ function createSimulator(options: CoreSimulatorOptions): CoreSimulator {
 let instance: CoreSimulator | undefined;
 
 /** Единая точка входа для настройки симуляции. */
-export function useSimulator(options: CoreSimulatorOptions = {}) {
+export function useSimulator() {
 
-  return instance ??= createSimulator(options);
+  return instance ??= createSimulator();
 
 }

@@ -14,6 +14,9 @@
     "README.md"
   ],
   "types": "./dist/index.d.mts",
+  "imports": {
+    "#*": "./src/*.js"
+  },
   "exports": {
     ".": {
       "import": {
