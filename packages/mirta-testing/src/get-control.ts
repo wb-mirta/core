@@ -1,3 +1,4 @@
+import { isObject } from 'mirta';
 import { type SimulatorInstance } from './types';
 import { mock } from 'vitest-mock-extended';
 
@@ -13,16 +14,15 @@ export interface GetControlSimulator extends SimulatorInstance {
 
 function createInstance(): GetControlSimulator {
 
-  let values: Record<string, WbRules.MqttValue> = {};
-
   function reset() {
 
-    values = {};
-
-    global.getControl = (devicePath: string) => {
+    global.getControl = (controlPath: string) => {
 
       return mock<WbRules.Control>({
-        getValue: () => values[devicePath],
+        getValue: () => dev[controlPath] as WbRules.MqttValue,
+        setValue: rawValue => dev[controlPath] = isObject(rawValue)
+          ? rawValue.value
+          : rawValue,
       });
 
     };
@@ -31,7 +31,7 @@ function createInstance(): GetControlSimulator {
 
   function defineValue(deviceId: string, controlId: string, value: WbRules.MqttValue) {
 
-    values[`${deviceId}/${controlId}`] = value;
+    dev[`${deviceId}/${controlId}`] = value;
 
   }
 
@@ -39,7 +39,7 @@ function createInstance(): GetControlSimulator {
 
     presets.forEach((preset) => {
 
-      values[`${preset.deviceId}/${preset.controlId}`] = preset.value;
+      dev[`${preset.deviceId}/${preset.controlId}`] = preset.value;
 
     });
 

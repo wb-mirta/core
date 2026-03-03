@@ -1,13 +1,17 @@
 import { useEvent, type EventRaiser } from 'mirta';
 import { type MqttMessageEventHandler, type SimulatorInstance } from './types';
 
+interface PublishOptions {
+  updateDev?: boolean;
+}
+
 interface WithDevice {
   publish(controlId: string, value: WbRules.MqttValue): WithDevice;
 }
 
 export interface TrackMqttSimulator extends SimulatorInstance {
   /** Отправляет одно или несколько сообщений. */
-  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void;
+  publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[], options?: PublishOptions): void;
   withDevice(deviceId: string): WithDevice;
 }
 
@@ -32,16 +36,25 @@ function createInstance(): TrackMqttSimulator {
 
   }
 
-  function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[]): void {
+  function publish(payload: WbRules.MqttMessage | WbRules.MqttMessage[], options: PublishOptions = {}): void {
 
-    if (!Array.isArray(payload))
-      mqttEvent.raise(payload);
-    else
-      payload.forEach((item) => {
+    const { updateDev = true } = options;
 
-        mqttEvent.raise(item);
+    payload = Array.isArray(payload) ? payload : [payload];
 
-      });
+    payload.forEach((item) => {
+
+      if (updateDev) {
+
+        // Устанавливаем значение напрямую во внутреннее состояние.
+        dev[item.topic] = item.value;
+
+      }
+
+      // Инициируем событие. Ивент не проверяет изменения, он просто вызывает коллбек.
+      mqttEvent.raise(item);
+
+    });
 
   }
 
@@ -50,7 +63,8 @@ function createInstance(): TrackMqttSimulator {
     return {
       publish(controlId: string, value: WbRules.MqttValue) {
 
-        mqttEvent.raise({
+        // Устанавливаем значение через publish, чтобы не дублировать логику.
+        publish({
           topic: `/devices/${deviceId}/controls/${controlId}`,
           value,
         });
