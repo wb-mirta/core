@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "@mirta/chatbot": "~0.4.12"
+    "@mirta/chatbot": "~0.5.0"
   }
 }

@@ -1,3 +1,24 @@
+# [0.5.0](https://github.com/wb-mirta/core/compare/v0.4.12...v0.5.0) (2026-03-03)
+
+
+### Bug Fixes
+
+* **create-mirta:** condition for package projects ([#233](https://github.com/wb-mirta/core/issues/233)) ([3a6a5de](https://github.com/wb-mirta/core/commit/3a6a5de8bff8a8fd1275178ecb5d7509e9b32a64))
+
+
+### Features
+
+* **create-mirta:** add release workflow ([#231](https://github.com/wb-mirta/core/issues/231)) ([8d3c749](https://github.com/wb-mirta/core/commit/8d3c749dfc89e62fb29d60ce611f955dea98b04d))
+* **mirta-rollup:** use minimal string escaping ([#225](https://github.com/wb-mirta/core/issues/225)) ([5a2f8f4](https://github.com/wb-mirta/core/commit/5a2f8f42c217cb52f4bb2b90586f006310472371))
+* **mirta-testing:** add dev state to simulator ([#237](https://github.com/wb-mirta/core/issues/237)) ([61d0dc0](https://github.com/wb-mirta/core/commit/61d0dc064548d1a31850d8624d42eb2292f138d2))
+
+
+### BREAKING CHANGES
+
+* **mirta-testing:** Упрощены публичные сигнатуры инициализации симулятора и правил (без опций). Единое хранилище dev для всех значений и синхронизация состояния.
+
+
+
 ## [0.4.12](https://github.com/wb-mirta/core/compare/v0.4.11...v0.4.12) (2026-02-21)
 
 
