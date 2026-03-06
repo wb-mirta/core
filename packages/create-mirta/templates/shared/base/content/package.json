@@ -9,7 +9,7 @@
     "@mirta/globals": "0.5.0",
     "@mirta/rollup": "0.5.0",
     "@mirta/tsconfig": "0.5.0",
-    "@types/node": "^24.10.10",
+    "@types/node": "^24.11.0",
     "cross-env": "^10.1.0",
     "rollup": "^4.59.0",
     "tslib": "^2.8.1",
