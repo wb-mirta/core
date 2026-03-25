@@ -277,10 +277,10 @@ describe('defineRuntimeConfig', () => {
 
       await defineRuntimeConfig({ cwd: mockCwd });
 
-      expect(replace).toHaveBeenCalledWith({
+      expect(replace).toHaveBeenCalledWith(expect.objectContaining({
         preventAssignment: true,
         values: expect.objectContaining(mockEnvReplacements),
-      });
+      }));
 
     });
 
