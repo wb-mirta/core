@@ -1,7 +1,7 @@
 {
   "name": "@mirta/staged-args",
   "description": "⚡ Staged CLI arguments parser with TypeScript support",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "Unlicense",
   "keywords": [
     "cli",

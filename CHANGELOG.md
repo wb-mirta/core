@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/wb-mirta/core/compare/v0.5.0...v0.5.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* **mirta-rollup:** always replace NODE_ENV in es5 ([#244](https://github.com/wb-mirta/core/issues/244)) ([c860a65](https://github.com/wb-mirta/core/commit/c860a65dfc3da07e9123cefc7cf05234210097f8))
+
+
+
 # [0.5.0](https://github.com/wb-mirta/core/compare/v0.4.12...v0.5.0) (2026-03-03)
 
 
