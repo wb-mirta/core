@@ -765,7 +765,7 @@ function createReplacePlugin(
   return replace({
     preventAssignment: true,
     values: replacements,
-    delimiters: ['\\b', '\\b(?![\\.\\:])'],
+    delimiters: ['\\b', '\\b(?![\'"]?[\\.\\:])'],
   });
 
 }

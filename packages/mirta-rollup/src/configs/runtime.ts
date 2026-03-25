@@ -186,12 +186,15 @@ export async function defineRuntimeConfig(
           rootDir: monorepoContext.rootDir,
         }),
 
+        'process.env.NODE_ENV': JSON.stringify(mode),
+
         // Признак сборки в режиме разработки
-        __DEV__: JSON.stringify(!isProduction),
+        '__DEV__': JSON.stringify(!isProduction),
         // Автоматически меняется в процессе тестирования
-        __TEST__: 'false',
+        '__TEST__': 'false',
 
       },
+      delimiters: ['\\b', '\\b(?![\'"]?[\\.\\:])'],
     }),
 
     // Очистка виртуальных файлов после сборки
