@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@dotenvx/dotenvx':
-        specifier: ^1.55.1
-        version: 1.55.1
+        specifier: ^1.59.1
+        version: 1.59.1
       '@eslint/js':
         specifier: ^9.39.4
         version: 9.39.4
@@ -294,8 +294,8 @@ importers:
   packages/mirta-env-loader:
     dependencies:
       '@dotenvx/dotenvx':
-        specifier: ^1.55.1
-        version: 1.55.1
+        specifier: ^1.59.1
+        version: 1.59.1
       '@mirta/basics':
         specifier: workspace:*
         version: link:../mirta-basics
@@ -320,8 +320,8 @@ importers:
         specifier: ^7.29.2
         version: 7.29.2(@babel/core@7.29.0)
       '@dotenvx/dotenvx':
-        specifier: ^1.55.1
-        version: 1.55.1
+        specifier: ^1.59.1
+        version: 1.59.1
       '@mirta/basics':
         specifier: workspace:*
         version: link:../mirta-basics
@@ -950,8 +950,8 @@ packages:
       conventional-commits-parser:
         optional: true
 
-  '@dotenvx/dotenvx@1.55.1':
-    resolution: {integrity: sha512-WEuKyoe9CA7dfcFBnNbL0ndbCNcptaEYBygfFo9X1qEG+HD7xku4CYIplw6sbAHJavesZWbVBHeRSpvri0eKqw==}
+  '@dotenvx/dotenvx@1.59.1':
+    resolution: {integrity: sha512-Qg+meC+XFxliuVSDlEPkKnaUjdaJKK6FNx/Wwl2UxhQR8pyPIuLhMavsF7ePdB9qFZUWV1jEK3ckbJir/WmF4w==}
     hasBin: true
 
   '@ecies/ciphers@0.2.4':
@@ -3514,7 +3514,7 @@ snapshots:
       conventional-commits-filter: 5.0.0
       conventional-commits-parser: 6.2.0
 
-  '@dotenvx/dotenvx@1.55.1':
+  '@dotenvx/dotenvx@1.59.1':
     dependencies:
       commander: 11.1.0
       dotenv: 17.2.3
