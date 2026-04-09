@@ -1,6 +1,6 @@
 {
   "name": "@mirta/workspace",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "sideEffects": false,
   "description": "Internal resolver for workspace and monorepo context, used by Mirta Framework",
   "keywords": [

@@ -1,3 +1,12 @@
+## [0.5.2](https://github.com/wb-mirta/core/compare/v0.5.1...v0.5.2) (2026-04-09)
+
+
+### Features
+
+* **mirta-testing:** add virtual device support ([#250](https://github.com/wb-mirta/core/issues/250)) ([658915d](https://github.com/wb-mirta/core/commit/658915d9b9f588c1bcd0a7f658d9c6fca3562688))
+
+
+
 ## [0.5.1](https://github.com/wb-mirta/core/compare/v0.5.0...v0.5.1) (2026-03-25)
 
 

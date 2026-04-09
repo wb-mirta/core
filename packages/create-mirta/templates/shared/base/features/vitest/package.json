@@ -3,7 +3,7 @@
     "test": "vitest run --config @mirta/testing/config"
   },
   "devDependencies": {
-    "@mirta/testing": "0.5.1",
+    "@mirta/testing": "0.5.2",
     "vitest": "^4.1.2",
     "vitest-mock-extended": "^3.1.0"
   }
