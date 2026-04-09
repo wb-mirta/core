@@ -17,6 +17,16 @@ export function defineZigbeeDevice(deviceId: string): ZigbeeDevice {
   const trackMqtt = useTrackMqtt();
 
   getDevice.defineDevice(deviceId, mock<WbRules.Device>({
+    getId() {
+
+      return deviceId;
+
+    },
+    getCellId(cellName) {
+
+      return `${deviceId}/${cellName}`;
+
+    },
     isVirtual() {
 
       return true;

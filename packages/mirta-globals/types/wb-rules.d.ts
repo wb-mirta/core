@@ -526,7 +526,7 @@ declare namespace WbRules {
 
     removeControl(cellName: string): void;
 
-    getControl(cellName: string): Control;
+    getControl(cellName: string): Control | undefined;
 
     isControlExists(cellName: string): boolean;
 
