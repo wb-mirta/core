@@ -23,6 +23,16 @@ export function createInstance(): SimulatorInstance {
       }
 
       const device = mock<WbRules.Device>({
+        getId() {
+
+          return deviceId;
+
+        },
+        getCellId(cellName) {
+
+          return `${deviceId}/${cellName}`;
+
+        },
         isVirtual() {
 
           return true;

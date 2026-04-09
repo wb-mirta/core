@@ -1,3 +1,4 @@
+import { setValueSilent } from '#dev';
 import { useSimulator } from '#simulator';
 
 describe('CoreSimulator', () => {
@@ -336,6 +337,8 @@ describe('CoreSimulator', () => {
       const callback = vi.fn();
       trackMqtt('/devices/device/controls/control', callback);
 
+      setValueSilent('device/control', 'initial');
+
       getControl('device/control')?.setValue('newValue');
 
       expect(callback).toHaveBeenCalledWith({
@@ -346,6 +349,8 @@ describe('CoreSimulator', () => {
     });
 
     it('setValue with an object should extract the value property', () => {
+
+      setValueSilent('device/control', 'initial');
 
       getControl('device/control')?.setValue({ value: 'extracted' });
 
@@ -429,6 +434,8 @@ describe('CoreSimulator', () => {
 
       trackMqtt('/devices/device/controls/control', mqttCallback);
       defineRule({ whenChanged: 'device/control', then: ruleCallback });
+
+      setValueSilent('device/control', 'initial');
 
       getControl('device/control')?.setValue('via-set-value');
 
