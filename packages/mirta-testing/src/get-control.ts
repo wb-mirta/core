@@ -18,6 +18,9 @@ function createInstance(): GetControlSimulator {
 
     global.getControl = (controlPath: string) => {
 
+      if (!(controlPath in dev))
+        return undefined;
+
       return mock<WbRules.Control>({
         getValue: () => dev[controlPath] as WbRules.MqttValue,
         setValue: rawValue => dev[controlPath] = isObject(rawValue)

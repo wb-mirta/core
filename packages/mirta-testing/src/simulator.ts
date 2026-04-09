@@ -5,6 +5,7 @@ import { useGetControl, type GetControlSimulator } from './get-control';
 import { defineZigbeeDevice, type ZigbeeDevice } from './define-device';
 import { type SimulatorInstance } from './types';
 import { useDev } from './dev';
+import { useDefineVirtualDevice } from '#define-virtual-device';
 
 interface CoreSimulator extends SimulatorInstance {
   get getDevice(): GetDeviceSimulator;
@@ -44,6 +45,8 @@ function createSimulator(): CoreSimulator {
   // Создаем и устанавливаем прокси на dev, передавая ему зависимости.
   // Это должно быть сделано ПОСЛЕ инициализации defineRule и trackMqtt.
   simulators.dev ??= useDev({ defineRule, trackMqtt });
+
+  simulators.defineVirtualDevice ??= useDefineVirtualDevice();
 
   return {
     reset,
