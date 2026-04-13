@@ -69,11 +69,11 @@
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.1",
     "magic-string": "^0.30.21",
-    "rollup-plugin-dts": "^6.3.0",
+    "rollup-plugin-dts": "^6.4.1",
     "find-up": "^8.0.0"
   },
   "devDependencies": {
-    "rollup": "^4.59.0",
+    "rollup": "^4.60.1",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
