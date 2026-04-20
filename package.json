@@ -55,7 +55,7 @@
     "cross-env": "^10.1.0",
     "del": "^8.0.1",
     "eslint": "^9.39.4",
-    "@vitest/eslint-plugin": "^1.6.15",
+    "@vitest/eslint-plugin": "^1.6.16",
     "eslint-plugin-workspaces": "^0.12.1",
     "find-up": "^8.0.0",
     "globals": "^17.5.0",
