@@ -40,6 +40,17 @@ export const STDIO_CAPTURE_OUTPUT: IOType[] = ['ignore', 'pipe', 'pipe'];
 export const STDIO_CAPTURE_ERRORS: IOType[] = ['ignore', 'ignore', 'pipe'];
 
 /**
+ * Режим `stdio`: поток ввода-вывода наследуется от родительского процесса.
+ *
+ * Используется, когда требуется передать данные (например, пароль или подтверждение)
+ * напрямую в дочерний процесс через стандартный ввод.
+ *
+ * @since 0.5.3
+ *
+ **/
+export const STDIO_PASSPHRASE = 'inherit';
+
+/**
  * Ошибка выполнения команды в shell.
  *
  * Возникает, когда команда завершилась с кодом, не входящим в `doneCodes` или `cancelCodes`.
