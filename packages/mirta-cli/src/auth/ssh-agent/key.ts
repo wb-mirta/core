@@ -1,7 +1,7 @@
 import type { KeyPath } from '#config/types';
 import { expandHomeDir } from '#utils/file-system';
 import { logger } from '#utils/logger';
-import { STDIO_INTERACTIVE } from '#utils/shell';
+import { STDIO_PASSPHRASE } from '#utils/shell';
 import { SSH_AUTH_SOCK } from '#auth/constants';
 import { hasEntryAsync } from './entry';
 import type { AuthContext } from '#auth/types';
@@ -94,7 +94,7 @@ export async function addKeyAsync(path: KeyPath, context: AuthContext): Promise<
       env: {
         SSH_AUTH_SOCK,
       },
-      stdio: STDIO_INTERACTIVE,
+      stdio: STDIO_PASSPHRASE,
       cancelCodes: [2, 130],
     });
 
