@@ -1,7 +1,7 @@
 {
   "name": "@mirta/i18n",
   "description": "Lightweight, type-safe i18n for Node.js with ICU-like plural support",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "sideEffects": false,
   "license": "Unlicense",
   "keywords": [

@@ -1,3 +1,12 @@
+## [0.5.3](https://github.com/wb-mirta/core/compare/v0.5.2...v0.5.3) (2026-05-08)
+
+
+### Bug Fixes
+
+* **mirta-cli:** prompt key passphrase on macos ([#261](https://github.com/wb-mirta/core/issues/261)) ([9a5e95d](https://github.com/wb-mirta/core/commit/9a5e95d7f69e720a0a987ea7a5f3dd091e69137a))
+
+
+
 ## [0.5.2](https://github.com/wb-mirta/core/compare/v0.5.1...v0.5.2) (2026-04-09)
 
 

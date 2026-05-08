@@ -1,6 +1,6 @@
 {
   "name": "@mirta/package",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "sideEffects": false,
   "description": "Internal type-safe reader & parser for package.json, used by Mirta Framework",
   "keywords": [
