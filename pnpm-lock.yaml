@@ -120,8 +120,8 @@ importers:
         specifier: ^4.1.6
         version: 4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))
       vitest-mock-extended:
-        specifier: ^3.1.1
-        version: 3.1.1(typescript@5.9.2)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2)))
+        specifier: ^4.0.0
+        version: 4.0.0(typescript@5.9.2)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2)))
 
   examples/classic/basic:
     dependencies:
@@ -398,8 +398,8 @@ importers:
         specifier: workspace:*
         version: link:../mirta
       vitest-mock-extended:
-        specifier: ^3.1.1
-        version: 3.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2)))
+        specifier: ^4.0.0
+        version: 4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2)))
     devDependencies:
       '@mirta/rollup':
         specifier: workspace:*
@@ -2756,11 +2756,11 @@ packages:
       yaml:
         optional: true
 
-  vitest-mock-extended@3.1.1:
-    resolution: {integrity: sha512-IQBKkEYB5BW4eJ+8JHZRzrLkKIJu5zkLJsU6u8vB+skSXbES+Di86nrUIbXwEQivDXcR4APMZFSvt398+iqKYA==}
+  vitest-mock-extended@4.0.0:
+    resolution: {integrity: sha512-m2FmH8JYfxzZoLsHuhXRY+Pv++a3zd91HYpSz81tpRLEHbtFkEL2QcWvJowucWuNTirzQURKfWbJJSXbYqkTsA==}
     peerDependencies:
       typescript: 3.x || 4.x || 5.x || 6.x
-      vitest: '>=3.0.0'
+      vitest: '>=4.0.0'
 
   vitest@4.1.6:
     resolution: {integrity: sha512-6lvjbS3p9b4CrdCmguzbh2/4uoXhGE2q71R4OX5sqF9R1bo9Xd6fGrMAfvp5wnCzlBnFVdCOp6onuTQVbo8iUQ==}
@@ -5227,13 +5227,13 @@ snapshots:
       fsevents: 2.3.3
       yaml: 2.8.2
 
-  vitest-mock-extended@3.1.1(typescript@5.9.2)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))):
+  vitest-mock-extended@4.0.0(typescript@5.9.2)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))):
     dependencies:
       ts-essentials: 10.1.1(typescript@5.9.2)
       typescript: 5.9.2
       vitest: 4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))
 
-  vitest-mock-extended@3.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))):
+  vitest-mock-extended@4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.2)(vite@7.1.7(@types/node@24.12.2)(yaml@2.8.2))):
     dependencies:
       ts-essentials: 10.1.1(typescript@5.9.3)
       typescript: 5.9.3

@@ -47,7 +47,7 @@
     "@mirta/env-loader": "workspace:*",
     "@mirta/workspace": "workspace:*",
     "mirta": "workspace:*",
-    "vitest-mock-extended": "^3.1.1"
+    "vitest-mock-extended": "^4.0.0"
   },
   "devDependencies": {
     "@mirta/rollup": "workspace:*"
