@@ -4,7 +4,7 @@
   },
   "devDependencies": {
     "@mirta/testing": "0.5.3",
-    "vitest": "^4.1.6",
+    "vitest": "^4.1.7",
     "vitest-mock-extended": "^4.0.0"
   }
 }
