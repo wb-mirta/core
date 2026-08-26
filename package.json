@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.66.0",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@eslint/json": "^1.2.0",
     "@mirta/cli": "workspace:*",
     "@mirta/globals": "workspace:*",
