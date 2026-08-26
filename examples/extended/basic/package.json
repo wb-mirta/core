@@ -20,7 +20,7 @@
     "mirta": "workspace:*"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@mirta/globals": "workspace:*",
     "@mirta/rollup": "workspace:*",
     "@mirta/tsconfig": "workspace:*",
