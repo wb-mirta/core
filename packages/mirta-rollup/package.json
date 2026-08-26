@@ -53,8 +53,8 @@
   },
   "dependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.2",
-    "@babel/plugin-transform-spread": "^7.28.6",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/plugin-transform-spread": "^8.0.1",
     "@dotenvx/dotenvx": "^1.66.0",
     "@mirta/basics": "workspace:*",
     "@mirta/env-loader": "workspace:*",
@@ -68,7 +68,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.1",
-    "magic-string": "^0.30.21",
+    "magic-string": "^1.2.3",
     "rollup-plugin-dts": "^6.4.1",
     "find-up": "^8.0.0"
   },
