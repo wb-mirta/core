@@ -60,8 +60,8 @@
     "@mirta/env-loader": "workspace:*",
     "@mirta/package": "workspace:*",
     "@mirta/workspace": "workspace:*",
-    "@rollup/plugin-babel": "^7.0.0",
-    "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-babel": "^7.1.0",
+    "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-multi-entry": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "^6.0.3",
@@ -69,11 +69,11 @@
     "babel-plugin-array-includes": "^2.0.3",
     "del": "^8.0.1",
     "magic-string": "^0.30.21",
-    "rollup-plugin-dts": "^6.4.1",
+    "rollup-plugin-dts": "^6.5.1",
     "find-up": "^8.0.0"
   },
   "devDependencies": {
-    "rollup": "^4.60.4",
+    "rollup": "^4.63.1",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
