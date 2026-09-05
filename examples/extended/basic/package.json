@@ -27,7 +27,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^24.12.4",
     "cross-env": "^10.1.0",
-    "eslint": "^9.39.4",
+    "eslint": "^10.10.0",
     "globals": "^17.6.0",
     "rollup": "^4.60.4",
     "typescript": "^5.8.3",
